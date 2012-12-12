@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html>
+<!--
+//Copyright (c) 2012, Priologic Software Inc.
+//All rights reserved.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright notice,
+//      this list of conditions and the following disclaimer.
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+//AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+//IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+//ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+//LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+//CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+//SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+//INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+//CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+//ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+//POSSIBILITY OF SUCH DAMAGE.
+-->
+<head>
+	<title>easyRTC Instant Messaging Demo</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="js/easyrtc.js"></script>
+	<script type="text/javascript" src="js/instant_messaging_demo.js"></script>
+</head>
+<body onload="connect()">
+
+    <p>
+    The application demonstrates text messaging using the easyRTC.sendData method.
+    It should connect to the server upon start up, and display buttons for the other
+    peers running the same application.
+    To use it, enter a message into the text box on the left side of the page.
+    Then press one of the buttons for another peer to send the message to that peer.
+    The message should appear on the text box to the right on both this page, and that of the peer.
+    </p>
+
+  <div style="width:100%;height:600px">
+	<div style="float:left;height:80%;width:45%">
+		<div style="clear:both" id="iam"></div>
+	    <div style="clear:both;height:5em">
+	       <textarea id="stuffToSend" rows="4" cols="40"></textarea><br>
+   	       <div id="otherClients"></div>
+	    </div>
+	</div>
+	<div id="conversation" style="border:solid 2px;float:left;top:0px;height:100%;width:45%;overflow-y:scroll">
+	</div>	  
+  </div>
+  <a href="http://www.easyrtc.com"><image style="float:right;bottom:0px" src="images/powered_by_easyrtc.png" alt="powered by easyrtc" /></a>
+</body>
+</html>

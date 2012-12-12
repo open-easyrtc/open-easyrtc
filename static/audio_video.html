@@ -1,0 +1,69 @@
+<!DOCTYPE HTML>
+<html>
+<!--
+//Copyright (c) 2012, Priologic Software Inc.
+//All rights reserved.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright notice,
+//      this list of conditions and the following disclaimer.
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+//AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+//IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+//ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+//LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+//CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+//SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+//INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+//CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+//ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+//POSSIBILITY OF SUCH DAMAGE.
+-->
+<head>
+	<title>easyRTC Audio-Video Chat Demo</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="js/easyrtc.js"></script>
+	<script type="text/javascript" src="js/audio_video.js"></script>
+</head>
+<body>    
+    <p>
+    The application provides an audio-video chat.
+    To use it, press the Connect button. 
+    You should see buttons representing other people using the audio-only chat page. 
+    Click one of those buttons to initiate a chat.    
+    </p>
+
+    <div>
+		<span style="clear:both">
+			<input type="checkbox" checked="true" id="shareAudio" />Share audio
+			<input type="checkbox" checked="true" id="shareVideo" />Share video
+			<button id="connectButton" onclick="connect()">Connect</button>
+		</span>
+		<div style="clear:both" id="iam"></div>
+		<div style="clear:both">
+			<div style="float:left">Connected users:</div>
+			<div style="float:left" id="otherClients"></div>
+		</div>
+		<div style="clear:both">
+			<button id="hangupButton" disabled="disabled" onclick="hangup()">Hangup</button>
+			<button id="disconnectButton" disabled="disabled" onclick="disconnect()">Disconnect</button>
+		</div>
+    </div>
+    <div id="videos"> 
+		<video style="float:left" width="400" height="300" id="selfVideo" ></video>
+		<video style="float:left" width="400" height="300" id="callerVideo" ></video>
+		<div style="display:none;z-index:2;position:absolute;padding:20px;left:20px;top:150px;border:red solid 2px;background-color:pink" id="acceptCallBox"> 
+		      <div id="acceptCallLabel"></div>
+			  <button id="callAcceptButton" >Accept</button> <button id="callRejectButton">Reject</button>
+		</div>
+    </div>
+      <a href="http://www.easyrtc.com"><image style="clear:both;float:right;bottom:0px" src="images/powered_by_easyrtc.png" alt="powered by easyrtc" /></a>
+</body>
+</html>

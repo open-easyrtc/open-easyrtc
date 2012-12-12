@@ -1,0 +1,19 @@
+.closeButton {
+    position:absolute;
+    right:2px;
+    background-color: transparent;      
+    border:none;
+    margin:0px;
+    padding:0px;
+    top:0px;
+    width:32px;
+    height:32px;
+    z-index: 2;
+}
+
+
+
+.closeButton:hover {
+   background-image: url('/images/closeButton.png');  
+}
+
