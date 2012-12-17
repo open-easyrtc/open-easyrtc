@@ -8,7 +8,7 @@ Priologic's easyRTC beta, a bundle of Open Source WebRTC joy, incorporates an ea
 
 Features
 --------
- * Install easyRTC's WebRTC Server Kit on your own Linux server in minutes not days.
+ * Install easyRTC's WebRTC Server Kit on your own Linux/Windows/Mac server in minutes not days.
  * Use our easyRTC API and sample application code to build and deploy your WebRTC app in hours not weeks.
  * easyRTC is completely free and open source under a BSD 2 license. No usage costs or other hidden fees.
 
@@ -57,13 +57,13 @@ Folder Structure
 Links for help and information
 ------------------------------
 
-* The easyRTC website is at:
+* The easyRTC website at:
   * [http://www.easyrtc.com/](http://www.easyrtc.com/)
-* Use our support forum is at:
+* Use our support forum at:
   * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
-* Bugs and requests can be filed on our github page or on the forum.
+* Bugs and requests can be filed on our github page or on the forum:
   * [https://github.com/priologic/easyrtc/issues](https://github.com/priologic/easyrtc/issues)
-* Our YouTube channel has live demo's
+* Our YouTube channel has live demo's:
   * [http://www.youtube.com/user/priologic](http://www.youtube.com/user/priologic)
 
 License
