@@ -43,7 +43,7 @@ Folder Structure
   * Contains the main file (server.js) and the configuration file (config.js)
   * Licenses and package information
 * /docs/
-  * Documentation for using the API and running the server.
+  * Documentation for using the API and running the server
 * /lib/
   * Required libraries
 * /static/
