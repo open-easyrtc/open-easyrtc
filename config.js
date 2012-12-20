@@ -24,6 +24,9 @@ config.experimentalStunServerPort1 = "3479";
 // The namespace for the default application.
 config.defaultApplicationName = "default";
 
+// Enable easyRTC demos. Viewable in /demos/
+config.enableDemos = true;
+
 // Check for updates
 config.updateCheckEnable = true;
 
@@ -34,7 +37,7 @@ config.updateCheckEnable = true;
 // The following settings work alongside the easyRTC client API.
 // DO NOT ALTER!
 // *************************************************************
-config.easyRtcVersion = "0.5.0";
+config.easyRtcVersion = "0.6.0";
 config.cmdPacketType = "easyRTCcmd";
 config.cmdMsgType = {
     list: "list",

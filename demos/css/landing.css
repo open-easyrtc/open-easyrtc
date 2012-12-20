@@ -1,0 +1,125 @@
+/*
+    General CSS for easyRTC local landing site.
+    Only general layout is here.
+    Any CSS related directly to the operation of a demo is kept in another file.
+*/
+
+body {
+    background-image:url("../images/bg_light.png");
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+#container {
+    width:960px;
+    margin-left: auto;
+    margin-right:auto;			
+
+    background-image:url("../images/bg_dark.png");
+    background-color:black;
+
+    border-color: #FF6600;
+    border-width: 1px;
+    border-style: solid;
+    border-radius:10px; 
+}
+
+#logo_easyrtc {
+    margin-top:5px;
+    margin-left:5px;
+}
+#logo_priologic {
+    margin-top:5px;
+    margin-right:5px;
+}
+
+#menu {
+    text-align: right;
+    clear: both;
+    padding-bottom: 2px;
+    padding-top: 2px;
+}
+.menu_item {
+    display: inline;
+    text-decoration: none;
+    border-color: gray;
+    border-width: 2px;
+    border-style: outset;
+    color: white;
+    padding: 0px 3px 0px 3px;
+    background-color: rgba(0,0,0,.4);
+}
+.menu_item:hover {
+    border-style:inset;
+    background-color: rgba(100,100,100,0);
+}
+.menu_link {
+    text-decoration:none;
+}
+.menu_link:focus {
+    text-decoration:underline;
+}
+
+
+
+#main {
+    background-color:white;
+    overflow:hidden;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#footer {
+    font-size: small;
+    padding: 5px;
+    color:white;
+    min-height:60px;    
+}
+#footer p {
+    margin: 0px;
+    color:white;
+    text-align:center;
+}
+#footer a {
+    color:white;
+}
+#license {
+    font-size: x-small;
+}
+#logo_priologic {
+    float:left;
+    padding-top: 10px;
+    margin-right: 10px;
+}
+#logo_pb_easyrtc {
+    float:right;
+    margin-left: 10px;
+}
+
+
+.demo_table {
+    border-collapse:collapse;
+    border:1px solid gray;
+}
+.demo_table  th{
+    padding:3px;
+    text-align:left;
+}
+.demo_table  td{
+    border-top:1px solid gray;
+    padding:3px;
+}
+.demo_table  #browser_note{
+    text-align:center;
+    font-size: smaller;
+    color: gray;
+}
+
+hr {
+    clear:both;
+}
+
+.prettyprint {
+     white-space: pre-wrap;
+     max-height:400px;
+     overflow-y:scroll;
+}

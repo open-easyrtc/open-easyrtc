@@ -34,7 +34,11 @@ var sio = require('socket.io');
 //	Set express http server options. Ensure static folder is not in the root.
 var httpApp = express();
 httpApp.configure(function() {
-  httpApp.use(express.static(__dirname + '/static/'));
+    httpApp.use(express.static(__dirname + '/static/'));
+    
+    if(easyRtcConfig.enableDemos) {
+        httpApp.use("/demos", express.static(__dirname + "/demos"));
+    }    
 });
 
 // Start HTTP and socket server

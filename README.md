@@ -8,7 +8,7 @@ Priologic's easyRTC beta, a bundle of Open Source WebRTC joy, incorporates an ea
 
 Features
 --------
- * Install easyRTC's WebRTC Server Kit on your own Linux/Windows/Mac server in minutes not days.
+ * Install easyRTC's WebRTC Server Kit on your own Linux, Windows, or Mac server in minutes not days.
  * Use our easyRTC API and sample application code to build and deploy your WebRTC app in hours not weeks.
  * easyRTC is completely free and open source under a BSD 2 license. No usage costs or other hidden fees.
 
@@ -42,24 +42,26 @@ Folder Structure
 * / (root)
   * Contains the main file (server.js) and the configuration file (config.js)
   * Licenses and package information
+* /demos/
+  * easyRTC live demos and example code
 * /docs/
   * Documentation for using the API and running the server
 * /lib/
   * Required libraries
 * /static/
-  * The easyRTC website and demo files
+  * Where you can put your own WebRTC application.
   * The easyrtc.js file is located in /static/js/
 * /node_modules/
-  * Requires node.js modules
+  * Required node.js modules
   * This folder will be created during the install
 
 
 Links for help and information
 ------------------------------
 
-* The easyRTC website at:
+* The easyRTC website is at:
   * [http://www.easyrtc.com/](http://www.easyrtc.com/)
-* Use our support forum at:
+* Use our support forum is at:
   * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
 * Bugs and requests can be filed on our github page or on the forum:
   * [https://github.com/priologic/easyrtc/issues](https://github.com/priologic/easyrtc/issues)

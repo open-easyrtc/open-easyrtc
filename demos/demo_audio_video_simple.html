@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>easyRTC Demo: Simple Audio and Video Chat</title>
+
+    <link rel="stylesheet" type="text/css" href="css/landing.css" />
+
+    <!-- Prettify Code -->
+    <script type="text/javascript" src="js/prettify/prettify.js"></script>
+    <link rel="stylesheet" type="text/css" href="js/prettify/prettify.css" />
+    
+    <!-- Assumes global locations for socket.io.js and easyrtc.js -->
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="../js/easyrtc.js"></script>
+	<script type="text/javascript" src="js/demo_audio_video_simple.js"></script>
+    
+    <!-- Styles used within the demo -->
+    <style type="text/css">
+        #demoContainer {
+            position:relative;
+        }
+        #connectControls {
+            float:left;
+            width:250px;
+            text-align:center;
+            border: 2px solid black;            
+        }
+        #otherClients {
+            height:200px;
+            overflow-y:scroll;
+        }
+        #selfVideo {
+            height:225px;
+            width:300px;
+            float:left;
+            border:1px solid gray;
+            margin-left:10px;
+        }
+        #callerVideoBox {
+            position:relative;
+        }
+        #callerVideo {
+            height:225px;
+            width:300px;
+            border:1px solid gray;
+            margin-left:10px;
+        }
+        .closeButton {
+            position:absolute;
+            right:2px;
+            background-color: transparent;      
+            background-image: url('images/button_close.png');  
+            border:none;
+            margin:0px;
+            padding:0px;
+            top:0px;
+            width:32px;
+            height:32px;
+            z-index: 2;
+            opacity:0.4;
+        }
+        .closeButton:hover {
+            cursor: pointer;
+            opacity:1;
+        }
+    </style>
+</head>
+<body onload="connect();">
+<div id="container">
+
+    <div id="header">
+        <a href="index.html"><img id="logo_easyrtc" src="images/easyrtc_logo.png" alt="easyRTC" style="" /></a>
+    </div>
+    <div id="menu"><a class="menu_link" href="index.html"><div class="menu_item">Local Demos</div></a><a class="menu_link" href="https://github.com/priologic/easyrtc/tree/master/docs"><div class="menu_item">Documentation</div></a><a class="menu_link" href="https://groups.google.com/forum/#!forum/easyrtc"><div class="menu_item">Support: Discussion Group</div></a><a class="menu_link" href="http://www.easyrtc.com/"><div class="menu_item">easyRTC.com</div></a></div>
+    <div id="main">
+ 
+<!-- Main Content -->
+    <h1>easyRTC Demo: Simple Audio and Video Chat</h1>
+
+    <p>The application provides a simple audio-video chat using the easyRTC.initManaged method.</p>
+    
+    <p>Connection is handled using an onload statement in the body. Requests are automatically accepted.<p>
+    
+    <p>To hang-up on a call, hover your mouse over the upper right of the video, and click on the 'X' which appears.</p>
+    
+    <hr />
+    <h2>The Demo</h2>
+
+    <div id="demoContainer">
+    <div id="connectControls">
+        <div id="iam">Not yet connected...</div>
+        <br />
+        <strong>Connected users:</strong>
+        <div id="otherClients"></div>
+    </div>
+    <div id="videos"> 
+        <video id="selfVideo"></video>
+        <div style="position:relative;float:left;"><video id="callerVideo"></video></div>
+        <!-- each caller video needs to be in it's own div so it's close button can be positioned correctly -->
+    </div>
+    </div>
+
+    <br style="clear:both;" />
+    <p><em>Browser Note: Until there is better interoperability among browsers, both clients may need to be using the same browser.</em></p>
+    <hr />
+    
+    <h2>The Code</h2>
+    <h3>HTML</h3>
+<pre class="prettyprint linenums:1">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+	&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+	&lt;title&gt;easyRTC Demo: Simple Audio and Video Chat&lt;/title&gt;
+
+    &lt;!-- Assumes global locations for socket.io.js and easyrtc.js --&gt;
+	&lt;script src=&quot;/socket.io/socket.io.js&quot;&gt;&lt;/script&gt;
+	&lt;script type=&quot;text/javascript&quot; src=&quot;../js/easyrtc.js&quot;&gt;&lt;/script&gt;
+	&lt;script type=&quot;text/javascript&quot; src=&quot;js/demo_audio_video_simple.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body onload=&quot;connect();&quot;&gt;
+
+    &lt;h2&gt;The Demo&lt;/h2&gt;
+
+    &lt;div id=&quot;demoContainer&quot;&gt;
+    &lt;div id=&quot;connectControls&quot;&gt;
+        &lt;div id=&quot;iam&quot;&gt;Not yet connected...&lt;/div&gt;
+        &lt;br /&gt;
+        &lt;strong&gt;Connected users:&lt;/strong&gt;
+        &lt;div id=&quot;otherClients&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div id=&quot;videos&quot;&gt; 
+        &lt;video id=&quot;selfVideo&quot;&gt;&lt;/video&gt;
+        &lt;div style=&quot;position:relative;float:left;&quot;&gt;&lt;video id=&quot;callerVideo&quot;&gt;&lt;/video&gt;&lt;/div&gt;
+        &lt;!-- each caller video needs to be in it's own div so it's close button can be positioned correctly --&gt;
+    &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Please help spread the word about easyRTC --&gt;
+    &lt;a href=&quot;http://easyrtc.com/&quot;&gt;&lt;img src=&quot;/images/powered_by_easyrtc.png&quot; height=&quot;40&quot; width=&quot;200&quot; /&gt;&lt;/a&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+    <h3>CSS</h3>
+    <p>In order to show the 'X' in the upper right corner, the callerVideo video tag must be in a div with relative positioning. Also the class of 'closeButton' should be defined as seen below. Ensure the button_close.png is available in the path.:</p>
+<pre class="prettyprint linenums:1">
+#demoContainer {
+    position:relative;
+}
+#connectControls {
+    float:left;
+    width:250px;
+    text-align:center;
+    border: 2px solid black;            
+}
+#otherClients {
+    height:200px;
+    overflow-y:scroll;
+}
+#selfVideo {
+    height:225px;
+    width:300px;
+    float:left;
+    border:1px solid gray;
+    margin-left:10px;
+}
+#callerVideoBox {
+    position:relative;
+}
+#callerVideo {
+    height:225px;
+    width:300px;
+    border:1px solid gray;
+    margin-left:10px;
+}
+.closeButton {
+    position:absolute;
+    right:2px;
+    background-color: transparent;      
+    background-image: url('images/button_close.png');  
+    border:none;
+    margin:0px;
+    padding:0px;
+    top:0px;
+    width:32px;
+    height:32px;
+    z-index: 2;
+    opacity:0.4;
+}
+.closeButton:hover {
+    cursor: pointer;
+    opacity:1;
+}
+</pre>
+
+    <h3>Javascript</h3>
+    <p>The contents of demo_audio_video_simple.js:</p>
+<pre class="prettyprint linenums:1">
+var selfEasyrtcid = &quot;&quot;;
+
+
+function connect() {
+    console.log(&quot;Initializing.&quot;);
+    easyRTC.setLoggedInListener(convertListToButtons);
+    easyRTC.initManaged(&quot;audioVideo&quot;, &quot;selfVideo&quot;, [&quot;callerVideo&quot;], loginSuccess);
+}
+
+
+function clearConnectList() {
+    otherClientDiv = document.getElementById('otherClients');
+    while (otherClientDiv.hasChildNodes()) {
+        otherClientDiv.removeChild(otherClientDiv.lastChild);
+    }
+}
+
+
+function convertListToButtons (data) {
+    clearConnectList();
+    otherClientDiv = document.getElementById('otherClients');
+    for(var i in data) {
+        var button = document.createElement('button');
+        button.onclick = function(easyrtcid) {
+            return function() {
+                performCall(easyrtcid);
+            }
+        }(i);
+
+        label = document.createTextNode(i);
+        button.appendChild(label);
+        otherClientDiv.appendChild(button);
+    }
+}
+
+
+function performCall(otherEasyrtcid) {
+    easyRTC.hangupAll();
+    var acceptedCB = function(accepted, caller) {
+        if( !accepted ) {
+            alert(&quot;Sorry, your call to &quot; + caller + &quot; was rejected&quot;);
+            enable('otherClients');
+        }
+    }
+    var successCB = function() {};
+    var failureCB = function() {};
+    easyRTC.call(otherEasyrtcid, successCB, failureCB, acceptedCB);
+}
+
+
+function loginSuccess(easyRTCId) {
+    selfEasyrtcid = easyRTCId;
+    document.getElementById(&quot;iam&quot;).innerHTML = &quot;I am &quot; + easyRTC.cleanId(easyRTCId);
+}
+
+
+function loginFailure(message) {
+    alert(&quot;failure to login&quot;);
+}
+
+
+// Sets calls so they are automatically accepted (this is default behaviour)
+easyRTC.setAcceptChecker(function(caller, cb) {
+    cb(true);
+} );
+</pre>
+    
+    
+    <!-- Runs the SyntaxHighlighter -->
+    <script type="text/javascript">prettyPrint();</script>
+
+    <!-- End Main Content -->
+    </div>
+    <div id="footer">
+    <a href="http://www.priologic.com/?from=landing"><img id="logo_priologic" src="images/priologic_logo_white.png" height="40" width="150" alt="Created By Priologic Software Inc." /></a>
+    <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="images/powered_by_easyrtc.png" height="60" width="200" alt="Powered By easyRTC" /></a>
+    <p><em>&copy; 2012 - Priologic Software Inc., All Rights Reserved.</em></p>
+    <p id="license">easyRTC source code released under a BSD2 Lcense. <a href="https://github.com/priologic/easyrtc/blob/master/LICENSE">See LICENSE file in project folder</a> for details.</p>
+    </div>
+</div>
+</body>
+</html>
