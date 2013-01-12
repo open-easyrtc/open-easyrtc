@@ -8,7 +8,7 @@ config.httpPort = 8080; // The port which the http and socket server is on.
 // External stun server (will be used if experimentalStunServerEnable is false)
 // Several public stun servers are available to be used.
 config.externalIceServers = [
-    {"url": "stun:stun.l.google.commmm:19302"}
+    {"url": "stun:stun.l.google.com:19302"}
 ];
 
 // EXPERIMENTAL STUN SERVER
