@@ -1,6 +1,6 @@
 # This file is used to restrict unnecessary files from being committed to git.
 # It the same as the recommended default, but with an addition of restricting
-# node_modules from being committed.
+# node_modules from being committed and .log files.
 
 #################
 ## Eclipse
@@ -171,3 +171,7 @@ pip-log.txt
 #########
 node_modules
 
+#########
+# easyRTC
+#########
+*.log
