@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, Priologic Software Inc.
+Copyright (c) 2013, Priologic Software Inc.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -24,172 +24,134 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-// All server configuration is done in config.js
-easyRtcConfig = require('./config');
+// Local includes
+easyRtcCfg  = require('./config');          // All server configuration (global)
+var g       = require('./lib/general');     // General helper functions
+var c       = require('./lib/connection');  // easyRTC connection functions
+
+
+// Ensure required modules are installed before beginning
+if (!g.moduleExists('express') || !g.moduleExists('socket.io') || !g.moduleExists('winston')) {
+    console.log('Error: Required modules are not installed. Run \'npm install\' from command line.');
+    process.exit(1);
+}
+
 
 // Module dependencies
-var express = require('express');
-var sio = require('socket.io');
+var fs      = require('fs');                // file system core module
+var http    = require('http');              // http server core module
+var express = require('express');           // web framework external module
+var sio     = require('socket.io');         // web socket external module
+var winston = require('winston');           // logging module
 
-//	Set express http server options. Ensure static folder is not in the root.
+
+// Logging Setup
+g.logInit();                                // Initialize logging settings
+var logServer   = winston.loggers.get('easyRtcServer');
+var logApi      = winston.loggers.get('easyRtcApi');
+var logExpress  = winston.loggers.get('express');
+var logSocketIo = winston.loggers.get('socketIo');
+
+
+//  Set express http server options.
 var httpApp = express();
 httpApp.configure(function() {
+    var logStream = {
+        write: function(message, encoding){
+            logExpress.info(message, { label: 'express'});
+        }        
+    }
+    httpApp.use(express.logger({stream: logStream}));
     httpApp.use(express.static(__dirname + '/static/'));
-    
-    if(easyRtcConfig.enableDemos) {
+
+    if(easyRtcCfg.enableDemos) {
         httpApp.use("/demos", express.static(__dirname + "/demos"));
-    }    
+    }
 });
 
-// Start HTTP and socket server
-var server = httpApp.listen(easyRtcConfig.httpPort);
-var io = sio.listen(server);
-// io.enable('browser client minification');  // send minified client
-io.enable('browser client etag');          // apply etag caching logic based on version number
-io.enable('browser client gzip');          // gzip the file
-io.set('log level', 1);                    // reduce logging
-console.log('HTTP and Socket Server started on port: ' + easyRtcConfig.httpPort);
+
+// Start either the HTTP or HTTPS web service
+logServer.info('Starting easyRTC Server (v' + easyRtcCfg.easyRtcVersion +')', { label: 'easyRtcServer'});
+if (easyRtcCfg.sslEnable) {  // Start SSL Server (https://)
+    var https = require('https');
+    var sslOptions = {
+        key:  fs.readFileSync(easyRtcCfg.sslKeyFile),
+        cert: fs.readFileSync(easyRtcCfg.sslCertFile)
+    };
+
+    var server = https.createServer(sslOptions, httpApp).listen(easyRtcCfg.sslPort);
+
+    logServer.info('HTTPS (SSL) Server started on port: ' + easyRtcCfg.sslPort, { label: 'easyRtcServer'});
+
+    // Optionally listen in on an http port and forward requests to secure port
+    if (easyRtcCfg.sslForwardFromHttp) {
+        var forwardingServer = express();
+        forwardingServer.all('*', function(req, res) {
+            return res.redirect("https://" + req.host + (easyRtcCfg.sslPort==443 ? '' :':' + easyRtcCfg.sslPort) + req.url);
+        });
+        forwardingServer.listen(easyRtcCfg.httpPort);
+    }    
+} else {    // Start HTTP server (http://)
+    var server = http.createServer(httpApp).listen(easyRtcCfg.httpPort);
+    logServer.info('HTTP Server started on port: ' + easyRtcCfg.httpPort, { label: 'easyRtcServer'});
+}
+
+
+// Start socket server
+var io = sio.listen(server, {
+        'logger': {
+            debug: function(message){ logSocketIo.debug(message, { label: 'socket.io'}); },
+            info:  function(message){ logSocketIo.info( message, { label: 'socket.io'}); },
+            warn:  function(message){ logSocketIo.warn( message, { label: 'socket.io'}); },
+            error: function(message){ logSocketIo.error(message, { label: 'socket.io'}); }
+        },
+        'browser client minification': true,
+        'browser client etag': true,
+        'browser client gzip': true
+});
+logServer.info('Socket Server started', { label: 'easyRtcServer'});
 
 
 // Start experimental STUN server (if enabled)
-if (easyRtcConfig.experimentalStunServerEnable) {
-    var stunLib = require('./lib/stunserver');
-    var stunServer = stunLib.createServer();
-    stunServer.setAddress0(easyRtcConfig.experimentalStunServerAddr0);
-    stunServer.setAddress1(easyRtcConfig.experimentalStunServerAddr1);
-    stunServer.setPort0(easyRtcConfig.experimentalStunServerPort0);
-    stunServer.setPort1(easyRtcConfig.experimentalStunServerPort1);
-    stunServer.listen();
+if (easyRtcCfg.experimentalStunServerEnable) {
+    g.experimentalStunServer();
 }
 
+
 // Shared variable to hold server and socket information.
-var easyRtc = {
-	serverStartTime: Date.now(),
-	connections: {}
+easyRtc = {
+    serverStartTime: Date.now(),
+    connections: {}
 };
+
 
 // Upon a socket connection, a socket is created for the life of the connection
 io.sockets.on('connection', function (socket) {
-    // console.log('easyRTC: User: ' + socket.id + ' Application: ' + easyRtcConfig.defaultApplicationName);
-	var connectionEasyRtcId = socket.id;
-	easyRtc.connections[connectionEasyRtcId]={
-		easyrtcid: connectionEasyRtcId,
-        applicationName: easyRtcConfig.defaultApplicationName,
-		clientConnectTime: Date.now()
-	};
+    logServer.debug('easyRTC: Socket [' + socket.id + '] connected with application: [' + easyRtcCfg.defaultApplicationName + ']', { label: 'easyRtc', easyRtcId:connectionEasyRtcId, applicationName:easyRtcCfg.defaultApplicationName});
+    var connectionEasyRtcId = socket.id;
+    c.onSocketConnection(io, socket, connectionEasyRtcId);
 
-	// Immediatly send the easyrtcid and application
-	socket.json.emit( easyRtcConfig.cmdPacketType, {
-		msgType:easyRtcConfig.cmdMsgType.token,
-		easyrtcid: connectionEasyRtcId,
-        applicationName: easyRtc.connections[connectionEasyRtcId].applicationName,
-		iceConfig: {"iceServers": easyRtcConfig.iceServers},
-		serverTime: Date.now()
-	});
-
-	// Send the connection list to current connection, then broadcast to all others
-    broadcastList(easyRtc.connections[connectionEasyRtcId].applicationName);
-    
-	// console.log('easyRTC: Socket connected: ' + socket.id);
-	
     // Incoming messages: Custom message. Allows applications to send socket messages to other connected users.
-	socket.on('message', function(msg) {
-		// Messages must have a targetId and a msgType. This section should be hardened.
-		if (msg.targetId) {
-			// console.log('easyRTC: Custom Message: ' + msg.msgData);
-			io.sockets.socket(msg.targetId).json.send({
-				msgType:msg.msgType,
-				senderId:connectionEasyRtcId,
-				msgData:msg.msgData,
-				serverTime: Date.now()
-			});
-		}
-	});
+    socket.on('message', function(msg) {
+        logServer.debug('easyRTC: Socket [' + socket.id + '] message received', { label: 'easyRtc', easyRtcId:connectionEasyRtcId, applicationName: easyRtc.connections[connectionEasyRtcId].applicationName, data:msg});
+        c.onSocketMessage(io, socket, connectionEasyRtcId, msg);
+    });
 
-	// Incoming Messages: easyRTC commands. Used to forward webRTC negotiation details and manage server settings.
-	socket.on('easyRTCcmd', function(msg) {
-		// Messages with a targetId get forwarded on. This section should be hardened.
-		if (msg.targetId) {
-			// console.log('easyRTC: Command: ' + msg.msgType + ' To: ' + msg.targetId + ' From: ' + connectionEasyRtcId);
-			io.sockets.socket(msg.targetId).json.emit('easyRTCcmd',{
-				msgType:msg.msgType,
-				senderId:connectionEasyRtcId,
-				msgData:msg.msgData,
-				serverTime: Date.now()
-			});
-		}
-        // easyRtc server-side user configuration options are set here.
-		if (msg.msgType == "setUserCfg") {
-			// console.log('easyRTC: Command: ' + msg.msgType + ' From: ' + connectionEasyRtcId);
-
-            if (msg.msgData.applicationName) {  // Set the application namespace
-                easyRtc.connections[connectionEasyRtcId].applicationName = msg.msgData.applicationName;
-                // console.log('easyRTC: Application Name Change: ' + connectionEasyRtcId + ' : ' + msg.msgData.applicationName);
-                broadcastList(easyRtc.connections[connectionEasyRtcId].applicationName);
-            }
-		}
+    // Incoming easyRTC commands: Used to forward webRTC negotiation details and manage server settings.
+    socket.on('easyRTCcmd', function(msg) {
+        logServer.debug('easyRTC: Socket [' + socket.id + '] command received', { label: 'easyRtc', easyRtcId:connectionEasyRtcId, data:msg});
+        c.onEasyRtcCmd(io, socket, connectionEasyRtcId, msg);
     });
     
-	// Upon a socket disconnecting (either directed or via time-out)
-	socket.on('disconnect', function(data) {
-		// console.log('easyRTC: Socket disconnected: ' + connectionEasyRtcId);
-
-        var previousApplicationName = easyRtc.connections[connectionEasyRtcId].applicationName;
-
-		// Remove connection from the map
-		delete easyRtc.connections[connectionEasyRtcId];
-
-		// Broadcast new list to all others
-        broadcastList(previousApplicationName);
-	});
-
-    // Send a list of all connected clients to a specific user
-    // This function is due for a major overhaul to improve its usefullness.
-    function sendList(easyRtcId) {
-        io.sockets.socket(easyRtcId).json.emit('easyRTCcmd',{
-            msgType:easyRtcConfig.cmdMsgType.list,
-            msgData:easyRtc,
-            serverTime: Date.now()
-        });
-    };
-    
-    // Broadcast a list of all connected clients to all connected users (except current client).
-    // This function is due for a major overhaul to improve its usefullness.
-    function broadcastList(applicationName) {
-        var listData = {
-            serverStartTime: easyRtc.serverStartTime,
-            connections: {}
-        };
-
-        // Form list of current connections
-        for (var key in easyRtc.connections) {
-            if (easyRtc.connections.hasOwnProperty(key) && easyRtc.connections[key].applicationName == applicationName) {
-                listData.connections[key] = easyRtc.connections[key];
-            }
-        };
-        
-        // Broadcast list of current connections
-        for (var key in listData.connections) {
-            io.sockets.socket(key).json.emit('easyRTCcmd',{
-                msgType:easyRtcConfig.cmdMsgType.list,
-                msgData:listData,
-                serverTime: Date.now()
-            });
-        };
-        
-    };
-    
+    // Upon a socket disconnecting (either directed or via time-out)
+    socket.on('disconnect', function(data) {
+        logServer.debug('easyRTC: Socket [' + socket.id + '] disconnected', { label: 'easyRtc', easyRtcId:connectionEasyRtcId});
+        c.onSocketDisconnect(io, socket, connectionEasyRtcId);
+    });
 });
 
+
 // Checks to see if there is a newer version of easyRTC available
-if (easyRtcConfig.updateCheckEnable) {
-    http = require('http');
-    http.get("http://easyrtc.com/version/?app=easyrtc&ver=" + easyRtcConfig.easyRtcVersion + "&platform=" + process.platform, function(res) {
-        if (res.statusCode == 200)
-            res.on('data', function(latestVersion) {
-                latestVersion = (latestVersion+"").replace(/[^0-9a-z.]/g,"");
-                if (latestVersion != easyRtcConfig.easyRtcVersion)
-                    console.log("Note: New version of easyRTC is available (" + latestVersion + "). Visit http://easyrtc.com/");
-            });
-    }).on('error', function(e){});
+if (easyRtcCfg.updateCheckEnable) {
+    g.updateCheck(http);
 }

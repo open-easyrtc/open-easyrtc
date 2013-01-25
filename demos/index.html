@@ -43,8 +43,8 @@
     <td><img alt="Pass" height="32" width="32" src="images/br_status_pass.png" /></td>
     <td><img alt="Pass" height="32" width="32" src="images/br_status_pass.png" /></td>
     <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
-    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set" /></td>
-    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set" /></td>
+    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set in about:config. Only does video." /></td>
+    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set in about:config. Only does video." /></td>
     <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
     <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
 </tr>
@@ -52,9 +52,9 @@
     <td><a href="demo_video_only.html">Video Only Demo</a></td>
     <td><img alt="Pass" height="32" width="32" src="images/br_status_pass.png" /></td>
     <td><img alt="Pass" height="32" width="32" src="images/br_status_pass.png" /></td>
-    <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
-    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set" /></td>
-    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set" /></td>
+    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set in about:config. Media source can not be shared between tabs." /></td>
+    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set in about:config. Only does video." /></td>
+    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set in about:config. Only does video." /></td>
     <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
     <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
 </tr>
@@ -63,8 +63,8 @@
     <td><img alt="Pass" height="32" width="32" src="images/br_status_pass.png" /></td>
     <td><img alt="Pass" height="32" width="32" src="images/br_status_pass.png" /></td>
     <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
-    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set" /></td>
-    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set" /></td>
+    <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
+    <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
     <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
     <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
 </tr>
@@ -73,23 +73,55 @@
     <td><img alt="Pass" height="32" width="32" src="images/br_status_pass.png" /></td>
     <td><img alt="Pass" height="32" width="32" src="images/br_status_pass.png" /></td>
     <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
-    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set" /></td>
-    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set" /></td>
+    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set in about:config. Only does video." /></td>
+    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set in about:config. Only does video." /></td>
     <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
     <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
 </tr>
 <tr>
-    <td colspan="8" id="browser_note"><em>Note: Browser compatability subject to change.</em></td>
+    <td><a href="demo_data_channel_messaging.html">Data Channel Messaging Demo</a></td>
+    <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
+    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires RTCDataChannel flag to be set in chrome://flags" /></td>
+    <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
+    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set in about:config" /></td>
+    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set in about:config" /></td>
+    <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
+    <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
+</tr>
+
+<tr>
+    <td><a href="demo_data_channel_filesharing.html">Data Channel File-sharing Demo</a></td>
+    <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
+    <td><img alt="Warn" height="32" width="32" src="images/br_status_fail.png" title="Requires RTCDataChannel flag to be set in chrome://flags" /></td>
+    <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
+    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set in about:config" /></td>
+    <td><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" title="Requires PeerConnection flag to be set in about:config" /></td>
+    <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
+    <td><img alt="Fail" height="32" width="32" src="images/br_status_fail.png" /></td>
+</tr>
+
+<tr>
+    <td colspan="8" id="browser_note"><em>Note: Browser compatability subject to change.<br />For compatability we recommend using the same browser version among clients.</em></td>
 </tr>
 </table>
 
-<h2>Enabling PeerConnection in Firefox</h2>
+<h2>Enabling PeerConnection in Firefox (in Aurora and Nightly)</h2>
 
 <p>Firefox currently requires WebRTC users to toggle a flag to enable peer connections:</p>
 <ol>
     <li>Type <code>about:config</code> in the browser.</li>
     <li>Click on "I'll be careful, I promise"</li>
     <li>Locate the preference "media.peerconnection.enabled", then double click on it so its value is True.</li>
+</ol>
+
+<p>We've experienced issues getting audio to properly transfer using Firefox peer connections, so we removed that as a compatability for now.</p>
+
+<h2>Enabling Data Channels in Chrome (in Canary)</h2>
+
+<p>Chrome currently requires WebRTC users to toggle a flag to enable data channels:</p>
+<ol>
+    <li>Type <code>chrome://flags</code> in the browser.</li>
+    <li>Locate the preference "RTCDataChannel", then click "enable".</li>
 </ol>
 
 <h2>easyRTC Links</h2>
@@ -113,7 +145,7 @@
     <div id="footer">
     <a href="http://www.priologic.com/?from=landing"><img id="logo_priologic" src="images/priologic_logo_white.png" height="40" width="150" alt="Created By Priologic Software Inc." /></a>
     <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="images/powered_by_easyrtc.png" height="60" width="200" alt="Powered By easyRTC" /></a>
-    <p><em>&copy; 2012 - Priologic Software Inc., All Rights Reserved.</em></p>
+    <p><em>&copy; 2013 - Priologic Software Inc., All Rights Reserved.</em></p>
     <p id="license">easyRTC source code released under a BSD2 Lcense. <a href="https://github.com/priologic/easyrtc/blob/master/LICENSE">See LICENSE file in project folder</a> for details.</p>
     </div>
 </div>

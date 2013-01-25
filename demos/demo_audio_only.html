@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>easyRTC Demo: Audio Only Chat</title>
 
@@ -29,19 +30,10 @@
             height:200px;
             overflow-y:scroll;
         }
-        #selfVideo {
-            display:none;
-            height:225px;
-            width:300px;
-            float:left;
-            border:1px solid gray;
-            margin-left:10px;
-        }
-        #callerVideo {
-            display:none;
-            height:225px;
-            width:300px;
-            border:1px solid gray;
+        #callerAudio {
+            /* display:none; */
+            height:10em;
+            width:10em;
             margin-left:10px;
         }
         #acceptCallBox {
@@ -90,8 +82,7 @@
 
     <!-- Note... this demo should be updated to remove video references -->
     <div id="videos"> 
-        <video id="selfVideo"></video>
-        <video id="callerVideo"></video>
+        <video id="callerAudio"></video>
         <div id="acceptCallBox"> <!-- Should be initially hidden using CSS -->
             <div id="acceptCallLabel"></div>
             <button id="callAcceptButton" >Accept</button> <button id="callRejectButton">Reject</button>
@@ -108,6 +99,7 @@
 <pre class="prettyprint linenums:1">
 &lt;!DOCTYPE html&gt;
 &lt;html&gt;
+&lt;head&gt;
 	&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
 	&lt;title&gt;easyRTC Demo: Audio Only Chat&lt;/title&gt;
 
@@ -130,8 +122,7 @@
 
     &lt;!-- Note... this demo should be updated to remove video references --&gt;
     &lt;div id=&quot;videos&quot;&gt; 
-        &lt;video id=&quot;selfVideo&quot;&gt;&lt;/video&gt;
-        &lt;video id=&quot;callerVideo&quot;&gt;&lt;/video&gt;
+        &lt;video id=&quot;callerAudio&quot;&gt;&lt;/video&gt;
         &lt;div id=&quot;acceptCallBox&quot;&gt; &lt;!-- Should be initially hidden using CSS --&gt;
             &lt;div id=&quot;acceptCallLabel&quot;&gt;&lt;/div&gt;
             &lt;button id=&quot;callAcceptButton&quot; &gt;Accept&lt;/button&gt; &lt;button id=&quot;callRejectButton&quot;&gt;Reject&lt;/button&gt;
@@ -165,8 +156,6 @@ function connect() {
     easyRTC.setLoggedInListener(convertListToButtons);
     easyRTC.initMediaSource(
         function(){        // success callback
-            var selfVideo = document.getElementById(&quot;selfVideo&quot;);
-            easyRTC.setVideoObjectSrc(selfVideo, easyRTC.getLocalStream());
             easyRTC.connect(&quot;audioOnly&quot;, loginSuccess, loginFailure);
         },
         function(errmesg){
@@ -254,20 +243,19 @@ function disconnect() {
     enable(&quot;connectButton&quot;);
     // disable(&quot;disconnectButton&quot;);
     clearConnectList();
-    easyRTC.setVideoObjectSrc(document.getElementById('selfVideo'), &quot;&quot;);
 }
 
 
 easyRTC.setStreamAcceptor( function(caller, stream) {
-    var video = document.getElementById('callerVideo');
-    easyRTC.setVideoObjectSrc(video,stream);
-    console.log(&quot;saw video from &quot; + caller);
+    var audio = document.getElementById('callerAudio');
+    easyRTC.setVideoObjectSrc(audio,stream);
+    console.log(&quot;saw audio from &quot; + caller);
     enable(&quot;hangupButton&quot;);
 });
 
 
 easyRTC.setOnStreamClosed( function (caller) {
-   easyRTC.setVideoObjectSrc(document.getElementById('callerVideo'), &quot;&quot;);
+   easyRTC.setVideoObjectSrc(document.getElementById('callerAudio'), &quot;&quot;);
 });
 
 
@@ -300,7 +288,7 @@ easyRTC.setAcceptChecker(function(caller, cb) {
     <div id="footer">
     <a href="http://www.priologic.com/?from=landing"><img id="logo_priologic" src="images/priologic_logo_white.png" height="40" width="150" alt="Created By Priologic Software Inc." /></a>
     <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="images/powered_by_easyrtc.png" height="60" width="200" alt="Powered By easyRTC" /></a>
-    <p><em>&copy; 2012 - Priologic Software Inc., All Rights Reserved.</em></p>
+    <p><em>&copy; 2013 - Priologic Software Inc., All Rights Reserved.</em></p>
     <p id="license">easyRTC source code released under a BSD2 Lcense. <a href="https://github.com/priologic/easyrtc/blob/master/LICENSE">See LICENSE file in project folder</a> for details.</p>
     </div>
 </div>

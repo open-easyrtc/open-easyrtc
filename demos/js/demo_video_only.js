@@ -1,5 +1,5 @@
 //
-//Copyright (c) 2012, Priologic Software Inc.
+//Copyright (c) 2013, Priologic Software Inc.
 //All rights reserved.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,7 @@ function enable(id) {
 
 
 function connect() {
+    easyRTC.enableDebug(true);
     console.log("Initializing.");
     easyRTC.enableAudio(false);
     easyRTC.setLoggedInListener(convertListToButtons);
@@ -146,6 +147,7 @@ easyRTC.setStreamAcceptor( function(caller, stream) {
 
 easyRTC.setOnStreamClosed( function (caller) {
     easyRTC.setVideoObjectSrc(document.getElementById('callerVideo'), "");
+    disable("hangupButton");
 });
 
 

@@ -1,5 +1,5 @@
 //
-//Copyright (c) 2012, Priologic Software Inc.
+//Copyright (c) 2013, Priologic Software Inc.
 //All rights reserved.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -64,7 +64,6 @@ function performCall(otherEasyrtcid) {
     var acceptedCB = function(accepted, caller) {
         if( !accepted ) {
             alert("Sorry, your call to " + caller + " was rejected");
-            enable('otherClients');
         }
     }
     var successCB = function() {};

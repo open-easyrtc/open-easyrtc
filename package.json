@@ -1,7 +1,7 @@
 {
   "name": "easyrtc",
 
-  "version": "0.6.0",
+  "version": "0.7.0",
 
   "homepage": "http://www.easyrtc.com/",
 
@@ -12,7 +12,7 @@
   "contributors": [ 
     "Doug Pelton <doug@priologic.com>",
     "Rod Apeldoorn <rod.apeldoorn@priologic.com>",
-	"Eric Davies <eric.davies@priologic.com>"
+    "Eric Davies <eric.davies@priologic.com>"
   ],
 
   "keywords": [
@@ -37,8 +37,9 @@
   },
 
   "dependencies" : {
+    "express" : "3.0.x",
     "socket.io" : "0.9.x",
-    "express" : "3.0.x"
+    "winston" : "0.6.x"
   },
 
   "analyze": false,

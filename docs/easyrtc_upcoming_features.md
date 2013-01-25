@@ -5,7 +5,6 @@ There are many exciting features we are looking to add to easyRTC in upcoming re
 
 General Features
 ----------------
-* SSL
 * TURN server support
 
 API Specific Features
@@ -15,9 +14,7 @@ API Specific Features
 
 Server Specific Features
 ------------------------
-* Option to disable Node.js web server
-* Instructions on installing a turn server
-* External server support
+* Option to minimize easyrtc.js
 
 Demos
 -----

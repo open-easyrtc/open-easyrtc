@@ -1,5 +1,5 @@
 //
-//Copyright (c) 2012, Priologic Software Inc.
+//Copyright (c) 2013, Priologic Software Inc.
 //All rights reserved.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -100,6 +100,7 @@ function performCall(otherEasyrtcid) {
         enable('otherClients');
     }
     easyRTC.call(otherEasyrtcid, successCB, failureCB, acceptedCB);
+    enable('hangupButton');
 }
 
 
@@ -136,13 +137,26 @@ easyRTC.setStreamAcceptor( function(caller, stream) {
 });
 
 
+
 easyRTC.setOnStreamClosed( function (caller) {
-   easyRTC.setVideoObjectSrc(document.getElementById('callerVideo'), "");
+    easyRTC.setVideoObjectSrc(document.getElementById('callerVideo'), "");
+    disable("hangupButton");
+});
+
+
+var callerPending = null;
+
+easyRTC.setCallCancelled( function(caller){
+    if( caller == callerPending) {
+        document.getElementById('acceptCallBox').style.display = "none";
+        callerPending = false;
+    }
 });
 
 
 easyRTC.setAcceptChecker(function(caller, cb) {
     document.getElementById('acceptCallBox').style.display = "block";
+    callerPending = caller;
     if( easyRTC.getConnectionCount() > 0 ) {
         document.getElementById('acceptCallLabel').innerHTML = "Drop current call and accept new from " + caller + " ?";
     }
@@ -150,12 +164,17 @@ easyRTC.setAcceptChecker(function(caller, cb) {
         document.getElementById('acceptCallLabel').innerHTML = "Accept incoming call from " + caller + " ?";
     }
     var acceptTheCall = function(wasAccepted) {
-       document.getElementById('acceptCallBox').style.display = "none";
-       if( wasAccepted && easyRTC.getConnectionCount() > 0 ) {
+        document.getElementById('acceptCallBox').style.display = "none";
+        if( wasAccepted && easyRTC.getConnectionCount() > 0 ) {
             easyRTC.hangupAll();
-       }
-       cb(wasAccepted);
+        }
+        cb(wasAccepted);
+        callerPending = null;
     }
-    document.getElementById("callAcceptButton").onclick = function() { acceptTheCall(true);};
-    document.getElementById("callRejectButton").onclick =function() { acceptTheCall(false);};
+    document.getElementById("callAcceptButton").onclick = function() {
+        acceptTheCall(true);
+    };
+    document.getElementById("callRejectButton").onclick =function() {
+        acceptTheCall(false);
+    };
 } );

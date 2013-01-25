@@ -17,8 +17,12 @@ Documentation
 -------------
  * Install instructions for Ubuntu, Windows, and Mac
      * `/docs/easyrtc_installing.md`
+ * Configuration options
+     * `/docs/easyrtc_configuration.md`
  * Client API documentation
      * `/docs/easyrtc_client_api.md`
+ * Client API tutorial
+     * `/docs/easyrtc_client_tutorial.md`
  * Frequently asked questions
      * `/docs/easyrtc_faq.md`
  * Upcoming features
@@ -48,12 +52,14 @@ Folder Structure
   * Documentation for using the API and running the server
 * /lib/
   * Required libraries
-* /static/
-  * Where you can put your own WebRTC application.
-  * The easyrtc.js file is located in /static/js/
+* /logs/
+  * Default location of file logs (disabled by default)
 * /node_modules/
   * Required node.js modules
   * This folder will be created during the install
+* /static/
+  * Where you can put your own WebRTC application.
+  * The easyrtc.js file is located in /static/js/
 
 
 Links for help and information
@@ -72,7 +78,7 @@ Links for help and information
 License
 -------
 
-Copyright (c) 2012, Priologic Software Inc.
+Copyright (c) 2013, Priologic Software Inc.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
