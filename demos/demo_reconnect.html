@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
+        <title>easyRTC Demo: Reconnect</title>
+
+
+
+        <!--show-->    
+        <!-- Assumes global locations for socket.io.js and easyrtc.js -->
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="../js/easyrtc.js"></script>
+        <script type="text/javascript" src="js/demo_reconnect.js"></script>
+    </head>
+    <body onload="initApp()">
+        State = <div id="stateLabel">Unconnected</div>
+        <button onclick="easyRTC.updateConfigurationInfo()">Update ConfigurationInfo</button>
+        <button onclick="sendDummy()">send message</button>
+    </body>
+</html>

@@ -59,7 +59,7 @@ function connect() {
         else {
             saveFile(fileDescriptions[easyrtcid], data);
         }
-        console.log("received data from " + easyrtcid);
+        console.log("received data from " + easyRTC.idToName(easyrtcid));
     });
     easyRTC.connect("fileShare", loginSuccess, loginFailure);
 }
@@ -101,7 +101,7 @@ function convertListToButtons (data) {
         if( !peerDivs[i]) {
             var div = document.createElement("div");
             div.className = "dragndrop notConnected";
-            div.innerHTML = "File drop area for <br>" + i;
+            div.innerHTML = "File drop area for <br>" + easyRTC.idToName(i);
             initDropSupport(div, i);
             otherClientsDiv.appendChild(div);    
             peerDivs[i] = div;
@@ -188,5 +188,5 @@ function loginSuccess(easyRTCId) {
 
 
 function loginFailure(message) {
-    alert("failure to login");
+    easyRTC.showError("LOGIN-FAILURE", message);
 }

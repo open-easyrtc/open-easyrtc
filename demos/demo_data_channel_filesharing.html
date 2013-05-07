@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
         <title>easyRTC Demo: Data Channel File-sharing</title>
 
+        <!--hide-->
         <link rel="stylesheet" type="text/css" href="css/landing.css" />
 
         <!-- Prettify Code -->
         <script type="text/javascript" src="js/prettify/prettify.js"></script>
         <link rel="stylesheet" type="text/css" href="js/prettify/prettify.css" />
-
+                <script type="text/javascript" src="js/prettify/loadAndFilter.js"></script>
+        <script type="text/javascript" src="js/prettify/jquery.min.js"></script>
+        
+        <!--show-->
         <!-- Assumes global locations for socket.io.js and easyrtc.js -->
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript" src="../js/easyrtc.js"></script>
         <script type="text/javascript" src="js/demo_data_channel_filesharing.js"></script>
-
+        <!--hide-->
         <!-- Styles used within the demo -->
         <style type="text/css">
             .alert img {
@@ -71,16 +75,16 @@
                 border-width: 2px;
             }
         </style>
+        <!--show-->
     </head>
     <body onload="connect()">
+        <!--hide-->
         <div id="container">
-
             <div id="header">
                 <a href="index.html"><img id="logo_easyrtc" src="images/easyrtc_logo.png" alt="easyRTC" style="" /></a>
             </div>
             <div id="menu"><a class="menu_link" href="index.html"><div class="menu_item">Local Demos</div></a><a class="menu_link" href="https://github.com/priologic/easyrtc/tree/master/docs"><div class="menu_item">Documentation</div></a><a class="menu_link" href="https://groups.google.com/forum/#!forum/easyrtc"><div class="menu_item">Support: Discussion Group</div></a><a class="menu_link" href="http://www.easyrtc.com/"><div class="menu_item">easyRTC.com</div></a></div>
             <div id="main">
-
                 <!-- Main Content -->
                 <h1>easyRTC Demo:  Data Channel File-sharing</h1>
                 <p>This application demonstrates file sharing using the easyRTC.sendData method.
@@ -94,6 +98,7 @@
                     currently and only with files less than 30KB.</p>
                 <hr />
                 <h2>The Demo</h2>
+                <!--show-->
                 <div id="sendMessageArea">
                     <div id="iam">Obtaining ID...</div>
                     <div id="otherClients"></div>
@@ -102,220 +107,29 @@
                     Received files:
                     <div id="conversation"></div>	  
                 </div>
-
+                <!--hide-->
                 <hr />
 
                 <h2>The Code</h2>
                 <h3>HTML</h3>
-                <pre class="prettyprint linenums:1">
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
-    &lt;title&gt;easyRTC Demo: Data Channel File-sharing&lt;/title&gt;
-    &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;css/landing.css&quot; /&gt;
+                <pre  id="prettyHtml" class="prettyprint linenums:1">
 
-    &lt;!-- Assumes global locations for socket.io.js and easyrtc.js --&gt;
-    &lt;script src=&quot;/socket.io/socket.io.js&quot;&gt;&lt;/script&gt;
-    &lt;script type=&quot;text/javascript&quot; src=&quot;../js/easyrtc.js&quot;&gt;&lt;/script&gt;
-    &lt;script type=&quot;text/javascript&quot; src=&quot;js/demo_data_channel_filesharing.js&quot;&gt;&lt;/script&gt;
-&lt;/head&gt;
-&lt;body onload=&quot;connect()&quot;&gt;
-    &lt;h2&gt;The Demo&lt;/h2&gt;
-    &lt;div id=&quot;sendMessageArea&quot;&gt;
-        &lt;div id=&quot;iam&quot;&gt;Obtaining ID...&lt;/div&gt;
-        &lt;div id=&quot;otherClients&quot;&gt;&lt;/div&gt;
-    &lt;/div&gt;
-    &lt;div id=&quot;receiveMessageArea&quot;&gt;
-        Received files:
-        &lt;div id=&quot;conversation&quot;&gt;&lt;/div&gt;	  
-    &lt;/div&gt;
-    &lt;/div&gt;
-
-    &lt;!-- Please help spread the word about easyRTC --&gt;
-    &lt;a href=&quot;http://easyrtc.com/&quot;&gt;&lt;img src=&quot;/images/powered_by_easyrtc.png&quot; height=&quot;40&quot; width=&quot;200&quot; /&gt;&lt;/a&gt;
-
-&lt;/body&gt;
-&lt;/html&gt;
                 </pre>
                 <h3>Javascript</h3>
                 <p>The contents of demo_instant_messaging.js:</p>
                 
-                <pre class="prettyprint linenums:1">
-var selfEasyrtcid = &quot;&quot;;
-var peerDivs = {};
-var noCallersDiv;
-
-
-function connect() {
-    //easyRTC.enableDebug(true);
-    noCallersDiv = document.createElement(&quot;div&quot;);
-    noCallersDiv.innerHTML = &quot;&lt;em&gt;Nobody else logged in yet&lt;/em&gt;&quot;;
-    var otherClientsDiv = document.getElementById('otherClients');
-    otherClientsDiv.appendChild(noCallersDiv);
-    
-    easyRTC.enableDataChannels(true);
-    easyRTC.enableVideo(false);
-    easyRTC.enableAudio(false);
-    easyRTC.setLoggedInListener(convertListToButtons);
-    easyRTC.setAcceptChecker( function(easyrtcid, responsefn) {
-        peerDivs[easyrtcid].className =&quot;dragndrop connecting&quot;;
-        responsefn(true);
-    });
-    easyRTC.setDataChannelOpenListener(function(easyrtcid) {
-        peerDivs[easyrtcid].className =&quot;dragndrop connected&quot;;
-    });
-    easyRTC.setDataChannelCloseListener(function(easyrtcid) {
-        if( peerDivs[easyrtcid]) {
-            peerDivs[easyrtcid].className =&quot;dragndrop notconnected&quot;;
-        }
-    });
-    var fileDescriptions = {};
-    easyRTC.setDataListener(function(easyrtcid, data){
-        if( typeof data == 'string') {
-            fileDescriptions[easyrtcid] = JSON.parse(data);
-        }
-        else {
-            saveFile(fileDescriptions[easyrtcid], data);
-        }
-        console.log(&quot;received data from &quot; + easyrtcid);
-    });
-    easyRTC.connect(&quot;fileShare&quot;, loginSuccess, loginFailure);
-}
-
-   
-function showMessage(message) { 
-    document.getElementById('conversation').appendChild(document.createTextNode(message));
-}
-
-
-function saveFile(fileInfo, body) {
-    //  saveAs(body, fileInfo.name);
-    var conversation = document.getElementById('conversation'); 
-    var div = document.createElement('div');
-    div.innerHTML = &quot;Received file &quot; + fileInfo.name + &quot;. Click here to display/save&quot;;
-    div.className = &quot;receivedFile&quot;;
-    div.onclick = function() {
-        var url = URL.createObjectURL(body);
-        window.open(url, '_blank', '');
-        setTimeout( function() { 
-            URL.revokeObjectURL(url);
-        }, 30000);
-        conversation.removeChild(div);
-    };
-    conversation.appendChild(div);   
-}
-
-
-function convertListToButtons (data) {
-    var otherClientsDiv = document.getElementById('otherClients');
-    for(var oldPeer in  peerDivs) {
-        if( !data[oldPeer] ) {
-            otherClientsDiv.removeChild(peerDivs[oldPeer]);
-            delete peerDivs[oldPeer];
-        } 
-    }
-    
-    for(var i in data) {
-        if( !peerDivs[i]) {
-            var div = document.createElement(&quot;div&quot;);
-            div.className = &quot;dragndrop notConnected&quot;;
-            div.innerHTML = &quot;File drop area for &lt;br&gt;&quot; + i;
-            initDropSupport(div, i);
-            otherClientsDiv.appendChild(div);    
-            peerDivs[i] = div;
-        }
-    }
-    noCallersDiv.style.display = (peerDivs == {})?&quot;block&quot;:&quot;none&quot;;
-}
-
-
-function initDropSupport(target, destUser) {
-    var ignore = function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        return false;
-    }
-
-    var drop = function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        var dt = e.dataTransfer;
-        var files = dt.files;
-        if( dt.files.length &gt;0) {
-            sendFiles(target, destUser, files);
-        }
-        return false;
-    }
-    
-    target.addEventListener(&quot;drop&quot;, drop, false);
-    target.addEventListener(&quot;dragenter&quot;, ignore, false);
-    target.addEventListener(&quot;dragover&quot;, ignore, false);
-}
-
-   
-function sendFiles(div, destUser, files) {
-    var i;
-    var fileSizeLIMIT = 30000; // approximate message size limit for firefox.
-    
-    switch( easyRTC.getConnectStatus(destUser)) {
-        case easyRTC.IS_CONNECTED:
-            for(i = 0; i &lt; files.length; i++) {
-                if( files[i].size &gt; fileSizeLIMIT ) {
-                    showMessage('File ' + files[i].name +
-                        ' is too big too send (' + files[i].size + ' bytes)');
-                    continue;
-                }
-                var txData = {
-                    name: files[i].name,
-                    type: files[i].type,
-                    size: files[i].size
-                };
-                //
-                // can't send an object, only a primitive type
-                //
-                easyRTC.sendDataP2P(destUser, JSON.stringify(txData));
-                easyRTC.sendDataP2P(destUser, files[i]);
-            }       
-            break;
-            
-        case easyRTC.NOT_CONNECTED:
-            div.className = &quot;dragndrop connecting&quot;;
-            easyRTC.call(destUser, 
-                function(caller, media) { // success callback                    
-                    div.className = &quot;dragndrop connected&quot;;
-                    sendFiles(div, caller, files);
-                }, 
-                function(errText) {
-                    showMessage(errText);
-                }, 
-                function(wasAccepted) {}
-                );
-            break;
-            
-        case BECOMING_CONNECTED:
-            showMessage(&quot;Wait for connection to finish before adding more files&quot;);
-            break;
-    }
-}
-      
-
-function loginSuccess(easyRTCId) {
-    selfEasyrtcid = easyRTCId;
-    document.getElementById(&quot;iam&quot;).innerHTML = &quot;I am &quot; + easyRTCId;
-}
-
-
-function loginFailure(message) {
-    alert(&quot;failure to login&quot;);
-}
+                <pre  id="prettyJS" class="prettyprint linenums:1">
                 </pre>
 
 
                 <!-- Runs the SyntaxHighlighter -->
-                <script type="text/javascript">prettyPrint();</script>
+                <script type="text/javascript">
+                    loadAndFilter(window.location.href, "prettyHtml",2 );
+                    loadAndFilter(window.location.href.replace("/demos/", "/demos/js/").replace(/.html$/, ".js"), "prettyJS", 2);
+                </script>
 
                 <!-- End Main Content -->
+
             </div>
             <div id="footer">
                 <a href="http://www.priologic.com/?from=landing"><img id="logo_priologic" src="images/priologic_logo_white.png" height="40" width="150" alt="Created By Priologic Software Inc." /></a>
@@ -325,5 +139,6 @@ function loginFailure(message) {
             </div>
 
         </div>
+        <!--show-->
     </body>
 </html>

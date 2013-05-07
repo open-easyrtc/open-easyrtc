@@ -27,10 +27,12 @@ var selfEasyrtcid = "";
 
 
 function connect() {
+    easyRTC.setVideoDims(1280,720);
+    easyRTC.enableDebug(true);
     console.log("Initializing.");
     easyRTC.setLoggedInListener(convertListToButtons);
     easyRTC.initManaged("audioVideo", "selfVideo", ["callerVideo"], loginSuccess);
- }
+}
 
 
 function clearConnectList() {
@@ -54,6 +56,7 @@ function convertListToButtons (data) {
 
         label = document.createTextNode(easyRTC.idToName(i));
         button.appendChild(label);
+        button.className = "callbutton";
         otherClientDiv.appendChild(button);
     }
 }
@@ -87,5 +90,3 @@ function loginFailure(message) {
 easyRTC.setAcceptChecker(function(caller, cb) {
     cb(true);
 } );
-
-

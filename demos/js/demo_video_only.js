@@ -47,7 +47,7 @@ function connect() {
             easyRTC.connect("videoOnly", loginSuccess, loginFailure);
         },
         function(errmesg){
-            alert(errmesg);
+            easyRTC.showError("MEDIA-ERROR", errmesg);
         }  // failure callback
         );
 }
@@ -84,7 +84,7 @@ function convertListToButtons (data) {
             }
         }(i);
 			
-        label = document.createTextNode(i);
+        label = document.createTextNode( easyRTC.idToName(i));
         button.appendChild(label);
         otherClientDiv.appendChild(button);
     }
@@ -98,7 +98,7 @@ function performCall(otherEasyrtcid) {
     easyRTC.hangupAll();
     var acceptedCB = function(accepted, caller) {
         if( !accepted ) {
-            alert("Sorry, your call to " + caller + " was rejected");
+            easyRTC.showError("CALL-REJECTED", "Sorry, your call to " + easyRTC.idToName(caller) + " was rejected");
             enable('otherClients');
         }
     }
@@ -122,7 +122,7 @@ function loginSuccess(easyRTCId) {
 
 
 function loginFailure(message) {
-    alert("failure to login");
+    easyRTC.showError("LOGIN-FAILURE", message);
 }
 
 
@@ -154,10 +154,10 @@ easyRTC.setOnStreamClosed( function (caller) {
 easyRTC.setAcceptChecker(function(caller, cb) {
     document.getElementById('acceptCallBox').style.display = "block";
     if( easyRTC.getConnectionCount() > 0 ) {
-        document.getElementById('acceptCallLabel').innerHTML = "Drop current call and accept new from " + easyRTC.cleanId(caller) + " ?";
+        document.getElementById('acceptCallLabel').innerHTML = "Drop current call and accept new from " + easyRTC.idToName(caller) + " ?";
     }
     else {
-        document.getElementById('acceptCallLabel').innerHTML = "Accept incoming call from " + easyRTC.cleanId(caller) +  " ?";
+        document.getElementById('acceptCallLabel').innerHTML = "Accept incoming call from " + easyRTC.idToName(caller) +  " ?";
     }
     var acceptTheCall = function(wasAccepted) {
         document.getElementById('acceptCallBox').style.display = "none";

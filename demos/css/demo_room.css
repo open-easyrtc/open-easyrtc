@@ -1,0 +1,74 @@
+
+.transit {
+    transition: left 1s, top 1s, right 1s, bottom 1s, width 1s, height 1s, transform 1s;
+    -moz-transition: left 1s, top 1s, right 1s, bottom 1s, width 1s, height 1s, -moz-transform 1s;
+    -webkit-transition: left 1s, top 1s, right 1s, bottom 1s, width 1s, height 1s, -webkit-transform 1s;
+    -o-transition: left 1s, top 1s, right 1s, bottom 1s, width 1s, height 1s,-o-transform 1s;    
+}
+
+.hidden {
+    background-color: transparent;
+    border-color: 2px solid blue;
+}
+
+.boxCommon {
+    position:absolute; 
+}
+
+.closeButton {
+    display: none; /* hide the initManaged's close button because we have our own */
+}
+
+.thumbCommon {
+    z-index:2;
+    box-shadow: 5px 5px 5px #000000;
+}
+
+#controlArea {
+    background-color: #ff8000;
+}
+
+body {
+    background-color:#ffd0d0;
+    margin-left:0px;
+    margin-top:0px;
+}
+
+#killButton {
+    opacity:0.7;
+}
+
+#killButton:hover {
+    opacity:1.0;
+}
+
+#muteButton {
+    opacity:0.7;
+}
+
+#muteButton:hover {
+    opacity:1.0;
+}
+
+#textentryBox {
+    border:2px solid #a0ffa0;
+    border-radius:10px;
+    z-index:5;
+    position: absolute;
+    background-color: #ffffff;
+    box-shadow: 5px 5px 5px #000000;
+    font-family: 'Courier New',Courier,monospace;
+}
+
+#textentryField {
+    font-size:x-large;
+    margin: 20px;
+}
+
+#textentrySubmit {
+    font-size:larger;
+}
+
+#textentryCancel {
+    font-size:larger;
+}
