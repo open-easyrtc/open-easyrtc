@@ -107,7 +107,7 @@ var io = sio.listen(server, {
         },
         'browser client minification': true,
         'browser client etag': true,
-        'browser client gzip': true
+        'browser client gzip': false   // true is faster but causes crashes on some windows boxes
 });
 logServer.info('Socket Server started', { label: 'easyRtcServer'});
 
