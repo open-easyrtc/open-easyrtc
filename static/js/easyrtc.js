@@ -52,7 +52,7 @@ easyRTC.errCodes = {
     INTERNAL_ERR: "INTERNAL_ERR"
 };
 
-easyRTC.apiVersion = "0.9.0";
+easyRTC.apiVersion = "0.8.0";
 
 /** Regular expression pattern for user ids. This will need modification to support non US character sets */
 easyRTC.userNamePattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,30}[a-zA-Z0-9]$/;
