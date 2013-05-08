@@ -45,7 +45,7 @@ var contactedListeners = {};
 var nameToIdMap = {};
 
 function connect() {
-    easyRTC.enableDebug(true);
+    easyRTC.enableDebug(false);
     var tempName = document.getElementById('userName').value;
     if(  !easyRTC.isNameValid(tempName)) {
         easyRTC.showError("BAD-USER-NAME", "illegal user name");

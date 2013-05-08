@@ -36,7 +36,7 @@ function addToConversation(who, content) {
 
 
 function connect() {
-    easyRTC.enableDebug(true);
+    easyRTC.enableDebug(false);
     easyRTC.enableDataChannels(true);
     easyRTC.enableVideo(false);
     easyRTC.enableAudio(false);

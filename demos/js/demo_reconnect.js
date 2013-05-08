@@ -34,22 +34,22 @@ function initApp() {
     easyRTC.connect("reconnect", loginSuccess, loginFailure);
 }
 
-	easyRTC.enableDebug(true);
-	easyRTC.setDisconnectListener(initApp);
+easyRTC.enableDebug(false);
+easyRTC.setDisconnectListener(initApp);
 
 
 function sendDummy() {
-	easyRTC.sendDataWS(null, {msgType:"xxx", burp:"burp"});
+    easyRTC.sendDataWS(null, {msgType: "xxx", burp: "burp"});
 }
 
 function loginSuccess(easyRTCId) {
-	document.getElementById("stateLabel").innerHTML = " connected as " + easyRTCId;
-	console.log("logged in");
+    document.getElementById("stateLabel").innerHTML = " connected as " + easyRTCId;
+    console.log("logged in");
 }
 
 
 function loginFailure(message) {
-	document.getElementById("stateLabel").innerHTML = "disconnected";
+    document.getElementById("stateLabel").innerHTML = "disconnected";
 }
 
 
