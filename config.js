@@ -90,7 +90,7 @@ config.updateCheckEnable = true;
 
 // Load version number from package.json file 
 var easyrtcPackage = require('./package');
-config.easyRtcVersion = easyrtcPackage.version;
+config.easyrtcVersion = easyrtcPackage.version;
 delete require.cache[easyrtcPackage];
 
 config.cmdPacketType = "easyRTCcmd";

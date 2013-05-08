@@ -47,8 +47,8 @@ var winston = require('winston');           // logging module
 
 // Logging Setup
 g.logInit();                                // Initialize logging settings
-var logServer   = winston.loggers.get('easyRtcServer');
-var logApi      = winston.loggers.get('easyRtcApi');
+var logServer   = winston.loggers.get('easyrtcServer');
+var logApi      = winston.loggers.get('easyrtcApi');
 var logExpress  = winston.loggers.get('express');
 var logSocketIo = winston.loggers.get('socketIo');
 
@@ -71,7 +71,7 @@ httpApp.configure(function() {
 
 
 // Start either the HTTP or HTTPS web service
-logServer.info('Starting easyRTC Server (v' + easyrtcCfg.easyRtcVersion +')', { label: 'easyRtcServer'});
+logServer.info('Starting easyRTC Server (v' + easyrtcCfg.easyrtcVersion +')', { label: 'easyrtcServer'});
 if (easyrtcCfg.sslEnable) {  // Start SSL Server (https://)
     var https = require('https');
     var sslOptions = {
@@ -81,7 +81,7 @@ if (easyrtcCfg.sslEnable) {  // Start SSL Server (https://)
 
     var server = https.createServer(sslOptions, httpApp).listen(easyrtcCfg.sslPort);
 
-    logServer.info('HTTPS (SSL) Server started on port: ' + easyrtcCfg.sslPort, { label: 'easyRtcServer'});
+    logServer.info('HTTPS (SSL) Server started on port: ' + easyrtcCfg.sslPort, { label: 'easyrtcServer'});
 
     // Optionally listen in on an http port and forward requests to secure port
     if (easyrtcCfg.sslForwardFromHttp) {
@@ -93,7 +93,7 @@ if (easyrtcCfg.sslEnable) {  // Start SSL Server (https://)
     }    
 } else {    // Start HTTP server (http://)
     var server = http.createServer(httpApp).listen(easyrtcCfg.httpPort);
-    logServer.info('HTTP Server started on port: ' + easyrtcCfg.httpPort, { label: 'easyRtcServer'});
+    logServer.info('HTTP Server started on port: ' + easyrtcCfg.httpPort, { label: 'easyrtcServer'});
 }
 
 
@@ -109,7 +109,7 @@ var io = sio.listen(server, {
         'browser client etag': easyrtcCfg.socketIoClientEtagEnabled,
         'browser client gzip': easyrtcCfg.socketIoClientGzipEnabled   // true is faster but causes crashes on some windows boxes
 });
-logServer.info('Socket Server started', { label: 'easyRtcServer'});
+logServer.info('Socket Server started', { label: 'easyrtcServer'});
 
 
 // Start experimental STUN server (if enabled)
@@ -119,7 +119,7 @@ if (easyrtcCfg.experimentalStunServerEnable) {
 
 
 // Shared variable to hold server and socket information.
-easyRtc = {
+easyrtc = {
     serverStartTime: Date.now(),
     connections: {}
 };
@@ -127,25 +127,25 @@ easyRtc = {
 
 // Upon a socket connection, a socket is created for the life of the connection
 io.sockets.on('connection', function (socket) {
-    logServer.debug('easyRTC: Socket [' + socket.id + '] connected with application: [' + easyrtcCfg.defaultApplicationName + ']', { label: 'easyRtc', easyRtcId:connectionEasyRtcId, applicationName:easyrtcCfg.defaultApplicationName});
+    logServer.debug('easyRTC: Socket [' + socket.id + '] connected with application: [' + easyrtcCfg.defaultApplicationName + ']', { label: 'easyrtc', easyrtcid:connectionEasyRtcId, applicationName:easyrtcCfg.defaultApplicationName});
     var connectionEasyRtcId = socket.id;
     c.onSocketConnection(io, socket, connectionEasyRtcId);
 
     // Incoming messages: Custom message. Allows applications to send socket messages to other connected users.
     socket.on('message', function(msg) {
-        logServer.debug('easyRTC: Socket [' + socket.id + '] message received', { label: 'easyRtc', easyRtcId:connectionEasyRtcId, applicationName: easyRtc.connections[connectionEasyRtcId].applicationName, data:msg});
+        logServer.debug('easyRTC: Socket [' + socket.id + '] message received', { label: 'easyrtc', easyrtcid:connectionEasyRtcId, applicationName: easyrtc.connections[connectionEasyRtcId].applicationName, data:msg});
         c.onSocketMessage(io, socket, connectionEasyRtcId, msg);
     });
 
     // Incoming easyRTC commands: Used to forward webRTC negotiation details and manage server settings.
     socket.on('easyRTCcmd', function(msg) {
-        logServer.debug('easyRTC: Socket [' + socket.id + '] command received', { label: 'easyRtc', easyRtcId:connectionEasyRtcId, data:msg});
+        logServer.debug('easyRTC: Socket [' + socket.id + '] command received', { label: 'easyrtc', easyrtcid:connectionEasyRtcId, data:msg});
         c.onEasyRtcCmd(io, socket, connectionEasyRtcId, msg);
     });
     
     // Upon a socket disconnecting (either directed or via time-out)
     socket.on('disconnect', function(data) {
-        logServer.debug('easyRTC: Socket [' + socket.id + '] disconnected', { label: 'easyRtc', easyRtcId:connectionEasyRtcId});
+        logServer.debug('easyRTC: Socket [' + socket.id + '] disconnected', { label: 'easyrtc', easyrtcid:connectionEasyRtcId});
         c.onSocketDisconnect(io, socket, connectionEasyRtcId);
     });
 });
