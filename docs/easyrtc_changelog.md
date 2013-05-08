@@ -12,10 +12,15 @@ New Features:
  * API - Added a cleaner error reporting mechanism. The code now calls showError(errCode, errText) to report an error. showError will in turn call onError (which you can still override).
  * API - Added support for calls that get cancelled (by the initiator) before they are accepted or rejected.
  * API - Added a method to query the status of a peer to peer call.
- * Demos - In demos which show the local media stream as both audio and video (as a mirror), the video object with the local media stream is muted and given a volume of 0.
+ * Server - Added socket.io options to config.js. Note that socketIoClientGzipEnabled is now false by default as gzip causes issues on some servers (often Windows).
  * Demos - Added a screen sending and screen receiving demo. These tend to crash the browser at this point. Hopefully Google will get that feature working properly again.
  * Demos - Added a multiperson tablet-oriented chat demo that runs very nicely on your Android devices.
  * Documentation - Moved the client API documentation from mark-down format to jsDoc and added inline examples. Check out the easyRTC.html file in the docs directory. The easyrtcjs.html file is a helper file that shouldn't be looked at directly.
+
+Changes:
+ * Demos - In demos which show the local media stream as both audio and video (as a mirror), the video object with the local media stream is muted and given a volume of 0.
+ * Server - Version bumps for node modules express (3.2.x) and winston (0.7.x). 
+
 v0.7.0
 ------
 
