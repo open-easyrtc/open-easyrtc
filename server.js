@@ -105,9 +105,9 @@ var io = sio.listen(server, {
             warn:  function(message){ logSocketIo.warn( message, { label: 'socket.io'}); },
             error: function(message){ logSocketIo.error(message, { label: 'socket.io'}); }
         },
-        'browser client minification': true,
-        'browser client etag': true,
-        'browser client gzip': false   // true is faster but causes crashes on some windows boxes
+        'browser client minification': easyrtcCfg.socketIoClientMinifyEnabled,
+        'browser client etag': easyrtcCfg.socketIoClientEtagEnabled,
+        'browser client gzip': easyrtcCfg.socketIoClientGzipEnabled   // true is faster but causes crashes on some windows boxes
 });
 logServer.info('Socket Server started', { label: 'easyRtcServer'});
 

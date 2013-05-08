@@ -72,6 +72,11 @@ config.defaultApplicationName = "default";
 // Enable easyRTC demos. Viewable in /demos/
 config.enableDemos = true;
 
+// Socket.IO Settings
+config.socketIoClientGzipEnabled    = false;        // Gzip socket.io client. Enabling could cause problems on some Windows installations.
+config.socketIoClientMinifyEnabled  = true;         // Pre-minify socket.io javascript. This is done just once and greatly saves on bandwidth.
+config.socketIoClientEtagEnabled    = true;         // Allow client caching of the socket.io javascript library
+
 // Check for updates
 config.updateCheckEnable = true;
 
@@ -90,6 +95,7 @@ delete require.cache[easyRtcPackage];
 
 config.cmdPacketType = "easyRTCcmd";
 config.cmdMsgType = {
+    error: "error",
     list: "list",
     token: "token"
 };
@@ -106,5 +112,5 @@ if (config.experimentalStunServerEnable)
 else
     config.iceServers = config.externalIceServers;
 
-// Allows the config file to be seen by a caller
+// Allows the config object to be seen by a caller
 module.exports = config;
