@@ -394,7 +394,7 @@ easyRTC.callCancelled = null;
  *   easyRTC.setAppDefinedFields( { favorite_alien:'Mr Spock'});
  *   easyRTC.setLoggedInListener( function(list) {
  *      for( var i in list ) {
- *         console.log("easyrtcid=" + i + " favorite alien is " + list[i].favorite_alien);
+ *         console.log("easyrtcid=" + i + " favorite alien is " + list[i].appDefinedFields.favorite_alien);
  *      }
  *   });
  */

@@ -79,7 +79,7 @@ easyRTC.errCodes = {
     INTERNAL_ERR: "INTERNAL_ERR"
 };
 
-easyRTC.apiVersion = "0.9.0";
+easyRTC.apiVersion = "0.8.0";
 
 /** Regular expression pattern for user ids. This will need modification to support non US character sets */
 easyRTC.userNamePattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,30}[a-zA-Z0-9]$/;
@@ -367,6 +367,7 @@ easyRTC.updateConfigurationInfo = function() {
 //        cancelled: temporarily true if a connection was cancelled by the peer asking to initiate it.
 //        candidatesToSend: SDP candidates temporarily queued 
 //        pc: RTCPeerConnection
+//        mediaStream: mediaStream
 //	  function callSuccessCB(string) - see the easyRTC.call documentation.
 //        function callFailureCB(string) - see the easyRTC.call documentation.
 //        function wasAcceptedCB(boolean,string) - see the easyRTC.call documentation.
@@ -387,7 +388,7 @@ easyRTC.acceptancePending = {};
  * the maximum length of the appDefinedFields. This is defined on the
  * server side as well, so changing it here alone is insufficient.
  */
-/** @private */ 
+/** @private */
 var maxAppDefinedFieldsLength = 128;
 
 /**
@@ -421,7 +422,7 @@ easyRTC.callCancelled = null;
  *   easyRTC.setAppDefinedFields( { favorite_alien:'Mr Spock'});
  *   easyRTC.setLoggedInListener( function(list) {
  *      for( var i in list ) {
- *         console.log("easyrtcid=" + i + " favorite alien is " + list[i].favorite_alien);
+ *         console.log("easyrtcid=" + i + " favorite alien is " + list[i].appDefinedFields.favorite_alien);
  *      }
  *   });
  */
@@ -743,10 +744,10 @@ easyRTC.formatError = function(x) {
         try {
             return JSON.stringify(x);
         }
-        catch(oops) {
+        catch (oops) {
             var result = "{";
-            for(var name in x) {
-                if( typeof x[name] === 'string') {
+            for (var name in x) {
+                if (typeof x[name] === 'string') {
                     result = result + name + "='" + x[name] + "' ";
                 }
             }
@@ -820,6 +821,8 @@ easyRTC.initMediaSource = function(successCallback, errorCallback) {
             errorCallback("Your browser doesn't appear to support WebRTC.");
         }
     }
+
+
 
 
     /** @private
@@ -1338,6 +1341,48 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     };
 
 
+    function haveTracks(easyrtcid, checkAudio) {
+        var peerConnObj = easyRTC.peerConns[easyrtcid];
+        if (!peerConnObj) {
+            return true;
+        }
+        var stream = peerConnObj.stream;
+        if (!stream) {
+            return false;
+        }
+
+        var tracks;
+        try {
+            if (checkAudio) {
+                tracks = stream.getAudioTracks();
+            }
+            else {
+                tracks = stream.getVideoTracks();
+            }
+        } catch (oops) {
+            return true;
+        }
+        if (!tracks)
+            return false;
+        return tracks.length > 0;
+    }
+
+    /** Determines if a particular peer2peer connection has an audio track.
+     * @param easyrtcid - the id of the other caller in the connection.
+     * @return {boolean} 
+     */
+    easyRTC.haveAudioTrack = function(easyrtcid) {
+        return haveTracks(easyrtcid, true);
+    }
+
+
+    /** Determines if a particular peer2peer connection has a video track.
+     * @param easyrtcid - the id of the other caller in the connection.
+     * @return {string} "yes", "no", "unknown"
+     */
+    easyRTC.haveVideoTrack = function(easyrtcid) {
+        return haveTracks(easyrtcid, false);
+    }
 
 
     /** Value returned by easyRTC.getConnectStatus if the other user isn't connected. */
@@ -1532,7 +1577,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             sd.sdp = pieces.join("\n");
         }
     }
-    
+
 
 
     function hangupBody(otherUser) {
@@ -1687,6 +1732,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 easyRTC.peerConns[otherUser].sharingAudio = easyRTC.haveAudioVideo.audio;
                 easyRTC.peerConns[otherUser].sharingVideo = easyRTC.haveAudioVideo.video;
                 easyRTC.peerConns[otherUser].connectTime = new Date().getTime();
+                easyRTC.peerConns[otherUser].stream = event.stream;
 
                 if (easyRTC.peerConns[otherUser].callSuccessCB) {
                     if (easyRTC.peerConns[otherUser].sharingAudio || easyRTC.peerConns[otherUser].sharingVideo) {
@@ -1707,12 +1753,14 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 }
 
                 if (easyRTC.peerConns[otherUser]) {
+                    easyRTC.peerConns[otherUser].stream = null;
                     if (easyRTC.onStreamClosed) {
                         easyRTC.onStreamClosed(otherUser);
                     }
                     delete easyRTC.peerConns[otherUser];
                     easyRTC.updateConfigurationInfo();
                 }
+
             };
             easyRTC.peerConns[otherUser] = newPeerConn;
 
@@ -1931,7 +1979,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         else {
             sd = new RTCSessionDescription(msg.actualData);
         }
-        if(easyRTC.debugPrinter) {
+        if (easyRTC.debugPrinter) {
             easyRTC.debugPrinter("sdp ||  " + JSON.stringify(sd));
         }
         var invokeCreateAnswer = function() {
@@ -2134,9 +2182,9 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             easyRTC.myEasyrtcid = msg.easyrtcid;
             easyRTC.pc_config = msg.iceConfig;
             easyRTC.cookieOwner = msg.isOwner ? true : false;
-            easyRTC.room = msg.room? msg.room: null;
-            
- 
+            easyRTC.room = msg.room ? msg.room : null;
+
+
             if (successCallback) {
                 successCallback(easyRTC.myEasyrtcid, easyRTC.cookieOwner);
             }
@@ -2823,7 +2871,7 @@ easyRTC.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Wed May 08 2013 09:32:12 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri May 10 2013 09:43:01 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
