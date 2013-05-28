@@ -1,5 +1,9 @@
 easyRTC: Change Log
 ===================
+v0.8.1
+  * API - Added the dontAddCloseButtons method.
+  * API - When initMediaSource is called, the API creates a temporary video object to determine the pixel dimensions of the local camera. Until this version, that video object wasn't being explicitly destroyed, which resulted in a feedback shriek in Firefox and the most recent versions of Chrome. The temporary video object is now being destroyed.
+  * The mozRTCSessionDescription object didn't use to work properly in Firefox. Now it appears to be required. 
 
 v0.8.0
 ------
