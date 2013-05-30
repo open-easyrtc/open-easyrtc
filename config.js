@@ -104,8 +104,8 @@ config.cmdMsgType = {
     token: "token"
 };
 
-// Programatically Setting Some Settings
-// *************************************
+// Programmatically Setting Some Settings
+// **************************************
 if (config.experimentalStunServerEnable)
     config.iceServers = [
         {"url": "stun:" + config.experimentalStunServerAddr0 + ":" + config.experimentalStunServerPort0},
