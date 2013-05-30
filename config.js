@@ -14,7 +14,11 @@ config.sslCertFile  = '/ssl/mydomain.crt';  // Local file location of public SSL
 // External stun server (will be used if experimentalStunServerEnable is false)
 // Several public stun servers are available to be used.
 config.externalIceServers = [
-    {"url": "stun:stun.l.google.com:19302"}
+    {url: "stun:stun.l.google.com:19302"},
+    {url: "stun:stun.sipgate.net"},
+    {url: "stun:217.10.68.152"},
+    {url: "stun:stun.sipgate.net:10000"},
+    {url: "stun:217.10.68.152:10000"}
 ];
 
 // EXPERIMENTAL STUN SERVER
