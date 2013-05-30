@@ -54,7 +54,7 @@ function convertListToButtons (data) {
                 sendStuffWS(easyrtcid);
             }
         }(i);        
-        var label = document.createTextNode("Send to " + i);
+        var label = document.createTextNode("Send to " + easyRTC.idToName(i));
         button.appendChild(label);
                 
         otherClientDiv.appendChild(button);        
@@ -84,5 +84,5 @@ function loginSuccess(easyRTCId) {
 
 
 function loginFailure(message) {
-    alert("failure to login");
+    easyRTC.showError("LOGIN-FAILURE", message);
 }

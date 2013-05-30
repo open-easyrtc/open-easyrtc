@@ -44,7 +44,7 @@ function connect() {
             easyRTC.connect("audioOnly", loginSuccess, loginFailure);
         },
         function(errmesg){
-            alert(errmesg);
+            easyRTC.showError("MEDIA-ERROR", errmesg);
         }  // failure callback
         );
 }
@@ -82,7 +82,7 @@ function convertListToButtons (data) {
         }(i);
             
         label = document.createElement('text');
-        label.innerHTML = easyRTC.cleanId(i);
+        label.innerHTML = easyRTC.idToName(i);
         button.appendChild(label);
         otherClientDiv.appendChild(button);
     }
@@ -93,7 +93,7 @@ function performCall(otherEasyrtcid) {
     easyRTC.hangupAll();
     var acceptedCB = function(accepted, caller) {
         if( !accepted ) {
-            alert("Sorry, your call to " + caller + " was rejected");
+            easyRTC.showError("CALL-REJECTED", "Sorry, your call to " + easyRTC.idToName(caller) + " was rejected");
             enable('otherClients');
         }
     }
@@ -117,7 +117,7 @@ function loginSuccess(easyRTCId) {
 
 
 function loginFailure(message) {
-    alert("failure to login");
+    easyRTC.showError("LOGIN-FAILURE", message);
 }
 
 
@@ -134,7 +134,6 @@ function disconnect() {
 easyRTC.setStreamAcceptor( function(caller, stream) {
     var audio = document.getElementById('callerAudio');
     easyRTC.setVideoObjectSrc(audio,stream);
-    console.log("saw audio from " + caller);
     enable("hangupButton");
 });
 

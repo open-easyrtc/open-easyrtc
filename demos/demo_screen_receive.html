@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
-        <title>easyRTC Demo: Audio Only Chat</title>
+        <title>easyRTC Demo: Screen Sharing Receiver</title>
 
         <!--hide-->
         <link rel="stylesheet" type="text/css" href="css/landing.css" />
@@ -12,12 +12,11 @@
         <script type="text/javascript" src="js/prettify/loadAndFilter.js"></script>
         <script type="text/javascript" src="js/prettify/jquery.min.js"></script>
         <link rel="stylesheet" type="text/css" href="js/prettify/prettify.css" />
-
-        <!--show-->    
+        <!--show-->
         <!-- Assumes global locations for socket.io.js and easyrtc.js -->
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript" src="../js/easyrtc.js"></script>
-        <script type="text/javascript" src="js/demo_audio_only.js"></script>
+        <script type="text/javascript" src="js/demo_screen_receive.js"></script>
         <!--hide-->
         <!-- Styles used within the demo -->
         <style type="text/css">
@@ -26,19 +25,13 @@
             }
             #connectControls {
                 float:left;
-                width:250px;
+                width:360px;
                 text-align:center;
                 border: 2px solid black;            
             }
             #otherClients {
                 height:200px;
-                overflow-y:scroll;
-            }
-            #callerAudio {
-                /* display:none; */
-                height:10em;
-                width:10em;
-                margin-left:10px;
+                overflow-y:auto;
             }
             #acceptCallBox {
                 display:none;
@@ -50,72 +43,120 @@
                 background-color:pink;
                 padding:15px;
             }
+	    
+
+           .smallBox{
+                width:500px;
+                height:400px;
+                overflow:scroll;
+                float:left;
+            }
+            
+            .bigBox{
+                position:fixed;
+                width: 100%;
+                height: 100%;
+                left: 0px;
+                top:0px;
+                z-index:2;
+                overflow:scroll;                
+            }
+            
+            .noShrink {
+                display:none;
+            }
+            
+            .yesShrink {
+                position:fixed;
+                right: 20px;
+                top : 20px;
+                z-index:3;
+                padding:1em;
+                border-radius: 10px;
+                border-color: red;
+                border-style: solid;
+                background-color: black;
+                color: white; 
+                opacity: 0.70;
+            }
+            
+            .yesShrink:hover {
+                opacity: 1.0;
+            }
+
         </style>
         <!--show-->
     </head>
-    <body>
+    <body onload="initApp">
+        <!--hide-->
         <div id="container">
-            <!--hide-->
             <div id="header">
                 <a href="index.html"><img id="logo_easyrtc" src="images/easyrtc_logo.png" alt="easyRTC" style="" /></a>
             </div>
             <div id="menu"><a class="menu_link" href="index.html"><div class="menu_item">Local Demos</div></a><a class="menu_link" href="https://github.com/priologic/easyrtc/tree/master/docs"><div class="menu_item">Documentation</div></a><a class="menu_link" href="https://groups.google.com/forum/#!forum/easyrtc"><div class="menu_item">Support: Discussion Group</div></a><a class="menu_link" href="http://www.easyrtc.com/"><div class="menu_item">easyRTC.com</div></a></div>
             <div id="main">
                 <!-- Main Content -->
-                <h1>easyRTC Demo: Audio Only Chat</h1>
+                <h1>easyRTC Demo: Screen Sharing Receiver</h1>
 
-                <p>The application provides an audio only chat by disabling video 
-                    before initializing the local media stream.</p>
+                <p>The application receives a video screen capture from a complementary sending program.</p>
 
                 <p>To use it, press the Connect button.
                     You should see buttons representing other people using this demo.
-                    Click one of those buttons to initiate a chat.</p>
-
+                    Click one of those buttons to see (with their permission) their live screen.</p>
                 <hr />
                 <h2>The Demo</h2>
-
-                <!--show-->
+	         <!--show-->
                 <div id="demoContainer">
                     <div id="connectControls">
-                        <button id="connectButton" onclick="connect()">Connect</button>
-                        <button id="hangupButton" disabled="disabled" onclick="hangup()">Hangup</button>
-                        <div id="iam">Not yet connected...</div>
-                        <br />
-                        <strong>Connected users:</strong>
-                        <div id="otherClients"></div>
-                    </div>
 
-                    <!-- Note... this demo should be updated to remove video references -->
-                    <div id="videos"> 
-                        <video id="callerAudio"></video>
-                        <div id="acceptCallBox"> <!-- Should be initially hidden using CSS -->
-                            <div id="acceptCallLabel"></div>
-                            <button id="callAcceptButton" >Accept</button> <button id="callRejectButton">Reject</button>
+                        <span style="float:left">
+                            Your name: <input type="text" id="userName" /> 
+                            <input type="checkbox" id="shareAudio" /><label for="shareAudio"> Share audio</label><br>
+                        </span>
+                        <span style="float:left;clear:both">
+                        <button id="connectButton" onclick="connect()">Connect to server</button>        
+                        <button id="disconnectButton" disabled="disabled" onclick="disconnect()">Disconnect</button>
+                        </span>
+                        <div style="float:left;clear:both" id="iam">Not yet connected...</div>                        
+                        <div style="float:left;clear:both" id="otherClients"></div>
+                        <button style="float:left;clear:both" id="hangupButton" disabled="disabled" onclick="hangup()">Hangup</button>
+                        <button style="float:right" onclick="requestFullScreen()">Use full screen</button>                        
+
+                    </div>
+                    <div id="videos" class="smallBox"> 
+                        <div id ="shrinkBox" class="noShrink">
+                            <p>
+                             Click here to exit<br>
+                             full screen.
+                            </p>
                         </div>
-                    </div>
+                        <video autoplay="autoplay" id="callerVideo" ></video>                        
+                    </div><br>
                 </div>
-
                 <!--hide-->
                 <br style="clear:both;" />
                 <p><em>Browser Note: Until there is better interoperability among browsers, both clients may need to be using the same browser.</em></p>
                 <hr />
+
                 <h2>The Code</h2>
                 <h3>HTML</h3>
-                <pre  id="prettyHtml" class="prettyprint linenums:1">
+                <pre id="prettyHTML" class="prettyprint linenums:1">
+
                 </pre>
                 <h3>Javascript</h3>
-                <p>The contents of demo_audio_only.js:</p>
+                <p>The contents of demo_audio_video.js:</p>
                 <pre id="prettyJS" class="prettyprint linenums:1">
                 </pre>
 
+
                 <!-- Runs the SyntaxHighlighter -->
                 <script type="text/javascript">
-                    loadAndFilter(window.location.href, "prettyHtml",2 );
+                    loadAndFilter(window.location.href, "prettyHTML",2 );
                     loadAndFilter(window.location.href.replace("/demos/", "/demos/js/").replace(/.html$/, ".js"), "prettyJS", 2);
                 </script>
-                <!-- End Main Content -->   
-            </div>
 
+                <!-- End Main Content -->
+            </div>
             <div id="footer">
                 <a href="http://www.priologic.com/?from=landing"><img id="logo_priologic" src="images/priologic_logo_white.png" height="40" width="150" alt="Created By Priologic Software Inc." /></a>
                 <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="images/powered_by_easyrtc.png" height="60" width="200" alt="Powered By easyRTC" /></a>

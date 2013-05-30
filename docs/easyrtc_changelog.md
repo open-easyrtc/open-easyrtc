@@ -1,6 +1,35 @@
 easyRTC: Change Log
 ===================
 
+v0.8.0
+------
+
+New Features:
+
+ * API - Added support for grabbing the screen as the local media source. Currently this only works in Canary, and causes the browser to crash if you try to use it in a peer connection. 
+ * API - Added support for grabbing video at high-definition instead of the default standard definition. Warning: the browser may cheat and give you a lower resolution than you asked for that has the desired aspect ratio.
+ * API - Added a number of callbacks to the initManaged method to support richer interactions with the client.
+ * API - Added a cleaner error reporting mechanism. The code now calls showError(errCode, errText) to report an error. showError will in turn call onError (which you can still override).
+ * API - Added support for calls that get cancelled (by the initiator) before they are accepted or rejected.
+ * API - Added a method to query the status of a peer to peer call.
+ * API - Added the dontAddCloseButtons method.
+ * API - When initMediaSource is called, the API creates a temporary video object to determine the pixel dimensions of the local camera. Until this version, that video object wasn't being explicitly destroyed, which resulted in a feedback shriek in Firefox and the most recent versions of Chrome. The temporary video object is now being destroyed.
+ * Server - Added socket.io options to config.js. Note that socketIoClientGzipEnabled is now false by default as gzip causes issues on some servers (often Windows).
+ * Demos - Added a screen sending and screen receiving demo. These tend to crash the browser at this point. Hopefully Google will get that feature working properly again.
+ * Demos - Added a multiperson tablet-oriented chat demo that runs very nicely on your Android devices.
+ * Documentation - Moved the client API documentation from mark-down format to jsDoc and added inline examples. Check out the easyRTC.html file in the docs directory. The easyrtcjs.html file is a helper file that shouldn't be looked at directly.
+
+Changes:
+ * Demos - In demos which show the local media stream as both audio and video (as a mirror), the video object with the local media stream is muted and given a volume of 0.
+ * Demos - Removed references to Firefox requiring flags
+ * Server - Version bumps for node modules express (3.2.x) and winston (0.7.x).
+ * Server - Added additional public stun servers
+ 
+Fixes:
+ * API - The mozRTCSessionDescription object didn't used to work properly in Firefox. Now it appears to be required.
+ * API - When initMediaSource is called, the API creates a temporary video object to determine the pixel dimensions of the local camera. Until this version, that video object wasn't being explicitly destroyed, which resulted in a feedback shriek in Firefox and the most recent versions of Chrome. The temporary video object is now being destroyed.   
+
+
 v0.7.0
 ------
 

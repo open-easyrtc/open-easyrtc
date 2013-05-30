@@ -1,7 +1,7 @@
 {
   "name": "easyrtc",
 
-  "version": "0.7.0",
+  "version": "0.8.0",
 
   "homepage": "http://www.easyrtc.com/",
 
@@ -37,9 +37,9 @@
   },
 
   "dependencies" : {
-    "express" : "3.0.x",
+    "express" : "3.2.x",
     "socket.io" : "0.9.x",
-    "winston" : "0.6.x"
+    "winston" : "0.7.x"
   },
 
   "analyze": false,
