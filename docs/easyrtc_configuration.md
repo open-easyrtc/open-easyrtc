@@ -76,6 +76,13 @@ Logs can be enabled can controlled independantly for the following services.
 - **log???FileName** - File location relative to the easyRTC root.
 
 
+Socket.io Settings
+------------------
+- **config.socketIoClientGzipEnabled** - Gzip socket.io client. Enabling could cause problems on some Windows installations. [true|false]
+- **config.socketIoClientMinifyEnabled** - Pre-minify socket.io javascript. This is done just once and greatly saves on bandwidth. [true|false]
+- **config.socketIoClientEtagEnabled** - Allow client caching of the socket.io javascript library [true|false]
+
+
 Other Settings
 --------------
 
