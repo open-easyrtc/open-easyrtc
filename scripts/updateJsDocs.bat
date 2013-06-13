@@ -1,0 +1,1 @@
+jsdoc -d ..\docs ..\api\easyrtc.js
