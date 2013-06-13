@@ -146,7 +146,7 @@ io.sockets.on('connection', function (socket) {
     });
 
     // Incoming easyRTC commands: Used to forward webRTC negotiation details and manage server settings.
-    socket.on('easyRTCcmd', function(msg) {
+    socket.on('easyrtcCmd', function(msg) {
         logServer.debug('easyRTC: Socket [' + socket.id + '] command received', { label: 'easyrtc', easyrtcid:connectionEasyRtcId, data:msg});
         c.onEasyRtcCmd(io, socket, connectionEasyRtcId, msg);
     });

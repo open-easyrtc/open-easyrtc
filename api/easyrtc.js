@@ -1285,7 +1285,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             if (easyRTC.debugPrinter) {
                 easyRTC.debugPrinter("sending socket message " + JSON.stringify(dataToShip));
             }
-            easyRTC.webSocket.json.emit("easyRTCcmd", dataToShip);
+            easyRTC.webSocket.json.emit("easyrtcCmd", dataToShip);
         }
     };
 
@@ -2554,7 +2554,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 easyRTC.debugPrinter("cfg=" + JSON.stringify(alteredData.added));
             }
             if (easyRTC.webSocket) {
-                easyRTC.webSocket.json.emit("easyRTCcmd",
+                easyRTC.webSocket.json.emit("easyrtcCmd",
                         {
                             msgType: 'setUserCfg',
                             msgData: alteredData.added
@@ -2586,7 +2586,6 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
 
         easyRTC.webSocket.on("message", onChannelMessage);
-        easyRTC.webSocket.on("easyRTCcmd", onChannelCmd);  // deprecated
         easyRTC.webSocket.on("easyrtcCmd", onChannelCmd);
         easyRTC.webSocket.on("disconnect", function(code, reason, wasClean) {
             easyRTC.updateConfigurationInfo = function() {
