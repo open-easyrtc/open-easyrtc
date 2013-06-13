@@ -26,7 +26,7 @@
     <section>
         <article>
             <pre class="prettyprint source"><code>/** @class
- *@version 0.8.0 
+ *@version 0.8.1
  *&lt;p>
  * Provides client side support for the easyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
@@ -80,7 +80,7 @@ easyRTC.errCodes = {
     SIP_ERR: "SIP_ERR"  //something went wrong with a sip session 
 };
 
-easyRTC.apiVersion = "0.8.0";
+easyRTC.apiVersion = "0.8.1";
 
 /** Regular expression pattern for user ids. This will need modification to support non US character sets */
 easyRTC.userNamePattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,30}[a-zA-Z0-9]$/;
@@ -545,7 +545,7 @@ easyRTC.onError = function(errorObject) {
     var easySheet = document.createElement("link");
     easySheet.setAttribute("rel", "stylesheet");
     easySheet.setAttribute("type", "text/css");
-    easySheet.setAttribute("href", "/api/easyrtc.css");
+    easySheet.setAttribute("href", "/easyrtc/easyrtc.css");
     var headSection = document.getElementsByTagName("head")[0];
     var firstHead = headSection.childNodes[0];
     headSection.insertBefore(easySheet, firstHead);
@@ -605,9 +605,10 @@ easyRTC.cleanId = function(idString) {
  * The callback expects to receive a map whose ideas are easyrtcids and whose values are in turn maps
  * supplying user specific information. The inner maps have the following keys:
  *  userName, applicationName, browserFamily, browserMajor, osFamily, osMajor, deviceFamily.
+ * The callback also receives a boolean that indicates whether the owner is the primary owner of a room.
  * @param {Function} listener
  * @example
- *   easyRTC.setLoggedInListener( function(list) {
+ *   easyRTC.setLoggedInListener( function(list, isPrimaryOwner) {
  *      for( var i in list ) {
  *         ("easyrtcid=" + i + " belongs to user " + list[i].userName);
  *      }
@@ -836,7 +837,7 @@ easyRTC.initMediaSource = function(successCallback, errorCallback) {
         if (easyRTC.debugPrinter) {
             easyRTC.debugPrinter("about to request local media = " + JSON.stringify(mode));
         }
-
+      //  console.log("about to call getUserMedia");
         if (navigator.getUserMedia) {
             navigator.getUserMedia(mode, successfunc, errorFunc);
         }
@@ -861,6 +862,7 @@ easyRTC.initMediaSource = function(successCallback, errorCallback) {
         if (easyRTC.debugPrinter) {
             easyRTC.debugPrinter("getUserMedia success callback entered");
         }
+   //     console.log("getusermedia succeeded");
         // the below commented out checks were for Chrome. However, Mozilla nightly started 
         // implementing the getAudioTracks method as well, except their implementation appears to 
         // be asychronous, the audioTracks.length are zero initially and filled later.
@@ -936,6 +938,7 @@ easyRTC.initMediaSource = function(successCallback, errorCallback) {
      * @param {String} error
      */
     var onUserMediaError = function(error) {
+        console.log("getusermedia failed");
         if (easyRTC.debugPrinter) {
             easyRTC.debugPrinter("failed to get local media");
         }
@@ -965,22 +968,27 @@ easyRTC.initMediaSource = function(successCallback, errorCallback) {
 
 
     if (easyRTC.videoEnabled || easyRTC.audioEnabled) {
-        try {
-            callGetUserMedia({
-                'audio': easyRTC.audioEnabled ? true : false,
-                'video': (easyRTC.videoEnabled) ? (easyRTC.videoFeatures) : false
-            }, onUserMediaSuccess,
-                    onUserMediaError);
-        } catch (e) {
+        //
+        // getUserMedia usually fails the first time I call it. I suspect it's a page loading
+        // issue. So I'm going to try adding a 1 second delay to allow things to settle down first.
+        // 
+        setTimeout(function() {
             try {
-
-                callGetUserMedia("video,audio", onUserMediaSuccess,
+                callGetUserMedia({
+                    'audio': easyRTC.audioEnabled ? true : false,
+                    'video': (easyRTC.videoEnabled) ? (easyRTC.videoFeatures) : false
+                }, onUserMediaSuccess,
                         onUserMediaError);
             } catch (e) {
-                document.body.removeChild(getUserMediaDiv);
-                errorCallback("getUserMedia failed with exception: " + e.message);
+                try {
+                    callGetUserMedia("video,audio", onUserMediaSuccess,
+                            onUserMediaError);
+                } catch (e) {
+                    document.body.removeChild(getUserMediaDiv);
+                    errorCallback("getUserMedia failed with exception: " + e.message);
+                }
             }
-        }
+        }, 1000);
     }
     else {
         onUserMediaSuccess(null);
@@ -1233,7 +1241,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         easyRTC.webSocket = 0;
         easyRTC.hangupAll();
         if (easyRTC.loggedInListener) {
-            easyRTC.loggedInListener({});
+            easyRTC.loggedInListener({}, false);
         }
         easyRTC.loggingOut = false;
         easyRTC.disconnecting = false;
@@ -1270,7 +1278,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             easyRTC.loggingOut = false;
             easyRTC.disconnecting = false;
             if (easyRTC.loggedInListener) {
-                easyRTC.loggedInListener({});
+                easyRTC.loggedInListener({}, false);
             }
             easyRTC.oldConfig = {};
         }, 250);
@@ -1304,7 +1312,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             if (easyRTC.debugPrinter) {
                 easyRTC.debugPrinter("sending socket message " + JSON.stringify(dataToShip));
             }
-            easyRTC.webSocket.json.emit("easyRTCcmd", dataToShip);
+            easyRTC.webSocket.json.emit("easyrtcCmd", dataToShip);
         }
     };
 
@@ -2248,8 +2256,25 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
         if (msgType === 'token') {
             easyRTC.myEasyrtcid = msg.easyrtcid;
-            easyRTC.pc_config = msg.iceConfig;
+            //
+            // Firefox doesn't support turn worth beans at this time so we filter 
+            // out all the turn server entries if we realize we're in firefox.
+            // This code assumes that the iceConfig contains a single element called iceServers.
+            // Hopefully this code won't need to remain here for long.
+            // 
+            easyRTC.pc_config = {iceServers: []};
+            for (var i in msg.iceConfig.iceServers) {
+                if (msg.iceConfig.iceServers[i].url.indexOf('turn:') == 0 && navigator.mozGetUserMedia) {
+                    console.log("discarding turn server entry for Mozilla.");
+                }
+                else {
+                    easyRTC.pc_config.iceServers.push(msg.iceConfig.iceServers[i]);
+                }
+            }
+
+
             easyRTC.cookieOwner = msg.isOwner ? true : false;
+            easyRTC.roomHasPassword = msg.hasPassword;
             easyRTC.room = msg.room ? msg.room : null;
 
             if (easyRTC.sipConfig) {
@@ -2270,11 +2295,19 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             easyRTC.updateConfigurationInfo();
         }
         else if (msgType === 'list') {
+            var isPrimaryOwner = easyRTC.cookieOwner?true:false;
+            for( id in actualData.connections) {
+                var item = actualData.connections[id];
+                if( item.isOwner && 
+                        item.clientConnectTime &lt; actualData.connections[easyRTC.myEasyrtcid].clientConnectTime) {     
+                   isPrimaryOwner = false; 
+                }
+            }
             delete actualData.connections[easyRTC.myEasyrtcid];
             easyRTC.lastLoggedInList = actualData.connections;
             processConnectedList(actualData.connections);
             if (easyRTC.loggedInListener) {
-                easyRTC.loggedInListener(actualData.connections);
+                easyRTC.loggedInListener(actualData.connections, isPrimaryOwner);
             }
         }
         else if (msgType === 'forwardToUrl') {
@@ -2548,7 +2581,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 easyRTC.debugPrinter("cfg=" + JSON.stringify(alteredData.added));
             }
             if (easyRTC.webSocket) {
-                easyRTC.webSocket.json.emit("easyRTCcmd",
+                easyRTC.webSocket.json.emit("easyrtcCmd",
                         {
                             msgType: 'setUserCfg',
                             msgData: alteredData.added
@@ -2580,7 +2613,6 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
 
         easyRTC.webSocket.on("message", onChannelMessage);
-        easyRTC.webSocket.on("easyRTCcmd", onChannelCmd);  // deprecated
         easyRTC.webSocket.on("easyrtcCmd", onChannelCmd);
         easyRTC.webSocket.on("disconnect", function(code, reason, wasClean) {
             easyRTC.updateConfigurationInfo = function() {
@@ -2934,7 +2966,7 @@ easyRTC.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Tue May 28 2013 09:25:04 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Thu Jun 13 2013 16:52:46 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
