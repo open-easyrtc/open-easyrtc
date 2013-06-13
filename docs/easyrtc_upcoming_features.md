@@ -15,6 +15,8 @@ API Specific Features
 Server Specific Features
 ------------------------
 * Option to minimize easyrtc.js
+* Switch to become a proper Node.js module
+* Events for creating your own handlers easily
 
 Demos
 -----
