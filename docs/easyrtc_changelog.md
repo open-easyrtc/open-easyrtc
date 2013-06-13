@@ -1,6 +1,17 @@
 easyRTC: Change Log
 ===================
 
+v0.8.1b
+-------
+New Features:
+Changes:
+ * Server - Moved API files to the /api/ folder thus cleaning up the /static/. API files are publicly linked using /easyrtc/easyrtc.js and /easyrtc/easyrtc.css. For transitional purposes, the old public file locations are still accessible.
+ * Server/Api - Renamed easyRTCcmd socket message type to easyrtcCmd. Should have no outside effect. 
+
+Fixes:
+ * API - Firefox - Strips TURN servers from ICE config if they are present. Firefox doesn't currently handle TURN servers well.
+ * API - Added one second delay to getUserMedia call to try and correct some page loading problems.
+
 v0.8.0
 ------
 
