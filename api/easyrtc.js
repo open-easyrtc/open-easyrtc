@@ -1,5 +1,5 @@
 /** @class
- *@version 0.8.0 
+ *@version 0.8.1
  *<p>
  * Provides client side support for the easyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
@@ -53,7 +53,7 @@ easyRTC.errCodes = {
     SIP_ERR: "SIP_ERR"  //something went wrong with a sip session 
 };
 
-easyRTC.apiVersion = "0.8.0";
+easyRTC.apiVersion = "0.8.1";
 
 /** Regular expression pattern for user ids. This will need modification to support non US character sets */
 easyRTC.userNamePattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,30}[a-zA-Z0-9]$/;
