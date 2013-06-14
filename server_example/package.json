@@ -11,7 +11,7 @@
   "dependencies" : {
     "easyrtc"   : "git://github.com/dryswabbie/easyrtc.git#beta",
     "express"   : "*",
-    "socket.io" : "*",
+    "socket.io" : "*"
   },
 
   "license"     : "BSD2",
