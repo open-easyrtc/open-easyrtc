@@ -15,7 +15,7 @@ Features
 
 Documentation
 -------------
- * Install instructions for Ubuntu, Windows, and Mac
+ * [Install instructions for Ubuntu, Windows, and Mac](./docs/easyrtc_installing.md)
      * `/docs/easyrtc_installing.md`
  * Configuration options
      * `/docs/easyrtc_configuration.md`
