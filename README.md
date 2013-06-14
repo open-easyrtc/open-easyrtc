@@ -1,4 +1,4 @@
-easyRTC
+easyRTC - BETA
 =======
 
 **A bundle of Open Source WebRTC joy!**

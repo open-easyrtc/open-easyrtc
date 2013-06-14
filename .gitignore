@@ -175,3 +175,5 @@ node_modules
 # easyRTC
 #########
 *.log
+config_override.js
+nbproject
