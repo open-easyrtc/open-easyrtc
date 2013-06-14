@@ -1,9 +1,16 @@
 easyRTC - BETA
 =======
 
+NOTE:
+-----
+This is a version of easyRTC I'm fiddling with to transform it as a module. Not even close to being ready for general consumpsion.
+
+
 **A bundle of Open Source WebRTC joy!**
 
 Priologic's easyRTC beta, a bundle of Open Source WebRTC joy, incorporates an easyRTC server install and client API, and working, HTML5 and Javascript, application source code under a BSD 2 license.
+
+
 
 
 Features
