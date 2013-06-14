@@ -17,15 +17,15 @@ Documentation
 -------------
  * [Install instructions for Ubuntu, Windows, and Mac](./docs/easyrtc_installing.md)
      * `/docs/easyrtc_installing.md`
- * Configuration options
+ * [Configuration options](./docs/easyrtc_configuration.md)
      * `/docs/easyrtc_configuration.md`
- * Client API documentation
+ * [Client API documentation](./docs/easyrtc_client_api.md)
      * `/docs/easyrtc_client_api.md`
- * Client API tutorial
+ * [Client API tutorial](./docs/easyrtc_client_tutorial.md)
      * `/docs/easyrtc_client_tutorial.md`
- * Frequently asked questions
+ * [Frequently asked questions](./docs/easyrtc_faq.md)
      * `/docs/easyrtc_faq.md`
- * Upcoming features
+ * [Upcoming features](./docs/easyrtc_upcoming_features.md)
      * `/docs/easyrtc_upcoming_features.md`
 
 
@@ -44,7 +44,6 @@ Folder Structure
 ----------------
 
 * / (root)
-  * Contains the main file (server.js) and the configuration file (config.js)
   * Licenses and package information
 * /demos/
   * easyRTC live demos and example code
@@ -52,14 +51,9 @@ Folder Structure
   * Documentation for using the API and running the server
 * /lib/
   * Required libraries
-* /logs/
-  * Default location of file logs (disabled by default)
 * /node_modules/
   * Required node.js modules
   * This folder will be created during the install
-* /static/
-  * Where you can put your own WebRTC application.
-  * The easyrtc.js file is located in /static/js/
 
 
 Links for help and information
