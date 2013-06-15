@@ -44,9 +44,6 @@ Setting a listener overrides the default easyRTC listener. Depending on your app
 
 - Default event names are the same as public event names.
 - The parameter list is the same as the public listener. This includes the callback if present.
-- Do not call the callback after emitting a default event. Can be unstable. 
-- Do not call events outside of a associated listener. Can be unstable.
-- Events predicated by 'after' do not have default easyRTC listeners. Emitting these events will have no effect.
 
 
 ## List of easyRTC Events
@@ -55,12 +52,6 @@ Setting a listener overrides the default easyRTC listener. Depending on your app
 
 Runs during easyRTC startup. It is preceeded by the http and socket server. Once 'next' is called, the 'startupCallback' is called if it was defined in easyrtc.listen().
 
-### 'afterStartup' (httpApp, socketServer, options)
-
-Runs at the end of the easyRTC startup routine.
-
 
 ### 'connect'
-
-### 'afterConnect'
 
