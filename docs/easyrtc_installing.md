@@ -8,7 +8,7 @@ Ubuntu easyRTC Install Steps:
     * `sudo apt-get install python-software-properties`
     * `sudo add-apt-repository ppa:chris-lea/node.js`
     * `sudo apt-get update`
-    * `sudo apt-get install nodejs npm`
+    * `sudo apt-get install nodejs`
 
 2. Create folder hold the easyRTC application
     * ex: `sudo mkdir /var/nodes`
