@@ -1,13 +1,13 @@
 // Load required modules
-var http    = require('http');              // http server core module
-var express = require('express');           // web framework external module
-var io      = require('socket.io');         // web socket external module
-var easyrtc = require('easyrtc');           // easyRTC external module
+var http    = require("http");              // http server core module
+var express = require("express");           // web framework external module
+var io      = require("socket.io");         // web socket external module
+var easyrtc = require("easyrtc");           // easyRTC external module
 
-// Setup and configure Express http server. Expect a subfolder called 'static' to be the web root.
+// Setup and configure Express http server. Expect a subfolder called "static" to be the web root.
 var httpApp = express();
 httpApp.configure(function() {
-    httpApp.use(express.static(__dirname + '/static/'));
+    httpApp.use(express.static(__dirname + "/static/"));
 });
 
 // Start Express http server on port 8080
