@@ -1285,7 +1285,11 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             if (easyRTC.debugPrinter) {
                 easyRTC.debugPrinter("sending socket message " + JSON.stringify(dataToShip));
             }
-            easyRTC.webSocket.json.emit("easyrtcCmd", dataToShip);
+            easyRTC.webSocket.json.emit("easyrtcCmd", dataToShip
+,function(msg) {
+    console.log("Received 'Return' Message", msg);
+}
+            );
         }
     };
 
@@ -2559,6 +2563,9 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                             msgType: 'setUserCfg',
                             msgData: alteredData.added
                         }
+,function(msg) {
+    console.log("Received 'Return' Message", msg);
+}
                 );
             }
             easyRTC.oldConfig = newConfig;
