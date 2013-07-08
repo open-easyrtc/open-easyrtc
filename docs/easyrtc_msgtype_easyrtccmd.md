@@ -210,7 +210,6 @@ Provides room information for all rooms the user is currently in. This includes 
    - **listDelta** (optional)
      - **updateConnection** (optional) Map of easyrtcid's to update. Will contain same fields as 'list'
      - **removeConnection** (optional) Map of easyrtcid's to remove the the list.
-       - **easyrtcid** (required) Matches map key
 
 
 ### msgType - 'forwardToUrl'
