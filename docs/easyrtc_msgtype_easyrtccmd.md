@@ -202,15 +202,15 @@ Provides room information for all rooms the user is currently in. This includes 
      - **easyrtcid** (required) Matches map key
      - **username** (optional)
      - **presence** (required) {show:[away|chat|dnd|xa],status:{String}}
-     - apiField (optional) Map of appDefinedFields and their values
+     - **apiField** (optional) Map of appDefinedFields and their values
      - **browserFamily** (optional)
      - **browserMajor** (optional)
      - **osFamily** (optional)
      - **deviceFamily** (optional)
    - **listDelta** (optional)
-     - updateConnection (optional) Map of easyrtcid's to update. Will contain same fields as 'list'
-     - removeConnection (optional) Map of easyrtcid's to remove the the list.
-       - easyrtcid (required) Matches map key
+     - **updateConnection** (optional) Map of easyrtcid's to update. Will contain same fields as 'list'
+     - **removeConnection** (optional) Map of easyrtcid's to remove the the list.
+       - **easyrtcid** (required) Matches map key
 
 
 ### msgType - 'forwardToUrl'
