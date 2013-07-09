@@ -102,11 +102,12 @@ easyRTC.apiKey = "cmhslu5vo57rlocg"; // default key for now
 
 easyRTC.credential = null;
 /* temporary hack */
-/** @private
- * @param {string} referer */
-easyRTC.setReferer = function(referer) {
-    easyRTC.referer = referer;
-};
+/**
+ * 
+ * @private
+ */
+easyRTC.sipAlreadyInitialized = false;
+
 /** The name user is in. This only applies to room oriented applications and is set at the same
  * time a token is received.
  */
@@ -2324,9 +2325,6 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         };
 
 
-        if (easyRTC.referer) {
-            newConfig.referer = easyRTC.referer;
-        }
 
         if (easyRTC.userName) {
             newConfig.userName = easyRTC.userName;
@@ -2370,6 +2368,11 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
     function processRoomData(msgData) {
         for (var roomname in msgData) {
+            //
+            // Important: we need to know what the roomname name is (easyRTC.room) 
+            // at this point in the code. Rod doesn't appear to have implemented that
+            // far yet.
+            //
             if (roomname == easyRTC.room) {
                 if (msgData[roomname].field && msgData[roomname].field.isOwner) {
                     easyRTC.cookieOwner = true;
@@ -2393,6 +2396,10 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                         }
                     }
                 }
+                
+               easyRTC.roomHasPassword = msgData[roomname].hasPassword;
+               //easyRTC.room = msg.room ? msg.room : null;
+
             }
         }
     }
@@ -2423,8 +2430,20 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             if (msgData.roomData) {
                 processRoomData(msg.msgData.roomData);
             }
-        }
+            
 
+            if (easyRTC.sipConfig && !easyRTC.sipAlreadyInitialized) {
+                if (!easyRTC.initSipUa) {
+                    console.log("SIP connection parameters provided but no sip stuff");
+                }
+                easyRTC.initSipUa();
+                easyRTC.sipAlreadyInitialized = true;
+            }
+
+            if (successCallback) {
+                successCallback(easyRTC.myEasyrtcid, easyRTC.cookieOwner);
+            }
+        }
     }
 
     function sendAuthenticate() {
