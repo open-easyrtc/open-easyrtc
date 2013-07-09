@@ -53,14 +53,17 @@ Includes fields needed for authentication. Sender and target must be online, aut
 **Fields:**
 
  - **msgData** (required)
-   - **apiVersion** (required) Api version string. 
-   - **applicationName** (optional) Will default to the server default application.
-   - **easyrtcsid** (optional) The easyRTC session ID which should be available in the browser cookie variables.
-   - **username** (optional)
-   - **credential** (optional) (for enterprise, this would include the apiKey)
-   - **setUserCfg** (optional) Contains all values from setUserCfg
-   - **setPresence** (optional) Contains all values from setPresence
-   - **enterRoom** (optional) Contains all values from enterRoom. Will default to application default room (if set).
+
+**msgData Fields:**
+
+ - **apiVersion** (required) Api version string. 
+ - **applicationName** (optional) Will default to the server default application.
+ - **easyrtcsid** (optional) The easyRTC session ID which should be available in the browser cookie variables.
+ - **username** (optional)
+ - **credential** (optional) (for enterprise, this would include the apiKey)
+ - **setUserCfg** (optional) Contains all values from setUserCfg
+ - **setPresence** (optional) Contains all values from setPresence
+ - **enterRoom** (optional) Contains all values from enterRoom. Will default to application default room (if set).
 
 **Returns:**
 
@@ -74,10 +77,13 @@ Sets user configurable options. User must be authenticated.
 **Fields:**
 
  - **msgData** (required)
-   - **setUserCfg** 
-     - **connectionList** (optional) Array of connections with their statistics.
-     - **userSettings** (optional) Fields related to the user's settings, WebRTC, browser, and OS capabilities/status.
-     - **apiField** (optional) Map of ffelds for the special appDefinedFields value which gets transferred in the broadcast list.
+
+**msgData Fields:**
+
+ - **setUserCfg** 
+   - **connectionList** (optional) Map of all connections with their statistics. The map key is the easyrtcid's. Unlike userSettings and apiField, this field must contain all current connections. Any connections not mentioned will be removed.
+   - **userSettings** (optional) Map of fields related to the user's settings, WebRTC, browser, and OS capabilities/status. Any settings not mentioned will be left as-is. To remove a setting, give it a value of `null`.
+   - **apiField** (optional) Map of fields for the special appDefinedFields value which gets transferred in the broadcast list. Any fields not mentioned will be left as-is. To remove a field, give it a value of `null`.
 
 **Returns:**
 
@@ -91,8 +97,11 @@ Sets user online presence which is re-broadcast as part of the list. User must b
 **Fields:**
 
  - **msgData** (required)
+
+**msgData Fields:**
+
    - **setPresence** 
-     - **show** (optional) [away|chat|dnd|xa]
+     - **show** (optional) [`away`|`chat`|`dnd`|`xa`]
      - **status** (optional) User configurable status string. TODO: Set regex for max length and allowed characters.
 
 **Returns:**
@@ -107,8 +116,11 @@ Enters a room. If room doesn't exist, a new room may be created.
 **Fields:**
 
  - **msgData** (required)
-   - **enterRoom** 
-     - **roomName** (required) String containing room name.
+
+**msgData Fields:**
+
+ - **enterRoom** (required)
+   - **roomName** (required) String containing room name.
 
 **Returns:**
 
@@ -122,8 +134,11 @@ Leaves a room. Upon leaving a room, the API should remove all room info (incl. c
 **Fields:**
 
  - **msgData** (required)
-   - **leaveRoom** 
-     - **roomName** (required) String containing room name.
+
+**msgData Fields:**
+
+ - **leaveRoom** (required)
+   - **roomName** (required) String containing room name.
 
 **Returns:**
 
@@ -138,6 +153,7 @@ Transfer of WebRTC ICE candidate(s) for establishing peer-connection. Sender and
 
 **Fields:**
 
+ - **serverTime** (required)
  - **senderEasyrtcid** (required)
  - **msgData** (required)
    - Contains candidate data (SDP's)
@@ -148,6 +164,7 @@ Sends WebRTC offer for establishing peer-connection. Sender and target must be o
 
 **Fields:**
 
+ - **serverTime** (required)
  - **senderEasyrtcid** (required)
  - **msgData** (required)
    - Contains candidate data (SDP's) 
@@ -157,6 +174,7 @@ Accepts WebRTC offer for establishing peer-connection. Sender and target must be
 
 **Fields:**
 
+ - **serverTime** (required)
  - **senderEasyrtcid** (required)
  - **msgData** (required)
    - Contains session description (SDP)
@@ -166,6 +184,7 @@ Rejects WebRTC offer for establishing peer-connection. Sender and target must be
 
 **Fields:**
 
+ - **serverTime** (required)
  - **senderEasyrtcid** (required)
 
 ### msgType - 'hangup'
@@ -173,6 +192,7 @@ Instructs target to hangup WebRTC peer-connection. Sender and target must be onl
 
 **Fields:**
 
+ - **serverTime** (required)
  - **senderEasyrtcid** (required)
 
 ### msgType - 'token'
@@ -180,6 +200,11 @@ Initiates an authenticated easyRTC application. Note this may be sent multiple t
 
 **Fields:**
 
+ - **serverTime** (required)
+ - **msgData** (required)
+
+**msgData Fields:**
+ 
  - **easyrtcid** (required)
  - **easyrtcsid** (if available)
  - **iceConfig** (required)
@@ -196,6 +221,10 @@ Provides room information for all rooms the user is currently in. This includes 
 
 **Fields:**
 
+ - **serverTime** (required)
+ - **msgData** (required)
+
+**msgData Fields:**
  - **roomData** (required) Map of room names
    - **roomName** (required) Room name (matches map key)
    - **list** (optional) Map of easyrtcid's for users online in the same room. If present, this should overrule the current list in memory.
@@ -219,7 +248,11 @@ Instructs API to forward user to specified URL. Useful for server handled error 
 
  - **serverTime** (required)
  - **msgData** (required)
-   - **url** (required) URL to forward user t 
+
+**msgData Fields:**
+
+ - **forwardToUrl** (required)
+   - **url** (required) URL to forward user to
 
 
 ### msgType - 'error'
@@ -227,6 +260,7 @@ Provides an error code to the API when an error occurs.
 
 **Fields:**
 
+ - **serverTime** (required)
  - **errorCode** (required)
  - **errorText** (optional) User readable text explaining error. 
 
