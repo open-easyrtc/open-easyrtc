@@ -4,6 +4,7 @@ The easyrtcCmd is the core socket.io emit type which easyRTC uses to send and re
 
 ## Incoming (to server)
 
+
 ### msgType - 'candidate'
 Transfer of WebRTC ICE candidate(s) for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
@@ -14,6 +15,7 @@ Transfer of WebRTC ICE candidate(s) for establishing peer-connection. Sender and
    - Contains candidate data (SDP's)
    - {type, label, id, candidate}
 
+
 ### msgType - 'offer'
 Sends WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
@@ -23,6 +25,7 @@ Sends WebRTC offer for establishing peer-connection. Sender and target must be o
  - **msgData** (required)
    - Contains candidate data (SDP's) 
  
+
 ### msgType - 'answer'
 Accepts WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
@@ -32,12 +35,14 @@ Accepts WebRTC offer for establishing peer-connection. Sender and target must be
  - **msgData** (required)
    - Contains session description (SDP)
 
+
 ### msgType - 'reject'
 Rejects WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
 
  - **targetEasyrtcid** (required)
+
 
 ### msgType - 'hangup'
 Instructs target to hangup WebRTC peer-connection. Sender and target must be online, authenticated, and in same application.
@@ -63,7 +68,8 @@ Includes fields needed for authentication. Sender and target must be online, aut
  - **credential** (optional) (for enterprise, this would include the apiKey)
  - **setUserCfg** (optional) Contains all values from setUserCfg
  - **setPresence** (optional) Contains all values from setPresence
- - **enterRoom** (optional) Contains all values from enterRoom. Will default to application default room (if set).
+ - **roomJoin** (optional) Contains all values from 
+ - om. Will default to application default room (if set).
 
 **Returns:**
 
@@ -91,7 +97,7 @@ Sets user configurable options. User must be authenticated.
  -error
 
 
-### msgType - 'setPresence'
+### msgType - 'setPresence'room
 Sets user online presence which is re-broadcast as part of the list. User must be authenticated.
 
 **Fields:**
@@ -110,7 +116,7 @@ Sets user online presence which is re-broadcast as part of the list. User must b
  -error
 
 
-### msgType - 'enterRoom'
+### msgType - 'roomJoin'
 Enters a room. If room doesn't exist, a new room may be created.
 
 **Fields:**
@@ -119,7 +125,7 @@ Enters a room. If room doesn't exist, a new room may be created.
 
 **msgData Fields:**
 
- - **enterRoom** (required)
+ - **roomJoin** (required)
    - **roomName** (required) String containing room name.
 
 **Returns:**
@@ -128,7 +134,7 @@ Enters a room. If room doesn't exist, a new room may be created.
  -error
 
 
-### msgType - 'leaveRoom'
+### msgType - 'roomLeave'
 Leaves a room. Upon leaving a room, the API should remove all room info (incl. connection list) from memory.
 
 **Fields:**
@@ -137,7 +143,7 @@ Leaves a room. Upon leaving a room, the API should remove all room info (incl. c
 
 **msgData Fields:**
 
- - **leaveRoom** (required)
+ - **roomLeave** (required)
    - **roomName** (required) String containing room name.
 
 **Returns:**
@@ -159,6 +165,7 @@ Transfer of WebRTC ICE candidate(s) for establishing peer-connection. Sender and
    - Contains candidate data (SDP's)
    - {type, label, id, candidate}
 
+
 ### msgType - 'offer'
 Sends WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
@@ -169,6 +176,7 @@ Sends WebRTC offer for establishing peer-connection. Sender and target must be o
  - **msgData** (required)
    - Contains candidate data (SDP's) 
  
+
 ### msgType - 'answer'
 Accepts WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
@@ -179,6 +187,7 @@ Accepts WebRTC offer for establishing peer-connection. Sender and target must be
  - **msgData** (required)
    - Contains session description (SDP)
 
+
 ### msgType - 'reject'
 Rejects WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
@@ -187,6 +196,7 @@ Rejects WebRTC offer for establishing peer-connection. Sender and target must be
  - **serverTime** (required)
  - **senderEasyrtcid** (required)
 
+
 ### msgType - 'hangup'
 Instructs target to hangup WebRTC peer-connection. Sender and target must be online, authenticated, and in same application.
 
@@ -194,6 +204,7 @@ Instructs target to hangup WebRTC peer-connection. Sender and target must be onl
 
  - **serverTime** (required)
  - **senderEasyrtcid** (required)
+
 
 ### msgType - 'token'
 Initiates an authenticated easyRTC application. Note this may be sent multiple times in a session upon configuration changes. The API should reset application, room, and list data.
@@ -262,5 +273,5 @@ Provides an error code to the API when an error occurs.
 
  - **serverTime** (required)
  - **errorCode** (required)
- - **errorText** (optional) User readable text explaining error. 
+ - **errorText** (optional) User readable text explaining error.
 
