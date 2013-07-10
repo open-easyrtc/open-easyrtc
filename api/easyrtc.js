@@ -1066,7 +1066,6 @@ easyRTC.closedChannel = null;
  * @param {Function} errorCallback (msgString) - is called on unsuccessful connect. if null, an alert is called instead.
  */
 easyRTC.connect = function(applicationName, successCallback, errorCallback) {
-    easyRTC.webSocket = null;
     easyRTC.pc_config = {};
     easyRTC.closedChannel = null;
     if (easyRTC.debugPrinter) {
@@ -1088,10 +1087,10 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         easyRTC.loggingOut = true;
         easyRTC.disconnecting = true;
         easyRTC.closedChannel = easyRTC.webSocket;
-        if (easyRTC.webSocket) {
-            easyRTC.webSocket.disconnect();
+        if (easyRTC.webSocketConnected) {
+            easyRTC.webSocket.close();
+            easyRTC.webSocketConnected = false;
         }
-        easyRTC.webSocket = 0;
         easyRTC.hangupAll();
         if (easyRTC.loggedInListener) {
             easyRTC.loggedInListener({}, false);
@@ -2183,28 +2182,62 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         easyRTC.onError("Your HTML has not included the socket.io.js library");
     }
 
+    function connectToWSServer() {
+//        easyRTC.webSocket = io.connect(easyRTC.serverPath, {
+//            'force new connection': true, 'connect timeout': 10000
+//        });
+        easyRTC.webSocket = io.connect(easyRTC.serverPath, {
+            'connect timeout': 10000
+        });
+        if (!easyRTC.webSocket) {
+            throw "io.connect failed";
+        }
 
-    easyRTC.webSocket = io.connect(easyRTC.serverPath, {
-        'force new connection': true, 'connect timeout': 10000
-    });
-    if (!easyRTC.webSocket) {
-        throw "io.connect failed";
+        easyRTC.webSocket.on('error', function() {
+            if (easyRTC.myEasyrtcid) {
+                easyRTC.showError(easyRTC.errCodes.SIGNAL_ERROR, "Miscellaneous error from signalling server. It may be ignorable.");
+            }
+            else {
+                errorCallback("Unable to reach the easyRTC signalling server.");
+            }
+        });
+
+        easyRTC.webSocket.on("connect", function(event) {
+
+            easyRTC.webSocketConnected = true;
+            if (!easyRTC.webSocket || !easyRTC.webSocket.socket || !easyRTC.webSocket.socket.sessionid) {
+                easyRTC.showError(easyRTC.errCodes.CONNECT_ERR, "Socket.io connect event fired with bad websocket.");
+            }
+
+            if (easyRTC.debugPrinter) {
+                easyRTC.debugPrinter("saw socketserver onconnect event");
+            }
+            if (easyRTC.webSocketConnected) {
+                // sendAuthenticate();
+                sendAuthenticate();
+            }
+            else {
+                errorCallback("Internal communications failure.");
+            }
+        }
+        );
+        easyRTC.webSocket.on("message", onChannelMessage);
+        easyRTC.webSocket.on("easyRTCCmd", onChannelCmd);
+        easyRTC.webSocket.on("easyrtcCmd", onChannelCmd);
+        easyRTC.webSocket.on("disconnect", function(code, reason, wasClean) {
+            console.log("saw disconnect event");
+            easyRTC.webSocketConnected = false;
+            easyRTC.updateConfigurationInfo = function() {
+            };
+            easyRTC.oldConfig = {};
+            easyRTC.disconnectBody();
+            if (easyRTC.disconnectListener) {
+                easyRTC.disconnectListener();
+            }
+        });
     }
-// the below lines were useless. Nobody on the net seems to have gotten connect_failed to work either.
-//    easyRTC.webSocket.on('connect_failed', function() {
-//        errorCallback("Unable to connect to the easyRTC WordPress Plugin server.");
-//    });
-//    easyRTC.webSocket.socket.on('connect_failed', function() {
-//        errorCallback("Unable to connect to the easyRTC WordPress Plugin server.");
-//    });
-    easyRTC.webSocket.on('error', function() {
-        if (easyRTC.myEasyrtcid) {
-            easyRTC.showError(easyRTC.errCodes.SIGNAL_ERROR, "Miscellaneous error from signalling server. It may be ignorable.");
-        }
-        else {
-            errorCallback("Unable to reach the easyRTC signalling server.");
-        }
-    });
+    connectToWSServer();
+    
     function  getStatistics(pc, track, results) {
         var successcb = function(stats) {
             for (var i in stats) {
@@ -2396,9 +2429,9 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                         }
                     }
                 }
-                
-               easyRTC.roomHasPassword = msgData[roomname].hasPassword;
-               //easyRTC.room = msg.room ? msg.room : null;
+
+                easyRTC.roomHasPassword = msgData[roomname].hasPassword;
+                //easyRTC.room = msg.room ? msg.room : null;
 
             }
         }
@@ -2430,7 +2463,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             if (msgData.roomData) {
                 processRoomData(msg.msgData.roomData);
             }
-            
+
 
             if (easyRTC.sipConfig && !easyRTC.sipAlreadyInitialized) {
                 if (!easyRTC.initSipUa) {
@@ -2473,46 +2506,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         easyRTC.sendServer("authenticate", msgData, processToken);
     }
 
-    easyRTC.webSocket.on("connect", function(event) {
-        if (!easyRTC.webSocket.socket.sessionid) {
-//
-// If you try to connect to a server that isn't there, you'll eventually get a 
-// connect event when the server is present, but the connection you get will be
-// broken, no sessionid field. In this scenario, we're going to try starting a
-// fresh connection.
-            easyRTC.webSocket.socket.disconnect();
-            startChannel(); // try again
-            return;
-        }
 
-        easyRTC.webSocket.on("message", onChannelMessage);
-        easyRTC.webSocket.on("easyrtcCmd", onChannelCmd);
-        easyRTC.webSocket.on("disconnect", function(code, reason, wasClean) {
-            easyRTC.updateConfigurationInfo = function() {
-            };
-            if (!easyRTC.disconnecting) {
-                setTimeout(function() {
-                    if (easyRTC.webSocket) {
-                        easyRTC.disconnectBody();
-                    }
-                    if (easyRTC.disconnectListener) {
-                        easyRTC.disconnectListener();
-                    }
-                }, 1000);
-            }
-        });
-        if (easyRTC.debugPrinter) {
-            easyRTC.debugPrinter("saw socketserver onconnect event");
-        }
-        if (easyRTC.webSocket) {
-            sendAuthenticate();
-            easyRTC.updateConfigurationInfo = updateConfiguration;
-        }
-        else {
-            errorCallback("Internal communications failure.");
-        }
-    }
-    );
 };
 // this flag controls whether the initManaged routine adds close buttons to the caller
 // video objects
