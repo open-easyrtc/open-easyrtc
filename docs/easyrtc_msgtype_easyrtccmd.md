@@ -68,8 +68,7 @@ Includes fields needed for authentication. Sender and target must be online, aut
  - **credential** (optional) (for enterprise, this would include the apiKey)
  - **setUserCfg** (optional) Contains all values from setUserCfg
  - **setPresence** (optional) Contains all values from setPresence
- - **roomJoin** (optional) Contains all values from 
- - om. Will default to application default room (if set).
+ - **roomJoin** (optional) Contains all values from roomJoin. Will default to application default room.
 
 **Returns:**
 
@@ -272,6 +271,9 @@ Provides an error code to the API when an error occurs.
 **Fields:**
 
  - **serverTime** (required)
+
+**msgData Fields:**
+
  - **errorCode** (required)
  - **errorText** (optional) User readable text explaining error.
 
