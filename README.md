@@ -20,7 +20,7 @@ Documentation
  * Configuration options
      * `/docs/easyrtc_configuration.md`
  * Client API documentation
-     * `/docs/easyrtc_client_api.md`
+     * `/docs/easyRTC.html`
  * Client API tutorial
      * `/docs/easyrtc_client_tutorial.md`
  * Frequently asked questions
