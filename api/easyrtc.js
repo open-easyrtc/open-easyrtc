@@ -111,7 +111,7 @@ easyRTC.sipAlreadyInitialized = false;
 /** The name user is in. This only applies to room oriented applications and is set at the same
  * time a token is received.
  */
-easyRTC.room = null;
+easyRTC.room = "default";
 /** Checks if the supplied string is a valid user name (standard identifier rules)
  * @param {String} name
  * @return {Boolean} true for a valid user name
@@ -1929,19 +1929,48 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             }
         }
     };
-    //
-    // The app engine has many machines running in parallel. This means when
-    //  a client sends a sequence of messages to another client via the server,
-    //  one at a time, they don't necessarily arrive in the same order in which
-    // they were sent. In particular, candidates arriving before an offer can throw
-    // a wrench in the gears. So we queue the messages up until we are ready for them.
-    //
+
+
     var queuedMessages = {};
     var clearQueuedMessages = function(caller) {
         queuedMessages[caller] = {
             candidates: []
         };
     };
+
+    function processConnectedList(connectedList) {
+        for (var i in easyRTC.peerConns) {
+            if (typeof connectedList[i] === 'undefined') {
+                if (easyRTC.peerConns[i].startedAV) {
+                    onRemoteHangup(i);
+                    clearQueuedMessages(i);
+                }
+            }
+        }
+    }
+    ;
+
+    function processList(list) {
+        var isPrimaryOwner = easyRTC.cookieOwner ? true : false;
+        easyRTC.reducedList = {};
+        for (id in list) {
+            var item = list[id];
+            if (item.isOwner &&
+                    item.clientConnectTime < list[easyRTC.myEasyrtcid].clientConnectTime) {
+                isPrimaryOwner = false;
+            }
+            if( id != easyRTC.myEasyrtcid) {
+                easyRTC.reducedList[id] = list[id];
+            }
+        }
+        processConnectedList(easyRTC.reducedList);
+        if (easyRTC.loggedInListener) {
+            easyRTC.loggedInListener(easyRTC.reducedList, isPrimaryOwner);
+        }
+    }
+
+
+
     var onChannelMessage = function(msg) {
 
         if (easyRTC.receiveDataCB) {
@@ -1965,16 +1994,8 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             clearQueuedMessages(caller);
         }
 
-        var processConnectedList = function(connectedList) {
-            for (var i in easyRTC.peerConns) {
-                if (typeof connectedList[i] === 'undefined') {
-                    if (easyRTC.peerConns[i].startedAV) {
-                        onRemoteHangup(i);
-                        clearQueuedMessages(i);
-                    }
-                }
-            }
-        };
+
+
         var processCandidate = function(msgData) {
             var candidate = null;
             if (window.mozRTCIceCandidate) {
@@ -2045,23 +2066,6 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 easyRTC.acceptCheck(caller, helper);
             }
         };
-        function processList(msgData) {
-            var isPrimaryOwner = easyRTC.cookieOwner ? true : false;
-            for (id in msgData.connections) {
-                var item = msgData.connections[id];
-                if (item.isOwner &&
-                        item.clientConnectTime < msgData.connections[easyRTC.myEasyrtcid].clientConnectTime) {
-                    isPrimaryOwner = false;
-                }
-            }
-            delete msgData.connections[easyRTC.myEasyrtcid];
-            easyRTC.lastLoggedInList = msgData.connections;
-            processConnectedList(msgData.connections);
-            if (easyRTC.loggedInListener) {
-                easyRTC.loggedInListener(msgData.connections, isPrimaryOwner);
-            }
-        }
-
 
         function processReject(caller) {
             delete easyRTC.acceptancePending[caller];
@@ -2139,7 +2143,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 processToken(msg);
                 break;
             case "roomData":
-                easyRTC.processRoomData(msgData);
+                processRoomData(msgData.roomData);
                 break;
             case "list":
                 processList(msgData);
@@ -2176,7 +2180,9 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 return;
                 break;
         }
-        ackAcceptorFn(easyRTC.ackMessage);
+        if (ackAcceptorFn) {
+            ackAcceptorFn(easyRTC.ackMessage);
+        }
     };
     if (!window.io) {
         easyRTC.onError("Your HTML has not included the socket.io.js library");
@@ -2237,7 +2243,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         });
     }
     connectToWSServer();
-    
+
     function  getStatistics(pc, track, results) {
         var successcb = function(stats) {
             for (var i in stats) {
@@ -2399,38 +2405,40 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
     }
 
-    function processRoomData(msgData) {
-        for (var roomname in msgData) {
+    function processRoomData(roomData) {
+        for (var roomname in roomData) {
             //
             // Important: we need to know what the roomname name is (easyRTC.room) 
             // at this point in the code. Rod doesn't appear to have implemented that
             // far yet.
             //
+
             if (roomname == easyRTC.room) {
-                if (msgData[roomname].field && msgData[roomname].field.isOwner) {
+                easyRTC.roomHasPassword = roomData[roomname].hasPassword;
+                if (roomData[roomname].field && roomData[roomname].field.isOwner) {
                     easyRTC.cookieOwner = true;
                 }
 
-                if (msgData[roomname].list) {
-                    easyRTC.lastLoggedInList = list;
-                    processList(list);
+                if (roomData[roomname].list) {
+                    easyRTC.lastLoggedInList = roomData[roomname].list;
                 }
-                else if (msgData[roomname].listDelta) {
-                    var stuffToAdd = msgData[roomname].listDelta.updateConnection;
+                else if (roomData[roomname].listDelta) {
+                    var stuffToAdd = roomData[roomname].listDelta.updateConnection;
                     if (stuffToAdd) {
                         for (var id in stuffToAdd) {
                             easyRTC.lastLoggedInList[id] = stuffToAdd[id];
                         }
                     }
-                    var stuffToRemove = msgData[roomname].listDelta.removeConnection;
+                    var stuffToRemove = roomData[roomname].listDelta.removeConnection;
                     if (stuffToRemove) {
                         for (var removeId in stuffToRemove) {
-                            easyRTC.lastLoggedInList[removeId] = stuffToRemove[removeId];
+                            delete easyRTC.lastLoggedInList[removeId];
                         }
                     }
-                }
 
-                easyRTC.roomHasPassword = msgData[roomname].hasPassword;
+                }
+                processList(easyRTC.lastLoggedInList);
+
                 //easyRTC.room = msg.room ? msg.room : null;
 
             }
@@ -2439,6 +2447,9 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
 
     function processToken(msg) {
+        if (easyRTC.debugPrinter) {
+            easyRTC.debugPrinter("entered process token");
+        }
         if (msg.msgType == "token") {
             var msgData = msg.msgData;
             if (msgData.easyrtcid) {
@@ -2502,8 +2513,9 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             easyrtcsid: easyrtcsid,
             credential: easyRTC.credential,
             setUserCfg: easyRTC.collectConfigurationInfo()
-        }
+        };
         easyRTC.sendServer("authenticate", msgData, processToken);
+
     }
 
 

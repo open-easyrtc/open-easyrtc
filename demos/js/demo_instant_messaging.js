@@ -24,7 +24,7 @@
 //POSSIBILITY OF SUCH DAMAGE.
 //
 var selfEasyrtcid = "";
-
+easyRTC.enableDebug(true);
 function addToConversation(who, content) {
     // Escape html special characters, then add linefeeds.
     content = content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
