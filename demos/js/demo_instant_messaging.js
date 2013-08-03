@@ -25,7 +25,7 @@
 //
 var selfEasyrtcid = "";
 easyRTC.enableDebug(true);
-function addToConversation(who, content) {
+function addToConversation(who, msgType, content) {
     // Escape html special characters, then add linefeeds.
     content = content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     content = content.replace(/\n/g, '<br />');
@@ -71,8 +71,8 @@ function sendStuffWS(otherEasyrtcid) {
         return;
     }
     
-    easyRTC.sendDataWS(otherEasyrtcid, text);
-    addToConversation("Me", text);
+    easyRTC.sendDataWS(otherEasyrtcid, "message",  text);
+    addToConversation("Me", "message", text);
     document.getElementById('sendMessageText').value = "";        
 }
 
