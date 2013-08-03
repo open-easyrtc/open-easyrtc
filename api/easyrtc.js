@@ -533,7 +533,7 @@ easyRTC.setLoggedInListener = function(listener) {
  * @param {Function} listener
  * @example
  *    easyRTC.setDataChannelOpenListener( function(easyrtcid) {
- *         easyRTC.sendDataP2P(easyrtcid, "hello");
+ *         easyRTC.sendDataP2P(easyrtcid, "greeting", "hello");
  *    });
  */
 easyRTC.setDataChannelOpenListener = function(listener) {
@@ -973,7 +973,7 @@ easyRTC.setVideoBandwidth = function(kbitsPerSecond) {
  * Sets a listener for data sent from another client (either peer to peer or via websockets).
  * @param {Function} listener has the signature (easyrtcid, data)
  * @example
- *     easyRTC.setDataListener( function(easyrtcid, data) {
+ *     easyRTC.setDataListener( function(easyrtcid, msgType, data) {
  *         ("From " + easyRTC.idToName(easyrtcid) + 
  *             " sent the follow data " + JSON.stringify(data));
  *     });
@@ -1180,11 +1180,13 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
      * @param {String} destUser (an easyrtcid)
      * @param {Object} data - an object which can be JSON'ed.
      * @example
-     *     easyRTC.sendDataP2P(someEasyrtcid, {room:499, bldgNum:'asd'});
+     *     easyRTC.sendDataP2P(someEasyrtcid, "roomdata", {room:499, bldgNum:'asd'});
      */
-    easyRTC.sendDataP2P = function(destUser, data) {
+    easyRTC.sendDataP2P = function(destUser, msgType, data) {
+        
+        var flattenedData = JSON.stringify({msgType:msgType, msgData:data});
         if (easyRTC.debugPrinter) {
-            easyRTC.debugPrinter("sending p2p message to " + destUser + " with data=" + JSON.stringify(data));
+            easyRTC.debugPrinter("sending p2p message to " + destUser + " with data=" + JSON.stringify(flattenedData));
         }
 
         if (!easyRTC.peerConns[destUser]) {
@@ -1197,7 +1199,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             easyRTC.showError(easyRTC.errCodes.DEVELOPER_ERR, "Attempt to use data channel to " + destUser + " before it's ready to send.");
         }
         else {
-            var flattenedData = JSON.stringify(data);
+            
             easyRTC.peerConns[destUser].dataChannelS.send(flattenedData);
         }
     };
@@ -1220,18 +1222,19 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     };
     /** Sends data to another user using websockets.
      * @param {String} destUser (an easyrtcid)
+     * @param {String msgType
      * @param {String} data - an object which can be JSON'ed.
      * @example 
      *    easyRTC.sendDataWS(someEasyrtcid, {room:499, bldgNum:'asd'});
      */
-    easyRTC.sendDataWS = function(destUser, data) {
+    easyRTC.sendDataWS = function(destUser, msgType, data) {
         if (easyRTC.debugPrinter) {
             easyRTC.debugPrinter("sending client message via websockets to " + destUser + " with data=" + JSON.stringify(data));
         }
         if (easyRTC.webSocket) {
-            easyRTC.webSocket.json.emit("message", {
-                senderId: easyRTC.myEasyrtcid,
+            easyRTC.webSocket.json.emit("easyrtcMsg", {
                 targetId: destUser,
+                msgType: msgType,
                 msgData: data
             });
         }
@@ -1244,16 +1247,17 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     };
     /** Sends data to another user. This method uses datachannels if one has been set up, or websockets otherwise.
      * @param {String} destUser (an easyrtcid)
+     * @param {String} msgType
      * @param {String} data - an object which can be JSON'ed.
      * @example 
      *    easyRTC.sendData(someEasyrtcid, {room:499, bldgNum:'asd'});
      */
-    easyRTC.sendData = function(destUser, data) {
+    easyRTC.sendData = function(destUser, msgType, data) {
         if (easyRTC.peerConns[destUser] && easyRTC.peerConns[destUser].dataChannelReady) {
-            easyRTC.sendDataP2P(destUser, data);
+            easyRTC.sendDataP2P(destUser, msgType, data);
         }
         else {
-            easyRTC.sendDataWS(destUser, data);
+            easyRTC.sendDataWS(destUser, msgType, data);
         }
     };
 
@@ -1974,7 +1978,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     var onChannelMessage = function(msg) {
 
         if (easyRTC.receiveDataCB) {
-            easyRTC.receiveDataCB(msg.senderId, msg.msgData);
+            easyRTC.receiveDataCB(msg.senderId, msg.msgType, msg.msgData);
         }
     };
     var onChannelCmd = function(msg, ackAcceptorFn) {
