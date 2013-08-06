@@ -1227,16 +1227,19 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
      * @example 
      *    easyRTC.sendDataWS(someEasyrtcid, {room:499, bldgNum:'asd'});
      */
-    easyRTC.sendDataWS = function(destUser, msgType, data) {
+    easyRTC.sendDataWS = function(destUser, msgType, data, ackhandler) {
         if (easyRTC.debugPrinter) {
             easyRTC.debugPrinter("sending client message via websockets to " + destUser + " with data=" + JSON.stringify(data));
+        }
+        if( !ackhandler) {
+            ackhandler = function() {};
         }
         if (easyRTC.webSocket) {
             easyRTC.webSocket.json.emit("easyrtcMsg", {
                 targetId: destUser,
                 msgType: msgType,
                 msgData: data
-            });
+            }, ackhandler);
         }
         else {
             if (easyRTC.debugPrinter) {
