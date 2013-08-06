@@ -1236,7 +1236,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
         if (easyRTC.webSocket) {
             easyRTC.webSocket.json.emit("easyrtcMsg", {
-                targetId: destUser,
+                targetEasyrtcid: destUser,
                 msgType: msgType,
                 msgData: data
             }, ackhandler);
