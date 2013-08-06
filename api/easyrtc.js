@@ -1146,7 +1146,9 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     //   msgData: either null or an SDP record
     //
     function sendSignalling(destUser, instruction, data, successCallback, errorCallback) {
-
+        if( !successCallback) {
+            console.log("whoops");
+        }
         if (!easyRTC.webSocket) {
             throw "Attempt to send message without a valid connection to the server."
         }
@@ -1454,16 +1456,16 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         easyRTC.peerConns[otherUser].callFailureCB = callFailureCB;
         easyRTC.peerConns[otherUser].wasAcceptedCB = wasAcceptedCB;
         var peerConnObj = easyRTC.peerConns[otherUser];
-        var setLocalAndSendMessage = function(sessionDescription) {
+        var setLocalAndSendMessage0 = function(sessionDescription) {
             if (peerConnObj.cancelled) {
                 return;
             }
-            var sendOffer = function(successCB, errorCB) {
-                sendSignalling(otherUser, "offer", sessionDescription, successCB, callFailureCB);
+            var sendOffer = function() {
+                sendSignalling(otherUser, "offer", sessionDescription, function() {}, callFailureCB);
             };
             pc.setLocalDescription(sessionDescription, sendOffer, callFailureCB);
         };
-        pc.createOffer(setLocalAndSendMessage, null, mediaConstraints);
+        pc.createOffer(setLocalAndSendMessage0, null, mediaConstraints);
     };
     function limitBandWidth(sd) {
         if (easyRTC.videoBandwidthString !== "") {
@@ -1805,12 +1807,13 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         };
         return pc;
     };
-    var doAnswer = function(caller, msg) {
+    var doAnswer = function(caller, msgData) {
 
+console.log("doAnswer caller=", caller);
         if (!easyRTC.localStream && (easyRTC.videoEnabled || easyRTC.audioEnabled)) {
             easyRTC.initMediaSource(
                     function(s) {
-                        doAnswer(caller, msg);
+                        doAnswer(caller, msgData);
                     },
                     function(err) {
                         easyRTC.showError(easyRTC.errCodes.MEDIA_ERR, "Error getting local media stream: " + err);
@@ -1827,7 +1830,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                     easyRTC.showError(easyRTC.errCodes.MEDIA_ERR, "Error getting fake media stream for Firefox datachannels: null stream");
                 }
                 easyRTC.mozFakeStream = s;
-                doAnswer(caller, msg);
+                doAnswer(caller, msgData);
             }, function(err) {
                 easyRTC.showError(easyRTC.errCodes.MEDIA_ERR, "Error getting fake media stream for Firefox datachannels: " + err);
             });
@@ -1845,7 +1848,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             }
             return;
         }
-        var setLocalAndSendMessage = function(sessionDescription) {
+        var setLocalAndSendMessage1 = function(sessionDescription) {
             if (newPeerConn.cancelled)
                 return;
             var sendAnswer = function() {
@@ -1873,10 +1876,10 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         };
         var sd = null;
         if (window.mozRTCSessionDescription) {
-            sd = new mozRTCSessionDescription(msg.msgData);
+            sd = new mozRTCSessionDescription(msgData);
         }
         else {
-            sd = new RTCSessionDescription(msg.msgData);
+            sd = new RTCSessionDescription(msgData);
         }
         if (easyRTC.debugPrinter) {
             easyRTC.debugPrinter("sdp ||  " + JSON.stringify(sd));
@@ -1884,7 +1887,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         var invokeCreateAnswer = function() {
             if (newPeerConn.cancelled)
                 return;
-            pc.createAnswer(setLocalAndSendMessage,
+            pc.createAnswer(setLocalAndSendMessage1,
                     function(message) {
                         easyRTC.showError(easyRTC.errCodes.INTERNAL_ERR, "create-answer: " + message);
                     },
@@ -1981,7 +1984,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     var onChannelMessage = function(msg) {
 
         if (easyRTC.receiveDataCB) {
-            easyRTC.receiveDataCB(msg.senderId, msg.msgType, msg.msgData);
+            easyRTC.receiveDataCB(msg.senderEasyrtcid, msg.msgType, msg.msgData);
         }
     };
     var onChannelCmd = function(msg, ackAcceptorFn) {
@@ -1989,7 +1992,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             easyRTC.debugPrinter("received message from socket server=" + JSON.stringify(msg));
         }
 
-        var caller = msg.senderId;
+        var caller = msg.senderEasyrtcid;
         var msgType = msg.msgType;
         var msgData = msg.msgData;
         var pc;
@@ -2003,7 +2006,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
 
 
-        var processCandidate = function(msgData) {
+        var processCandidate = function(caller, msgData) {
             var candidate = null;
             if (window.mozRTCIceCandidate) {
                 candidate = new mozRTCIceCandidate({
@@ -2234,7 +2237,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             }
         }
         );
-        easyRTC.webSocket.on("message", onChannelMessage);
+        easyRTC.webSocket.on("easyrtcMsg", onChannelMessage);
         easyRTC.webSocket.on("easyRTCCmd", onChannelCmd);
         easyRTC.webSocket.on("easyrtcCmd", onChannelCmd);
         easyRTC.webSocket.on("disconnect", function(code, reason, wasClean) {
