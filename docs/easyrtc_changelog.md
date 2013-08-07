@@ -5,8 +5,9 @@ v0.8.1b
 -------
 New Features:
 Changes:
+ * API - Implementing methods used in Google's adapter.js for cross browser support
+ * Server/API - Renamed easyRTCcmd socket message type to easyrtcCmd. Should have no outside effect. 
  * Server - Moved API files to the /api/ folder thus cleaning up the /static/. API files are publicly linked using /easyrtc/easyrtc.js and /easyrtc/easyrtc.css. For transitional purposes, the old public file locations are still accessible.
- * Server/Api - Renamed easyRTCcmd socket message type to easyrtcCmd. Should have no outside effect. 
 
 Fixes:
  * API - Firefox - Strips TURN servers from ICE config if they are present. Firefox doesn't currently handle TURN servers well.
