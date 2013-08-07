@@ -36,6 +36,164 @@
  */
 
 
+//
+// the below code is a copy of the standard polyfill adapter.js
+//
+var RTCPeerConnection = null;
+var getUserMedia = null;
+var attachMediaStream = null;
+var reattachMediaStream = null;
+var webrtcDetectedBrowser = null;
+var webrtcDetectedVersion = null;
+
+
+if (navigator.mozGetUserMedia) {
+    // console.log("This appears to be Firefox");
+
+    webrtcDetectedBrowser = "firefox";
+
+    webrtcDetectedVersion =
+            parseInt(navigator.userAgent.match(/Firefox\/([0-9]+)\./)[1]);
+
+    // The RTCPeerConnection object.
+    RTCPeerConnection = mozRTCPeerConnection;
+
+    // The RTCSessionDescription object.
+    RTCSessionDescription = mozRTCSessionDescription;
+
+    // The RTCIceCandidate object.
+    RTCIceCandidate = mozRTCIceCandidate;
+
+    // Get UserMedia (only difference is the prefix).
+    // Code from Adam Barth.
+    getUserMedia = navigator.mozGetUserMedia.bind(navigator);
+
+    // Creates iceServer from the url for FF.
+    createIceServer = function(url, username, password) {
+        var iceServer = null;
+        var url_parts = url.split(':');
+        if (url_parts[0].indexOf('stun') === 0) {
+            // Create iceServer with stun url.
+            iceServer = {'url': url};
+        } else if (url_parts[0].indexOf('turn') === 0 &&
+                (url.indexOf('transport=udp') !== -1 ||
+                        url.indexOf('?transport') === -1)) {
+            // Create iceServer with turn url.
+            // Ignore the transport parameter from TURN url.
+            var turn_url_parts = url.split("?");
+            iceServer = {'url': turn_url_parts[0],
+                'credential': password,
+                'username': username};
+        }
+        return iceServer;
+    };
+
+    // Attach a media stream to an element.
+    attachMediaStream = function(element, stream) {
+        console.log("Attaching media stream");
+        element.mozSrcObject = stream;
+        element.play();
+    };
+
+    reattachMediaStream = function(to, from) {
+        console.log("Reattaching media stream");
+        to.mozSrcObject = from.mozSrcObject;
+        to.play();
+    };
+
+    if( webrtcDetectedVersion < 23) {
+        // Fake get{Video,Audio}Tracks
+        MediaStream.prototype.getVideoTracks = function() {
+            return [];
+        };
+
+        MediaStream.prototype.getAudioTracks = function() {
+            return [];
+        };
+    }
+} else if (navigator.webkitGetUserMedia) {
+    console.log("This appears to be Chrome");
+
+    webrtcDetectedBrowser = "chrome";
+    webrtcDetectedVersion =
+            parseInt(navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./)[2]);
+
+    // Creates iceServer from the url for Chrome.
+    createIceServer = function(url, username, password) {
+        var iceServer = null;
+        var url_parts = url.split(':');
+        if (url_parts[0].indexOf('stun') === 0) {
+            // Create iceServer with stun url.
+            iceServer = {'url': url};
+        } else if (url_parts[0].indexOf('turn') === 0) {
+            if (webrtcDetectedVersion < 28) {
+                // For pre-M28 chrome versions use old TURN format.
+                var url_turn_parts = url.split("turn:");
+                iceServer = {'url': 'turn:' + username + '@' + url_turn_parts[1],
+                    'credential': password};
+            } else {
+                // For Chrome M28 & above use new TURN format.
+                iceServer = {'url': url,
+                    'credential': password,
+                    'username': username};
+            }
+        }
+        return iceServer;
+    };
+
+    // The RTCPeerConnection object.
+    RTCPeerConnection = webkitRTCPeerConnection;
+
+    // Get UserMedia (only difference is the prefix).
+    // Code from Adam Barth.
+    getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
+
+    // Attach a media stream to an element.
+    attachMediaStream = function(element, stream) {
+        if (typeof element.srcObject !== 'undefined') {
+            element.srcObject = stream;
+        } else if (typeof element.mozSrcObject !== 'undefined') {
+            element.mozSrcObject = stream;
+        } else if (typeof element.src !== 'undefined') {
+            element.src = URL.createObjectURL(stream);
+        } else {
+            console.log('Error attaching stream to element.');
+        }
+    };
+
+    reattachMediaStream = function(to, from) {
+        to.src = from.src;
+    };
+
+    // The representation of tracks in a stream is changed in M26.
+    // Unify them for earlier Chrome versions in the coexisting period.
+    if (!webkitMediaStream.prototype.getVideoTracks) {
+        webkitMediaStream.prototype.getVideoTracks = function() {
+            return this.videoTracks;
+        };
+        webkitMediaStream.prototype.getAudioTracks = function() {
+            return this.audioTracks;
+        };
+    }
+
+    // New syntax of getXXXStreams method in M26.
+    if (!webkitRTCPeerConnection.prototype.getLocalStreams) {
+        webkitRTCPeerConnection.prototype.getLocalStreams = function() {
+            return this.localStreams;
+        };
+        webkitRTCPeerConnection.prototype.getRemoteStreams = function() {
+            return this.remoteStreams;
+        };
+    }
+} else {
+    console.log("Browser does not appear to be WebRTC-capable");
+}
+
+//
+// This is the end of the polyfill adapter.js
+//
+
+
 var easyRTC = {};
 
 /** Error codes that the easyRTC will use in the errCode field of error object passed
@@ -60,9 +218,6 @@ easyRTC.userNamePattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,30}[a-zA-Z0-9]$/;
 
 /** @private */
 easyRTC.userName = null;
-
-/** @private */
-easyRTC.apiKey = "cmhslu5vo57rlocg"; // default key for now
 
 /** @private */
 easyRTC.loggingOut = false;
@@ -100,30 +255,26 @@ easyRTC.oldConfig = {};
 /** @private */
 easyRTC.offersPending = {};
 
+/** private */
+easyRTC.cookieId = "easyrtcsid";
+
 /** @private */
 easyRTC.filterOutTurn = false;
 
 easyRTC.sipUA = null;  // JSSIP user agent if SIP is supported.
 
 /** The height of the local media stream video in pixels. This field is set an indeterminate period 
- * of time after easyRTC.initMedia succeeds.
+ * of time after easyRTC.initMediaSource succeeds.
  */
 easyRTC.nativeVideoHeight = 0;
 
 /** The width of the local media stream video in pixels. This field is set an indeterminate period 
- * of time after easyRTC.initMedia succeeds.
+ * of time after easyRTC.initMediaSource succeeds.
  */
 easyRTC.nativeVideoWidth = 0;
 
 /** @private */
 easyRTC.apiKey = "cmhslu5vo57rlocg"; // default key for now
-
-/* temporary hack */
-/** @private
- * @param {string} referer */
-easyRTC.setReferer = function(referer) {
-    easyRTC.referer = referer;
-};
 
 /** The name user is in. This only applies to room oriented applications and is set at the same
  * time a token is received.
@@ -162,7 +313,7 @@ easyRTC.setCookieId = function(cookieId) {
     easyRTC.cookieId = cookieId;
 };
 /** This function is used to set the dimensions of the local camera, usually to get HD.
- *  If called, it must be called before calling easyRTC.initLocalMedia (explicitly or implicitly).
+ *  If called, it must be called before calling easyRTC.initMediaSource (explicitly or implicitly).
  *  assuming it is supported. If you don't pass any parameters, it will default to 720p dimensions.
  * @param {Number} width in pixels
  * @param {Number} height in pixels
@@ -275,11 +426,8 @@ easyRTC.enableDebug = function(enable) {
  * @returns {Boolean} True getUserMedia is supported.
  */
 easyRTC.supportsGetUserMedia = function() {
-    return (navigator.getUserMedia ||
-            navigator.webkitGetUserMedia ||
-            navigator.mozGetUserMedia) ? true : false;
+    return !!getUserMedia;
 };
-
 /**
  * Determines if the local browser supports WebRTC Peer connections to the extent of being able to do video chats.
  * @returns {Boolean} True if Peer connections are supported.
@@ -288,8 +436,7 @@ easyRTC.supportsPeerConnection = function() {
     if (!easyRTC.supportsGetUserMedia()) {
         return false;
     }
-    if (!(window.mozRTCPeerConnection || window.webkitRTCPeerConnection ||
-            window.RTCPeerConnection)) {
+    if (!window.RTCPeerConnection) {
         return false;
     }
     try {
@@ -299,42 +446,12 @@ easyRTC.supportsPeerConnection = function() {
     }
     return true;
 };
-
-/** @private
- * @returns {DOMObject}
- */
-easyRTC.getFilteredIce = function() {
-
-    if (!easyRTC.filterOutTurn) {
-        return easyRTC.pc_config;
-    }
-    else {
-        var pc_config = {iceServers: []};
-        for (var i in easyRTC.pc_config.iceServers) {
-            if (easyRTC.pc_config.iceServers[i].url.indexOf('turn:') === 0) {
-                console.log("Filtering out turn server entry.");
-            }
-            else {
-                pc_config.iceServers.push(easyRTC.pc_config.iceServers[i]);
-            }
-        }
-        return pc_config;
-    }
-};
-
 /** @private
  * @param pc_config ice configuration array
  * @param optionalStuff peer constraints.
  */
 easyRTC.createRTCPeerConnection = function(pc_config, optionalStuff) {
-
-    if (window.mozRTCPeerConnection) {
-        return new mozRTCPeerConnection(pc_config, optionalStuff);
-    }
-    else if (window.webkitRTCPeerConnection) {
-        return new webkitRTCPeerConnection(pc_config, optionalStuff);
-    }
-    else if (window.RTCPeerConnection) {
+    if (RTCPeerConnection) {
         return new RTCPeerConnection(pc_config, optionalStuff);
     }
     else {
@@ -372,8 +489,14 @@ easyRTC.onDataChannelOpen = null;
 easyRTC.onDataChannelClose = null;
 /** @private */
 easyRTC.lastLoggedInList = {};
+
 /** @private */
-easyRTC.receiveDataCB = null;
+easyRTC.receivePeerCB = null;
+
+/** @private */
+easyRTC.receiveServerCB = null;
+
+
 /** @private */
 easyRTC.appDefinedFields = {};
 
@@ -733,6 +856,61 @@ easyRTC.getLocalStream = function() {
     return easyRTC.localStream;
 };
 
+/**
+ * Sends a easyrtcCmd command to the server, rather than another client. 
+ * @param {string} instruction
+ * @param {object} data
+ * @returns {undefined}
+ */
+easyRTC.sendEasyrtcCmd = function(instruction, data) {
+    if (!easyRTC.webSocketConnected) {
+        throw "Attempt to send message without a valid connection to the server."
+    }
+    else {
+        var dataToShip = {
+            msgType: instruction,
+            msgData: data
+        };
+
+        if (easyRTC.debugPrinter) {
+            easyRTC.debugPrinter("sending server message " + JSON.stringify(dataToShip));
+        }
+        easyRTC.webSocket.json.emit("easyrtcCmd", dataToShip);
+    }
+};
+
+easyRTC.sendServerMessage = function(instruction, data) {
+    if (!easyRTC.webSocketConnected) {
+        throw "Attempt to send message without a valid connection to the server."
+    }
+    else {
+        var dataToShip = {
+            msgType: instruction,
+            msgData: data
+        };
+
+        if (easyRTC.debugPrinter) {
+            easyRTC.debugPrinter("sending server message " + JSON.stringify(dataToShip));
+        }
+        easyRTC.webSocket.json.emit("message", dataToShip);
+    }
+};
+
+/** Clears the media stream on a video object.
+ * 
+ * @param {type} element the video object.
+ * @returns {undefined}
+ */
+easyRTC.clearMediaStream = function(element) {
+    if (typeof element.srcObject !== 'undefined') {
+        element.srcObject = null;
+    } else if (typeof element.mozSrcObject !== 'undefined') {
+        element.mozSrcObject = null;
+    } else if (typeof element.src !== 'undefined') {
+        element.src = null;
+    } else {
+    }
+};
 
 /**
  *  Sets a video or audio object from a media stream.
@@ -750,22 +928,15 @@ easyRTC.getLocalStream = function() {
  *     
  */
 easyRTC.setVideoObjectSrc = function(videoObject, stream) {
-
-    if (stream) {
+    if (stream && stream != "") {
         videoObject.autoplay = true;
-    }
-
-    if (typeof videoObject.mozSrcObject !== "undefined") {
-        videoObject.mozSrcObject = (stream === "") ? null : stream;
-    }
-    else {
-        videoObject.src = (stream === "") ? "" : easyRTC.createObjectURL(stream);
-    }
-    if (stream) {
+        attachMediaStream(videoObject, stream);
         videoObject.play();
     }
+    else {
+        easyRTC.clearMediaStream(videoObject);
+    }
 };
-
 /** @private
  * @param {String} x */
 easyRTC.formatError = function(x) {
@@ -824,6 +995,10 @@ easyRTC.initMediaSource = function(successCallback, errorCallback) {
         easyRTC.debugPrinter("about to request local media");
     }
 
+    if (!window.getUserMedia) {
+        errorCallback("Your browser doesn't appear to support WebRTC.");
+    }
+
     if (errorCallback === null) {
         errorCallback = function(x) {
             var message = "easyRTC.initMediaSource: " + easyRTC.formatError(x);
@@ -839,30 +1014,10 @@ easyRTC.initMediaSource = function(successCallback, errorCallback) {
         return;
     }
 
-    /** @private
-     * @param {String} mode
-     * @param {Function} successfunc
-     * @param {Function} errorFunc */
-    function callGetUserMedia(mode, successfunc, errorFunc) {
-        if (easyRTC.debugPrinter) {
-            easyRTC.debugPrinter("about to request local media = " + JSON.stringify(mode));
-        }
-        if (navigator.getUserMedia) {
-            navigator.getUserMedia(mode, successfunc, errorFunc);
-        }
-        else if (navigator.webkitGetUserMedia) {
-            navigator.webkitGetUserMedia(mode, successfunc, errorFunc);
-        }
-        else if (navigator.mozGetUserMedia) {
-            navigator.mozGetUserMedia(mode, successfunc, errorFunc);
-        }
-        else {
-            errorCallback("Your browser doesn't appear to support WebRTC.");
-        }
-    }
 
 
-
+    var mode = {'audio': easyRTC.audioEnabled ? true : false,
+        'video': (easyRTC.videoEnabled) ? (easyRTC.videoFeatures) : false};
 
     /** @private
      * @param {Stream} stream
@@ -871,6 +1026,25 @@ easyRTC.initMediaSource = function(successCallback, errorCallback) {
         if (easyRTC.debugPrinter) {
             easyRTC.debugPrinter("getUserMedia success callback entered");
         }
+//     console.log("getusermedia succeeded");
+// the below commented out checks were for Chrome. However, Mozilla nightly started 
+// implementing the getAudioTracks method as well, except their implementation appears to 
+// be asychronous, the audioTracks.length are zero initially and filled later.
+// 
+//        if (easyRTC.audioEnabled && stream.getAudioTracks) {
+//            var audioTracks = stream.getAudioTracks();
+//            if (!audioTracks || audioTracks.length === 0) {
+//                errorCallback("The application requested audio but the system didn't supply it");
+//                return;
+//            }
+//        }
+//        if (easyRTC.videoEnabled && stream.getVideoTracks) {
+//            var videoTracks = stream.getVideoTracks();
+//            if (!videoTracks || videoTracks.length === 0) {
+//                errorCallback("The application requested video but the system didn't supply it");
+//                return;
+//            }
+//        }
 
         if (easyRTC.debugPrinter) {
             easyRTC.debugPrinter("successfully got local media");
@@ -879,7 +1053,6 @@ easyRTC.initMediaSource = function(successCallback, errorCallback) {
         if (easyRTC.haveAudioVideo.video) {
             var videoObj = document.createElement('video');
             videoObj.muted = true;
-
             var triesLeft = 30;
             var tryToGetSize = function() {
                 if (videoObj.videoWidth > 0 || triesLeft < 0) {
@@ -903,7 +1076,7 @@ easyRTC.initMediaSource = function(successCallback, errorCallback) {
                         ele.removeChild(videoObj);
                     }
 
-                    // easyRTC.updateConfigurationInfo();
+// easyRTC.updateConfigurationInfo();
                     if (successCallback) {
                         successCallback();
                     }
@@ -923,7 +1096,6 @@ easyRTC.initMediaSource = function(successCallback, errorCallback) {
             }
         }
     };
-
     /** @private
      * @param {String} error
      */
@@ -942,8 +1114,6 @@ easyRTC.initMediaSource = function(successCallback, errorCallback) {
         };
         easyRTC.updateConfigurationInfo();
     };
-
-
     if (!easyRTC.audioEnabled && !easyRTC.videoEnabled) {
         onUserMediaError("At least one of audio and video must be provided");
         return;
@@ -954,29 +1124,16 @@ easyRTC.initMediaSource = function(successCallback, errorCallback) {
         audio: easyRTC.audioEnabled,
         video: easyRTC.videoEnabled
     };
-
-
-
     if (easyRTC.videoEnabled || easyRTC.audioEnabled) {
-        //
-        // getUserMedia usually fails the first time I call it. I suspect it's a page loading
-        // issue. So I'm going to try adding a 1 second delay to allow things to settle down first.
-        // 
+//
+// getUserMedia usually fails the first time I call it. I suspect it's a page loading
+// issue. So I'm going to try adding a 1 second delay to allow things to settle down first.
+// 
         setTimeout(function() {
             try {
-                callGetUserMedia({
-                    'audio': easyRTC.audioEnabled ? true : false,
-                    'video': (easyRTC.videoEnabled) ? (easyRTC.videoFeatures) : false
-                }, onUserMediaSuccess,
-                        onUserMediaError);
+                getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
             } catch (e) {
-                try {
-                    callGetUserMedia("video,audio", onUserMediaSuccess,
-                            onUserMediaError);
-                } catch (e) {
-                    document.body.removeChild(getUserMediaDiv);
-                    errorCallback("getUserMedia failed with exception: " + e.message);
-                }
+                errorCallback("getUserMedia failed with exception: " + e.message);
             }
         }, 1000);
     }
@@ -1096,14 +1253,42 @@ easyRTC.setVideoBandwidth = function(kbitsPerSecond) {
  * Sets a listener for data sent from another client (either peer to peer or via websockets).
  * @param {Function} listener has the signature (easyrtcid, data)
  * @example
+ *     easyRTC.setPeerListener( function(easyrtcid, data) {
+ *         ("From " + easyRTC.idToName(easyrtcid) + 
+ *             " sent the follow data " + JSON.stringify(data));
+ *     });
+ *     
+ *     
+ */
+easyRTC.setPeerListener = function(listener) {
+    easyRTC.receivePeerCB = listener;
+};
+/**
+ * Sets a listener for data sent from another client (either peer to peer or via websockets).
+ * @deprecated This is now a synonym for setPeerListener.
+ * @param {Function} listener has the signature (easyrtcid, data)
+ * @example
  *     easyRTC.setDataListener( function(easyrtcid, data) {
  *         ("From " + easyRTC.idToName(easyrtcid) + 
  *             " sent the follow data " + JSON.stringify(data));
  *     });
+ *     
+ *     
  */
-easyRTC.setDataListener = function(listener) {
-    easyRTC.receiveDataCB = listener;
+easyRTC.setDataListener = easyRTC.setPeerListener;
+
+/**
+ * Sets a listener for messages from the server.
+ * @param {Function} listener has the signature (data)
+ * @example
+ *     easyRTC.setPeerListener( function(data) {
+ *         ("From Server sent the follow data " + JSON.stringify(data));
+ *     });     
+ */
+easyRTC.setServerListener = function(listener) {
+    easyRTC.receiveServerCB = listener;
 };
+
 
 
 /**
@@ -1182,9 +1367,68 @@ easyRTC.idToName = function(easyrtcid) {
 
 
 
+easyRTC.haveTracks = function(easyrtcid, checkAudio) {
+    var stream;
+
+    if (easyrtcid) {
+        var peerConnObj = easyRTC.peerConns[easyrtcid];
+        if (!peerConnObj) {
+            return true;
+        }
+        var stream = peerConnObj.stream;
+    }
+    else {
+        stream = easyRTC.localStream;
+    }
+
+    if (!stream) {
+        return false;
+    }
+
+    var tracks;
+    try {
+        if (checkAudio) {
+            tracks = stream.getAudioTracks();
+        }
+        else {
+            tracks = stream.getVideoTracks();
+        }
+    } catch (oops) {
+        return true;
+    }
+    if (!tracks)
+        return false;
+    return tracks.length > 0;
+}
+
+
+
+/** Determines if a particular peer2peer connection has an audio track.
+ * @param easyrtcid - the id of the other caller in the connection. Null for local media stream.
+ * @return {boolean} 
+ */
+easyRTC.haveAudioTrack = function(easyrtcid) {
+    return easyRTC.haveTracks(easyrtcid, true);
+};
+
+
+
+
+/** Determines if a particular peer2peer connection has a video track.
+ * @param easyrtcid - the id of the other caller in the connection. Null for local media stream.
+ * @return {string} "yes", "no", "unknown"
+ */
+easyRTC.haveVideoTrack = function(easyrtcid) {
+    return easyRTC.haveTracks(easyrtcid, false);
+};
+
+
+
 /* used in easyRTC.connect */
 /** @private */
 easyRTC.webSocket = null;
+easyRTC.webSocketConnected = false;
+
 /** @private  */
 easyRTC.pc_config = {};
 /** @private  */
@@ -1200,7 +1444,7 @@ easyRTC.closedChannel = null;
  * @param {Function} errorCallback (msgString) - is called on unsuccessful connect. if null, an alert is called instead.
  */
 easyRTC.connect = function(applicationName, successCallback, errorCallback) {
-    easyRTC.webSocket = null;
+    easyRTC.webSocketConnected = false;
     easyRTC.pc_config = {};
     easyRTC.closedChannel = null;
 
@@ -1222,19 +1466,14 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     // easyRTC.disconnect performs a clean disconnection of the client from the server.
     //
     easyRTC.disconnectBody = function() {
+
         easyRTC.loggingOut = true;
-        easyRTC.disconnecting = true;
         easyRTC.closedChannel = easyRTC.webSocket;
-        if (easyRTC.webSocket) {
-            easyRTC.webSocket.disconnect();
-        }
-        easyRTC.webSocket = 0;
         easyRTC.hangupAll();
         if (easyRTC.loggedInListener) {
             easyRTC.loggedInListener({}, false);
         }
         easyRTC.loggingOut = false;
-        easyRTC.disconnecting = false;
         easyRTC.oldConfig = {};
     };
 
@@ -1243,8 +1482,6 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             easyRTC.debugPrinter("attempt to disconnect from webrtc signalling server");
         }
 
-
-        easyRTC.disconnecting = true;
         easyRTC.hangupAll();
         easyRTC.loggingOut = true;
         // 
@@ -1254,7 +1491,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         // the info, so 250ms should be sufficient for the disconnecting.
         // 
         setTimeout(function() {
-            if (easyRTC.webSocket) {
+            if (easyRTC.webSocketConnected) {
                 try {
                     easyRTC.webSocket.disconnect();
                 } catch (e) {
@@ -1262,7 +1499,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 }
                 ;
                 easyRTC.closedChannel = easyRTC.webSocket;
-                easyRTC.webSocket = 0;
+                easyRTC.webSocketConnected = false;
 
             }
             easyRTC.loggingOut = false;
@@ -1284,7 +1521,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
     var sendMessage = function(destUser, instruction, data, successCallback, errorCallback) {
 
-        if (!easyRTC.webSocket) {
+        if (!easyRTC.webSocketConnected) {
             throw "Attempt to send message without a valid connection to the server."
         }
         else {
@@ -1302,7 +1539,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             if (easyRTC.debugPrinter) {
                 easyRTC.debugPrinter("sending socket message " + JSON.stringify(dataToShip));
             }
-            easyRTC.webSocket.json.emit("easyRTCcmd", dataToShip);
+            easyRTC.webSocket.json.emit("easyrtcCmd", dataToShip);
         }
     };
 
@@ -1349,7 +1586,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         if (easyRTC.debugPrinter) {
             easyRTC.debugPrinter("sending client message via websockets to " + destUser + " with data=" + JSON.stringify(data));
         }
-        if (easyRTC.webSocket) {
+        if (easyRTC.webSocketConnected) {
             easyRTC.webSocket.json.emit("message", {
                 senderId: easyRTC.myEasyrtcid,
                 targetId: destUser,
@@ -1380,49 +1617,6 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
     };
 
-
-    function haveTracks(easyrtcid, checkAudio) {
-        var peerConnObj = easyRTC.peerConns[easyrtcid];
-        if (!peerConnObj) {
-            return true;
-        }
-        var stream = peerConnObj.stream;
-        if (!stream) {
-            return false;
-        }
-
-        var tracks;
-        try {
-            if (checkAudio) {
-                tracks = stream.getAudioTracks();
-            }
-            else {
-                tracks = stream.getVideoTracks();
-            }
-        } catch (oops) {
-            return true;
-        }
-        if (!tracks)
-            return false;
-        return tracks.length > 0;
-    }
-
-    /** Determines if a particular peer2peer connection has an audio track.
-     * @param easyrtcid - the id of the other caller in the connection.
-     * @return {boolean} 
-     */
-    easyRTC.haveAudioTrack = function(easyrtcid) {
-        return haveTracks(easyrtcid, true);
-    };
-
-
-    /** Determines if a particular peer2peer connection has a video track.
-     * @param easyrtcid - the id of the other caller in the connection.
-     * @return {string} "yes", "no", "unknown"
-     */
-    easyRTC.haveVideoTrack = function(easyrtcid) {
-        return haveTracks(easyrtcid, false);
-    };
 
 
     /** Value returned by easyRTC.getConnectStatus if the other user isn't connected. */
@@ -1528,7 +1722,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
 
 
-        if (!easyRTC.webSocket) {
+        if (!easyRTC.webSocketConnected) {
             var message = "Attempt to make a call prior to connecting to service";
             if (easyRTC.debugPrinter) {
                 easyRTC.debugPrinter(message);
@@ -1640,7 +1834,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             easyRTC.peerConns[otherUser].cancelled = true;
 
             delete easyRTC.peerConns[otherUser];
-            if (easyRTC.webSocket) {
+            if (easyRTC.webSocketConnected) {
                 sendMessage(otherUser, "hangup", {}, function() {
                 }, function(msg) {
                     if (easyRTC.debugPrinter) {
@@ -1715,7 +1909,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         for (otherUser in easyRTC.peerConns) {
             sawAConnection = true;
             hangupBody(otherUser);
-            if (easyRTC.webSocket) {
+            if (easyRTC.webSocketConnected) {
                 sendMessage(otherUser, "hangup", {}, function() {
                 }, function(msg) {
                     if (easyRTC.debugPrinter) {
@@ -1730,7 +1924,23 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
     };
 
-
+    /**
+     * This method adds a new stream to an existing connection. 
+     * @param {string} otherUser - the easyrtcid of the other party in the connection.
+     * @param {MediaStream} stream - the other local media stream.
+     */
+    easyRTC.addNewStream = function(otherUser, stream) {
+        if (!easyRTC.peerConns[otherUser]) {
+            alert("Programmer error: addNewStream: no connection to " + otherUser);
+        }
+        else if (!stream) {
+            alert("Programmer error: addNewStream: stream to add is null");
+        }
+        else {
+            var pc = easyRTC.peerConns[otherUser].pc;
+            pc.addStream(stream);
+        }
+    }
 
 
     var buildPeerConnection = function(otherUser, isInitiator, failureCB) {
@@ -1743,7 +1953,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
 
         try {
-            pc = easyRTC.createRTCPeerConnection(easyRTC.getFilteredIce(), easyRTC.buildPeerConstraints());
+            pc = easyRTC.createRTCPeerConnection(easyRTC.pc_config, easyRTC.buildPeerConstraints());
             if (!pc) {
                 message = "Unable to create PeerConnection object, check your ice configuration(" +
                         JSON.stringify(easyRTC.pc_config) + ")";
@@ -1826,7 +2036,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 if (easyRTC.debugPrinter) {
                     easyRTC.debugPrinter("saw remove on remote media stream");
                 }
-
+                console.log("saw onremovestream ", event);
                 if (easyRTC.peerConns[otherUser]) {
                     easyRTC.peerConns[otherUser].stream = null;
                     if (easyRTC.onStreamClosed) {
@@ -1862,6 +2072,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 pc.addStream(easyRTC.localStream);
             }
         }
+
 
         function initOutGoingChannel(otherUser) {
             if (easyRTC.debugPrinter) {
@@ -2133,8 +2344,15 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
     var onChannelMessage = function(msg) {
 
-        if (easyRTC.receiveDataCB) {
-            easyRTC.receiveDataCB(msg.senderId, msg.msgData);
+        if (msg.senderId && msg.senderId !== "server") {
+            if (easyRTC.receivePeerCB) {
+                easyRTC.receivePeerCB(msg.senderId, msg.msgData);
+            }
+        }
+        else {
+            if (easyRTC.receiveServerCB) {
+                easyRTC.receiveServerCB(msg);
+            }
         }
     };
 
@@ -2256,28 +2474,39 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         if (msgType === 'token') {
             easyRTC.myEasyrtcid = msg.easyrtcid;
             //
-            // Firefox doesn't support turn worth beans at this time so we filter 
-            // out all the turn server entries if we realize we're in firefox.
-            // This code assumes that the iceConfig contains a single element called iceServers.
-            // Hopefully this code won't need to remain here for long.
+            // There are two formats that the iceserver may be coming down in:
+            //   {url:"turn:username@host", credential:"password"}
+            //   or {url:"turn:host", username:"username", credential:"password"}
+            //   if it's the former, we split it to look like the latter.
             // 
-            if (easyRTC.filterOutTurn === false || !navigator.mozGetUserMedia) {
-                easyRTC.pc_config = msg.iceConfig;
-            }
-            else {
-                easyRTC.pc_config = {iceServers: []};
-                for (var i in msg.iceConfig.iceServers) {
-                    if (msg.iceConfig.iceServers[i].url.indexOf('turn:') == 0) {
-                        console.log("discarding turn server entry for Mozilla.");
+
+            easyRTC.pc_config = {iceServers: []};
+            for (var i in msg.iceConfig.iceServers) {
+                var item = msg.iceConfig.iceServers[i];
+                var fixedItem;
+                if (item.url.indexOf('turn:') == 0) {
+                    if (item.username) {
+                        fixedItem = createIceServer(item.url, item.username, item.credential);
                     }
                     else {
-                        easyRTC.pc_config.iceServers.push(msg.iceConfig.iceServers[i]);
+                        var parts = item.url.substring("turn:".length).split("@");
+                        if (parts.length != 2) {
+                            easyRTC.showError("badparam", "turn server url looked like " + item.url);
+                        }
+                        var username = parts[0];
+                        var url = "turn:" + parts[1];
+                        fixedItem = createIceServer(url, username, item.credential);
                     }
                 }
+                else { // is stun server entry
+                    fixedItem = item;
+                }
+                easyRTC.pc_config.iceServers.push(fixedItem); 
             }
 
 
             easyRTC.cookieOwner = msg.isOwner ? true : false;
+            easyRTC.roomCanNotifyOwner = msg.canNotifyOwner;
             easyRTC.roomHasPassword = msg.hasPassword;
             easyRTC.room = msg.room ? msg.room : null;
 
@@ -2402,27 +2631,61 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     }
 
 
-    easyRTC.webSocket = io.connect(easyRTC.serverPath, {
-        'force new connection': true, 'connect timeout': 10000
-    });
-    if (!easyRTC.webSocket) {
-        throw "io.connect failed";
+    function connectToWSServer() {
+//        easyRTC.webSocket = io.connect(easyRTC.serverPath, {
+//            'force new connection': true, 'connect timeout': 10000
+//        });
+        easyRTC.webSocket = io.connect(easyRTC.serverPath, {
+            'connect timeout': 10000
+        });
+        if (!easyRTC.webSocket) {
+            throw "io.connect failed";
+        }
+
+        easyRTC.webSocket.on('error', function() {
+            if (easyRTC.myEasyrtcid) {
+                easyRTC.showError(easyRTC.errCodes.SIGNAL_ERROR, "Miscellaneous error from signalling server. It may be ignorable.");
+            }
+            else {
+                errorCallback("Unable to reach the easyRTC signalling server.");
+            }
+        });
+
+        easyRTC.webSocket.on("connect", function(event) {
+
+            easyRTC.webSocketConnected = true;
+            if (!easyRTC.webSocket || !easyRTC.webSocket.socket || !easyRTC.webSocket.socket.sessionid) {
+                easyRTC.showError(easyRTC.errCodes.CONNECT_ERR, "Socket.io connect event fired with bad websocket.");
+            }
+
+            if (easyRTC.debugPrinter) {
+                easyRTC.debugPrinter("saw socketserver onconnect event");
+            }
+            if (easyRTC.webSocketConnected) {
+                // sendAuthenticate();
+                easyRTC.updateConfigurationInfo = updateConfiguration;
+                updateConfiguration();
+            }
+            else {
+                errorCallback("Internal communications failure.");
+            }
+        }
+        );
+        easyRTC.webSocket.on("message", onChannelMessage);
+        easyRTC.webSocket.on("easyRTCCmd", onChannelCmd);
+        easyRTC.webSocket.on("easyrtcCmd", onChannelCmd);
+        easyRTC.webSocket.on("disconnect", function(code, reason, wasClean) {
+            easyRTC.webSocketConnected = false;
+            easyRTC.updateConfigurationInfo = function() {
+            };
+            easyRTC.oldConfig = {};
+            easyRTC.disconnectBody();
+            if (easyRTC.disconnectListener) {
+                easyRTC.disconnectListener();
+            }
+        });
     }
-// the below lines were useless. Nobody on the net seems to have gotten connect_failed to work either.
-//    easyRTC.webSocket.on('connect_failed', function() {
-//        errorCallback("Unable to connect to the easyRTC WordPress Plugin server.");
-//    });
-//    easyRTC.webSocket.socket.on('connect_failed', function() {
-//        errorCallback("Unable to connect to the easyRTC WordPress Plugin server.");
-//    });
-    easyRTC.webSocket.on('error', function() {
-        if (easyRTC.myEasyrtcid) {
-            easyRTC.showError(easyRTC.errCodes.SIGNAL_ERROR, "Miscellaneous error from signalling server. It may be ignorable.");
-        }
-        else {
-            errorCallback("Unable to reach the easyRTC signalling server.");
-        }
-    });
+    connectToWSServer();
 
 
 
@@ -2538,13 +2801,14 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             language: navigator.language
         };
         if (easyRTC.cookieId && document.cookie) {
-            var cookies = document.cookie.split("[; ]");
+            var cookies = document.cookie.split(/[; ]/);
             var target = easyRTC.cookieId + "=";
 
             for (var i in cookies) {
                 if (cookies[i].indexOf(target) === 0) {
                     var cookie = cookies[i].substring(target.length);
-                    newConfig.easyrtcsid = cookie;
+                    cookieData = cookie.split(".");
+                    newConfig.easyrtcsid = cookieData[0];
                 }
             }
         }
@@ -2575,14 +2839,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             if (easyRTC.debugPrinter) {
                 easyRTC.debugPrinter("cfg=" + JSON.stringify(alteredData.added));
             }
-            if (easyRTC.webSocket) {
-                easyRTC.webSocket.json.emit("easyRTCcmd",
-                        {
-                            msgType: 'setUserCfg',
-                            msgData: alteredData.added
-                        }
-                );
-            }
+            easyRTC.sendEasyrtcCmd('setUserCfg', alteredData.added);
             easyRTC.oldConfig = newConfig;
         };
 
@@ -2595,47 +2852,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     }
 
 
-    easyRTC.webSocket.on("connect", function(event) {
-        if (!easyRTC.webSocket.socket.sessionid) {
-            //
-            // If you try to connect to a server that isn't there, you'll eventually get a 
-            // connect event when the server is present, but the connection you get will be
-            // broken, no sessionid field. In this scenario, we're going to try starting a
-            // fresh connection.
-            easyRTC.webSocket.socket.disconnect();
-            startChannel(); // try again
-            return;
-        }
 
-        easyRTC.webSocket.on("message", onChannelMessage);
-        easyRTC.webSocket.on("easyRTCcmd", onChannelCmd);  // deprecated
-        easyRTC.webSocket.on("easyrtcCmd", onChannelCmd);
-        easyRTC.webSocket.on("disconnect", function(code, reason, wasClean) {
-            easyRTC.updateConfigurationInfo = function() {
-            };
-            if (!easyRTC.disconnecting) {
-                setTimeout(function() {
-                    if (easyRTC.webSocket) {
-                        easyRTC.disconnectBody();
-                    }
-                    if (easyRTC.disconnectListener) {
-                        easyRTC.disconnectListener();
-                    }
-                }, 1000);
-            }
-        });
-        if (easyRTC.debugPrinter) {
-            easyRTC.debugPrinter("saw socketserver onconnect event");
-        }
-        if (easyRTC.webSocket) {
-            easyRTC.updateConfigurationInfo = updateConfiguration;
-            easyRTC.updateConfigurationInfo();
-        }
-        else {
-            errorCallback("Internal communications failure.");
-        }
-    }
-    );
 };
 
 // this flag controls whether the initManaged routine adds close buttons to the caller
@@ -2837,9 +3054,9 @@ easyRTC.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
             video = getIthVideo(i);
             if (video.caller == caller) {
                 easyRTC.setVideoObjectSrc(video, stream);
-                if (onCall) {
-                    onCall(caller, i);
-                }
+//                if (onCall) {
+//                    onCall(caller, i);
+//                }
                 return;
             }
         }
