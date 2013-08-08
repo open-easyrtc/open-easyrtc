@@ -1,5 +1,4 @@
 ![alt text](./api/img/easyrtc.png "easyRTC")
-
 easyRTC
 =======
 
