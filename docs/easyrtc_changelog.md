@@ -13,7 +13,7 @@ Changes:
  * Server/API - Renamed easyRTCcmd socket message type to easyrtcCmd. Should have no outside effect. 
  * Server - Moved API files to the /api/ folder thus cleaning up the /static/. API files are publicly linked using /easyrtc/easyrtc.js and /easyrtc/easyrtc.css. For transitional purposes, the old public file locations are still accessible.
  * Server - Version bump for express to 3.3.x
- * Demos - Renamed mobile rooms demo to multiparty room demo so its capabilities were more clear
+ * Demos - Renamed mobile rooms demo to multiparty char room demo so its capabilities were more clear
  * Documentation - Added links and images in readme.md to the various documentation and youtube resources
 
 Fixes:
