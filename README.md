@@ -1,4 +1,4 @@
-![alt text](./api/img/easyrtc.png "easyRTC")
+![easyRTC](./api/img/easyrtc.png "easyRTC")
 easyRTC
 =======
 
@@ -70,6 +70,7 @@ Links for help and information
   * [https://github.com/priologic/easyrtc/issues](https://github.com/priologic/easyrtc/issues)
 * Our YouTube channel has live demo's:
   * [http://www.youtube.com/user/priologic](http://www.youtube.com/user/priologic)
+  * [![Installing easyRTC Using Git](http://img.youtube.com/vi/Nq042zJ_em4/0.jpg)](http://www.youtube.com/watch?v=Nq042zJ_em4)
 
 
 License
