@@ -90,13 +90,13 @@ if (navigator.mozGetUserMedia) {
 
     // Attach a media stream to an element.
     attachMediaStream = function(element, stream) {
-        console.log("Attaching media stream");
+//        console.log("Attaching media stream");
         element.mozSrcObject = stream;
         element.play();
     };
 
     reattachMediaStream = function(to, from) {
-        console.log("Reattaching media stream");
+//        console.log("Reattaching media stream");
         to.mozSrcObject = from.mozSrcObject;
         to.play();
     };
@@ -112,7 +112,7 @@ if (navigator.mozGetUserMedia) {
         };
     }
 } else if (navigator.webkitGetUserMedia) {
-    console.log("This appears to be Chrome");
+//    console.log("This appears to be Chrome");
 
     webrtcDetectedBrowser = "chrome";
     webrtcDetectedVersion =
@@ -1861,7 +1861,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             return false;
         }
         else {
-            console.log("invoking getstats");
+//            console.log("invoking getstats");
             easyRTC.peerConns[otherUser].pc.getStats(function(stats) {
                 var reports = stats.result();
                 var results = {};
@@ -1877,7 +1877,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                         }
                     }
                 }
-                console.log("callback with results");
+ //               console.log("callback with results");
                 collector(results);
             });
             return true;
@@ -2036,7 +2036,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 if (easyRTC.debugPrinter) {
                     easyRTC.debugPrinter("saw remove on remote media stream");
                 }
-                console.log("saw onremovestream ", event);
+//                console.log("saw onremovestream ", event);
                 if (easyRTC.peerConns[otherUser]) {
                     easyRTC.peerConns[otherUser].stream = null;
                     if (easyRTC.onStreamClosed) {
@@ -2512,7 +2512,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
             if (easyRTC.sipConfig) {
                 if (!easyRTC.initSipUa) {
-                    console.log("SIP connection parameters provided but no sip stuff");
+ //                  console.log("SIP connection parameters provided but no sip stuff");
                 }
                 easyRTC.initSipUa();
 

@@ -560,7 +560,7 @@ function callEverybodyElse(otherPeople) {
 
 
 function loginSuccess() {
-    console.log("Successfully connected");
+//    console.log("Successfully connected");
     expandThumb(0);  // expand the mirror image initially.
 }
 
