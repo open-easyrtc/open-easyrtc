@@ -18,7 +18,7 @@ Documentation
 -------------
  * [Install instructions for Ubuntu, Windows, and Mac](./docs/easyrtc_installing.md)
  * [Configuration options](./docs/easyrtc_configuration.md)
- * [Client API documentation](http://htmlpreview.github.com/?./docs/easyRTC.html)
+ * [Client API documentation](http://htmlpreview.github.io/?https://raw.github.com/priologic/easyrtc/master/docs/easyRTC.html)
  * [Client API tutorial](./docs/easyrtc_client_tutorial.md)
  * [Frequently asked questions](./docs/easyrtc_faq.md)
  * [Upcoming features](./docs/easyrtc_upcoming_features.md)
