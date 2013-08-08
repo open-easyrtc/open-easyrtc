@@ -1,5 +1,7 @@
-![alt text](./api/img/easyrtc.png "easyRTC") easyRTC
-====================================================
+![alt text](./api/img/easyrtc.png "easyRTC")
+
+easyRTC
+=======
 
 **A bundle of Open Source WebRTC joy!**
 
