@@ -1,5 +1,5 @@
-easyRTC
-=======
+![alt text](./api/img/easyrtc.png "easyRTC") easyRTC
+====================================================
 
 **A bundle of Open Source WebRTC joy!**
 
@@ -15,18 +15,12 @@ Features
 
 Documentation
 -------------
- * Install instructions for Ubuntu, Windows, and Mac
-     * `/docs/easyrtc_installing.md`
- * Configuration options
-     * `/docs/easyrtc_configuration.md`
- * Client API documentation
-     * `/docs/easyRTC.html`
- * Client API tutorial
-     * `/docs/easyrtc_client_tutorial.md`
- * Frequently asked questions
-     * `/docs/easyrtc_faq.md`
- * Upcoming features
-     * `/docs/easyrtc_upcoming_features.md`
+ * [Install instructions for Ubuntu, Windows, and Mac](./docs/easyrtc_installing.md)
+ * [Configuration options](./docs/easyrtc_configuration.md)
+ * [Client API documentation](./docs/easyRTC.html)
+ * [Client API tutorial](./docs/easyrtc_client_tutorial.md)
+ * [Frequently asked questions](./docs/easyrtc_faq.md)
+ * [Upcoming features](./docs/easyrtc_upcoming_features.md)
 
 
 Installation In A Nutshell
@@ -37,7 +31,7 @@ Installation In A Nutshell
  4. Start easyRTC by running `node server.js`
  5. Browse the examples using a WebRTC enabled browser. *(defaults to port `8080`)*
 
-Step by step instructions including additional setup options can be found in `/docs/easyrtc_installing.md`
+Step by step instructions including additional setup options can be found in `[/docs/easyrtc_installing.md](./docs/easyrtc_installing.md)`
 
 
 Folder Structure
