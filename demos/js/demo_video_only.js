@@ -36,7 +36,7 @@ function enable(id) {
 
 
 function connect() {
-    easyRTC.enableDebug(false);
+    easyRTC.enableDebug(true);
     console.log("Initializing.");
     easyRTC.enableAudio(false);
     easyRTC.setLoggedInListener(convertListToButtons);

@@ -1,5 +1,5 @@
 /** @class
- *@version 0.8.0 
+ *@version 0.9.0 
  *<p>
  * Provides client side support for the easyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
@@ -1016,8 +1016,8 @@ easyRTC.initMediaSource = function(successCallback, errorCallback) {
 
 
 
-    var mode = {'audio': easyRTC.audioEnabled ? true : false,
-        'video': (easyRTC.videoEnabled) ? (easyRTC.videoFeatures) : false};
+    var mode = {'audio': (easyRTC.audioEnabled ? true : false),
+        'video': ((easyRTC.videoEnabled) ? (easyRTC.videoFeatures) : false)};
 
     /** @private
      * @param {Stream} stream
@@ -2122,7 +2122,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                     delete easyRTC.peerConns[otherUser].dataChannelS;
                 }
                 if (easyRTC.onDataChannelClose) {
-                    easyRTC.onDataChannelClose(openUser);
+                    easyRTC.onDataChannelClose(otherUser);
                 }
 
                 easyRTC.updateConfigurationInfo();
@@ -2244,7 +2244,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 sendMessage(caller, "answer", sessionDescription, function() {
                 }, easyRTC.onError);
                 easyRTC.peerConns[caller].startedAV = true;
-                if (pc.connectDataConnection) {
+                if (pc.connectDataConnection && easyRTC.dataEnabled ) {
                     if (easyRTC.debugPrinter) {
                         easyRTC.debugPrinter("calling connectDataConnection(5002,5001)");
                     }
@@ -2592,7 +2592,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 easyRTC.debugPrinter("about to call initiating setRemoteDescription");
             }
             pc.setRemoteDescription(sd, function() {
-                if (pc.connectDataConnection) {
+                if (pc.connectDataConnection && easyRTC.dataEnabled ) {
                     if (easyRTC.debugPrinter) {
                         easyRTC.debugPrinter("calling connectDataConnection(5001,5002)");
                     }

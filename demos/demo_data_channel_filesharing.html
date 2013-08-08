@@ -17,6 +17,8 @@
         <!-- Assumes global locations for socket.io.js and easyrtc.js -->
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
+        <script type="text/javascript" src="js/Blob.js"></script>
+        <script type="text/javascript" src="js/FileSaver.js"></script>
         <script type="text/javascript" src="js/demo_data_channel_filesharing.js"></script>
         <!--hide-->
         <!-- Styles used within the demo -->
@@ -94,8 +96,8 @@
                 </p>
 
                 <p class="alert"><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" />
-                    This demo requires data channels that support blobs, which means it only runs on Mozilla
-                    currently and only with files less than 30KB.</p>
+                    This demo requires data channels that support blobs, which means (currently) that
+                    both parties need to using the same brand of browser and the files have to be very small.</p>
                 <hr />
                 <h2>The Demo</h2>
                 <!--show-->
@@ -122,7 +124,7 @@
                 </pre>
 
 
-                <!-- Runs the SyntaxHighlighter -->
+                <!-- Runs the SyntaxHighlighter 
                 <script type="text/javascript">
                     loadAndFilter(window.location.href, "prettyHtml",2 );
                     loadAndFilter(window.location.href.replace("/demos/", "/demos/js/").replace(/.html$/, ".js"), "prettyJS", 2);
