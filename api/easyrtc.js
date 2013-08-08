@@ -2089,8 +2089,8 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                     if (easyRTC.debugPrinter) {
                         easyRTC.debugPrinter("saw dataChannel.onmessage event");
                     }
-                    if (easyRTC.receiveDataCB) {
-                        easyRTC.receiveDataCB(otherUser, JSON.parse(event.data), null);
+                    if (easyRTC.receivePeerCB) {
+                        easyRTC.receivePeerCB(otherUser, JSON.parse(event.data), null);
                     }
                 };
 
@@ -2148,8 +2148,8 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                     if (easyRTC.debugPrinter) {
                         easyRTC.debugPrinter("saw dataChannel.onmessage event");
                     }
-                    if (easyRTC.receiveDataCB) {
-                        easyRTC.receiveDataCB(otherUser, JSON.parse(event.data), null);
+                    if (easyRTC.receivePeerCB) {
+                        easyRTC.receivePeerCB(otherUser, JSON.parse(event.data), null);
                     }
                 };
                 dataChannel.onclose = function(event) {
