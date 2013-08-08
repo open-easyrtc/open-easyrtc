@@ -1,17 +1,25 @@
 easyRTC: Change Log
 ===================
 
-v0.8.1b
--------
+v0.9.0b
+------
+
 New Features:
+ * API - new easyRTC.setPeerListener() function. Sets a listener for data sent from another client. Replacement for set data listener.
+ * API - new easyRTC.setServerListener() function. Listens for messages from the server which are not from another peer.
+
 Changes:
  * API - Implementing methods used in Google's adapter.js for cross browser support
  * Server/API - Renamed easyRTCcmd socket message type to easyrtcCmd. Should have no outside effect. 
  * Server - Moved API files to the /api/ folder thus cleaning up the /static/. API files are publicly linked using /easyrtc/easyrtc.js and /easyrtc/easyrtc.css. For transitional purposes, the old public file locations are still accessible.
+ * Server - Version bump for express to 3.3.x
+ * Demos - Renamed mobile rooms demo to multiparty room demo so its capabilities were more clear
+ * Documentation - Added links and images in readme.md to the various documentation and youtube resources
 
 Fixes:
  * API - Firefox - Strips TURN servers from ICE config if they are present. Firefox doesn't currently handle TURN servers well.
  * API - Added one second delay to getUserMedia call to try and correct some page loading problems.
+
 
 v0.8.0
 ------
