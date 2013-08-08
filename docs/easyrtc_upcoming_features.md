@@ -5,7 +5,10 @@ There are many exciting features we are looking to add to easyRTC in upcoming re
 
 General Features
 ----------------
-* TURN server support
+* Better authentication support
+* Rooms
+* Groups (aka roles)
+* Faster and better 'Who is online?' lists.
 
 API Specific Features
 ---------------------
