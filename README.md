@@ -75,6 +75,8 @@ Links for help and information
   * [http://www.easyrtc.com/](http://www.easyrtc.com/)
 * Use our support forum is at:
   * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
+* Live demo site:
+  * [http://demo.easyrtc.com/](http://demo.easyrtc.com/)
 * Bugs and requests can be filed on our github page or on the forum:
   * [https://github.com/priologic/easyrtc/issues](https://github.com/priologic/easyrtc/issues)
 * Our YouTube channel has live demo's:

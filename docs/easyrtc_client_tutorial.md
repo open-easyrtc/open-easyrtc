@@ -52,7 +52,7 @@ The CSS file provides some styling for a "hangup" button.
     <head>
       ...
             <script src="/socket.io/socket.io.js"></script> 
-            <script type="text/javascript" src="js/easyrtc.js"></script> 
+            <script type="text/javascript" src="/easyrtc/easyrtc.js"></script> 
             <script type="text/javascript" src="js/application.js"></script> 
             <link rel="stylesheet" type="text/css" href="css/easy_rtc_controls.css" />
       ...
@@ -165,7 +165,7 @@ Here is the complete HTML and Javascript for this solution.
         <html>
             <head>
                 <script src="/socket.io/socket.io.js"></script> 
-                <script type="text/javascript" src="js/easyrtc.js"></script> 
+                <script type="text/javascript" src="/easyrtc/easyrtc.js"></script> 
                 <script type="text/javascript" src="js/application.js"></script> 
                 <link rel="stylesheet" type="text/css" href="/css/easy_rtc_controls.css" />
             </head>
@@ -239,7 +239,7 @@ because there won't be any automatically added hangup button. The HTML ends up l
     <html>
         <head>
             <script src="/socket.io/socket.io.js"></script> 
-            <script type="text/javascript" src="js/easyrtc.js"></script> 
+            <script type="text/javascript" src="/easyrtc/easyrtc.js"></script> 
             <script type="text/javascript" src="js/application2.js"></script> 
         </head>
          <body onload="my_init()">
