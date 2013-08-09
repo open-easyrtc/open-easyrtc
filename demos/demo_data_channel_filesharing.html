@@ -16,7 +16,9 @@
         <!--show-->
         <!-- Assumes global locations for socket.io.js and easyrtc.js -->
         <script src="/socket.io/socket.io.js"></script>
-        <script type="text/javascript" src="../js/easyrtc.js"></script>
+        <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
+        <script type="text/javascript" src="js/Blob.js"></script>
+        <script type="text/javascript" src="js/FileSaver.js"></script>
         <script type="text/javascript" src="js/demo_data_channel_filesharing.js"></script>
         <!--hide-->
         <!-- Styles used within the demo -->
@@ -94,8 +96,8 @@
                 </p>
 
                 <p class="alert"><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" />
-                    This demo requires data channels that support blobs, which means it only runs on Mozilla
-                    currently and only with files less than 30KB.</p>
+                    This demo requires data channels that support blobs, which means (currently) that
+                    both parties need to using the same brand of browser and the files have to be very small.</p>
                 <hr />
                 <h2>The Demo</h2>
                 <!--show-->
@@ -133,7 +135,7 @@
             </div>
             <div id="footer">
                 <a href="http://www.priologic.com/?from=landing"><img id="logo_priologic" src="images/priologic_logo_white.png" height="40" width="150" alt="Created By Priologic Software Inc." /></a>
-                <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="images/powered_by_easyrtc.png" height="60" width="200" alt="Powered By easyRTC" /></a>
+                <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="/easyrtc/img/powered_by_easyrtc.png" height="60" width="200" alt="Powered By easyRTC" /></a>
                 <p><em>&copy; 2013 - Priologic Software Inc., All Rights Reserved.</em></p>
                 <p id="license">easyRTC source code released under a BSD2 Lcense. <a href="https://github.com/priologic/easyrtc/blob/master/LICENSE">See LICENSE file in project folder</a> for details.</p>
             </div>

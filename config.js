@@ -97,7 +97,7 @@ var easyrtcPackage = require('./package');
 config.easyrtcVersion = easyrtcPackage.version;
 delete require.cache[easyrtcPackage];
 
-config.cmdPacketType = "easyRTCcmd";
+config.cmdPacketType = "easyrtcCmd";
 config.cmdMsgType = {
     error: "error",
     list: "list",

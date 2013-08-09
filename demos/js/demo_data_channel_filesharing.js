@@ -52,13 +52,10 @@ function connect() {
         }
     });
     var fileDescriptions = {};
+    
     easyRTC.setDataListener(function(easyrtcid, data){
-        if( typeof data == 'string') {
-            fileDescriptions[easyrtcid] = JSON.parse(data);
-        }
-        else {
-            saveFile(fileDescriptions[easyrtcid], data);
-        }
+            fileobj = JSON.parse(data);
+            saveFile(fileobj);
         console.log("received data from " + easyRTC.idToName(easyrtcid));
     });
     easyRTC.connect("fileShare", loginSuccess, loginFailure);
@@ -70,19 +67,21 @@ function showMessage(message) {
 }
 
 
-function saveFile(fileInfo, body) {
+function saveFile(fileobj) {
     //  saveAs(body, fileInfo.name);
     var conversation = document.getElementById('conversation'); 
     var div = document.createElement('div');
-    div.innerHTML = "Received file " + fileInfo.name + ". Click here to display/save";
+    div.innerHTML = "Received file " + fileobj.name + ". Click here to save it";
     div.className = "receivedFile";
     div.onclick = function() {
-        var url = URL.createObjectURL(body);
-        window.open(url, '_blank', '');
-        setTimeout( function() { 
-            URL.revokeObjectURL(url);
-        }, 30000);
-        conversation.removeChild(div);
+          var blob = new Blob([fileobj.binaryContents], {type:fileobj.type});
+          saveAs(blob, fileobj.name);
+//        var url = URL.createObjectURL(fileobj.dataurl);
+//        window.open(fileobj.dataurl, '_blank', '');
+//        conversation.removeChild(div);
+//        setTimeout( function() { 
+//            URL.revokeObjectURL(url);
+//        }, 30000);
     };
     conversation.appendChild(div);   
 }
@@ -134,7 +133,31 @@ function initDropSupport(target, destUser) {
     target.addEventListener("dragover", ignore, false);
 }
 
-   
+ 
+function sendFile( destUser, file) {
+    var reader = new FileReader();
+
+      // Closure to capture the file information.
+      reader.onload = function(e) {
+            var txData = {
+                name: file.name,
+                type: file.type,
+                size: file.size, 
+                binaryContents: e.target.result
+            };
+            //
+            // can't send an object, only a primitive type
+            //
+            easyRTC.sendDataP2P(destUser, JSON.stringify(txData));
+        };
+
+      // Read in the image file as a data URL.
+      reader.readAsBinaryString(file);
+
+ }
+
+
+ 
 function sendFiles(div, destUser, files) {
     var i;
     var fileSizeLIMIT = 30000; // approximate message size limit for firefox.
@@ -142,22 +165,13 @@ function sendFiles(div, destUser, files) {
     switch( easyRTC.getConnectStatus(destUser)) {
         case easyRTC.IS_CONNECTED:
             for(i = 0; i < files.length; i++) {
-                if( files[i].size > fileSizeLIMIT ) {
-                    showMessage('File ' + files[i].name +
-                        ' is too big too send (' + files[i].size + ' bytes)');
-                    continue;
-                }
-                var txData = {
-                    name: files[i].name,
-                    type: files[i].type,
-                    size: files[i].size
-                };
-                //
-                // can't send an object, only a primitive type
-                //
-                easyRTC.sendDataP2P(destUser, JSON.stringify(txData));
-                easyRTC.sendDataP2P(destUser, files[i]);
-            }       
+           //     if( files[i].size > fileSizeLIMIT ) {
+           //         showMessage('File ' + files[i].name +
+           //             ' is too big too send (' + files[i].size + ' bytes)');
+           //         continue;
+           //     }
+                sendFile(destUser, files[i]);
+             }       
             break;
             
         case easyRTC.NOT_CONNECTED:

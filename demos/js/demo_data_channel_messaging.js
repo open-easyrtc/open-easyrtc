@@ -41,7 +41,7 @@ function connect() {
     easyRTC.enableVideo(false);
     easyRTC.enableAudio(false);
 
-    easyRTC.setDataListener(addToConversation);
+    easyRTC.setPeerListener(addToConversation);
     easyRTC.setLoggedInListener(loggedInListener);
     easyRTC.connect("data_channel_im", loginSuccess, loginFailure);
 }

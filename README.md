@@ -1,3 +1,4 @@
+![easyRTC](./api/img/easyrtc.png "easyRTC")
 easyRTC
 =======
 
@@ -15,18 +16,12 @@ Features
 
 Documentation
 -------------
- * Install instructions for Ubuntu, Windows, and Mac
-     * `/docs/easyrtc_installing.md`
- * Configuration options
-     * `/docs/easyrtc_configuration.md`
- * Client API documentation
-     * `/docs/easyrtc_client_api.md`
- * Client API tutorial
-     * `/docs/easyrtc_client_tutorial.md`
- * Frequently asked questions
-     * `/docs/easyrtc_faq.md`
- * Upcoming features
-     * `/docs/easyrtc_upcoming_features.md`
+ * [Install instructions for Ubuntu, Windows, and Mac](./docs/easyrtc_installing.md)
+ * [Configuration options](./docs/easyrtc_configuration.md)
+ * [Client API documentation](http://htmlpreview.github.io/?https://raw.github.com/priologic/easyrtc/master/docs/easyRTC.html)
+ * [Client API tutorial](./docs/easyrtc_client_tutorial.md)
+ * [Frequently asked questions](./docs/easyrtc_faq.md)
+ * [Upcoming features](./docs/easyrtc_upcoming_features.md)
 
 
 Installation In A Nutshell
@@ -37,7 +32,7 @@ Installation In A Nutshell
  4. Start easyRTC by running `node server.js`
  5. Browse the examples using a WebRTC enabled browser. *(defaults to port `8080`)*
 
-Step by step instructions including additional setup options can be found in `/docs/easyrtc_installing.md`
+Step by step instructions including additional setup options can be found in [/docs/easyrtc_installing.md](./docs/easyrtc_installing.md)
 
 
 Folder Structure
@@ -62,6 +57,17 @@ Folder Structure
   * The easyrtc.js file is located in /static/js/
 
 
+Included Demos
+--------------
+
+easyRTC comes with a number of demo's which work immediatly after installation.
+
+ * Video and/or Audio connections
+ * Multi-party video chat
+ * Text Messaging with or without Data Channels
+ * Screen and tab sharing
+
+
 Links for help and information
 ------------------------------
 
@@ -73,6 +79,7 @@ Links for help and information
   * [https://github.com/priologic/easyrtc/issues](https://github.com/priologic/easyrtc/issues)
 * Our YouTube channel has live demo's:
   * [http://www.youtube.com/user/priologic](http://www.youtube.com/user/priologic)
+  * [![Installing easyRTC Using Git](http://img.youtube.com/vi/Nq042zJ_em4/0.jpg)](http://www.youtube.com/watch?v=Nq042zJ_em4)
 
 
 License
