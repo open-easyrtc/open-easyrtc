@@ -43,7 +43,7 @@ function connect() {
 
     easyRTC.setDataListener(addToConversation);
     easyRTC.setLoggedInListener(loggedInListener);
-    easyRTC.connect("data_channel_im", loginSuccess, loginFailure);
+    easyRTC.connect("easyrtc.dataMessaging", loginSuccess, loginFailure);
 }
 
 

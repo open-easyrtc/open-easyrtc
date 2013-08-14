@@ -60,7 +60,7 @@ function connect() {
     easyRTC.enableAudio(document.getElementById('shareAudio').checked);
     easyRTC.enableVideo(false);
     easyRTC.setLoggedInListener(convertListToButtons);
-    easyRTC.connect("screenshare", loginSuccess, loginFailure);
+    easyRTC.connect("easyrtc.videoScreen", loginSuccess, loginFailure);
 
 }
 

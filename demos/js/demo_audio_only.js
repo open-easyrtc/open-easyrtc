@@ -41,7 +41,7 @@ function connect() {
     easyRTC.setLoggedInListener(convertListToButtons);
     easyRTC.initMediaSource(
         function(){        // success callback
-            easyRTC.connect("audioOnly", loginSuccess, loginFailure);
+            easyRTC.connect("easyrtc.audioOnly", loginSuccess, loginFailure);
         },
         function(errmesg){
             easyRTC.showError("MEDIA-ERROR", errmesg);

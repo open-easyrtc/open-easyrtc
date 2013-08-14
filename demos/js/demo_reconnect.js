@@ -31,7 +31,7 @@ function initApp() {
     console.log("Initializing.");
     easyRTC.enableVideo(false);
     easyRTC.enableAudio(false);
-    easyRTC.connect("reconnect", loginSuccess, loginFailure);
+    easyRTC.connect("easyrtc.instantMessaging", loginSuccess, loginFailure);
 }
 
 easyRTC.enableDebug(false);

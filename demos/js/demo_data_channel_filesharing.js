@@ -61,7 +61,7 @@ function connect() {
         }
         console.log("received data from " + easyRTC.idToName(easyrtcid));
     });
-    easyRTC.connect("fileShare", loginSuccess, loginFailure);
+    easyRTC.connect("easyrtc.dataFileTransfer", loginSuccess, loginFailure);
 }
 
    

@@ -37,7 +37,7 @@ function addToConversation(who, msgType, content) {
 function connect() {
     easyRTC.setDataListener(addToConversation);
     easyRTC.setLoggedInListener(convertListToButtons);
-    easyRTC.connect("im", loginSuccess, loginFailure);
+    easyRTC.connect("easyrtc.instantMessaging", loginSuccess, loginFailure);
 }
 
 

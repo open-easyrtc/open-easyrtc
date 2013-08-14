@@ -684,7 +684,7 @@ function appInit() {
     
     // easyRTC.setVideoBandwidth(20);
     easyRTC.setLoggedInListener(callEverybodyElse);
-    easyRTC.initManaged("roomDemo", "box0", ["box1", "box2", "box3"], loginSuccess);
+    easyRTC.initManaged("easyrtc.room", "box0", ["box1", "box2", "box3"], loginSuccess);
     easyRTC.setDataListener(messageListener);
     easyRTC.setDisconnectListener( function() {
         easyRTC.showError("LOST-CONNECTION", "Lost connection to signalling server");

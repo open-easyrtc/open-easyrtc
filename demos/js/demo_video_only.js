@@ -44,7 +44,7 @@ function connect() {
         function(){ 	   // success callback
             var selfVideo = document.getElementById("selfVideo");
             easyRTC.setVideoObjectSrc(selfVideo, easyRTC.getLocalStream());
-            easyRTC.connect("videoOnly", loginSuccess, loginFailure);
+            easyRTC.connect("easyrtc.videoOnly", loginSuccess, loginFailure);
         },
         function(errmesg){
             easyRTC.showError("MEDIA-ERROR", errmesg);

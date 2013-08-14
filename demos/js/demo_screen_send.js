@@ -72,7 +72,7 @@ function connect() {
     
     easyRTC.setDataListener(function(peer, data){});
     
-    easyRTC.connect("screenshare", loginSuccess, loginFailure);
+    easyRTC.connect("easyrtc.videoScreen", loginSuccess, loginFailure);
 }
 
 

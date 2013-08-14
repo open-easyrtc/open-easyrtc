@@ -1150,10 +1150,10 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                     }
                     else {
                         if( errorCallback) {
-                            errorCallback(ackmsg.errorCode, ackmsg.errorText);
+                            errorCallback(ackmsg.msgData.errorCode, ackmsg.msgData.errorText);
                         }
                         else {
-                            easyRTC.showError(ackmsg.errorCode, ackmsg.errorText);
+                            easyRTC.showError(ackmsg.msgData.errorCode, ackmsg.msgData.errorText);
                         }
                     }
                 }
@@ -1435,8 +1435,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 return;
             }
             var sendOffer = function() {
-                sendSignalling(otherUser, "offer", sessionDescription, function() {
-                }, callFailureCB);
+                sendSignalling(otherUser, "offer", sessionDescription, null, callFailureCB);
             };
             pc.setLocalDescription(sessionDescription, sendOffer, callFailureCB);
         };
@@ -1842,9 +1841,9 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 }
                 sendSignalling(caller, "answer", sessionDescription,
                         null,
-                        function(errorCode, error) {
+                        function(errorCode, errorText) {
                             delete easyRTC.peerConns[caller];
-                            easyRTC.showError(errorCode, error);
+                            easyRTC.showError(errorCode, errorText);
                         });
                 easyRTC.peerConns[caller].startedAV = true;
                 if (pc.connectDataConnection) {
@@ -2481,6 +2480,13 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             if (successCallback) {
                 successCallback(easyRTC.myEasyrtcid, easyRTC.cookieOwner);
             }
+        }
+        else if( msg.msgType === "error") { // authenticate error
+            console.log( msg.msgType + ": " + msg.msgData.errorText);
+            easyRTC.showError(msg.msgData.errorCode, msg.msgData.errorText);
+        }
+        else {
+            alert("Unexpected response to authentication message");
         }
     }
 
