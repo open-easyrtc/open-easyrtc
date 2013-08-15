@@ -1188,7 +1188,6 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             easyRTC.showError(easyRTC.errCodes.DEVELOPER_ERR, "Attempt to use data channel to " + destUser + " before it's ready to send.");
         }
         else {
-
             easyRTC.peerConns[destUser].dataChannelS.send(flattenedData);
         }
     };
@@ -1964,7 +1963,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
 
 
-    var onChannelMessage = function(msg) {
+    var onChannelMsg = function(msg) {
 
         if (easyRTC.receiveDataCB) {
             easyRTC.receiveDataCB(msg.senderEasyrtcid, msg.msgType, msg.msgData);
@@ -2219,7 +2218,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             }
         }
         );
-
+        easyRTC.webSocket.on("easyrtcMsg", onChannelMsg);
         easyRTC.webSocket.on("easyrtcCmd", onChannelCmd);
         easyRTC.webSocket.on("disconnect", function(code, reason, wasClean) {
             console.log("saw disconnect event");
