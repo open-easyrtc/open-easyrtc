@@ -2,9 +2,10 @@
 
 easyRTC socket messages are sent via socket.io using three custom emit types:
 
- - [easyrtcAuth](#easyrtcAuth)
- - [easyrtcCmd](#easyrtcCmd)
- - [easyrtcMsg](#easyrtcMsg)  
+ - **easyrtcAuth** - Initial negotiation and authentication
+ - **easyrtcCmd** - All standard easyRTC communications including WebRTC messages
+ - **easyrtcMsg** - Custom application specific messages 
+
 
 ----------
 
@@ -37,7 +38,6 @@ Includes fields needed for authentication. Sender and target must be online, aut
 
  - **token**
  - **error**
-
 
 ----------
 
