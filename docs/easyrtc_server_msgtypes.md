@@ -241,6 +241,7 @@ Provides room information for all rooms the user is currently in. This includes 
    - **list** (optional) Map of easyrtcid's for users online in the same room. If present, this should overrule the current list in memory.
      - **easyrtcid** (required) Matches map key
      - **username** (optional)
+     - **roomJoinTime** (required) Timestamp of when client joined room
      - **presence** (required) {show:[away|chat|dnd|xa],status:{String}}
      - **apiField** (optional) Map of appDefinedFields and their values
      - **browserFamily** (optional)
