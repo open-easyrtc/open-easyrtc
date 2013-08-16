@@ -76,7 +76,7 @@ function hangup() {
 // this method actually just removes old buttons.
 // The adding of buttons is done with the data listener.
 //
-function convertListToButtons(data){    
+function convertListToButtons(roomName, data){    
     console.log("saw data list of " + JSON.stringify(data));
     var otherClientDiv = document.getElementById('otherClients');
     var i, nextChild;
