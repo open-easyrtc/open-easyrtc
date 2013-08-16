@@ -41,17 +41,25 @@ var easyRTC = {};
 
 /** Error codes that the easyRTC will use in the errCode field of error object passed
  *  to error handler set by easyRTC.setOnError. The error codes are short printable strings.
- * @type Dictionary.
+ * @type {object}.
+ * @property {string} BAD_NAME - a user name wasn't of the desired form 
+ * @property {string} DEVELOPER_ERR - the developer using the easyRTC library made a mistake
+ * @property {string} SYSTEM_ERR - probably an error related to the network
+ * @property {string} CONNECT_ERR - error occured when trying to create a connection
+ * @property {string} MEDIA_ERR - unable to get the local media
+ * @property {string} MEDIA_WARNING - didn't get the desired resolution
+ * @property {string} INTERNAL_ERR -
+ * @property {string} SIP_ERR - something went wrong with a sip session
  */
 easyRTC.errCodes = {
-    BAD_NAME: "BAD_NAME", // a user name wasn't of the desired form 
-    DEVELOPER_ERR: "DEVELOPER_ERR", // the developer using the easyRTC library made a mistake
-    SYSTEM_ERR: "SYSTEM_ERR", // probably an error related to the network
-    CONNECT_ERR: "CONNECT_ERR", // error occured when trying to create a connection
-    MEDIA_ERR: "MEDIA_ERR", // unable to get the local media
-    MEDIA_WARNING: "MEDIA_WARNING", // didn't get the desired resolution
+    BAD_NAME: "BAD_NAME", // 
+    DEVELOPER_ERR: "DEVELOPER_ERR", 
+    SYSTEM_ERR: "SYSTEM_ERR", 
+    CONNECT_ERR: "CONNECT_ERR", 
+    MEDIA_ERR: "MEDIA_ERR", 
+    MEDIA_WARNING: "MEDIA_WARNING",
     INTERNAL_ERR: "INTERNAL_ERR",
-    SIP_ERR: "SIP_ERR"  //something went wrong with a sip session 
+    SIP_ERR: "SIP_ERR"
 };
 
 easyRTC.apiVersion = "0.8.0";
@@ -1431,7 +1439,6 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
         if (easyRTC.webSocketConnected) {
             easyRTC.webSocket.json.emit("message", {
-                senderId: easyRTC.myEasyrtcid,
                 targetId: destUser,
                 msgData: data
             });
