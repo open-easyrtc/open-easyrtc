@@ -41,7 +41,7 @@ function connect() {
 }
 
 
-function convertListToButtons (data) {
+function convertListToButtons (roomName, data) {
     otherClientDiv = document.getElementById('otherClients');
     while (otherClientDiv.hasChildNodes()) {
         otherClientDiv.removeChild(otherClientDiv.lastChild);

@@ -111,10 +111,11 @@ easyRTC.credential = null;
  */
 easyRTC.sipAlreadyInitialized = false;
 
-/** The name user is in. This only applies to room oriented applications and is set at the same
+/** The rooms the user is in. This only applies to room oriented applications and is set at the same
  * time a token is received.
  */
-easyRTC.room = "default";
+easyRTC.roomJoin = {};
+
 /** Checks if the supplied string is a valid user name (standard identifier rules)
  * @param {String} name
  * @return {Boolean} true for a valid user name
@@ -135,6 +136,70 @@ easyRTC.isNameValid = function(name) {
 easyRTC.setCookieId = function(cookieId) {
     easyRTC.cookieId = cookieId;
 };
+
+/**
+ * This method allows you to join a single room. It may be called multiple times to be in 
+ * multiple rooms simultaneously. It may be called before or after connecting to the server.
+ * Note: the successCB and failureDB will only be called if you are already connected to the server.
+ * @param {type} roomName
+ * @param {type} roomParameters : application specific parameters, can be null.
+ * @param {Function} successCB called once the room is joined.
+ * @param {Function} failureCB called if the room can not be joined.
+ * @returns {unresolved}
+ */
+easyRTC.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
+    if( easyRTC.roomJoin[roomName]) {
+        alert("Programmer error: attempt to join room " + roomName + " which you are already in.");
+        return;
+    }
+    var newRoomData = { roomName:roomName};
+    if( roomParameters) {
+        for(var key in roomParameters) {
+            newRoomData[key] = roomParameters[key];        
+        }
+    }
+    easyRTC.roomJoin[roomName] = newRoomData;
+    if( failureCB === null) {
+        failureCB = function(why){
+            easyRTC.showError("Unable to enter room " + roomName + " because " + why);
+        };
+    }
+    if( easyRTC.webSocket ){
+        easyRTC.sendSignalling(null, "roomJoin", {roomJoin:newRoomData}, 
+            function() {
+                if( successCB) {
+                    successCB(roomName);
+                }
+            }, 
+            function(why) {
+                if( failureCB) {
+                    failureCB(roomName);
+                }
+                else {
+                    easyRTC.showError("Unable to enter room " + roomName + " because " + why);
+                }
+            }
+        );
+    }
+};
+
+/**
+ * This function allows you to leave a single room. 
+ * @param {type} roomName
+ * @returns {void}
+ */
+easyRTC.leaveRoom = function(roomName) {
+    if( easyRTC.roomJoin[roomName]) {
+        delete easyRTC.roomJoin[roomName];
+        if( easyRTC.webSocket) {
+            
+        }
+        roomItem = {};
+        roomItem[roomName] = {roomName:roomName};
+        easyRTC.sendSignalling(null, "roomLeave", {roomLeave: roomItem}, null, null);
+    }    
+};
+
 /** This function is used to set the dimensions of the local camera, usually to get HD.
  *  If called, it must be called before calling easyRTC.initMediaSource (explicitly or implicitly).
  *  assuming it is supported. If you don't pass any parameters, it will default to 720p dimensions.
@@ -299,7 +364,7 @@ easyRTC.onDataChannelClose = null;
 /** @private */
 easyRTC.lastLoggedInList = {};
 /** @private */
-easyRTC.receiveDataCB = null;
+easyRTC.receivePeerCB = null;
 /** @private */
 easyRTC.appDefinedFields = {};
 /** @private */
@@ -951,17 +1016,32 @@ easyRTC.setVideoBandwidth = function(kbitsPerSecond) {
         easyRTC.videoBandwidthString = "";
     }
 };
+
+
 /**
  * Sets a listener for data sent from another client (either peer to peer or via websockets).
- * @param {Function} listener has the signature (easyrtcid, data)
+ * @param {Function} listener has the signature (easyrtcid, msgType, data, targetting).
+ *   msgType is a string. targetting is null if the message was received using WebRTC data channels, otherwise it
+ *   is an object that contains one or more of the following string valued elements {targetEasyrtcid, targetGroup, targetRoom}.
  * @example
- *     easyRTC.setDataListener( function(easyrtcid, msgType, data) {
+ *     easyRTC.setPeerListener( function(easyrtcid, msgType, data, targetting) {
  *         ("From " + easyRTC.idToName(easyrtcid) + 
  *             " sent the follow data " + JSON.stringify(data));
  *     });
+ *     
+ *     
+ */
+easyRTC.setPeerListener = function(listener) {
+    easyRTC.receivePeerCB = listener;
+};
+
+/**
+ * Sets a listener for data sent from another client (either peer to peer or via websockets).
+ * @param {Function} listener has the signature (easyrtcid, msgType, data, targetting)
+ * @deprecated This is now a synonym for setPeerListener.
  */
 easyRTC.setDataListener = function(listener) {
-    easyRTC.receiveDataCB = listener;
+    easyRTC.receivePeerCB = listener;
 };
 /**
  * Sets the url of the Socket server.
@@ -1161,6 +1241,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
     }
 
+    easyRTC.sendSignalling = sendSignalling;
     /**
      *Sends data to another user using previously established data channel. This method will
      * fail if no data channel has been established yet. Unlike the easyRTC.sendWS method, 
@@ -1194,27 +1275,52 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
    
     
-    /** Sends data to another user using websockets.
-     * @param {String} destUser (an easyrtcid)
+    /** Sends data to another user using websockets. Messages are received by the other party's peerListener.
+     * @param {String} destination - either a string containing the easyrtcId of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.
+     * Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).
      * @param {String msgType
      * @param {String} data - an object which can be JSON'ed.
+     * @param {Function} ackHandler - by default, the ackhandler handles acknowledgements from the server that your message was delivered to it's destination.
+     * However, application logic in the server can over-ride this. If you leave this null, a stub ackHandler will be used. The ackHandler
+     * gets passed a message with the same msgType as your outgoing message, or a message type of "error" in which case
+     * msgData will contain a errorCode and errorText fields.
      * @example 
-     *    easyRTC.sendDataWS(someEasyrtcid, {room:499, bldgNum:'asd'});
+     *    easyRTC.sendDataWS(someEasyrtcid, "setPostalAddress", {room:499, bldgNum:'asd'}, 
+     *      function(ackmessage){
+     *          console.log("saw the following acknowledgement " + JSON.stringify(ackmessage));
+     *      }
+     *    );
      */
-    easyRTC.sendDataWS = function(destUser, msgType, data, ackhandler) {
+    easyRTC.sendDataWS = function(destination, msgType, data, ackhandler) {
         if (easyRTC.debugPrinter) {
-            easyRTC.debugPrinter("sending client message via websockets to " + destUser + " with data=" + JSON.stringify(data));
+            easyRTC.debugPrinter("sending client message via websockets to " + destination + " with data=" + JSON.stringify(data));
         }
         if (!ackhandler) {
             ackhandler = function() {
             };
         }
+        
+        var outgoingMessage = {
+            msgType: msgType,
+            msgData: data
+        };
+        if( typeof destination === 'string') {
+            outgoingMessage.targetEasyrtcid = destination;
+        }
+        else if( typeof destination === 'object') {
+            if( destination.targetEasyrtcid ) {
+                outgoingMessage.targetEasyrtcid = destination.targetEasyrtcid;
+            }
+            if( destination.targetRoom ) {
+                outgoingMessage.targetRoom = destination.targetRoom;
+            }
+            if( destination.targetGroup ) {
+                outgoingMessage.targetGroup = destination.targetGroup;
+            }
+        }
+       
         if (easyRTC.webSocket) {
-            easyRTC.webSocket.json.emit("easyrtcMsg", {
-                targetEasyrtcid: destUser,
-                msgType: msgType,
-                msgData: data
-            }, ackhandler);
+            easyRTC.webSocket.json.emit("easyrtcMsg", outgoingMessage, ackhandler);
         }
         else {
             if (easyRTC.debugPrinter) {
@@ -1942,13 +2048,13 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     }
     ;
 
-    function processList(list) {
+    function processList(roomName, list) {
         var isPrimaryOwner = easyRTC.cookieOwner ? true : false;
         easyRTC.reducedList = {};
         for (id in list) {
             var item = list[id];
             if (item.isOwner &&
-                    item.clientConnectTime < list[easyRTC.myEasyrtcid].clientConnectTime) {
+                    item.roomJoinTime < list[easyRTC.myEasyrtcid].roomJoinTime) {
                 isPrimaryOwner = false;
             }
             if (id != easyRTC.myEasyrtcid) {
@@ -1957,16 +2063,25 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
         processConnectedList(easyRTC.reducedList);
         if (easyRTC.loggedInListener) {
-            easyRTC.loggedInListener(easyRTC.reducedList, isPrimaryOwner);
+            easyRTC.loggedInListener(roomName, easyRTC.reducedList, isPrimaryOwner);
         }
     }
 
 
 
     var onChannelMsg = function(msg) {
-
-        if (easyRTC.receiveDataCB) {
-            easyRTC.receiveDataCB(msg.senderEasyrtcid, msg.msgType, msg.msgData);
+        if (easyRTC.receivePeerCB) {
+            var targetting = {};
+            if( msg.targetEasyrtcId) {
+                targetting.targetEasyrtcId =  msg.targetEasyrtcId;
+            }
+            if( msg.targetRoom) {
+                targetting.targetRoom =  msg.targetRoom;
+            }
+            if( msg.targetGroup) {
+                targetting.targetGroup =  msg.targetGroup;
+            }
+            easyRTC.receivePeerCB(msg.senderEasyrtcid, msg.msgType, msg.msgData, targetting);
         }
     };
     var onChannelCmd = function(msg, ackAcceptorFn) {
@@ -2389,13 +2504,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
     function processRoomData(roomData) {
         for (var roomname in roomData) {
-            //
-            // Important: we need to know what the roomname name is (easyRTC.room) 
-            // at this point in the code. Rod doesn't appear to have implemented that
-            // far yet.
-            //
-
-            if (roomname == easyRTC.room) {
+            if (easyRTC.roomJoin[roomname]) {
                 easyRTC.roomHasPassword = roomData[roomname].hasPassword;
                 if (roomData[roomname].field && roomData[roomname].field.isOwner) {
                     easyRTC.cookieOwner = true;
@@ -2419,10 +2528,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                     }
 
                 }
-                processList(easyRTC.lastLoggedInList);
-
-                //easyRTC.room = msg.room ? msg.room : null;
-
+                processList(roomname, easyRTC.lastLoggedInList);
             }
         }
     }
@@ -2506,9 +2612,14 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             }
         }
 
+        if( !easyRTC.roomJoin) {
+            easyRTC.roomJoin =  { "default":{roomName:"default"}};
+        }
+        
         var msgData = {
             apiVersion: easyRTC.apiVersion,
             applicationName: applicationName,
+            roomJoin: easyRTC.roomJoin,
             easyrtcsid: easyrtcsid,
             credential: easyRTC.credential,
             setUserCfg: easyRTC.collectConfigurationInfo()

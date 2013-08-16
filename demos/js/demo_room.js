@@ -522,9 +522,9 @@ function muteActiveBox() {
 
 
 
-function callEverybodyElse(otherPeople) {
+function callEverybodyElse(roomName, otherPeople) {
     
-    easyRTC.setLoggedInListener(null); // so we're only called once.
+    easyRTC.setLoggedInListener(null, null); // so we're only called once.
 
     var list = [];
     var connectCount = 0;

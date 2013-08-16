@@ -25,61 +25,183 @@
 //
 var selfEasyrtcid = "";
 easyRTC.enableDebug(true);
-function addToConversation(who, msgType, content) {
+
+
+function addToConversation(who, msgType, content, targetting) {
     // Escape html special characters, then add linefeeds.
-    content = content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    content = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     content = content.replace(/\n/g, '<br />');
-    document.getElementById('conversation').innerHTML += 
-    "<b>" + who + ":</b>&nbsp;" + content + "<br />";
+    var targettingStr = "";
+    if (targetting) {
+        if (targetting.targetEasyrtcid) {
+            targettingStr += "user=" + targetting.targetEasyrtcid;
+        }
+        if (targetting.targetRoom) {
+            targettingStr += " room=" + targetting.targetRoom;
+        }
+        if (targetting.targetGroup) {
+            targettingStr += " group=" + targetting.targetGroup;
+        }
+    }
+    document.getElementById('conversation').innerHTML +=
+            "<b>" + who + " sent to " + targettingStr + ":</b>&nbsp;" + content + "<br />";
+}
+
+function addRoom() {
+    var roomName = document.getElementById("roomToAdd").value;
+
+    var roomButtonHolder = document.getElementById('rooms');
+    var roomButton = document.createElement("input");
+    var roomLabel = document.createElement("label");
+    roomLabel.appendChild(document.createTextNode(roomName));
+    roomButton.type = "checkbox";
+    roomButton.id = "roombutton_" + roomName;
+    roomButton.roomName = roomName;
+    roomLabel.id = "roomlabel_" + roomName;
+    roomLabel.htmlFor = roomButton.id;
+    roomButtonHolder.appendChild(roomButton);
+    roomButtonHolder.appendChild(roomLabel);
+    easyRTC.joinRoom(roomName, null, function() {
+        roomButtonHolder.removeChild(roomButton);
+    });
+}
+
+
+function leaveRoom() {
+    var roomName = document.getElementById("roomToAdd").value;
+    var roomButtonHolder = document.getElementById('rooms');
+    easyRTC.leaveRoom(roomName, null);
+    var button = document.getElementById("roombutton_" + roomName);
+    var label = document.getElementById("roomlabel_" + roomName);
+    if (button) {
+        roomButtonHolder.removeChild(button);
+        roomButtonHolder.removeChild(label);
+    }
 }
 
 
 function connect() {
-    easyRTC.setDataListener(addToConversation);
+    easyRTC.setPeerListener(addToConversation);
     easyRTC.setLoggedInListener(convertListToButtons);
     easyRTC.connect("easyrtc.instantMessaging", loginSuccess, loginFailure);
 }
 
 
-function convertListToButtons (data) {
-    otherClientDiv = document.getElementById('otherClients');
+function convertListToButtons(roomName, data) {
+    var otherClientDiv = document.getElementById('peers');
+
+    /** get rid of any buttons for the same room */
+    var traverseAgain = true;
+    while (traverseAgain) {
+        traverseAgain = false;
+        var n = otherClientDiv.childNodes.length;
+        for (var j = 0; j < n; j++) {
+            var childnode = otherClientDiv.childNodes[j];
+            if (childnode.roomName == roomName) {
+                otherClientDiv.removeChild(childnode);
+                traverseAgain = true;
+                break;
+            }
+        }
+    }
     while (otherClientDiv.hasChildNodes()) {
         otherClientDiv.removeChild(otherClientDiv.lastChild);
     }
-    
-    for(var i in data) {        
-        var button = document.createElement('button');
-        button.onclick = function(easyrtcid) {        
-            return function() {
-                sendStuffWS(easyrtcid);
-            }
-        }(i);        
-        var label = document.createTextNode("Send to " + easyRTC.idToName(i));
-        button.appendChild(label);
-                
-        otherClientDiv.appendChild(button);        
+
+    for (var i in data) {
+        var button = document.createElement("input");
+        button.type = "checkbox";
+        button.easyrtcid = i;
+        button.id = "button_" + roomName + "_" + i;
+        button.roomName = roomName;
+        var label = document.createTextNode(i + " in room " + roomName);
+        label.id = "button_" + roomName + "_" + i;
+        label.htmlFor = button.id;
+        otherClientDiv.appendChild(button);
+        otherClientDiv.appendChild(label);
     }
-    if( !otherClientDiv.hasChildNodes() ) {
-        otherClientDiv.innerHTML = "<em>Nobody else logged in to talk to...</em>";
+}
+
+function getTargetId() {
+    var otherClientDiv = document.getElementById('peers');
+    var n = otherClientDiv.childNodes.length;
+
+    for (var j = 0; j < n; j++) {
+        var childnode = otherClientDiv.childNodes[j];
+        if (childnode.checked) {
+            return childnode.easyrtcid;
+        }
+    }
+    return null;
+}
+
+
+function getRoomId() {
+    var roomButtonHolder = document.getElementById('rooms');
+    var n = roomButtonHolder.childNodes.length;
+    for (var i = 0; i < n; i++) {
+        var roomButton = roomButtonHolder.childNodes[i];
+        if (roomButton.checked) {
+            return roomButton.roomName;
+        }
+    }
+    return null;
+}
+
+
+function getGroupId() {
+    var id = document.getElementById('groupName').value;
+    if (id) {
+        id = id.trim();
+    }
+    if (id && id != "") {
+        return id;
+    }
+    else {
+        return null;
     }
 }
 
 
-function sendStuffWS(otherEasyrtcid) {    
-    var text = document.getElementById('sendMessageText').value;    
-    if(text.replace(/\s/g, "").length == 0) { // Don't send just whitespace
+function sendMessage(otherEasyrtcid) {
+    var text = document.getElementById('sendMessageText').value;
+    if (text.replace(/\s/g, "").length == 0) { // Don't send just whitespace
         return;
     }
-    
-    easyRTC.sendDataWS(otherEasyrtcid, "message",  text);
+    var dest;
+    var destTargetId = getTargetId();
+    var destRoom = getRoomId();
+    var destGroup = getGroupId();
+    if (destRoom || destGroup) {
+        dest = {};
+        if (destRoom) {
+            dest.targetRoom = destRoom;
+        }
+        if (destGroup) {
+            dest.targetGroup = destGroup;
+        }
+        if (destTargetId) {
+            dest.targetEasyrtcid = destTargetId;
+        }
+    }
+    else if (destTargetId) {
+        dest = destTargetId;
+    }
+    else {
+        easyRTC.showError("user error", "no destination selected");
+        return;
+    }
+
+    easyRTC.sendDataWS(dest, "message", text);
     addToConversation("Me", "message", text);
-    document.getElementById('sendMessageText').value = "";        
+    document.getElementById('sendMessageText').value = "";
 }
 
 
 function loginSuccess(easyRTCId) {
     selfEasyrtcid = easyRTCId;
     document.getElementById("iam").innerHTML = "I am " + easyRTCId;
+    document.getElementById("connectButton").disabled = "disabled";
 }
 
 
