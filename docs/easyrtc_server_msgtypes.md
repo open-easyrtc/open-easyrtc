@@ -151,6 +151,13 @@ Leaves a room. Upon leaving a room, the API should remove all room info (incl. c
    - **roomName** (required) Room name (matches map key)
 
 
+### msgType - 'getRoomList'
+Requests a list of all rooms which the client has access to. It has no fields. The server should return a message to the callback with msgType of 'roomList'.
+
+**Fields:**
+
+
+
 
 ## Outgoing (from server)
 
@@ -252,6 +259,18 @@ Provides room information for all rooms the user is currently in. This includes 
      - **updateConnection** (optional) Map of easyrtcid's to update. Will contain same fields as 'list'
      - **removeConnection** (optional) Map of easyrtcid's to remove the the list.
 
+### msgType - 'roomList'
+Provides rooms which the client has access to. By default authenticated users can see all other rooms in the same application.
+
+**Fields:**
+
+ - **serverTime** (required)
+ - **msgData** (required)
+
+**msgData Fields:**
+ - **roomList** (required) Map of room names
+   - **roomName** (required) Room name (matches map key)
+   - **numberConnections** (optional) The number of clients in the room. By default this is enabled.
 
 ### msgType - 'forwardToUrl'
 Instructs API to forward user to specified URL. Useful for server handled error handling and user support techniques. 
