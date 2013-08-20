@@ -63,14 +63,19 @@ function addRoom(roomName) {
     roomLabel.htmlFor = roomButton.id;
     roomButtonHolder.appendChild(roomButton);
     roomButtonHolder.appendChild(roomLabel);
+
+    $("#roomlabel_" + roomName).append(" -<a href=\"javascript:\leaveRoom('" + roomName + "')\">leave</a>");
+
     easyRTC.joinRoom(roomName, null, function() {
         roomButtonHolder.removeChild(roomButton);
     });
 }
 
 
-function leaveRoom() {
-    var roomName = document.getElementById("roomToAdd").value;
+function leaveRoom(roomName) {
+    if (!roomName) {
+        roomName = document.getElementById("roomToAdd").value;
+    }
     var roomButtonHolder = document.getElementById('rooms');
     easyRTC.leaveRoom(roomName, null);
     var button = document.getElementById("roombutton_" + roomName);
