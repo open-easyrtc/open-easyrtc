@@ -47,8 +47,10 @@ function addToConversation(who, msgType, content, targetting) {
             "<b>" + who + " sent to " + targettingStr + ":</b>&nbsp;" + content + "<br />";
 }
 
-function addRoom() {
-    var roomName = document.getElementById("roomToAdd").value;
+function addRoom(roomName) {
+    if (!roomName) {
+        roomName = document.getElementById("roomToAdd").value;
+    }
 
     var roomButtonHolder = document.getElementById('rooms');
     var roomButton = document.createElement("input");
