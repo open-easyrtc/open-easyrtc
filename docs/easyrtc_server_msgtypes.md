@@ -137,6 +137,10 @@ Enters a room. If room doesn't exist, a new room may be created.
  - **roomJoin** (required) Map of room names
    - **roomName** (required) Room name (matches map key)
 
+**Returns:**
+ - **roomJoinData**
+ - **error**
+
 
 ### msgType - 'roomLeave'
 Leaves a room. Upon leaving a room, the API should remove all room info (incl. connection list) from memory.
@@ -258,6 +262,34 @@ Provides room information for all rooms the user is currently in. This includes 
    - **listDelta** (optional)
      - **updateConnection** (optional) Map of easyrtcid's to update. Will contain same fields as 'list'
      - **removeConnection** (optional) Map of easyrtcid's to remove the the list.
+
+
+### msgType - 'roomJoinData'
+Provides room information for the room(s) the user just joined. This contains the same information as roomData but for newly joined rooms only.
+
+**Fields:**
+
+ - **serverTime** (required)
+ - **msgData** (required)
+
+**msgData Fields:**
+ - **roomJoinData** (required) Map of room names
+   - **roomName** (required) Room name (matches map key)
+   - **list** (optional) Map of easyrtcid's for users online in the same room. If present, this should overrule the current list in memory.
+     - **easyrtcid** (required) Matches map key
+     - **username** (optional)
+     - **roomJoinTime** (required) Timestamp of when client joined room
+     - **presence** (required) {show:[away|chat|dnd|xa],status:{String}}
+     - **apiField** (optional) Map of appDefinedFields and their values
+     - **browserFamily** (optional)
+     - **browserMajor** (optional)
+     - **osFamily** (optional)
+     - **deviceFamily** (optional)
+   - **listDelta** (optional)
+     - **updateConnection** (optional) Map of easyrtcid's to update. Will contain same fields as 'list'
+     - **removeConnection** (optional) Map of easyrtcid's to remove the the list.
+
+
 
 ### msgType - 'roomList'
 Provides rooms which the client has access to. By default authenticated users can see all other rooms in the same application.
