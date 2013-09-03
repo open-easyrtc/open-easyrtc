@@ -148,37 +148,37 @@ easyRTC.setCookieId = function(cookieId) {
  * @returns {unresolved}
  */
 easyRTC.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
-    if( easyRTC.roomJoin[roomName]) {
+    if (easyRTC.roomJoin[roomName]) {
         alert("Programmer error: attempt to join room " + roomName + " which you are already in.");
         return;
     }
-    var newRoomData = { roomName:roomName};
-    if( roomParameters) {
-        for(var key in roomParameters) {
-            newRoomData[key] = roomParameters[key];        
+    var newRoomData = {roomName: roomName};
+    if (roomParameters) {
+        for (var key in roomParameters) {
+            newRoomData[key] = roomParameters[key];
         }
     }
     easyRTC.roomJoin[roomName] = newRoomData;
-    if( failureCB === null) {
-        failureCB = function(why){
+    if (failureCB === null) {
+        failureCB = function(why) {
             easyRTC.showError("Unable to enter room " + roomName + " because " + why);
         };
     }
-    if( easyRTC.webSocket ){
-        easyRTC.sendSignalling(null, "roomJoin", {roomJoin:newRoomData}, 
-            function() {
-                if( successCB) {
-                    successCB(roomName);
-                }
-            }, 
-            function(why) {
-                if( failureCB) {
-                    failureCB(roomName);
-                }
-                else {
-                    easyRTC.showError("Unable to enter room " + roomName + " because " + why);
-                }
+    if (easyRTC.webSocket) {
+        easyRTC.sendSignalling(null, "roomJoin", {roomJoin: newRoomData},
+        function() {
+            if (successCB) {
+                successCB(roomName);
             }
+        },
+                function(why) {
+                    if (failureCB) {
+                        failureCB(roomName);
+                    }
+                    else {
+                        easyRTC.showError("Unable to enter room " + roomName + " because " + why);
+                    }
+                }
         );
     }
 };
@@ -189,15 +189,15 @@ easyRTC.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
  * @returns {void}
  */
 easyRTC.leaveRoom = function(roomName) {
-    if( easyRTC.roomJoin[roomName]) {
+    if (easyRTC.roomJoin[roomName]) {
         delete easyRTC.roomJoin[roomName];
-        if( easyRTC.webSocket) {
-            
+        if (easyRTC.webSocket) {
+
         }
         roomItem = {};
-        roomItem[roomName] = {roomName:roomName};
+        roomItem[roomName] = {roomName: roomName};
         easyRTC.sendSignalling(null, "roomLeave", {roomLeave: roomItem}, null, null);
-    }    
+    }
 };
 
 /** This function is used to set the dimensions of the local camera, usually to get HD.
@@ -1210,33 +1210,37 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     //
     function sendSignalling(destUser, instruction, data, successCallback, errorCallback) {
         if (!easyRTC.webSocket) {
-            throw "Attempt to send message without a valid connection to the server."
+            throw "Attempt to send message without a valid connection to the server.";
         }
         else {
             var dataToShip = {
-                msgType: instruction,
-                targetEasyrtcid: destUser,
-                msgData: data
+                msgType: instruction                
+            };
+            if( destUser) {
+                dataToShip.targetEasyrtcid = destUser;
+            }
+            if( data) {
+                dataToShip.msgData = data;
             };
             if (easyRTC.debugPrinter) {
                 easyRTC.debugPrinter("sending socket message " + JSON.stringify(dataToShip));
             }
             easyRTC.webSocket.json.emit("easyrtcCmd", dataToShip,
-                function(ackmsg) {
-                    if (ackmsg.msgType != "error") {
-                        if( successCallback) {
-                            successCallback(ackmsg.msgType, ackmsg.data);
-                        }
-                    }
-                    else {
-                        if( errorCallback) {
-                            errorCallback(ackmsg.msgData.errorCode, ackmsg.msgData.errorText);
+                    function(ackmsg) {
+                        if (ackmsg.msgType != "error") {
+                            if (successCallback) {
+                                successCallback(ackmsg.msgType, ackmsg.data);
+                            }
                         }
                         else {
-                            easyRTC.showError(ackmsg.msgData.errorCode, ackmsg.msgData.errorText);
+                            if (errorCallback) {
+                                errorCallback(ackmsg.msgData.errorCode, ackmsg.msgData.errorText);
+                            }
+                            else {
+                                easyRTC.showError(ackmsg.msgData.errorCode, ackmsg.msgData.errorText);
+                            }
                         }
                     }
-                }
             );
         }
     }
@@ -1273,8 +1277,8 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
     };
 
-   
-    
+
+
     /** Sends data to another user using websockets. Messages are received by the other party's peerListener.
      * @param {String} destination - either a string containing the easyrtcId of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.
      * Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).
@@ -1299,26 +1303,26 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             ackhandler = function() {
             };
         }
-        
+
         var outgoingMessage = {
             msgType: msgType,
             msgData: data
         };
-        if( typeof destination === 'string') {
+        if (typeof destination === 'string') {
             outgoingMessage.targetEasyrtcid = destination;
         }
-        else if( typeof destination === 'object') {
-            if( destination.targetEasyrtcid ) {
+        else if (typeof destination === 'object') {
+            if (destination.targetEasyrtcid) {
                 outgoingMessage.targetEasyrtcid = destination.targetEasyrtcid;
             }
-            if( destination.targetRoom ) {
+            if (destination.targetRoom) {
                 outgoingMessage.targetRoom = destination.targetRoom;
             }
-            if( destination.targetGroup ) {
+            if (destination.targetGroup) {
                 outgoingMessage.targetGroup = destination.targetGroup;
             }
         }
-       
+
         if (easyRTC.webSocket) {
             easyRTC.webSocket.json.emit("easyrtcMsg", outgoingMessage, ackhandler);
         }
@@ -1687,8 +1691,8 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                         candidate: event.candidate.candidate
                     };
                     if (easyRTC.peerConns[otherUser].startedAV) {
-                        
-                        sendSignalling(otherUser, "candidate", candidateData, null, function(){
+
+                        sendSignalling(otherUser, "candidate", candidateData, null, function() {
                             failureCB("Candidate disappeared");
                         });
                     }
@@ -2072,14 +2076,14 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     var onChannelMsg = function(msg) {
         if (easyRTC.receivePeerCB) {
             var targetting = {};
-            if( msg.targetEasyrtcId) {
-                targetting.targetEasyrtcId =  msg.targetEasyrtcId;
+            if (msg.targetEasyrtcId) {
+                targetting.targetEasyrtcId = msg.targetEasyrtcId;
             }
-            if( msg.targetRoom) {
-                targetting.targetRoom =  msg.targetRoom;
+            if (msg.targetRoom) {
+                targetting.targetRoom = msg.targetRoom;
             }
-            if( msg.targetGroup) {
-                targetting.targetGroup =  msg.targetGroup;
+            if (msg.targetGroup) {
+                targetting.targetGroup = msg.targetGroup;
             }
             easyRTC.receivePeerCB(msg.senderEasyrtcid, msg.msgType, msg.msgData, targetting);
         }
@@ -2193,14 +2197,14 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             easyRTC.peerConns[caller].startedAV = true;
             for (var i = 0; i < easyRTC.peerConns[caller].candidatesToSend.length; i++) {
                 sendSignalling(caller, "candidate", easyRTC.peerConns[caller].candidatesToSend[i],
-                       null, 
-                       function(errorCode, errorText) {
+                        null,
+                        function(errorCode, errorText) {
                             if (easyRTC.peerConns[caller]) {
                                 delete easyRTC.peerConns[caller];
                             }
                             easyRTC.showError(errorCode, errorText);
                         }
-                    );
+                );
             }
 
             pc = easyRTC.peerConns[caller].pc;
@@ -2502,34 +2506,40 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
     }
 
+
     function processRoomData(roomData) {
-        for (var roomname in roomData) {
-            if (easyRTC.roomJoin[roomname]) {
-                easyRTC.roomHasPassword = roomData[roomname].hasPassword;
-                if (roomData[roomname].field && roomData[roomname].field.isOwner) {
-                    easyRTC.cookieOwner = true;
-                }
-
-                if (roomData[roomname].list) {
-                    easyRTC.lastLoggedInList = roomData[roomname].list;
-                }
-                else if (roomData[roomname].listDelta) {
-                    var stuffToAdd = roomData[roomname].listDelta.updateConnection;
-                    if (stuffToAdd) {
-                        for (var id in stuffToAdd) {
-                            easyRTC.lastLoggedInList[id] = stuffToAdd[id];
-                        }
-                    }
-                    var stuffToRemove = roomData[roomname].listDelta.removeConnection;
-                    if (stuffToRemove) {
-                        for (var removeId in stuffToRemove) {
-                            delete easyRTC.lastLoggedInList[removeId];
-                        }
-                    }
-
-                }
-                processList(roomname, easyRTC.lastLoggedInList);
+        function isEmptyObj(obj) {
+            var isEmpty = true;
+            for (var key in isEmpty) {
+                isEmpty = false;
             }
+            return isEmpty;
+        }
+
+        for (var roomname in roomData) {
+            easyRTC.roomHasPassword = roomData[roomname].hasPassword;
+            if (roomData[roomname].field && roomData[roomname].field.isOwner) {
+                easyRTC.cookieOwner = true;
+            }
+
+            if (roomData[roomname].list) {
+                easyRTC.lastLoggedInList = roomData[roomname].list;
+            }
+            else if (roomData[roomname].listDelta) {
+                var stuffToAdd = roomData[roomname].listDelta.updateConnection;
+                if (stuffToAdd) {
+                    for (var id in stuffToAdd) {
+                        easyRTC.lastLoggedInList[id] = stuffToAdd[id];
+                    }
+                }
+                var stuffToRemove = roomData[roomname].listDelta.removeConnection;
+                if (stuffToRemove) {
+                    for (var removeId in stuffToRemove) {
+                        delete easyRTC.lastLoggedInList[removeId];
+                    }
+                }
+            }
+            processList(roomname, easyRTC.lastLoggedInList);
         }
     }
 
@@ -2586,8 +2596,8 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 successCallback(easyRTC.myEasyrtcid, easyRTC.cookieOwner);
             }
         }
-        else if( msg.msgType === "error") { // authenticate error
-            console.log( msg.msgType + ": " + msg.msgData.errorText);
+        else if (msg.msgType === "error") { // authenticate error
+            console.log(msg.msgType + ": " + msg.msgData.errorText);
             easyRTC.showError(msg.msgData.errorCode, msg.msgData.errorText);
         }
         else {
@@ -2612,10 +2622,10 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             }
         }
 
-        if( !easyRTC.roomJoin) {
-            easyRTC.roomJoin =  { "default":{roomName:"default"}};
+        if (!easyRTC.roomJoin) {
+            easyRTC.roomJoin = {"default": {roomName: "default"}};
         }
-        
+
         var msgData = {
             apiVersion: easyRTC.apiVersion,
             applicationName: applicationName,
@@ -2645,7 +2655,7 @@ easyRTC.autoAddCloseButtons = true;
  */
 easyRTC.dontAddCloseButtons = function() {
     easyRTC.autoAddCloseButtons = false;
-}
+};
 /**
  * Provides a layer on top of the easyRTC.initMediaSource and easyRTC.connect, assign the local media stream to
  * the video object identified by monitorVideoId, assign remote video streams to
@@ -2849,7 +2859,7 @@ easyRTC.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
             var parentDiv = video.parentNode;
             video.caller = "";
             var closeButton = document.createElement("div");
-            closeButton.className = "closeButton";
+            closeButton.className = "easyRTC_closeButton";
             closeButton.onclick = function() {
                 if (video.caller) {
                     easyRTC.hangup(video.caller);
