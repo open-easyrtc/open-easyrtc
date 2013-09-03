@@ -64,7 +64,7 @@ function addRoom(roomName) {
     roomButtonHolder.appendChild(roomButton);
     roomButtonHolder.appendChild(roomLabel);
 
-    $("#roomlabel_" + roomName).append(" -<a href=\"javascript:\leaveRoom('" + roomName + "')\">leave</a>");
+    $("#roomlabel_" + roomName).append(" -<a href=\"javascript:\leaveRoom('" + roomName + "')\">leave</a><br />");
 
     easyRTC.joinRoom(roomName, null, function() {
         roomButtonHolder.removeChild(roomButton);
