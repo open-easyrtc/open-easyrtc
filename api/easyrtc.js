@@ -165,7 +165,9 @@ easyRTC.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
         };
     }
     if (easyRTC.webSocket) {
-        easyRTC.sendSignalling(null, "roomJoin", {roomJoin: newRoomData},
+        var entry = {};
+        entry[roomName] = newRoomData;
+        easyRTC.sendSignalling(null, "roomJoin", {roomJoin: entry},
         function() {
             if (successCB) {
                 successCB(roomName);

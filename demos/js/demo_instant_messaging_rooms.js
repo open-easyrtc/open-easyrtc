@@ -44,7 +44,15 @@ function addToConversation(who, msgType, content, targetting) {
         }
     }
     document.getElementById('conversation').innerHTML +=
-            "<b>" + who + " sent to " + targettingStr + ":</b>&nbsp;" + content + "<br />";
+            "<b>" + who + " sent " + targettingStr + ":</b>&nbsp;" + content + "<br />";
+}
+
+function genRoomDivName(roomName) {
+    return "roomblock_" + roomName;
+}
+
+function genRoomOccupantName(roomName) {
+    return "roomOccupant_" + roomName;
 }
 
 function addRoom(roomName) {
@@ -53,18 +61,23 @@ function addRoom(roomName) {
     }
 
     var roomButtonHolder = document.getElementById('rooms');
-    var roomButton = document.createElement("input");
-    var roomLabel = document.createElement("label");
-    roomLabel.appendChild(document.createTextNode(roomName));
-    roomButton.type = "checkbox";
-    roomButton.id = "roombutton_" + roomName;
-    roomButton.roomName = roomName;
-    roomLabel.id = "roomlabel_" + roomName;
-    roomLabel.htmlFor = roomButton.id;
-    roomButtonHolder.appendChild(roomButton);
-    roomButtonHolder.appendChild(roomLabel);
-
-    $("#roomlabel_" + roomName).append(" -<a href=\"javascript:\leaveRoom('" + roomName + "')\">leave</a><br />");
+    var roomdiv = document.createElement("div");
+    roomdiv.id = genRoomDivName(roomName);
+    roomdiv.className = "roomDiv"
+    
+    var roomButton = document.createElement("button");
+    roomButton.onclick = function() {
+        sendMessage(null, roomName);
+    };
+    var roomLabel = (document.createTextNode(roomName));
+    roomButton.appendChild(roomLabel);
+    roomdiv.appendChild(roomButton);
+    roomButtonHolder.appendChild(roomdiv);
+    var roomOccupants = document.createElement("div");
+    roomOccupants.id = genRoomOccupantName(roomName);
+    roomOccupants.className = "roomOccupants"
+    roomdiv.appendChild(roomOccupants);
+    $(roomdiv).append(" -<a href=\"javascript:\leaveRoom('" + roomName + "')\">leave</a>");
 
     easyRTC.joinRoom(roomName, null, function() {
         roomButtonHolder.removeChild(roomButton);
@@ -76,14 +89,10 @@ function leaveRoom(roomName) {
     if (!roomName) {
         roomName = document.getElementById("roomToAdd").value;
     }
+    var entry = document.getElementById(genRoomDivName(roomName));
     var roomButtonHolder = document.getElementById('rooms');
     easyRTC.leaveRoom(roomName, null);
-    var button = document.getElementById("roombutton_" + roomName);
-    var label = document.getElementById("roomlabel_" + roomName);
-    if (button) {
-        roomButtonHolder.removeChild(button);
-        roomButtonHolder.removeChild(label);
-    }
+    roomButtonHolder.removeChild(entry);
 }
 
 
@@ -95,65 +104,26 @@ function connect() {
 
 
 function convertListToButtons(roomName, data) {
-    var otherClientDiv = document.getElementById('peers');
+    var otherClientDiv = document.getElementById(genRoomOccupantName(roomName));
 
-    /** get rid of any buttons for the same room */
-    var traverseAgain = true;
-    while (traverseAgain) {
-        traverseAgain = false;
-        var n = otherClientDiv.childNodes.length;
-        for (var j = 0; j < n; j++) {
-            var childnode = otherClientDiv.childNodes[j];
-            if (childnode.roomName == roomName) {
-                otherClientDiv.removeChild(childnode);
-                traverseAgain = true;
-                break;
-            }
-        }
-    }
-    while (otherClientDiv.hasChildNodes()) {
-        otherClientDiv.removeChild(otherClientDiv.lastChild);
-    }
-
+    $(otherClientDiv).empty();
+    
     for (var i in data) {
-        var button = document.createElement("input");
-        button.type = "checkbox";
-        button.easyrtcid = i;
-        button.id = "button_" + roomName + "_" + i;
-        button.roomName = roomName;
-        var label = document.createTextNode(i + " in room " + roomName);
-        label.id = "button_" + roomName + "_" + i;
-        label.htmlFor = button.id;
+        var button = document.createElement("button");
+        button.onclick =(function(roomname, user) {
+            return function() {
+                sendMessage(user, roomName); 
+            };
+        })(roomName, i);
+        
+        var label = document.createTextNode(i );
+        button.appendChild(label);
         otherClientDiv.appendChild(button);
-        otherClientDiv.appendChild(label);
     }
 }
 
-function getTargetId() {
-    var otherClientDiv = document.getElementById('peers');
-    var n = otherClientDiv.childNodes.length;
-
-    for (var j = 0; j < n; j++) {
-        var childnode = otherClientDiv.childNodes[j];
-        if (childnode.checked) {
-            return childnode.easyrtcid;
-        }
-    }
-    return null;
-}
 
 
-function getRoomId() {
-    var roomButtonHolder = document.getElementById('rooms');
-    var n = roomButtonHolder.childNodes.length;
-    for (var i = 0; i < n; i++) {
-        var roomButton = roomButtonHolder.childNodes[i];
-        if (roomButton.checked) {
-            return roomButton.roomName;
-        }
-    }
-    return null;
-}
 
 
 function getGroupId() {
@@ -170,14 +140,12 @@ function getGroupId() {
 }
 
 
-function sendMessage(otherEasyrtcid) {
+function sendMessage(destTargetId, destRoom) {
     var text = document.getElementById('sendMessageText').value;
     if (text.replace(/\s/g, "").length == 0) { // Don't send just whitespace
         return;
     }
     var dest;
-    var destTargetId = getTargetId();
-    var destRoom = getRoomId();
     var destGroup = getGroupId();
     if (destRoom || destGroup) {
         dest = {};
