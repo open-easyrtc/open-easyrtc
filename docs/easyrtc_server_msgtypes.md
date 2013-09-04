@@ -124,6 +124,10 @@ Sets user online presence which is re-broadcast as part of the list. User must b
      - **show** (optional) [`away`|`chat`|`dnd`|`xa`]
      - **status** (optional) User configurable status string. TODO: Set regex for max length and allowed characters.
 
+**Returns:**
+ - **roomData** (with roomStatus of `update`)
+ - **error**
+
 
 ### msgType - 'roomJoin'
 Enters a room. If room doesn't exist, a new room may be created.
@@ -138,7 +142,7 @@ Enters a room. If room doesn't exist, a new room may be created.
    - **roomName** (required) Room name (matches map key)
 
 **Returns:**
- - **roomJoinData**
+ - **roomData** (with roomStatus of `join`)
  - **error**
 
 
@@ -154,13 +158,14 @@ Leaves a room. Upon leaving a room, the API should remove all room info (incl. c
  - **roomLeave** (required) Map of room names
    - **roomName** (required) Room name (matches map key)
 
+**Returns:**
+ - **roomData** (with roomStatus of `leave`)
+ - **error**
 
 ### msgType - 'getRoomList'
 Requests a list of all rooms which the client has access to. It has no fields. The server should return a message to the callback with msgType of 'roomList'.
 
 **Fields:**
-
-
 
 
 ## Outgoing (from server)
@@ -249,6 +254,10 @@ Provides room information for all rooms the user is currently in. This includes 
 **msgData Fields:**
  - **roomData** (required) Map of room names
    - **roomName** (required) Room name (matches map key)
+   - **roomStatus** (required) Instruction to API as to whether to join, update, or leave a given room.  [join|update|leave]
+   	 - `join` - Client is considered to be joined to the given room. `list` field will may be present to show other users who are visible in the room.
+   	 - `update` - Client should update what it knows about the room. `list` or `listDelta` field may be present.
+   	 - `leave` - Client is considered to have left the room, and should delete everything it knows about the room including the ids of other users.
    - **list** (optional) Map of easyrtcid's for users online in the same room. If present, this should overrule the current list in memory.
      - **easyrtcid** (required) Matches map key
      - **username** (optional)
@@ -262,33 +271,6 @@ Provides room information for all rooms the user is currently in. This includes 
    - **listDelta** (optional)
      - **updateConnection** (optional) Map of easyrtcid's to update. Will contain same fields as 'list'
      - **removeConnection** (optional) Map of easyrtcid's to remove the the list.
-
-
-### msgType - 'roomJoinData'
-Provides room information for the room(s) the user just joined. This contains the same information as roomData but for newly joined rooms only.
-
-**Fields:**
-
- - **serverTime** (required)
- - **msgData** (required)
-
-**msgData Fields:**
- - **roomJoinData** (required) Map of room names
-   - **roomName** (required) Room name (matches map key)
-   - **list** (optional) Map of easyrtcid's for users online in the same room. If present, this should overrule the current list in memory.
-     - **easyrtcid** (required) Matches map key
-     - **username** (optional)
-     - **roomJoinTime** (required) Timestamp of when client joined room
-     - **presence** (required) {show:[away|chat|dnd|xa],status:{String}}
-     - **apiField** (optional) Map of appDefinedFields and their values
-     - **browserFamily** (optional)
-     - **browserMajor** (optional)
-     - **osFamily** (optional)
-     - **deviceFamily** (optional)
-   - **listDelta** (optional)
-     - **updateConnection** (optional) Map of easyrtcid's to update. Will contain same fields as 'list'
-     - **removeConnection** (optional) Map of easyrtcid's to remove the the list.
-
 
 
 ### msgType - 'roomList'
@@ -303,6 +285,7 @@ Provides rooms which the client has access to. By default authenticated users ca
  - **roomList** (required) Map of room names
    - **roomName** (required) Room name (matches map key)
    - **numberConnections** (optional) The number of clients in the room. By default this is enabled.
+
 
 ### msgType - 'forwardToUrl'
 Instructs API to forward user to specified URL. Useful for server handled error handling and user support techniques. 
