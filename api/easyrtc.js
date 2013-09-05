@@ -168,20 +168,26 @@ easyRTC.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
         var entry = {};
         entry[roomName] = newRoomData;
         easyRTC.sendSignalling(null, "roomJoin", {roomJoin: entry},
-        function(msgType, roomData) {
-            if (successCB) {
-                successCB(roomName);
-                easyRTC.roomOccupantListener(roomName, roomData[roomName].list);
-            }
-        },
-                function(errorCode, errorText) {
-                    if (failureCB) {
-                        failureCB(errorCode, errorText, roomName);
+            function(msgType, roomData) {
+                if (successCB) {
+                    successCB(roomName);
+                    easyRTC.lastLoggedInList[roomName] = {};
+                    for(var key in roomData[roomName].list) {
+                        if( key !== easyRTC.myEasyrtcid) {
+                            easyRTC.lastLoggedInList[roomName][key] = roomData[roomName].list[key];
+                        }
                     }
-                    else {
-                        easyRTC.showError("Unable to enter room " + roomName + " because " + why);
-                    }
+                    easyRTC.roomOccupantListener(roomName, easyRTC.lastLoggedInList[roomName]);
                 }
+            },
+            function(errorCode, errorText) {
+                if (failureCB) {
+                    failureCB(errorCode, errorText, roomName);
+                }
+                else {
+                    easyRTC.showError("Unable to enter room " + roomName + " because " + why);
+                }
+            }
         );
     }
 };
@@ -2539,15 +2545,15 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
         for (var roomname in roomData) {
             easyRTC.roomHasPassword = roomData[roomname].hasPassword;
-            if (roomData[roomname].roomState === "join") {
+            if (roomData[roomname].roomStatus === "join") {
                 if (easyRTC.roomEntryListener) {
                     easyRTC.roomEntryListener(true, roomname);
                 }
                 if (!(easyRTC.roomJoin[roomname])) {
-                    easyRTC.roomJoin[roomname] = roomData[roommame];
+                    easyRTC.roomJoin[roomname] = roomData[roomname];
                 }
             }
-            else if (roomData[roomname].roomState === "leave") {
+            else if (roomData[roomname].roomStatus === "leave") {
                 if (easyRTC.roomEntryListener) {
                     easyRTC.roomEntryListener(false, roomname);
                 }
