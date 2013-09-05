@@ -236,7 +236,6 @@ Initiates an authenticated easyRTC application. Note this may be sent multiple t
  - **easyrtcsid** (if available)
  - **iceConfig** (required)
  - **groupList** (optional - default to no group)
- - **serverTime** (required)
  - **roomData** (required) See roomData msgType for contents
  - **application**
    - **applicationName** (required - defaults to 'default')
