@@ -38,7 +38,7 @@ function connect() {
     easyRTC.enableDataChannels(true);
     easyRTC.enableVideo(false);
     easyRTC.enableAudio(false);
-    easyRTC.setLoggedInListener(convertListToButtons);
+    easyRTC.setRoomOccupantListener(convertListToButtons);
     easyRTC.setAcceptChecker( function(easyrtcid, responsefn) {
         peerDivs[easyrtcid].className ="dragndrop connecting";
         responsefn(true);

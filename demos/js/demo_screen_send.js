@@ -58,7 +58,7 @@ function connect() {
     console.log("Initializing with username " + tempName);
     easyRTC.setScreenCapture();
     easyRTC.enableAudio(document.getElementById("shareAudio").checked);
-    easyRTC.setLoggedInListener(function (roomName, otherPeers){
+    easyRTC.setRoomOccupantListener(function (roomName, otherPeers){
         var peer;
         for(peer in otherPeers ) {
             if( !contactedListeners[peer]) {

@@ -42,7 +42,7 @@ function connect() {
     easyRTC.enableAudio(false);
 
     easyRTC.setDataListener(addToConversation);
-    easyRTC.setLoggedInListener(loggedInListener);
+    easyRTC.setRoomOccupantListener(loggedInListener);
     easyRTC.connect("easyrtc.dataMessaging", loginSuccess, loginFailure);
 }
 

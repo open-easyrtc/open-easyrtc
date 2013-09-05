@@ -24,8 +24,9 @@
 //POSSIBILITY OF SUCH DAMAGE.
 //
 var selfEasyrtcid = "";
+var waitingForRoomList = true;
 easyRTC.enableDebug(true);
-
+var isConnected = false;
 
 function addToConversation(who, msgType, content, targetting) {
     // Escape html special characters, then add linefeeds.
@@ -55,33 +56,52 @@ function genRoomOccupantName(roomName) {
     return "roomOccupant_" + roomName;
 }
 
-function addRoom(roomName) {
+
+function addRoom(roomName, userAdded) {
     if (!roomName) {
         roomName = document.getElementById("roomToAdd").value;
     }
+    var roomid = genRoomDivName(roomName);
+    if( document.getElementById(roomid)) {
+        console.log("room " + roomName + " already exists, don't need to add");
+        return;
+    }
+    function addRoomButton() {
 
-    var roomButtonHolder = document.getElementById('rooms');
-    var roomdiv = document.createElement("div");
-    roomdiv.id = genRoomDivName(roomName);
-    roomdiv.className = "roomDiv"
-    
-    var roomButton = document.createElement("button");
-    roomButton.onclick = function() {
-        sendMessage(null, roomName);
-    };
-    var roomLabel = (document.createTextNode(roomName));
-    roomButton.appendChild(roomLabel);
-    roomdiv.appendChild(roomButton);
-    roomButtonHolder.appendChild(roomdiv);
-    var roomOccupants = document.createElement("div");
-    roomOccupants.id = genRoomOccupantName(roomName);
-    roomOccupants.className = "roomOccupants"
-    roomdiv.appendChild(roomOccupants);
-    $(roomdiv).append(" -<a href=\"javascript:\leaveRoom('" + roomName + "')\">leave</a>");
+        var roomButtonHolder = document.getElementById('rooms');
+        var roomdiv = document.createElement("div");
+        roomdiv.id = roomid;
+        roomdiv.className = "roomDiv"
 
-    easyRTC.joinRoom(roomName, null, function() {
-        roomButtonHolder.removeChild(roomButton);
-    });
+        var roomButton = document.createElement("button");
+        roomButton.onclick = function() {
+            sendMessage(null, roomName);
+        };
+        var roomLabel = (document.createTextNode(roomName));
+        roomButton.appendChild(roomLabel);
+        roomdiv.appendChild(roomButton);
+        roomButtonHolder.appendChild(roomdiv);
+        var roomOccupants = document.createElement("div");
+        roomOccupants.id = genRoomOccupantName(roomName);
+        roomOccupants.className = "roomOccupants";
+        roomdiv.appendChild(roomOccupants);
+        $(roomdiv).append(" -<a href=\"javascript:\leaveRoom('" + roomName + "')\">leave</a>");
+    }
+
+    if (!isConnected || !userAdded) {
+        addRoomButton();
+        console.log("adding gui for room " + roomName);
+    }
+    else {
+        console.log("not adding gui for room " + roomName + " because already connected and it's a user action");
+    }
+    if (userAdded) {
+        console.log("calling joinRoom(" + roomName + ") because it was a user action ");
+        easyRTC.joinRoom(roomName, null, isConnected ? addRoomButton : null,
+                function(errorCode, errorText, roomName) {
+                    easyRTC.showError("errorCode", errorText + ": room name was(" + roomName + ")");
+                });
+    }
 }
 
 
@@ -96,33 +116,53 @@ function leaveRoom(roomName) {
 }
 
 
+function roomEntryListener(entered, roomName) {
+    if (entered) { // entered a room 
+        console.log("saw add of room " + roomName);
+        addRoom(roomName, false);
+    }
+    else {
+        var roomNode = document.getElementById(roomId);
+        if (roomNode) {
+            document.getElementById('#rooms').removeChildNode(roomNode);
+        }
+    }
+}
+
+
+
 function connect() {
     easyRTC.setPeerListener(addToConversation);
-    easyRTC.setLoggedInListener(convertListToButtons);
+    easyRTC.setRoomOccupantListener(convertListToButtons);
+    easyRTC.setRoomEntryListener(roomEntryListener);
     easyRTC.connect("easyrtc.instantMessaging", loginSuccess, loginFailure);
 }
 
 
 function convertListToButtons(roomName, data) {
-    var otherClientDiv = document.getElementById(genRoomOccupantName(roomName));
-
-    $(otherClientDiv).empty();
-    
+    console.log("convertListToButtons being called with roomname " + roomName);
+    var roomId = genRoomOccupantName(roomName);
+    var roomDiv = document.getElementById(roomId);
+    if (!roomDiv) {
+        addRoom(roomName, false);
+        roomDiv = document.getElementById(roomId);
+    }
+    else {
+        jQuery(roomDiv).empty();
+    }
     for (var i in data) {
         var button = document.createElement("button");
-        button.onclick =(function(roomname, user) {
+        button.onclick = (function(roomname, user) {
             return function() {
-                sendMessage(user, roomName); 
+                sendMessage(user, roomName);
             };
         })(roomName, i);
-        
-        var label = document.createTextNode(i );
+
+        var label = document.createTextNode(i);
         button.appendChild(label);
-        otherClientDiv.appendChild(button);
+        roomDiv.appendChild(button);
     }
 }
-
-
 
 
 
@@ -177,6 +217,7 @@ function loginSuccess(easyRTCId) {
     selfEasyrtcid = easyRTCId;
     document.getElementById("iam").innerHTML = "I am " + easyRTCId;
     document.getElementById("connectButton").disabled = "disabled";
+    isConnected = true;
 }
 
 

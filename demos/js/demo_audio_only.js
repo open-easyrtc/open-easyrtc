@@ -38,7 +38,7 @@ function enable(id) {
 function connect() {
     console.log("Initializing.");
     easyRTC.enableVideo(false);
-    easyRTC.setLoggedInListener(convertListToButtons);
+    easyRTC.setRoomOccupantListener(convertListToButtons);
     easyRTC.initMediaSource(
         function(){        // success callback
             easyRTC.connect("easyrtc.audioOnly", loginSuccess, loginFailure);
