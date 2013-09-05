@@ -30,7 +30,7 @@ function connect() {
     easyRTC.setVideoDims(1280,720);
     easyRTC.enableDebug(false);
     console.log("Initializing.");
-    easyRTC.setLoggedInListener(convertListToButtons);
+    easyRTC.setRoomOccupantListener(convertListToButtons);
     easyRTC.initManaged("easyrtc.videoChatHd", "selfVideo", ["callerVideo"], loginSuccess);
 }
 

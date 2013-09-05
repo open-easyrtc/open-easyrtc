@@ -524,7 +524,7 @@ function muteActiveBox() {
 
 function callEverybodyElse(roomName, otherPeople) {
     
-    easyRTC.setLoggedInListener(null, null); // so we're only called once.
+    easyRTC.setRoomOccupantListener(null, null); // so we're only called once.
 
     var list = [];
     var connectCount = 0;
@@ -683,7 +683,7 @@ function appInit() {
     handleWindowResize(); //initial call of the top-down layout manager
     
     // easyRTC.setVideoBandwidth(20);
-    easyRTC.setLoggedInListener(callEverybodyElse);
+    easyRTC.setRoomOccupantListener(callEverybodyElse);
     easyRTC.initManaged("easyrtc.room", "box0", ["box1", "box2", "box3"], loginSuccess);
     easyRTC.setDataListener(messageListener);
     easyRTC.setDisconnectListener( function() {

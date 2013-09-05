@@ -42,7 +42,7 @@ function connect() {
     console.log("Initializing.");
     easyRTC.enableAudio(document.getElementById('shareAudio').checked);
     easyRTC.enableVideo(document.getElementById('shareVideo').checked);
-    easyRTC.setLoggedInListener(convertListToButtons);
+    easyRTC.setRoomOccupantListener(convertListToButtons);
     easyRTC.connect("easyrtc.audioVideo", loginSuccess, loginFailure);
 
 }
