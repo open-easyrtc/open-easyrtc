@@ -1327,7 +1327,10 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             easyRTC.debugPrinter("sending client message via websockets to " + destination + " with data=" + JSON.stringify(data));
         }
         if (!ackhandler) {
-            ackhandler = function() {
+            ackhandler = function(msg) {
+                if( msg.msgType === "error") {
+                    easyRTC.showError(msg.msgData.errorCode, msg.msgData.errorText);
+                }
             };
         }
 
@@ -1364,15 +1367,17 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
      * @param {String} destUser (an easyrtcid)
      * @param {String} msgType
      * @param {String} data - an object which can be JSON'ed.
+     * @param {Function} ackHandler - a function which receives acknowledgements. May only be invoked in
+     *  the websocket case.
      * @example 
      *    easyRTC.sendData(someEasyrtcid, {room:499, bldgNum:'asd'});
      */
-    easyRTC.sendData = function(destUser, msgType, data) {
+    easyRTC.sendData = function(destUser, msgType, data, ackHandler) {
         if (easyRTC.peerConns[destUser] && easyRTC.peerConns[destUser].dataChannelReady) {
             easyRTC.sendDataP2P(destUser, msgType, data);
         }
         else {
-            easyRTC.sendDataWS(destUser, msgType, data);
+            easyRTC.sendDataWS(destUser, msgType, data, ackHandler);
         }
     };
 

@@ -207,7 +207,11 @@ function sendMessage(destTargetId, destRoom) {
         return;
     }
 
-    easyRTC.sendDataWS(dest, "message", text);
+    easyRTC.sendDataWS(dest, "message", text, function(reply) {
+        if( reply.msgType === "error") {
+            easyRTC.showError(reply.msgData.errorCode, reply.msgData.errorText);
+        }
+    });
     addToConversation("Me", "message", text);
     document.getElementById('sendMessageText').value = "";
 }
