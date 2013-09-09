@@ -2546,6 +2546,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         //
         var sendDeltas = function() {
             var alteredData = findDeltas(easyRTC.oldConfig, newConfig);
+ console.log("sendDeltas sending out update configuration info", alteredData);
             //
             // send all the configuration information that changes during the session
             //
@@ -2564,7 +2565,12 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             setTimeout(sendDeltas, 100);
         }
     }
-
+    easyRTC.updateConfiguration = updateConfiguration;
+    
+    easyRTC.updatePresence = function(state, statusText) {
+        sendSignalling(null, 'setPresence', {'show':state, 'status':statusText},  null);
+    }
+    
 
     function processRoomData(roomData) {
         function isEmptyObj(obj) {

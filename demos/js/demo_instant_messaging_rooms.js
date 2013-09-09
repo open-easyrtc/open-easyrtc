@@ -187,8 +187,18 @@ function convertListToButtons(roomName, data, isPrimary) {
                 sendMessage(user, roomName);
             };
         })(roomName, i);
-
-        var label = document.createTextNode(i);
+        var presenceText = "";
+        if( data[i].presence) {
+            presenceText += "(";
+            if( data[i].presence.show) {
+                presenceText += "show=" + data[i].presence.show + " ";
+            }
+            if( data[i].presence.status) {
+                presenceText += "status" + data[i].presence.status;
+            }
+            presenceText += ")";
+        }
+        var label = document.createTextNode(i + presenceText);
         button.appendChild(label);
         roomDiv.appendChild(button);
     }
@@ -260,3 +270,20 @@ function loginFailure(message) {
     easyRTC.showError("LOGIN-FAILURE", message);
 }
 
+var currentShowState = 'chat';
+var currentShowText = '';
+
+function setPresence(value) {
+    currentShowState = value;
+    updatePresence();
+}
+
+function updatePresenceStatus(value) {
+    currentShowText = value;
+    updatePresence();
+}
+
+function updatePresence()
+{
+    easyRTC.updatePresence(currentShowState, currentShowText);
+}

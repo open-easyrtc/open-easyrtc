@@ -67,6 +67,13 @@
                 <hr />
                 <h2>The Demo</h2>
                 <!--show-->
+                <div>
+                    <input type="radio" name="presence" onclick="setPresence('away');"/>away
+                    <input type="radio" name="presence" checked onclick="setPresence('chat');"/>chat
+                    <input type="radio" name="presence" onclick="setPresence('dnd');"/>dnd
+                    <input type="radio" name="presence" onclick="setPresence('xa');"/>xa
+                    <input type="text" onkeypress="updatePresenceStatus(this.value);" />
+                </div>
                 <div >
                     Quick Join -
                     <button onclick="refreshRoomList();"> Refresh</button>
