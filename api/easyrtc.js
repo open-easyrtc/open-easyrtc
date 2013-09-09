@@ -2573,13 +2573,13 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 easyRTC.lastLoggedInList[roomname] = roomData[roomname].clientList;
             }
             else if (roomData[roomname].clientListDelta) {
-                var stuffToAdd = roomData[roomname].clientListDelta.updateConnection;
+                var stuffToAdd = roomData[roomname].clientListDelta.updateClient;
                 if (stuffToAdd) {
                     for (var id in stuffToAdd) {
                         easyRTC.lastLoggedInList[roomname][id] = stuffToAdd[id];
                     }
                 }
-                var stuffToRemove = roomData[roomname].clientListDelta.removeConnection;
+                var stuffToRemove = roomData[roomname].clientListDelta.removeClient;
                 if (stuffToRemove) {
                     for (var removeId in stuffToRemove) {
                         delete easyRTC.lastLoggedInList[roomname][removeId];
