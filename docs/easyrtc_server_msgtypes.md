@@ -268,8 +268,8 @@ Provides room information for all rooms the user is currently in. This includes 
      - **osFamily** (optional)
      - **deviceFamily** (optional)
    - **clientListDelta** (optional)
-     - **updateConnection** (optional) Map of easyrtcids to update. Will contain same fields as 'clientList'
-     - **removeConnection** (optional) Map of easyrtcids to remove from the client list.
+     - **updateClient** (optional) Map of easyrtcids to update. Will contain same fields as 'clientList'
+     - **removeClient** (optional) Map of easyrtcids to remove from the client list.
 
 
 ### msgType - 'roomList'
