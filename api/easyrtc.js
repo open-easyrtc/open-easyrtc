@@ -172,9 +172,9 @@ easyRTC.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
                 if (successCB) {
                     successCB(roomName);
                     easyRTC.lastLoggedInList[roomName] = {};
-                    for(var key in roomData[roomName].list) {
+                    for(var key in roomData[roomName].clientList) {
                         if( key !== easyRTC.myEasyrtcid) {
-                            easyRTC.lastLoggedInList[roomName][key] = roomData[roomName].list[key];
+                            easyRTC.lastLoggedInList[roomName][key] = roomData[roomName].clientList[key];
                         }
                     }
                     easyRTC.roomOccupantListener(roomName, easyRTC.lastLoggedInList[roomName]);
@@ -2569,17 +2569,17 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 easyRTC.cookieOwner = true;
             }
 
-            if (roomData[roomname].list) {
-                easyRTC.lastLoggedInList[roomname] = roomData[roomname].list;
+            if (roomData[roomname].clientList) {
+                easyRTC.lastLoggedInList[roomname] = roomData[roomname].clientList;
             }
-            else if (roomData[roomname].listDelta) {
+            else if (roomData[roomname].clientListDelta) {
                 var stuffToAdd = roomData[roomname].listDelta.updateConnection;
                 if (stuffToAdd) {
                     for (var id in stuffToAdd) {
                         easyRTC.lastLoggedInList[roomname][id] = stuffToAdd[id];
                     }
                 }
-                var stuffToRemove = roomData[roomname].listDelta.removeConnection;
+                var stuffToRemove = roomData[roomname].clientListDelta.removeConnection;
                 if (stuffToRemove) {
                     for (var removeId in stuffToRemove) {
                         delete easyRTC.lastLoggedInList[roomname][removeId];
