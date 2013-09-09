@@ -283,7 +283,7 @@ Provides rooms which the client has access to. By default authenticated users ca
 **msgData Fields:**
  - **roomList** (required) Map of room names
    - **roomName** (required) Room name (matches map key)
-   - **numberConnections** (optional) The number of clients in the room. By default this is enabled.
+   - **numberClients** (optional) The number of clients in the room. By default this is enabled.
 
 
 ### msgType - 'forwardToUrl'
