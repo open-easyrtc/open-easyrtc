@@ -73,7 +73,7 @@ function clearConnectList() {
 }
 
 
-function convertListToButtons (roomName, data) {
+function convertListToButtons (roomName, data, isPrimary) {
     clearConnectList();
     otherClientDiv = document.getElementById('otherClients');
     for(var i in data) {

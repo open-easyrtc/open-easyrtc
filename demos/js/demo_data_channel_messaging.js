@@ -53,7 +53,7 @@ function loggedInListener (data) {
 }
 
 
-function convertListToButtons (connectList) {
+function convertListToButtons (roomName, connectList, isPrimary) {
 
     otherClientDiv = document.getElementById('otherClients');
     while (otherClientDiv.hasChildNodes()) {

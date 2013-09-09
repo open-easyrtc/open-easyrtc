@@ -127,9 +127,13 @@ function roomEntryListener(entered, roomName) {
             document.getElementById('#rooms').removeChildNode(roomNode);
         }
     }
+    refreshRoomList();
 }
 
 
+function refreshRoomList(){
+    easyRTC.getRoomList(addRoomButtons, null);
+}
 
 function connect() {
     easyRTC.setPeerListener(addToConversation);
@@ -141,6 +145,10 @@ function connect() {
 
 function addRoomButtons(roomList) {
     var quickJoinBlock = document.getElementById("quickJoinBlock");
+    var n = quickJoinBlock.childNodes.length;
+    for(var i = n-1; i >= 0; i--) {
+        quickJoinBlock.removeChild( quickJoinBlock.childNodes[i]);
+    }
     function addQuickJoinButton(roomname, numberClients) {
         var id = "quickjoin_" + roomname;
         if( document.getElementById(id)) {
@@ -161,7 +169,7 @@ function addRoomButtons(roomList) {
 
 
 
-function convertListToButtons(roomName, data) {
+function convertListToButtons(roomName, data, isPrimary) {
     console.log("convertListToButtons being called with roomname " + roomName);
     var roomId = genRoomOccupantName(roomName);
     var roomDiv = document.getElementById(roomId);
@@ -243,7 +251,7 @@ function loginSuccess(easyRTCId) {
     selfEasyrtcid = easyRTCId;
     document.getElementById("iam").innerHTML = "I am " + easyRTCId;
     document.getElementById("connectButton").disabled = "disabled";
-    easyRTC.getRoomList(addRoomButtons, null);
+    refreshRoomList();
     isConnected = true;
 }
 

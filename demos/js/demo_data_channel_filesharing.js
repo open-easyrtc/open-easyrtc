@@ -88,7 +88,7 @@ function saveFile(fileInfo, body) {
 }
 
 
-function convertListToButtons (data) {
+function convertListToButtons (roomName, data, isPrimary) {
     var otherClientsDiv = document.getElementById('otherClients');
     for(var oldPeer in  peerDivs) {
         if( !data[oldPeer] ) {
