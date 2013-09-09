@@ -62,7 +62,7 @@ function addRoom(roomName, userAdded) {
         roomName = document.getElementById("roomToAdd").value;
     }
     var roomid = genRoomDivName(roomName);
-    if( document.getElementById(roomid)) {
+    if (document.getElementById(roomid)) {
         console.log("room " + roomName + " already exists, don't need to add");
         return;
     }
@@ -139,6 +139,28 @@ function connect() {
 }
 
 
+function addRoomButtons(roomList) {
+    var quickJoinBlock = document.getElementById("quickJoinBlock");
+    function addQuickJoinButton(roomname, numberClients) {
+        var id = "quickjoin_" + roomname;
+        if( document.getElementById(id)) {
+            return; // already present so don't add again
+        }
+        var button = document.createElement("button");
+        button.id = id;
+        button.onclick = function() {
+            addRoom(roomname, true);
+        };
+        button.appendChild( document.createTextNode(roomname +"(" + numberClients + ")"));
+        quickJoinBlock.appendChild(button);
+    }
+    for (var roomName in roomList) {
+        addQuickJoinButton(roomName, roomList[roomName].numberClients);
+    }    
+}
+
+
+
 function convertListToButtons(roomName, data) {
     console.log("convertListToButtons being called with roomname " + roomName);
     var roomId = genRoomOccupantName(roomName);
@@ -208,7 +230,7 @@ function sendMessage(destTargetId, destRoom) {
     }
 
     easyRTC.sendDataWS(dest, "message", text, function(reply) {
-        if( reply.msgType === "error") {
+        if (reply.msgType === "error") {
             easyRTC.showError(reply.msgData.errorCode, reply.msgData.errorText);
         }
     });
@@ -221,6 +243,7 @@ function loginSuccess(easyRTCId) {
     selfEasyrtcid = easyRTCId;
     document.getElementById("iam").innerHTML = "I am " + easyRTCId;
     document.getElementById("connectButton").disabled = "disabled";
+    easyRTC.getRoomList(addRoomButtons, null);
     isConnected = true;
 }
 
@@ -228,3 +251,4 @@ function loginSuccess(easyRTCId) {
 function loginFailure(message) {
     easyRTC.showError("LOGIN-FAILURE", message);
 }
+

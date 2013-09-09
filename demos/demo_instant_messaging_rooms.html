@@ -41,7 +41,7 @@
             .roomOccupants {
                 margin-left: 20px;
             }
-            
+
         </style>
         <!--show-->
     </head>
@@ -68,10 +68,7 @@
                 <h2>The Demo</h2>
                 <!--show-->
                 <div >
-                    Quick Join - <a href="javascript:addRoom('roomOne', true);">roomOne</a> 
-                    - <a href="javascript:addRoom('roomTwo', true);">roomTwo</a>
-                    - <a href="javascript:addRoom('roomThree', true);">roomThree</a><br /> 
-                    
+                    Quick Join - <div id="quickJoinBlock"></div><br>                    
                     Room to join: <input id="roomToAdd" type="text" size="20" /> 
                     <button onclick="addRoom(null, true);"> Join</button>                   
                 </div>
@@ -121,6 +118,15 @@
                 <p id="license">easyRTC source code released under a BSD2 Lcense. <a href="https://github.com/priologic/easyrtc/blob/master/LICENSE">See LICENSE file in project folder</a> for details.</p>
             </div>   
         </div>
-        <!--show-->
+        <script type="text/javascript">
+
+                        addRoomButtons({
+                            room1: {roomName: "room1", numberClients: " "},
+                            room2: {roomName: "room2", numberClients: " "},
+                            room3: {roomName: "room3", numberClients: " "}
+                        }
+                        );
+
+        </script>
     </body>
 </html>

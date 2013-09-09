@@ -168,7 +168,8 @@ easyRTC.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
         var entry = {};
         entry[roomName] = newRoomData;
         easyRTC.sendSignalling(null, "roomJoin", {roomJoin: entry},
-            function(msgType, roomData) {
+            function(msgType, msg) {
+                var roomData = msg.roomData;
                 if (successCB) {
                     successCB(roomName);
                     easyRTC.lastLoggedInList[roomName] = {};
@@ -1154,6 +1155,7 @@ easyRTC.closedChannel = null;
 easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     easyRTC.pc_config = {};
     easyRTC.closedChannel = null;
+    
     if (easyRTC.debugPrinter) {
         easyRTC.debugPrinter("attempt to connect to webrtc signalling server with application name=" + applicationName);
     }
@@ -1229,10 +1231,11 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
     //
     // This function is used to send webrtc signalling messages to another client. These messages all the form:
-    //   msgType: one of ["offer"/"answer"/"candidate","reject","hangup"]
-    //   targetEasyrtcid: someid
+    //   msgType: one of ["offer"/"answer"/"candidate","reject","hangup", "getRoomList"]
+    //   targetEasyrtcid: someid or null
     //   msgData: either null or an SDP record
-    //   
+    //   successCallback: a function with the signature  function(msgType, wholeMsg);
+    //   errorCallback: a function with signature function(errorCode, errorText)
     //
     function sendSignalling(destUser, instruction, data, successCallback, errorCallback) {
         if (!easyRTC.webSocket) {
@@ -1256,7 +1259,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                     function(ackmsg) {
                         if (ackmsg.msgType != "error") {
                             if (successCallback) {
-                                successCallback(ackmsg.msgType, ackmsg.roomData);
+                                successCallback(ackmsg.msgType, ackmsg);
                             }
                         }
                         else {
@@ -1363,6 +1366,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             throw "Attempt to send message without a valid connection to the server.";
         }
     };
+    
     /** Sends data to another user. This method uses datachannels if one has been set up, or websockets otherwise.
      * @param {String} destUser (an easyrtcid)
      * @param {String} msgType
@@ -1380,7 +1384,30 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             easyRTC.sendDataWS(destUser, msgType, data, ackHandler);
         }
     };
-
+    
+    /** Sends the server a request for the list of rooms the user can see.
+     * You must have already be connected to use this function.
+     * @param {Function} callback - on success, this function is called with a map of the form  { roomname:{"roomName":String, "numberClients": Number}}.
+     * The roomname appears as both the key to the map, and as the value of the "roomName" field.
+     * @param errorCallback {Function} callback - is called on failure. It gets an errorCode and errorText as it's too arguments.
+     */
+    easyRTC.getRoomList = function( callback, errorCallback) {
+        easyRTC.sendSignalling(null,"getRoomList", null, function(ackType, ackMsg) {
+            if( ackType == 'error') {
+                if( errorCallback) {
+                    errorCallback(ackMsg.msgData.errorCode, ackMsg.msgData.errorText);
+                }
+                else {
+                    easyRTC.showError(ackMsg.msgData.errorCode, ackMsg.msgData.errorText);
+                }
+            }
+            else {
+                callback(ackMsg.roomList);
+            }
+        });
+    };
+    
+    
     function haveTracks(easyrtcid, checkAudio) {
         var peerConnObj = easyRTC.peerConns[easyrtcid];
         if (!peerConnObj) {
@@ -1620,9 +1647,9 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             delete easyRTC.peerConns[otherUser];
             if (easyRTC.webSocket) {
                 sendSignalling(otherUser, "hangup", null, function() {
-                }, function(msg) {
+                }, function(errorCode, errorText) {
                     if (easyRTC.debugPrinter) {
-                        debugPrinter("hangup failed:" + msg);
+                        debugPrinter("hangup failed:" + errorText);
                     }
                 });
             }
