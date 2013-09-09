@@ -2568,7 +2568,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     easyRTC.updateConfiguration = updateConfiguration;
     
     easyRTC.updatePresence = function(state, statusText) {
-        sendSignalling(null, 'setPresence', {'show':state, 'status':statusText},  null);
+        sendSignalling(null, 'setPresence', {setPresence:{'show':state, 'status':statusText}},  null);
     }
     
 
