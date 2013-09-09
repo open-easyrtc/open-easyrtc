@@ -2573,7 +2573,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 easyRTC.lastLoggedInList[roomname] = roomData[roomname].clientList;
             }
             else if (roomData[roomname].clientListDelta) {
-                var stuffToAdd = roomData[roomname].listDelta.updateConnection;
+                var stuffToAdd = roomData[roomname].clientListDelta.updateConnection;
                 if (stuffToAdd) {
                     for (var id in stuffToAdd) {
                         easyRTC.lastLoggedInList[roomname][id] = stuffToAdd[id];
