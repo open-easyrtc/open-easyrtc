@@ -254,10 +254,10 @@ Provides room information for all rooms the user is currently in. This includes 
  - **roomData** (required) Map of room names
    - **roomName** (required) Room name (matches map key)
    - **roomStatus** (required) Instruction to API as to whether to join, update, or leave a given room.  [join|update|leave]
-   	 - `join` - Client is considered to be joined to the given room. `list` field will may be present to show other users who are visible in the room.
-   	 - `update` - Client should update what it knows about the room. `list` or `listDelta` field may be present.
+   	 - `join` - Client is considered to be joined to the given room. `clientList` field will may be present to show other users who are visible in the room.
+   	 - `update` - Client should update what it knows about the room. `clientList` or `clientListDelta` field may be present.
    	 - `leave` - Client is considered to have left the room, and should delete everything it knows about the room including the ids of other users.
-   - **list** (optional) Map of easyrtcid's for users online in the same room. If present, this should overrule the current list in memory.
+   - **clientList** (optional) Map of easyrtcid's for users online in the same room. If present, this should overrule the current list in memory.
      - **easyrtcid** (required) Matches map key
      - **username** (optional)
      - **roomJoinTime** (required) Timestamp of when client joined room
@@ -267,9 +267,9 @@ Provides room information for all rooms the user is currently in. This includes 
      - **browserMajor** (optional)
      - **osFamily** (optional)
      - **deviceFamily** (optional)
-   - **listDelta** (optional)
-     - **updateConnection** (optional) Map of easyrtcid's to update. Will contain same fields as 'list'
-     - **removeConnection** (optional) Map of easyrtcid's to remove the the list.
+   - **clientListDelta** (optional)
+     - **updateConnection** (optional) Map of easyrtcids to update. Will contain same fields as 'clientList'
+     - **removeConnection** (optional) Map of easyrtcids to remove from the client list.
 
 
 ### msgType - 'roomList'
