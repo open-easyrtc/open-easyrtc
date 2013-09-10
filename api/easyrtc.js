@@ -1194,6 +1194,15 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 RtpDataChannels: easyRTC.dataEnabled
             }]
     };
+
+
+    function isEmptyObj(obj) {
+        var isEmpty = true;
+        for (var key in obj) {
+            isEmpty = false;
+        }
+        return isEmpty;
+    }
     //
     // easyRTC.disconnect performs a clean disconnection of the client from the server.
     //
@@ -2401,17 +2410,17 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             }
         }
         else {
-            for(var i in easyRTC.websocketListeners) {
-                easyRTC.webSocket.removeEventListener( easyRTC.websocketListeners[i].event, 
-                easyRTC.websocketListeners[i].handler);
+            for (var i in easyRTC.websocketListeners) {
+                easyRTC.webSocket.removeEventListener(easyRTC.websocketListeners[i].event,
+                        easyRTC.websocketListeners[i].handler);
             }
         }
         easyRTC.websocketListeners = [];
         function addSocketListener(event, handler) {
             easyRTC.webSocket.on(event, handler);
-            easyRTC.websocketListeners.push( {event:event, handler:handler});
+            easyRTC.websocketListeners.push({event: event, handler: handler});
         }
-        
+
         addSocketListener('error', function() {
             if (easyRTC.myEasyrtcid) {
                 easyRTC.showError(easyRTC.errCodes.SIGNAL_ERROR, "Miscellaneous error from signalling server. It may be ignorable.");
@@ -2617,13 +2626,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
 
     function processRoomData(roomData) {
-        function isEmptyObj(obj) {
-            var isEmpty = true;
-            for (var key in isEmpty) {
-                isEmpty = false;
-            }
-            return isEmpty;
-        }
+
 
         for (var roomname in roomData) {
             easyRTC.roomHasPassword = roomData[roomname].hasPassword;
@@ -2755,9 +2758,6 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         var msgData = {
             apiVersion: easyRTC.apiVersion,
             applicationName: applicationName,
-            roomJoin: easyRTC.roomJoin,
-            easyrtcsid: easyrtcsid,
-            credential: easyRTC.credential,
             setUserCfg: easyRTC.collectConfigurationInfo()
         };
         if (easyRTC.presenceShow) {
@@ -2765,6 +2765,12 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
         if (easyRTC.userName) {
             msgData.username = easyRTC.userName;
+        }
+        if (easyRTC.roomJoin && !isEmptyObj(easyRTC.roomJoin)) {
+            msgData.roomJoin = easyRTC.roomJoin;
+        }
+        if (easyRTC.easyrtcsid) {
+            msgData.easyrtcsid = easyRTC.easyrtcsid;
         }
         if (easyRTC.credential) {
             msgData.credential = easyRTC.credential;
