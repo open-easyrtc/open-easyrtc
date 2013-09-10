@@ -139,6 +139,7 @@ function connect() {
     easyRTC.setPeerListener(addToConversation);
     easyRTC.setRoomOccupantListener(convertListToButtons);
     easyRTC.setRoomEntryListener(roomEntryListener);
+    updatePresence();
     easyRTC.connect("easyrtc.instantMessaging", loginSuccess, loginFailure);
 }
 

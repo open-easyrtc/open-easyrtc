@@ -168,27 +168,27 @@ easyRTC.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
         var entry = {};
         entry[roomName] = newRoomData;
         easyRTC.sendSignalling(null, "roomJoin", {roomJoin: entry},
-            function(msgType, msg) {
-                var roomData = msg.roomData;
-                if (successCB) {
-                    successCB(roomName);
-                    easyRTC.lastLoggedInList[roomName] = {};
-                    for(var key in roomData[roomName].clientList) {
-                        if( key !== easyRTC.myEasyrtcid) {
-                            easyRTC.lastLoggedInList[roomName][key] = roomData[roomName].clientList[key];
-                        }
+        function(msgType, msg) {
+            var roomData = msg.roomData;
+            if (successCB) {
+                successCB(roomName);
+                easyRTC.lastLoggedInList[roomName] = {};
+                for (var key in roomData[roomName].clientList) {
+                    if (key !== easyRTC.myEasyrtcid) {
+                        easyRTC.lastLoggedInList[roomName][key] = roomData[roomName].clientList[key];
                     }
-                    easyRTC.roomOccupantListener(roomName, easyRTC.lastLoggedInList[roomName]);
                 }
-            },
-            function(errorCode, errorText) {
-                if (failureCB) {
-                    failureCB(errorCode, errorText, roomName);
-                }
-                else {
-                    easyRTC.showError("Unable to enter room " + roomName + " because " + why);
-                }
+                easyRTC.roomOccupantListener(roomName, easyRTC.lastLoggedInList[roomName]);
             }
+        },
+                function(errorCode, errorText) {
+                    if (failureCB) {
+                        failureCB(errorCode, errorText, roomName);
+                    }
+                    else {
+                        easyRTC.showError("Unable to enter room " + roomName + " because " + why);
+                    }
+                }
         );
     }
 };
@@ -304,6 +304,12 @@ easyRTC.enableDebug = function(enable) {
         easyRTC.debugPrinter = null;
     }
 };
+
+easyRTC.updatePresence = function(state, statusText) {
+    easyRTC.presenceShow = state;
+    easyRTC.presenceStatus = statusText;
+}
+
 /**
  * Determines if the local browser supports WebRTC GetUserMedia (access to camera and microphone).
  * @returns {Boolean} True getUserMedia is supported.
@@ -1155,7 +1161,7 @@ easyRTC.closedChannel = null;
 easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     easyRTC.pc_config = {};
     easyRTC.closedChannel = null;
-    
+
     if (easyRTC.debugPrinter) {
         easyRTC.debugPrinter("attempt to connect to webrtc signalling server with application name=" + applicationName);
     }
@@ -1181,8 +1187,8 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
         easyRTC.hangupAll();
         if (easyRTC.roomOccupantListener) {
-            for(var key in easyRTC.lastLoggedInList) {
-                easyRTC.roomOccupantListener(key, {}, false);                
+            for (var key in easyRTC.lastLoggedInList) {
+                easyRTC.roomOccupantListener(key, {}, false);
             }
         }
         easyRTC.loggingOut = false;
@@ -1331,7 +1337,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
         if (!ackhandler) {
             ackhandler = function(msg) {
-                if( msg.msgType === "error") {
+                if (msg.msgType === "error") {
                     easyRTC.showError(msg.msgData.errorCode, msg.msgData.errorText);
                 }
             };
@@ -1366,7 +1372,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             throw "Attempt to send message without a valid connection to the server.";
         }
     };
-    
+
     /** Sends data to another user. This method uses datachannels if one has been set up, or websockets otherwise.
      * @param {String} destUser (an easyrtcid)
      * @param {String} msgType
@@ -1384,17 +1390,17 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             easyRTC.sendDataWS(destUser, msgType, data, ackHandler);
         }
     };
-    
+
     /** Sends the server a request for the list of rooms the user can see.
      * You must have already be connected to use this function.
      * @param {Function} callback - on success, this function is called with a map of the form  { roomname:{"roomName":String, "numberClients": Number}}.
      * The roomname appears as both the key to the map, and as the value of the "roomName" field.
      * @param errorCallback {Function} callback - is called on failure. It gets an errorCode and errorText as it's too arguments.
      */
-    easyRTC.getRoomList = function( callback, errorCallback) {
-        easyRTC.sendSignalling(null,"getRoomList", null, function(ackType, ackMsg) {
-            if( ackType == 'error') {
-                if( errorCallback) {
+    easyRTC.getRoomList = function(callback, errorCallback) {
+        easyRTC.sendSignalling(null, "getRoomList", null, function(ackType, ackMsg) {
+            if (ackType == 'error') {
+                if (errorCallback) {
                     errorCallback(ackMsg.msgData.errorCode, ackMsg.msgData.errorText);
                 }
                 else {
@@ -1406,8 +1412,8 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             }
         });
     };
-    
-    
+
+
     function haveTracks(easyrtcid, checkAudio) {
         var peerConnObj = easyRTC.peerConns[easyrtcid];
         if (!peerConnObj) {
@@ -2546,7 +2552,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         //
         var sendDeltas = function() {
             var alteredData = findDeltas(easyRTC.oldConfig, newConfig);
- console.log("sendDeltas sending out update configuration info", alteredData);
+            console.log("sendDeltas sending out update configuration info", alteredData);
             //
             // send all the configuration information that changes during the session
             //
@@ -2566,11 +2572,13 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
     }
     easyRTC.updateConfiguration = updateConfiguration;
-    
+
     easyRTC.updatePresence = function(state, statusText) {
-        sendSignalling(null, 'setPresence', {setPresence:{'show':state, 'status':statusText}},  null);
+        easyRTC.presenceShow = state;
+        easyRTC.presenceStatus = statusText;
+        sendSignalling(null, 'setPresence', {setPresence: {'show': state, 'status': statusText}}, null);
     }
-    
+
 
     function processRoomData(roomData) {
         function isEmptyObj(obj) {
@@ -2716,6 +2724,9 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             credential: easyRTC.credential,
             setUserCfg: easyRTC.collectConfigurationInfo()
         };
+        if( easyRTC.presenceShow) {
+            msgData.setPresence = {show: easyRTC.presenceShow, status: easyRTC.presenceStatus};
+        }
         // easyRTC.sendServer("authenticate", msgData, processToken);
         easyRTC.webSocket.json.emit("easyrtcAuth",
                 {msgType: "authenticate",
