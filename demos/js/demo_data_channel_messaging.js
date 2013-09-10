@@ -25,17 +25,7 @@
 //
 var selfEasyrtcid = "";
 var connectList = {};
-
-function addToConversation(who, msg) {
-    // Escape html special characters, then add linefeeds.
-    content = msg.msgData;
-    console.log("incoming text is ",content);
-    content = content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    content = content.replace(/\n/g, '<br />');
-    console.log("final text is ", content);
-    document.getElementById('conversation').innerHTML += 
-    "<b>" + who + ":</b>&nbsp;" + content + "<br />";
-}
+var channelIsActive = {}; // tracks which channels are active
 
 
 function connect() {
@@ -51,106 +41,121 @@ function connect() {
 }
 
 
-function loggedInListener (data) {
-    connectList = data;
-    convertListToButtons(connectList);
+function addToConversation(who, msg) {
+    // Escape html special characters, then add linefeeds.
+    if( msg.msgData) {
+        var content = msg.msgData;    
+    }
+    else {
+        content = msg;
+    }
+    content = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    content = content.replace(/\n/g, '<br />');    
+    document.getElementById('conversation').innerHTML +=
+            "<b>" + who + ":</b>&nbsp;" + content + "<br />";
 }
 
-function openListener(otherParty){
-    easyRTC.showError("Normal", "Now connected to " + otherParty);
+
+function openListener(otherParty) {
+    channelIsActive[otherParty] = true;
+    updateButtonState(otherParty);
 }
 
-function closeListener(otherParty){
-    easyRTC.showError("Normal", "No longer connected to " + otherParty);
+
+function closeListener(otherParty) {
+    channelIsActive[otherParty] = false;
+    updateButtonState(otherParty);
 }
 
-function convertListToButtons (roomName, connectList, isPrimary) {
+function convertListToButtons(roomName, occupantList, isPrimary) {
+    connectList = occupantList;
 
     otherClientDiv = document.getElementById('otherClients');
     while (otherClientDiv.hasChildNodes()) {
         otherClientDiv.removeChild(otherClientDiv.lastChild);
     }
-    
+
     var label, button;
-    for(var i in connectList) {
+    for (var i in connectList) {
         var rowGroup = document.createElement("span");
         var rowLabel = document.createTextNode(easyRTC.idToName(i));
         rowGroup.appendChild(rowLabel);
 
         button = document.createElement('button');
-        button.onclick = function(easyrtcid) {        
+        button.id = "connect_" + i;
+        button.onclick = function(easyrtcid) {
             return function() {
                 startCall(easyrtcid);
             }
         }(i);
         label = document.createTextNode("Connect");
         button.appendChild(label);
-        if( easyRTC.getConnectStatus(i) !== easyRTC.NOT_CONNECTED) {
-            button.disabled = 'true';
-        }
         rowGroup.appendChild(button);
 
         button = document.createElement('button');
-        button.onclick = function(easyrtcid) {        
+        button.id = "send_" + i;
+        button.onclick = function(easyrtcid) {
             return function() {
                 sendStuffP2P(easyrtcid);
             }
         }(i);
         label = document.createTextNode("Send Message");
         button.appendChild(label);
-        if( easyRTC.getConnectStatus(i) !== easyRTC.IS_CONNECTED) {
-            button.disabled = 'true';
-        }
         rowGroup.appendChild(button);
-
-        otherClientDiv.appendChild(rowGroup);        
+        otherClientDiv.appendChild(rowGroup);
+        updateButtonState(i);
     }
-    if( !otherClientDiv.hasChildNodes() ) {
+    if (!otherClientDiv.hasChildNodes()) {
         otherClientDiv.innerHTML = "<em>Nobody else logged in to talk to...</em>";
     }
 }
 
+function updateButtonState(otherEasyrtcid) {
+    var isConnected = channelIsActive[otherEasyrtcid];
+    document.getElementById('connect_' + otherEasyrtcid).disabled = isConnected;
+    document.getElementById('send_' + otherEasyrtcid).disabled = !isConnected;
+}
 
 
 function startCall(otherEasyrtcid) {
-    if( easyRTC.getConnectStatus(otherEasyrtcid) == easyRTC.NOT_CONNECTED) {
-        easyRTC.call(otherEasyrtcid, 
-            function(caller, media) { // success callback
-                if( media == 'datachannel') {
-                    console.log("made call succesfully");
-                    connectList[otherEasyrtcid] = true;
+    if (easyRTC.getConnectStatus(otherEasyrtcid) == easyRTC.NOT_CONNECTED) {
+        easyRTC.call(otherEasyrtcid,
+                function(caller, media) { // success callback
+                    if (media == 'datachannel') {
+                        // console.log("made call succesfully");
+                        connectList[otherEasyrtcid] = true;
+                    }
+                },
+                function(errText) {
+                    connectList[otherEasyrtcid] = false;
+                    easyRTC.showError("CALL-FAILURE", errText);
+                },
+                function(wasAccepted) {
+                    // console.log("was accepted=" + wasAccepted);
                 }
-            }, 
-            function(errText) {
-                connectList[otherEasyrtcid] = false;
-                easyRTC.showError("CALL-FAILURE", errText);
-            }, 
-            function(wasAccepted) {
-                console.log("was accepted=" + wasAccepted);
-            }
-            );
+        );
     }
     else {
         easyRTC.showError("ALREADY-CONNECTED", "already connected to " + easyRTC.idToName(otherEasyrtcid));
     }
 }
 
-function sendStuffP2P(otherEasyrtcid) {    
-    var text = document.getElementById('sendMessageText').value;    
-    if(text.replace(/\s/g, "").length == 0) { // Don't send just whitespace
+function sendStuffP2P(otherEasyrtcid) {
+    var text = document.getElementById('sendMessageText').value;
+    if (text.replace(/\s/g, "").length == 0) { // Don't send just whitespace
         return;
     }
-    if( easyRTC.getConnectStatus(otherEasyrtcid) == easyRTC.IS_CONNECTED) {
-        easyRTC.sendDataP2P(otherEasyrtcid, 'msg', text);                
+    if (easyRTC.getConnectStatus(otherEasyrtcid) == easyRTC.IS_CONNECTED) {
+        easyRTC.sendDataP2P(otherEasyrtcid, 'msg', text);
     }
     else {
         easyRTC.showError("NOT-CONNECTED", "not connected to " + easyRTC.idToName(otherEasyrtcid) + " yet.");
     }
     addToConversation("Me", text);
-    document.getElementById('sendMessageText').value = "";        
+    document.getElementById('sendMessageText').value = "";
 }
- 
- 
+
+
 function loginSuccess(easyRTCId) {
     selfEasyrtcid = easyRTCId;
     document.getElementById("iam").innerHTML = "I am " + easyRTCId;

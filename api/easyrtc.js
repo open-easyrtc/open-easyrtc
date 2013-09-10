@@ -385,6 +385,7 @@ easyRTC.receivePeerCB = null;
 easyRTC.appDefinedFields = {};
 /** @private */
 easyRTC.updateConfigurationInfo = function() {
+    
 }; // dummy placeholder for when we aren't connected
 //
 //
@@ -1921,10 +1922,16 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                         delete easyRTC.peerConns[otherUser].dataChannelR;
                     }
                     if (easyRTC.onDataChannelClose) {
-                        easyRTC.onDataChannelClose(openUser);
+                        easyRTC.onDataChannelClose(otherUser);
                     }
+                
                     easyRTC.updateConfigurationInfo();
                 };
+                
+                if( easyRTC.onDataChannelOpen) {
+                    easyRTC.onDataChannelOpen(otherUser);
+                }
+
             };
         }
 
@@ -1967,7 +1974,6 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
     var doAnswer = function(caller, msgData) {
 
-        console.log("doAnswer caller=", caller);
         if (!easyRTC.localStream && (easyRTC.videoEnabled || easyRTC.audioEnabled)) {
             easyRTC.initMediaSource(
                     function(s) {
@@ -2405,10 +2411,9 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         easyRTC.webSocket.on("easyrtcMsg", onChannelMsg);
         easyRTC.webSocket.on("easyrtcCmd", onChannelCmd);
         easyRTC.webSocket.on("disconnect", function(code, reason, wasClean) {
-            console.log("saw disconnect event");
             easyRTC.webSocketConnected = false;
-            easyRTC.updateConfigurationInfo = function() {
-            };
+            easyRTC.updateConfigurationInfo = function() {               
+            }; // dummy update function 
             easyRTC.oldConfig = {};
             easyRTC.disconnectBody();
             if (easyRTC.disconnectListener) {
@@ -2545,6 +2550,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         return newConfig;
     };
     function updateConfiguration() {
+
         var newConfig = easyRTC.collectConfigurationInfo();
         //
         // we need to give the getStats calls a chance to fish out the data. 
@@ -2552,7 +2558,6 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         //
         var sendDeltas = function() {
             var alteredData = findDeltas(easyRTC.oldConfig, newConfig);
-            console.log("sendDeltas sending out update configuration info", alteredData);
             //
             // send all the configuration information that changes during the session
             //
@@ -2571,7 +2576,9 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             setTimeout(sendDeltas, 100);
         }
     }
-    easyRTC.updateConfiguration = updateConfiguration;
+    easyRTC.updateConfigurationInfo = function() {
+        updateConfiguration();  
+    };
 
     easyRTC.updatePresence = function(state, statusText) {
         easyRTC.presenceShow = state;
