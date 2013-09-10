@@ -56,6 +56,18 @@ function genRoomOccupantName(roomName) {
     return "roomOccupant_" + roomName;
 }
 
+function setUserName(event, value) {
+    if( event.keyCode == 13) {
+        easyRTC.setUserName(value);
+    }
+}
+
+function setCredential(event, value) {
+    if( event.keyCode == 13) {
+        easyRTC.setCredential(value);
+    }    
+}
+
 
 function addRoom(roomName, userAdded) {
     if (!roomName) {
@@ -139,7 +151,18 @@ function connect() {
     easyRTC.setPeerListener(addToConversation);
     easyRTC.setRoomOccupantListener(convertListToButtons);
     easyRTC.setRoomEntryListener(roomEntryListener);
+    easyRTC.setDisconnectListener(function(){
+        jQuery('#rooms').empty();
+    });
     updatePresence();
+    var username = document.getElementById("userNameField").value;
+    var password = document.getElementById("credentialField").value;
+    if( username ) {
+        easyRTC.setUserName(username);
+    }
+    if( password ) {
+        easyRTC.setCredential({password:password});
+    }
     easyRTC.connect("easyrtc.instantMessaging", loginSuccess, loginFailure);
 }
 
@@ -171,7 +194,9 @@ function addRoomButtons(roomList) {
 
 
 function convertListToButtons(roomName, data, isPrimary) {
-    console.log("convertListToButtons being called with roomname " + roomName);
+    if( roomName === null) {
+        return;
+    }
     var roomId = genRoomOccupantName(roomName);
     var roomDiv = document.getElementById(roomId);
     if (!roomDiv) {
@@ -199,7 +224,7 @@ function convertListToButtons(roomName, data, isPrimary) {
             }
             presenceText += ")";
         }
-        var label = document.createTextNode(i + presenceText);
+        var label = document.createTextNode(easyRTC.idToName(i) + presenceText);
         button.appendChild(label);
         roomDiv.appendChild(button);
     }
@@ -261,7 +286,6 @@ function sendMessage(destTargetId, destRoom) {
 function loginSuccess(easyRTCId) {
     selfEasyrtcid = easyRTCId;
     document.getElementById("iam").innerHTML = "I am " + easyRTCId;
-    document.getElementById("connectButton").disabled = "disabled";
     refreshRoomList();
     isConnected = true;
 }

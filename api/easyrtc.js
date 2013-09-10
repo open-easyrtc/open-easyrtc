@@ -61,8 +61,7 @@ easyRTC.ackMessage = {msgType: "ack", msgData: {}};
 easyRTC.userNamePattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,30}[a-zA-Z0-9]$/;
 /** @private */
 easyRTC.userName = null;
-/** @private */
-easyRTC.credential = {apiKey: "cmhslu5vo57rlocg"}; // default key for now
+
 
 /** @private */
 easyRTC.loggingOut = false;
@@ -103,6 +102,7 @@ easyRTC.nativeVideoWidth = 0;
 /** @private */
 easyRTC.apiKey = "cmhslu5vo57rlocg"; // default key for now
 
+/** @private */
 easyRTC.credential = null;
 /* temporary hack */
 /**
@@ -385,7 +385,7 @@ easyRTC.receivePeerCB = null;
 easyRTC.appDefinedFields = {};
 /** @private */
 easyRTC.updateConfigurationInfo = function() {
-    
+
 }; // dummy placeholder for when we aren't connected
 //
 //
@@ -1096,7 +1096,7 @@ easyRTC.setSocketUrl = function(socketUrl) {
     easyRTC.serverPath = socketUrl;
 };
 /** 
- * Sets the user name associated with the connection.
+ * Sets the user name associated with the connection. 
  * @param {String} userName must obey standard identifier conventions.
  * @returns {Boolean} true if the call succeeded, false if the username was invalid.
  * @example
@@ -1105,6 +1105,7 @@ easyRTC.setSocketUrl = function(socketUrl) {
  *    
  */
 easyRTC.setUserName = function(userName) {
+
     if (easyRTC.isNameValid(userName)) {
         easyRTC.userName = userName;
         return true;
@@ -1114,6 +1115,24 @@ easyRTC.setUserName = function(userName) {
         return false;
     }
 };
+
+/**
+ * Set the authentication credential if needed.
+ * @param {Object} credential - a JSONifiable object.
+ * @returns {Boolean}
+ */
+easyRTC.setCredential = function(credential) {
+    try {
+        JSON.stringify(credential);
+        easyRTC.credential = credential;
+        return true;
+    }
+    catch (oops) {
+        easyRTC.showError(easyRTC.errCodes.BAD_CREDENTIAL, "easyRTC.setCredential passed a non-JSON-able object");
+        return false;
+    }
+};
+
 /**
  * Sets the listener for socket disconnection by external (to the API) reasons.
  * @param {Function} disconnectListener takes no arguments and is not called as a result of calling easyRTC.disconnect.
@@ -1136,8 +1155,8 @@ easyRTC.setDisconnectListener = function(disconnectListener) {
 easyRTC.idToName = function(easyrtcid) {
     for (var roomname in easyRTC.lastLoggedInList) {
         if (easyRTC.lastLoggedInList[roomname][easyrtcid]) {
-            if (easyRTC.lastLoggedInList[roomname][easyrtcid].userName) {
-                return easyRTC.lastLoggedInList[roomname][easyrtcid].userName;
+            if (easyRTC.lastLoggedInList[roomname][easyrtcid].username) {
+                return easyRTC.lastLoggedInList[roomname][easyrtcid].username;
             }
         }
     }
@@ -1924,11 +1943,11 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                     if (easyRTC.onDataChannelClose) {
                         easyRTC.onDataChannelClose(otherUser);
                     }
-                
+
                     easyRTC.updateConfigurationInfo();
                 };
-                
-                if( easyRTC.onDataChannelOpen) {
+
+                if (easyRTC.onDataChannelOpen) {
                     easyRTC.onDataChannelOpen(otherUser);
                 }
 
@@ -2373,14 +2392,27 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 //        easyRTC.webSocket = io.connect(easyRTC.serverPath, {
 //            'force new connection': true, 'connect timeout': 10000
 //        });
-        easyRTC.webSocket = io.connect(easyRTC.serverPath, {
-            'connect timeout': 10000
-        });
         if (!easyRTC.webSocket) {
-            throw "io.connect failed";
+            easyRTC.webSocket = io.connect(easyRTC.serverPath, {
+                'connect timeout': 10000
+            });
+            if (!easyRTC.webSocket) {
+                throw "io.connect failed";
+            }
         }
-
-        easyRTC.webSocket.on('error', function() {
+        else {
+            for(var i in easyRTC.websocketListeners) {
+                easyRTC.webSocket.removeEventListener( easyRTC.websocketListeners[i].event, 
+                easyRTC.websocketListeners[i].handler);
+            }
+        }
+        easyRTC.websocketListeners = [];
+        function addSocketListener(event, handler) {
+            easyRTC.webSocket.on(event, handler);
+            easyRTC.websocketListeners.push( {event:event, handler:handler});
+        }
+        
+        addSocketListener('error', function() {
             if (easyRTC.myEasyrtcid) {
                 easyRTC.showError(easyRTC.errCodes.SIGNAL_ERROR, "Miscellaneous error from signalling server. It may be ignorable.");
             }
@@ -2389,7 +2421,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             }
         });
 
-        easyRTC.webSocket.on("connect", function(event) {
+        addSocketListener("connect", function(event) {
 
             easyRTC.webSocketConnected = true;
             if (!easyRTC.webSocket || !easyRTC.webSocket.socket || !easyRTC.webSocket.socket.sessionid) {
@@ -2408,11 +2440,11 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             }
         }
         );
-        easyRTC.webSocket.on("easyrtcMsg", onChannelMsg);
-        easyRTC.webSocket.on("easyrtcCmd", onChannelCmd);
-        easyRTC.webSocket.on("disconnect", function(code, reason, wasClean) {
+        addSocketListener("easyrtcMsg", onChannelMsg);
+        addSocketListener("easyrtcCmd", onChannelCmd);
+        addSocketListener("disconnect", function(code, reason, wasClean) {
             easyRTC.webSocketConnected = false;
-            easyRTC.updateConfigurationInfo = function() {               
+            easyRTC.updateConfigurationInfo = function() {
             }; // dummy update function 
             easyRTC.oldConfig = {};
             easyRTC.disconnectBody();
@@ -2542,11 +2574,6 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             connectionList: connectionList,
         };
 
-
-
-        if (easyRTC.userName) {
-            newConfig.userName = easyRTC.userName;
-        }
         return newConfig;
     };
     function updateConfiguration() {
@@ -2577,13 +2604,15 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         }
     }
     easyRTC.updateConfigurationInfo = function() {
-        updateConfiguration();  
+        updateConfiguration();
     };
 
     easyRTC.updatePresence = function(state, statusText) {
         easyRTC.presenceShow = state;
         easyRTC.presenceStatus = statusText;
-        sendSignalling(null, 'setPresence', {setPresence: {'show': state, 'status': statusText}}, null);
+        if (easyRTC.webSocketConnected) {
+            sendSignalling(null, 'setPresence', {setPresence: {'show': state, 'status': statusText}}, null);
+        }
     }
 
 
@@ -2731,8 +2760,14 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
             credential: easyRTC.credential,
             setUserCfg: easyRTC.collectConfigurationInfo()
         };
-        if( easyRTC.presenceShow) {
+        if (easyRTC.presenceShow) {
             msgData.setPresence = {show: easyRTC.presenceShow, status: easyRTC.presenceStatus};
+        }
+        if (easyRTC.userName) {
+            msgData.username = easyRTC.userName;
+        }
+        if (easyRTC.credential) {
+            msgData.credential = easyRTC.credential;
         }
         // easyRTC.sendServer("authenticate", msgData, processToken);
         easyRTC.webSocket.json.emit("easyrtcAuth",

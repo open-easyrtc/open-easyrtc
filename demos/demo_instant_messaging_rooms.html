@@ -68,6 +68,13 @@
                 <h2>The Demo</h2>
                 <!--show-->
                 <div>
+                    Username: <input type="text" id="userNameField" />
+                    Password: <input type="text" id="credentialField" />
+                </div>
+                <div>
+                    <button id="connectButton" onclick="connect();">Connect</button>
+                </div>
+                <div>
                     <input type="radio" name="presence" onclick="setPresence('away');"/>away
                     <input type="radio" name="presence" checked onclick="setPresence('chat');"/>chat
                     <input type="radio" name="presence" onclick="setPresence('dnd');"/>dnd
@@ -81,9 +88,7 @@
                     Room to join: <input id="roomToAdd" type="text" size="20" /> 
                     <button onclick="addRoom(null, true);"> Join</button>                   
                 </div>
-                <div>
-                    <button id="connectButton" onclick="connect();">Connect</button>
-                </div>
+
                 <div id="sendMessageArea">
                     <div id="iam">Not connected yet</div>
                     <textarea id="sendMessageText"></textarea>
