@@ -33,7 +33,13 @@
     "async"     : "0.2.x",
     "clone"     : "0.1.x",
     "colors"    : "*", 
-    "underscore": "1.4.x"
+    "underscore": "1.4.x",
+    "jsdoc": "3.x"
+  },
+  
+ "scripts": {
+    "start": "node server.js",
+    "postinstall": "./post_install.sh"
   },
 
   "analyze"     : false,

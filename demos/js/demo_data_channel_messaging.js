@@ -29,15 +29,15 @@ var channelIsActive = {}; // tracks which channels are active
 
 
 function connect() {
-    easyRTC.enableDebug(false);
-    easyRTC.enableDataChannels(true);
-    easyRTC.enableVideo(false);
-    easyRTC.enableAudio(false);
-    easyRTC.setDataChannelOpenListener(openListener);
-    easyRTC.setDataChannelCloseListener(closeListener);
-    easyRTC.setDataListener(addToConversation);
-    easyRTC.setRoomOccupantListener(convertListToButtons);
-    easyRTC.connect("easyrtc.dataMessaging", loginSuccess, loginFailure);
+    easyrtc.enableDebug(false);
+    easyrtc.enableDataChannels(true);
+    easyrtc.enableVideo(false);
+    easyrtc.enableAudio(false);
+    easyrtc.setDataChannelOpenListener(openListener);
+    easyrtc.setDataChannelCloseListener(closeListener);
+    easyrtc.setDataListener(addToConversation);
+    easyrtc.setRoomOccupantListener(convertListToButtons);
+    easyrtc.connect("easyrtc.dataMessaging", loginSuccess, loginFailure);
 }
 
 
@@ -78,7 +78,7 @@ function convertListToButtons(roomName, occupantList, isPrimary) {
     var label, button;
     for (var i in connectList) {
         var rowGroup = document.createElement("span");
-        var rowLabel = document.createTextNode(easyRTC.idToName(i));
+        var rowLabel = document.createTextNode(easyrtc.idToName(i));
         rowGroup.appendChild(rowLabel);
 
         button = document.createElement('button');
@@ -86,7 +86,7 @@ function convertListToButtons(roomName, occupantList, isPrimary) {
         button.onclick = function(easyrtcid) {
             return function() {
                 startCall(easyrtcid);
-            }
+            };
         }(i);
         label = document.createTextNode("Connect");
         button.appendChild(label);
@@ -97,7 +97,7 @@ function convertListToButtons(roomName, occupantList, isPrimary) {
         button.onclick = function(easyrtcid) {
             return function() {
                 sendStuffP2P(easyrtcid);
-            }
+            };
         }(i);
         label = document.createTextNode("Send Message");
         button.appendChild(label);
@@ -118,17 +118,17 @@ function updateButtonState(otherEasyrtcid) {
 
 
 function startCall(otherEasyrtcid) {
-    if (easyRTC.getConnectStatus(otherEasyrtcid) == easyRTC.NOT_CONNECTED) {
-        easyRTC.call(otherEasyrtcid,
+    if (easyrtc.getConnectStatus(otherEasyrtcid) === easyrtc.NOT_CONNECTED) {
+        easyrtc.call(otherEasyrtcid,
                 function(caller, media) { // success callback
-                    if (media == 'datachannel') {
+                    if (media === 'datachannel') {
                         // console.log("made call succesfully");
                         connectList[otherEasyrtcid] = true;
                     }
                 },
                 function(errText) {
                     connectList[otherEasyrtcid] = false;
-                    easyRTC.showError("CALL-FAILURE", errText);
+                    easyrtc.showError("CALL-FAILURE", errText);
                 },
                 function(wasAccepted) {
                     // console.log("was accepted=" + wasAccepted);
@@ -136,20 +136,20 @@ function startCall(otherEasyrtcid) {
         );
     }
     else {
-        easyRTC.showError("ALREADY-CONNECTED", "already connected to " + easyRTC.idToName(otherEasyrtcid));
+        easyrtc.showError("ALREADY-CONNECTED", "already connected to " + easyrtc.idToName(otherEasyrtcid));
     }
 }
 
 function sendStuffP2P(otherEasyrtcid) {
     var text = document.getElementById('sendMessageText').value;
-    if (text.replace(/\s/g, "").length == 0) { // Don't send just whitespace
+    if (text.replace(/\s/g, "").length === 0) { // Don't send just whitespace
         return;
     }
-    if (easyRTC.getConnectStatus(otherEasyrtcid) == easyRTC.IS_CONNECTED) {
-        easyRTC.sendDataP2P(otherEasyrtcid, 'msg', text);
+    if (easyrtc.getConnectStatus(otherEasyrtcid) === easyrtc.IS_CONNECTED) {
+        easyrtc.sendDataP2P(otherEasyrtcid, 'msg', text);
     }
     else {
-        easyRTC.showError("NOT-CONNECTED", "not connected to " + easyRTC.idToName(otherEasyrtcid) + " yet.");
+        easyrtc.showError("NOT-CONNECTED", "not connected to " + easyrtc.idToName(otherEasyrtcid) + " yet.");
     }
     addToConversation("Me", text);
     document.getElementById('sendMessageText').value = "";
@@ -163,5 +163,5 @@ function loginSuccess(easyRTCId) {
 
 
 function loginFailure(message) {
-    easyRTC.showError("LOGIN-FAILURE", "failure to login");
+    easyrtc.showError("LOGIN-FAILURE", "failure to login");
 }
