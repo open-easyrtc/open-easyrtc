@@ -1197,11 +1197,13 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
 
 
     function isEmptyObj(obj) {
-        var isEmpty = true;
-        for (var key in obj) {
-            isEmpty = false;
+        if( obj === null || obj === undefined) {
+            return true;
         }
-        return isEmpty;
+        for (var key in obj) {
+            return false;
+        }
+        return true;
     }
     //
     // easyRTC.disconnect performs a clean disconnection of the client from the server.
@@ -2535,7 +2537,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
     // It returns that information, leaving it the responsibility of the caller to
     // do the actual sending.
     //
-    easyRTC.collectConfigurationInfo = function() {
+    easyRTC.collectConfigurationInfo = function(forAuthentication) {
         var connectionList = {};
         for (var i in easyRTC.peerConns) {
             connectionList[i] = {
@@ -2578,16 +2580,19 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 cookieEnabled: navigator.cookieEnabled,
                 os: navigator.oscpu,
                 language: navigator.language
-            },
-            apiField: easyRTC.appDefinedFields,
-            connectionList: connectionList,
+            }
         };
-
+        if( !forAuthentication || !isEmptyObj(easyRTC.appDefinedFields)) {
+            newConfig.apiField = easyRTC.appDefinedFields;
+        }
+        if( !forAuthentication || !isEmptyObj(connectionList)) {
+            newConfig.connectionList = connectionList;
+        }
         return newConfig;
     };
     function updateConfiguration() {
 
-        var newConfig = easyRTC.collectConfigurationInfo();
+        var newConfig = easyRTC.collectConfigurationInfo(false);
         //
         // we need to give the getStats calls a chance to fish out the data. 
         // The longest I've seen it take is 5 milliseconds so 100 should be overkill.
@@ -2758,7 +2763,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
         var msgData = {
             apiVersion: easyRTC.apiVersion,
             applicationName: applicationName,
-            setUserCfg: easyRTC.collectConfigurationInfo()
+            setUserCfg: easyRTC.collectConfigurationInfo(true)
         };
         if (easyRTC.presenceShow) {
             msgData.setPresence = {show: easyRTC.presenceShow, status: easyRTC.presenceStatus};
