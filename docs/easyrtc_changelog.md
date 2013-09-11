@@ -15,7 +15,8 @@ New Features:
 Changes:
  * Server/API - Delta lists. When the online list is changed, only the changed connections are broadcast. This should reduce bandwidth and improve scalability.
  * Server - No longer includes modules for express, socket.io. These must now be included in your server app. (See our server examples)
- * Server - No longer uses the winston module for logging. The default listener logs to the console. This can be easily overruled by setting your own `log` listener.   
+ * Server - No longer uses the winston module for logging. The default listener logs to the console. This can be easily overruled by setting your own `log` listener.
+ * Documentation - While the EasyRTC logo remains, when in text form, EasyRTC will have a capitol "E", which should make writing about it in sentences easier.   
 
 Fixes:
  * Lots. But please let us know if there's any others which need doing.
