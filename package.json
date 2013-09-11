@@ -3,7 +3,7 @@
   "version"     : "0.10.0a",
   "homepage"    : "http://www.easyrtc.com/",
   "author"      : "Priologic Software Inc. <info@priologic.com> (http://priologic.com/)",
-  "description" : "easyRTC enables quick development of webRTC",
+  "description" : "EasyRTC enables quick development of webRTC",
   "contributors": [ 
     "Doug Pelton <doug@priologic.com>",
     "Rod Apeldoorn <rod.apeldoorn@priologic.com>",
@@ -13,7 +13,7 @@
   "keywords": [
     "webRTC",
     "easy",
-    "easyRTC",
+    "EasyRTC",
     "RTC",
     "server"
   ],

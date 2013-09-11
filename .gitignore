@@ -172,7 +172,7 @@ pip-log.txt
 node_modules
 
 #########
-# easyRTC
+# EasyRTC
 #########
 *.log
 config_override.js

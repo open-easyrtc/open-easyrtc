@@ -101,7 +101,7 @@ Below is the initial server program which will run an EasyRTC server along with 
     // Start Socket.io so it attaches itself to Express server
     var socketServer = io.listen(webServer);
     
-    // Start easyRTC server
+    // Start EasyRTC server
     var easyrtcServer = easyrtc.listen(httpApp, socketServer);
 
 
@@ -176,7 +176,7 @@ API Hosting Options
 -------------------
 
 **apiEnable**
-Enables hosting of the easyRTC API files.
+Enables hosting of the EasyRTC API files.
 
 Default Value:
  - true
@@ -295,7 +295,7 @@ Default Value:
  - /^[a-z0-9_. -]{1,32}$/i
 
 **easyrtcidRegExp**
-easyRTC socket id (easyrtcid)
+EasyRTC socket id (easyrtcid)
 
 Default Value:
  - /^[a-z0-9_.-]{1,32}$/i

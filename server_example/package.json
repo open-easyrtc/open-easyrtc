@@ -2,7 +2,7 @@
   "name"        : "easyrtc_server_example",
   "version"     : "0.1.0",
   "author"      : "Priologic Software Inc. <info@priologic.com> (http://priologic.com/)",
-  "description" : "Simple easyRTC server example which includes easyRTC, Express, and Socket.io",
+  "description" : "Simple EasyRTC server example which includes EasyRTC, Express, and Socket.io",
 
   "scripts": {
     "start"     : "node server.js"

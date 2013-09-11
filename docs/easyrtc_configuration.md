@@ -1,10 +1,10 @@
-easyRTC: Configuration
+EasyRTC: Configuration
 ======================
 
 config.js
 ---------
 
-Configuration of easyRTC is done within config.js which is located in the easyRTC root folder. It should be edited within your favorite text editor. Any changes will take effect the next time the server is started.
+Configuration of EasyRTC is done within config.js which is located in the EasyRTC root folder. It should be edited within your favorite text editor. Any changes will take effect the next time the server is started.
 
 
 Ports
@@ -61,7 +61,7 @@ Service Log Settings
 --------------------
 Logs can be enabled can controlled independantly for the following services.
 
-- **EasyRtc** - Logs server starts/stops and easyRTC commands sent within websockets.
+- **EasyRtc** - Logs server starts/stops and EasyRTC commands sent within websockets.
 - **Express** - Logs http and https connection information.
 - **SocketIo** - Logs generic websocket information. Not highly detailed.
 - **Stun** - Logs STUN connection information if experimantal STUN server is enabled.
@@ -73,7 +73,7 @@ Logs can be enabled can controlled independantly for the following services.
 - **log???ConsoleLevel** - Lowest priority level to start showing logs for. ['debug'|'info'|'warn'|'error']
 - **log???FileEnabled** - Enable file logging. [true|false]
 - **log???FileLevel** - Lowest priority level to start showing logs for. ['debug'|'info'|'warn'|'error']
-- **log???FileName** - File location relative to the easyRTC root.
+- **log???FileName** - File location relative to the EasyRTC root.
 
 
 Socket.io Settings
@@ -86,11 +86,6 @@ Socket.io Settings
 Other Settings
 --------------
 
-- **defaultApplicationName** - The namespace for the default application. This can be read and reassigned via the easyRTC API.
-- **enableDemos** - Enable the provided easyRTC demos. Viewable in /demos/. [true|false]
+- **defaultApplicationName** - The namespace for the default application. This can be read and reassigned via the EasyRTC API.
+- **enableDemos** - Enable the provided EasyRTC demos. Viewable in /demos/. [true|false]
 - **updateCheckEnable** - Checks in with easyrtc.com to see if a new version is available. [true|false]
-
-
-
-
-

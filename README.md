@@ -1,23 +1,23 @@
-easyRTC - BETA
+EasyRTC - BETA
 =======
 
 NOTE:
 -----
-This is a version of easyRTC I'm fiddling with to transform it as a module. Not even close to being ready for general consumpsion.
+This is a version of EasyRTC I'm fiddling with to transform it as a module. Not even close to being ready for general consumpsion.
 
 
 **A bundle of Open Source WebRTC joy!**
 
-Priologic's easyRTC beta, a bundle of Open Source WebRTC joy, incorporates an easyRTC server install and client API, and working, HTML5 and Javascript, application source code under a BSD 2 license.
+Priologic's EasyRTC beta, a bundle of Open Source WebRTC joy, incorporates an EasyRTC server install and client API, and working, HTML5 and Javascript, application source code under a BSD 2 license.
 
 
 
 
 Features
 --------
- * Install easyRTC's WebRTC Server Kit on your own Linux, Windows, or Mac server in minutes not days.
- * Use our easyRTC API and sample application code to build and deploy your WebRTC app in hours not weeks.
- * easyRTC is completely free and open source under a BSD 2 license. No usage costs or other hidden fees.
+ * Install EasyRTC's WebRTC Server Kit on your own Linux, Windows, or Mac server in minutes not days.
+ * Use our EasyRTC API and sample application code to build and deploy your WebRTC app in hours not weeks.
+ * EasyRTC is completely free and open source under a BSD 2 license. No usage costs or other hidden fees.
 
 
 Documentation
@@ -39,9 +39,9 @@ Documentation
 Installation In A Nutshell
 --------------------------
  1. Install [Node.js](http://nodejs.org)
- 2. Download and uncompress easyRTC in the folder of your choice
+ 2. Download and uncompress EasyRTC in the folder of your choice
  3. Run `npm install` from the installation folder to install dependant packages
- 4. Start easyRTC by running `node server.js`
+ 4. Start EasyRTC by running `node server.js`
  5. Browse the examples using a WebRTC enabled browser. *(defaults to port `8080`)*
 
 Step by step instructions including additional setup options can be found in `/docs/easyrtc_installing.md`
@@ -53,7 +53,7 @@ Folder Structure
 * / (root)
   * Licenses and package information
 * /demos/
-  * easyRTC live demos and example code
+  * EasyRTC live demos and example code
 * /docs/
   * Documentation for using the API and running the server
 * /lib/
@@ -66,7 +66,7 @@ Folder Structure
 Links for help and information
 ------------------------------
 
-* The easyRTC website is at:
+* The EasyRTC website is at:
   * [http://www.easyrtc.com/](http://www.easyrtc.com/)
 * Use our support forum is at:
   * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)

@@ -1,7 +1,7 @@
-easyRTC: Upcoming Features
+EasyRTC: Upcoming Features
 ==========================
 
-There are many exciting features we are looking to add to easyRTC in upcoming releases.
+There are many exciting features we are looking to add to EasyRTC in upcoming releases.
 
 General Features
 ----------------

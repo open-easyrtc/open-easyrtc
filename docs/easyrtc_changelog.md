@@ -1,16 +1,16 @@
-easyRTC: Change Log
+EasyRTC: Change Log
 ===================
 
 
 v0.9.0a (note, alpha means alpha... please let us know of issues.)
 -------
 New Features:
- * Server/API - Rooms. An easyRTC application can have multiple rooms. A user can be in one or more rooms at the same time. Users can only see other users in the same room. If no room is provided, connections will be entered into a room named `default`.
+ * Server/API - Rooms. An EasyRTC application can have multiple rooms. A user can be in one or more rooms at the same time. Users can only see other users in the same room. If no room is provided, connections will be entered into a room named `default`.
  * Server/API - Custom authentication method. Username / Credential can be provided. Username is broadcast to other authenticated users, so it may be used by apps.  
  * Server/API - Groups. A user can be in one or more groups. This is intended to be set via the authtication method.   
  * Server - Reworked to be node.js module. (BIGGEST NEW FEATURE)
- * Server - Many new server events. Ths is intended to be the new way for developers in interect with easyRTC server.
- * Documentation - New documentation for internal easyRTC command messages which highlight how the API and server communicate to each other.
+ * Server - Many new server events. Ths is intended to be the new way for developers in interect with EasyRTC server.
+ * Documentation - New documentation for internal EasyRTC command messages which highlight how the API and server communicate to each other.
 Changes:
  * Server/API - Delta lists. When the online list is changed, only the changed connections are broadcast. This should reduce bandwidth and improve scalability.
  * Server - No longer includes modules for express, socket.io. These must now be included in your server app. (See our server examples)

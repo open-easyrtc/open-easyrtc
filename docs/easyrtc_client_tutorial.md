@@ -1,29 +1,29 @@
-easyRTC Framework Tutorial
+EasyRTC Framework Tutorial
 =======================
 
 Overview
 ---------
 
-easyRTC is a framework built on top of WebRTC an emerging W3C/IETF standard for real time communication of audio, video, and data directly between web browsers.  WebRTC supports the transfer of audio, video and data on a peer-to-peer basis putting very little load on supporting servers. 
+EasyRTC is a framework built on top of WebRTC an emerging W3C/IETF standard for real time communication of audio, video, and data directly between web browsers.  WebRTC supports the transfer of audio, video and data on a peer-to-peer basis putting very little load on supporting servers. 
 
-The easyRTC framework consists of a client or browser-side Javascript library and a backend Javascript server built on top of a node.js.  Because the WebRTC libraries will be built into each browser there is no need for a browser plug-in. 
+The EasyRTC framework consists of a client or browser-side Javascript library and a backend Javascript server built on top of a node.js.  Because the WebRTC libraries will be built into each browser there is no need for a browser plug-in. 
 
 Google's Chrome browser version 23 or higher has the broadest support for the WebRTC API and other browsers are making great strides in incorporating WebRTC, including: Mozilla's Firefox, Opera, and Ericsson's Bowser. 
   
-This document is a tutorial for writing applications with the easyRTC framework.  
+This document is a tutorial for writing applications with the EasyRTC framework.  
 
 WebRTC has the potential once it is fully standardized to support audio and video chats and conferencing, multiplayer games and many other audio, video and data-based applications.
 
-As is often the case with software, with power comes complexity. WebRTC has a learning curve that is likely to hamper it's use by web developers. To hide that complexity, Priologic has built the easyRTC framework.
+As is often the case with software, with power comes complexity. WebRTC has a learning curve that is likely to hamper it's use by web developers. To hide that complexity, Priologic has built the EasyRTC framework.
 
 A WebRTC application usually needs to do most of the following steps.
 
 + Get access to the local camera and microphone in the form of a "media stream".
-+ Establish a connection to an easyRTC server.
++ Establish a connection to an EasyRTC server.
 + Initiate a call to a person on another browser.
 + Connect media streams to video tags.
 
-Using the easyRTC framework, several of these steps can be collapsed into a single call, 
+Using the EasyRTC framework, several of these steps can be collapsed into a single call, 
 vastly simplifying the developers job, particularly if the web developer is 
 trying to support multiple platforms.
 
@@ -32,12 +32,12 @@ Terminology
 + Callback - A Javascript function supplied to a library so that the library will call it when a particular event occurs.
 + Media Stream - An object encapsulating a video track and/or one or more audio tracks.
 + Peer Connection - A connection between two different browsers that enables peer to peer communication.
-+ Server - The Node.js server plus some Javascript code we supply provides the server side of the easyRTC framework.
++ Server - The Node.js server plus some Javascript code we supply provides the server side of the EasyRTC framework.
 
-Installing easyRTC and Getting Help
+Installing EasyRTC and Getting Help
 --------------
 
-The easyRTC framework can be easily installed on most platforms in 10 minutes.  We have install  instructions for Windows, Mac and Linux available. The files that make up easyRTC at [the github repository for easyRTC](https://github.com/priologic/easyrtc) . Start with the README.md file.
+The EasyRTC framework can be easily installed on most platforms in 10 minutes.  We have install  instructions for Windows, Mac and Linux available. The files that make up EasyRTC at [the github repository for EasyRTC](https://github.com/priologic/easyrtc) . Start with the README.md file.
 
 If you find yourself running into problems installing check out the various sources for connecting with us and the community also listed in the README.md file.
 
@@ -46,7 +46,7 @@ Video Conferencing - Easy-Side Up
 
 This section shows you how to build a page that supports two-way (person to person) audio/visual conversations with as little developer effort as possible.
 
-Include the below four lines in the &lt;head> section of your html file. The first two scripts are needed by easyRTC, while the third will be your own application logic.
+Include the below four lines in the &lt;head> section of your html file. The first two scripts are needed by EasyRTC, while the third will be your own application logic.
 The CSS file provides some styling for a "hangup" button.
 
     <head>
@@ -73,7 +73,7 @@ The second video tag should be in a &lt;div> block with a CSS _position_ value o
 
 Now we have to start writing some application logic for the application.js file, 
 starting with an initialization function that will be called when the page gets loaded.
-The primary responsibility of the initialization function is to call the easyRTC.initManaged method. It takes the following arguments: 
+The primary responsibility of the initialization function is to call the EasyRTC.initManaged method. It takes the following arguments: 
 
 + applicationName - some literal string like "Company Chat Line".
 + self-video-id - a string containing the id of the first video tag.
@@ -81,7 +81,7 @@ The primary responsibility of the initialization function is to call the easyRTC
 + successCallback - a function to call on successful connection.
 
 The initialization function is also a good place to register a callback to 
-find out who else is hooked up to the server. The callback is registered using easyRTC.setLoggedInListener.
+find out who else is hooked up to the server. The callback is registered using EasyRTC.setLoggedInListener.
 
 Here is an example initialization function:
 
@@ -383,7 +383,7 @@ It will have no effect on media streams passed to a peer connection before it wa
 
 In the examples above, the callee always accepted connections from the caller.
 In a production environment, a user would want control over which calls were accepted.
-The easyRTC framework supports such by allowing you to register a callback that will be invoked
+The EasyRTC framework supports such by allowing you to register a callback that will be invoked
 each time a caller tries to establish a connection with you. The callback should expect to get 
 the caller's easyrtcid as it's first argument, and a reporting function as it's second argument. 
 The reporting function should be called with a value of true if the call should be accepted, false otherwise. 

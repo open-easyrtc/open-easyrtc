@@ -1,7 +1,7 @@
-easyRTC: Server Installation
+EasyRTC: Server Installation
 ============================
 
-Ubuntu easyRTC Install Steps:
+Ubuntu EasyRTC Install Steps:
 ----------------------------
 
 1. Install Node.js
@@ -10,7 +10,7 @@ Ubuntu easyRTC Install Steps:
     * `sudo apt-get update`
     * `sudo apt-get install nodejs npm`
 
-2. Create folder hold the easyRTC application
+2. Create folder hold the EasyRTC application
     * ex: `sudo mkdir /var/nodes`
     * ex: `sudo mkdir /var/nodes/easyrtc`
 
@@ -19,14 +19,14 @@ Ubuntu easyRTC Install Steps:
     * chown the nodes folder to be owned by this user
     * ensure the node is run as that user.
 	
-4. Uncompress the easyRTC package into the easyrtc folder
+4. Uncompress the EasyRTC package into the easyrtc folder
 
 5. Change to the easyrtc folder and then install node modules locally
     * `cd /var/nodes/easyrtc`
     * `sudo npm install`
 
 
-Windows easyRTC Install Steps:
+Windows EasyRTC Install Steps:
 ------------------------------
 
 1. Install Node.js
@@ -34,7 +34,7 @@ Windows easyRTC Install Steps:
     * Click 'Install' to download the .msi file
     * Run the Node.js installer
 
-2. Uncompress the easyRTC package into a folder of your choice.
+2. Uncompress the EasyRTC package into a folder of your choice.
     * Note: Node is defaulted to browse to `%HOMEDRIVE%%HOMEPATH%`
     * ex: `C:\Users\USERNAME\nodes\easyrtc`
 
@@ -47,7 +47,7 @@ Windows easyRTC Install Steps:
     * `npm install`
 
 
-Mac easyRTC Install Steps:
+Mac EasyRTC Install Steps:
 ------------------------------
 
 1. Install Node.js
@@ -57,7 +57,7 @@ Mac easyRTC Install Steps:
     * By default node.js will be installed in /usr/local/bin/node and npm will be installed in /usr/local/bin/npm
     * Make sure /usr/local/bin is in your $PATH variable (echo $PATH)
 
-2. Uncompress the easyRTC package into a folder of your choice.
+2. Uncompress the EasyRTC package into a folder of your choice.
     * ex: `/Users/USERNAME/nodes/easyrtc`
 
 3. Open a terminal window by double-clicking on Terminal within the Applications/Utilities directory in finder
@@ -70,7 +70,7 @@ Mac easyRTC Install Steps:
  
 
 
-Configuring easyRTC (all platforms)
+Configuring EasyRTC (all platforms)
 -----------------------------------
 
 Open "config.js" in your favorite text editor. The file is located in the project root folder.
@@ -98,7 +98,7 @@ Note 3: Before you begin, your server "should" have two addresses which resolve 
 4. Ensure firewalls are set to allow connections to the ports
 
 
-Running easyRTC Server From Console
+Running EasyRTC Server From Console
 -----------------------------------
 
 Running the server from the console may be the best approach for development. It allows easy access to console messages which can alert you to problems and status.
@@ -109,12 +109,12 @@ Running the server from the console may be the best approach for development. It
 3. Run the server using the node command.
     * `node server.js`
 
-Running easyRTC as a Service in Ubuntu
+Running EasyRTC as a Service in Ubuntu
 --------------------------------------
 
 Below is a small upstart script which can be saved as /etc/init/easyrtc.conf
 
-    description "easyRTC Node.js server"
+    description "EasyRTC Node.js server"
     author "Priologic Software Inc."
 
     # Saves log to /var/log/upstart/easyrtc.log
@@ -134,7 +134,7 @@ Below is a small upstart script which can be saved as /etc/init/easyrtc.conf
         exec /usr/bin/node /var/nodes/easyrtc/server.js
     end script
 
-This will start easyRTC at boot and allow you to start and stop the service in the console using the following:
+This will start EasyRTC at boot and allow you to start and stop the service in the console using the following:
 
     sudo start easyrtc  
     sudo stop easyrtc
@@ -145,7 +145,7 @@ There are improvements which can be made such as increasing the open file limit,
 Start Browsing!
 ---------------
 
-Browsing easyRTC should be a snap. If you have installed the server on your desktop machine with the default settings, you can browse to it by going to:
+Browsing EasyRTC should be a snap. If you have installed the server on your desktop machine with the default settings, you can browse to it by going to:
 
  * [http://localhost:8080/](http://localhost:8080/)
 

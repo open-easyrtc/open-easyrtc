@@ -1,9 +1,9 @@
-# easyRTC API to/from Server Messages
+# EasyRTC API to/from Server Messages
 
-easyRTC socket messages are sent via socket.io using three custom emit types:
+EasyRTC socket messages are sent via socket.io using three custom emit types:
 
  - **easyrtcAuth** - Initial negotiation and authentication
- - **easyrtcCmd** - All standard easyRTC communications including WebRTC messages
+ - **easyrtcCmd** - All standard EasyRTC communications including WebRTC messages
  - **easyrtcMsg** - Custom application specific messages 
 
 
@@ -12,7 +12,7 @@ easyRTC socket messages are sent via socket.io using three custom emit types:
 
 # easyrtcAuth
 
-"easyrtcAuth" is the socket.io emit type which easyRTC expects to initialize (or re-initialize) a connection. No other messages are handled by easyRTC until a connection is authenticated. 
+"easyrtcAuth" is the socket.io emit type which EasyRTC expects to initialize (or re-initialize) a connection. No other messages are handled by EasyRTC until a connection is authenticated. 
 
 ## Incoming (to server)
 
@@ -27,7 +27,7 @@ Includes fields needed for authentication. Sender and target must be online, aut
 
  - **apiVersion** (required) Api version string. 
  - **applicationName** (optional) Will default to the server default application.
- - **easyrtcsid** (optional) The easyRTC session ID which should be available in the browser cookie variables.
+ - **easyrtcsid** (optional) The EasyRTC session ID which should be available in the browser cookie variables.
  - **username** (optional)
  - **credential** (optional) (for enterprise, this would include the apiKey)
  - **setUserCfg** (optional) Contains all values from setUserCfg
@@ -43,7 +43,7 @@ Includes fields needed for authentication. Sender and target must be online, aut
 
 # easyrtcCmd
 
-The easyrtcCmd is the core socket.io emit type which easyRTC uses to send and receive commands.
+The easyrtcCmd is the core socket.io emit type which EasyRTC uses to send and receive commands.
 
 ## Incoming (to server)
 
@@ -223,7 +223,7 @@ Instructs target to hangup WebRTC peer-connection. Sender and target must be onl
 
 
 ### msgType - 'token'
-Initiates an authenticated easyRTC application. Note this may be sent multiple times in a session upon configuration changes. The API should reset application, room, and list data.
+Initiates an authenticated EasyRTC application. Note this may be sent multiple times in a session upon configuration changes. The API should reset application, room, and list data.
 
 **Fields:**
 
@@ -318,7 +318,7 @@ Provides an error code to the API when an error occurs.
 
 # easyrtcMsg
 
-"easyrtcMsg" is the socket.io emit type which easyRTC uses for custom application level messages.
+"easyrtcMsg" is the socket.io emit type which EasyRTC uses for custom application level messages.
 
 ## Incoming (to server)
 

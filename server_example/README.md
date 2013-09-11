@@ -1,7 +1,7 @@
-easyRTC Server Example
+EasyRTC Server Example
 ======================
 
-This folder contains all the files you'll need to create a simple server with easyRTC, Express, and Socket.io. You can copy these files where you wish.
+This folder contains all the files you'll need to create a simple server with EasyRTC, Express, and Socket.io. You can copy these files where you wish.
 
 Files and Folders:
 ------------------
@@ -15,7 +15,7 @@ Installing Required Modules:
 ----------------------------
 
  - Type `npm install` in console.
- - This will read the package.json file to find and install the required modules including easyRTC, Express, and Socket.io.
+ - This will read the package.json file to find and install the required modules including EasyRTC, Express, and Socket.io.
  - Required modules will go into a new 'node_modules' subfolder
 
 

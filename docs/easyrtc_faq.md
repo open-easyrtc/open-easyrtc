@@ -1,4 +1,4 @@
-easyRTC: FAQ
+EasyRTC: FAQ
 ============
 
 What is WebRTC?
@@ -11,10 +11,10 @@ What is WebRTC?
 > * Standardized negotiation for steaming audio, video and data.
 
 
-What is easyRTC?
+What is EasyRTC?
 ----------------
 
-> easyRTC removes the pain associated with getting started with WebRTC with the following cool features:
+> EasyRTC removes the pain associated with getting started with WebRTC with the following cool features:
 
 > * Cross browser support.
 > * Working source code.
@@ -28,20 +28,20 @@ Why is WebRTC Hard?
 
 > The WebRTC API is a mid-level API. That is to say, that while it insulates the developer from stuff like connecting to cameras or contacting TURN and STUN servers, it still requires the developers to implement an involved message passing scheme between clients to establish the peer to peer connection.
 
-> The easyRTC framework provides that message passing scheme so that the developer can focus on the tasks that are actually relevant to them.
+> The EasyRTC framework provides that message passing scheme so that the developer can focus on the tasks that are actually relevant to them.
 
 
-easyRTC Requirements:
+EasyRTC Requirements:
 --------------------
-> So far we have tested easyRTC on Windows 7 and Ubuntu 12.04 LTS where users have administrator or sudo access.
+> So far we have tested EasyRTC on Windows 7 and Ubuntu 12.04 LTS where users have administrator or sudo access.
 
 > We'll be testing it on a bunch more platforms shortly. We expect it can run anywhere Node.JS will, with only minor changes.
 
 
-Is easyRTC production ready?
+Is EasyRTC production ready?
 ----------------------------
 
-> Not yet. Our first priority is to get easyRTC out quickly to allow developers the chance to experiment and program WebRTC applications. There is a lot of work still to go in providing additional features which production code will need. We invite all users to give us feedback as to what features you desire.
+> Not yet. Our first priority is to get EasyRTC out quickly to allow developers the chance to experiment and program WebRTC applications. There is a lot of work still to go in providing additional features which production code will need. We invite all users to give us feedback as to what features you desire.
 
 
 When will WebRTC be ready for production?
@@ -56,7 +56,7 @@ When will WebRTC be ready for production?
 
 How about Multi-way Conversations?
 ----------------------------------
-> WebRTC doesn't support multicast or broadcast packets (currently), so the only way to do multi-way conversations is a star configuration: each peer establishes a connection to every other peer. The easyRTC API will support this, but it isn't advised for production environments because multiple connections tend to make the browser crash.
+> WebRTC doesn't support multicast or broadcast packets (currently), so the only way to do multi-way conversations is a star configuration: each peer establishes a connection to every other peer. The EasyRTC API will support this, but it isn't advised for production environments because multiple connections tend to make the browser crash.
 
 > [Check out our YouTube Demo](http://www.youtube.com/watch?v=ZIIcEac24RU) where we had a four-way conversation going using Chrome Canary (v25).
 
@@ -69,15 +69,15 @@ Why use Node.js?
 > * Performs exceptionally well as a HTML5 socket server.
 > * Easy to program for with a thriving open source community to back it up.
 > * Multi-platform! Allows installs on Linux, Windows, and Macs.
-> * The Node Package Manager provides an easy way to distribute and install easyRTC.
+> * The Node Package Manager provides an easy way to distribute and install EasyRTC.
 
 
 Are there plans to integrating with SIP?
 ----------------------------------------
 
-> SIP is an extensive protocol, and developing a WebRTC platform which supports it in a way casual developers could use it would be difficult. Unless we can come up with a way to make this "easy", it won't happen. This does allow for SIP and VOIP gateways to implement WebRTC using easyRTC.
+> SIP is an extensive protocol, and developing a WebRTC platform which supports it in a way casual developers could use it would be difficult. Unless we can come up with a way to make this "easy", it won't happen. This does allow for SIP and VOIP gateways to implement WebRTC using EasyRTC.
 
-> We hope to get to the point where the question will be posed to the SIP gateways out there. Are there plans to integrate with easyRTC?
+> We hope to get to the point where the question will be posed to the SIP gateways out there. Are there plans to integrate with EasyRTC?
 
 
 How do I report bugs or ask for features?

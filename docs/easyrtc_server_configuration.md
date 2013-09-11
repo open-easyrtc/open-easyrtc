@@ -1,3 +1,3 @@
-easyRTC: Server Configuration
+EasyRTC: Server Configuration
 =============================
 
