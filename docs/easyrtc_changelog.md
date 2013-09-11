@@ -1,34 +1,49 @@
 EasyRTC: Change Log
 ===================
 
-
-v0.9.0a (note, alpha means alpha... please let us know of issues.)
+v0.10.0a (note, alpha means alpha... please let us know of issues.)
 -------
 New Features:
  * Server/API - Rooms. An EasyRTC application can have multiple rooms. A user can be in one or more rooms at the same time. Users can only see other users in the same room. If no room is provided, connections will be entered into a room named `default`.
  * Server/API - Custom authentication method. Username / Credential can be provided. Username is broadcast to other authenticated users, so it may be used by apps.  
- * Server/API - Groups. A user can be in one or more groups. This is intended to be set via the authtication method.   
+ * Server/API - Groups. A user can be in one or more groups. This is intended to be set via the authentication method.   
  * Server - Reworked to be node.js module. (BIGGEST NEW FEATURE)
- * Server - Many new server events. Ths is intended to be the new way for developers in interect with EasyRTC server.
+ * Server - New server options handler. Allows possibility of server/application/room level options. Many new options available.
+ * Server - Many new server events. This is intended to be the new primary way for developers to interact with EasyRTC server.
  * Documentation - New documentation for internal EasyRTC command messages which highlight how the API and server communicate to each other.
+
 Changes:
  * Server/API - Delta lists. When the online list is changed, only the changed connections are broadcast. This should reduce bandwidth and improve scalability.
  * Server - No longer includes modules for express, socket.io. These must now be included in your server app. (See our server examples)
- * Server - No longer uses the winston module for logging. The default listener logs to the console. This can be easily overruled by setting your own `log` listener.   
+ * Server - No longer uses the winston module for logging. The default listener logs to the console. This can be easily overruled by setting your own `log` listener.
+ * Documentation - While the EasyRTC logo remains, when in text form, EasyRTC will have a capitol "E", which should make writing about it in sentences easier.   
+
 Fixes:
+ * Lots. But please let us know if there's any others which need doing.
+
 Upgrade Note:
  * This is a major release which will require existing installations to carefully upgrade.
 
-v0.8.1b
--------
+
+v0.9.0
+------
+
 New Features:
+ * API - new easyRTC.setPeerListener() function. Sets a listener for data sent from another client. Replacement for set data listener.
+ * API - new easyRTC.setServerListener() function. Listens for messages from the server which are not from another peer.
+
 Changes:
+ * API - Implementing methods used in Google's adapter.js for cross browser support
+ * Server/API - Renamed easyRTCcmd socket message type to easyrtcCmd. Should have no outside effect. 
  * Server - Moved API files to the /api/ folder thus cleaning up the /static/. API files are publicly linked using /easyrtc/easyrtc.js and /easyrtc/easyrtc.css. For transitional purposes, the old public file locations are still accessible.
- * Server/Api - Renamed easyRTCcmd socket message type to easyrtcCmd. Should have no outside effect. 
+ * Server - Version bump for express to 3.3.x
+ * Demos - Renamed mobile rooms demo to multiparty char room demo so its capabilities were more clear
+ * Documentation - Added links and images in readme.md to the various documentation and youtube resources
 
 Fixes:
  * API - Firefox - Strips TURN servers from ICE config if they are present. Firefox doesn't currently handle TURN servers well.
  * API - Added one second delay to getUserMedia call to try and correct some page loading problems.
+ 
 
 v0.8.0
 ------
