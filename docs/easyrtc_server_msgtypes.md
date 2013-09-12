@@ -50,7 +50,7 @@ The easyrtcCmd is the core socket.io emit type which EasyRTC uses to send and re
 Unless specified, messages sent to the server will be returned with an **ack** or an **error**.
 
 ### msgType - 'candidate'
-Transfer of WebRTC ICE candidate(s) for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
+WebRTC signal. Transfer of WebRTC ICE candidate(s) for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
 
@@ -61,7 +61,7 @@ Transfer of WebRTC ICE candidate(s) for establishing peer-connection. Sender and
 
 
 ### msgType - 'offer'
-Sends WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
+WebRTC signal. Sends WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
 
@@ -71,7 +71,7 @@ Sends WebRTC offer for establishing peer-connection. Sender and target must be o
  
 
 ### msgType - 'answer'
-Accepts WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
+WebRTC signal. Accepts WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
 
@@ -81,7 +81,7 @@ Accepts WebRTC offer for establishing peer-connection. Sender and target must be
 
 
 ### msgType - 'reject'
-Rejects WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
+WebRTC signal. Rejects WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
 
@@ -89,44 +89,17 @@ Rejects WebRTC offer for establishing peer-connection. Sender and target must be
 
 
 ### msgType - 'hangup'
-Instructs target to hangup WebRTC peer-connection. Sender and target must be online, authenticated, and in same application.
+WebRTC signal. Instructs target to hangup WebRTC peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
 
  - **targetEasyrtcid** (required)
 
 
-### msgType - 'setUserCfg'
-Sets user configurable options. User must be authenticated.
+### msgType - 'getRoomList'
+Requests a list of all rooms which the client has access to. It has no fields. The server should return a message to the callback with msgType of 'roomList'.
 
 **Fields:**
-
- - **msgData** (required)
-
-**msgData Fields:**
-
- - **setUserCfg** 
-   - **connectionList** (optional) Map of all connections with their statistics. The map key is the easyrtcid's. Unlike userSettings and apiField, this field must contain all current connections. Any connections not mentioned will be removed.
-   - **userSettings** (optional) Map of fields related to the user's settings, WebRTC, browser, and OS capabilities/status. Any settings not mentioned will be left as-is. To remove a setting, give it a value of `null`.
-   - **apiField** (optional) Map of fields for the special appDefinedFields value which gets transferred in the broadcast list. Any fields not mentioned will be left as-is. To remove a field, give it a value of `null`.
-
-
-### msgType - 'setPresence'
-Sets user online presence which is re-broadcast as part of the list. User must be authenticated.
-
-**Fields:**
-
- - **msgData** (required)
-
-**msgData Fields:**
-
-   - **setPresence** 
-     - **show** (optional) [`away`|`chat`|`dnd`|`xa`]
-     - **status** (optional) User configurable status string. TODO: Set regex for max length and allowed characters.
-
-**Returns:**
- - **roomData** (with roomStatus of `update`)
- - **error**
 
 
 ### msgType - 'roomJoin'
@@ -162,10 +135,38 @@ Leaves a room. Upon leaving a room, the API should remove all room info (incl. c
  - **roomData** (with roomStatus of `leave`)
  - **error**
 
-### msgType - 'getRoomList'
-Requests a list of all rooms which the client has access to. It has no fields. The server should return a message to the callback with msgType of 'roomList'.
+
+### msgType - 'setPresence'
+Sets user online presence which is re-broadcast as part of the list. User must be authenticated.
 
 **Fields:**
+
+ - **msgData** (required)
+
+**msgData Fields:**
+
+   - **setPresence** 
+     - **show** (optional) [`away`|`chat`|`dnd`|`xa`]
+     - **status** (optional) User configurable status string. TODO: Set regex for max length and allowed characters.
+
+**Returns:**
+ - **roomData** (with roomStatus of `update`)
+ - **error**
+
+
+### msgType - 'setUserCfg'
+Sets user configurable options. User must be authenticated.
+
+**Fields:**
+
+ - **msgData** (required)
+
+**msgData Fields:**
+
+ - **setUserCfg** 
+   - **connectionList** (optional) Map of all connections with their statistics. The map key is the easyrtcid's. Unlike userSettings and apiField, this field must contain all current connections. Any connections not mentioned will be removed.
+   - **userSettings** (optional) Map of fields related to the user's settings, WebRTC, browser, and OS capabilities/status. Any settings not mentioned will be left as-is. To remove a setting, give it a value of `null`.
+   - **apiField** (optional) Map of fields for the special appDefinedFields value which gets transferred in the broadcast list. Any fields not mentioned will be left as-is. To remove a field, give it a value of `null`.
 
 
 ## Outgoing (from server)
