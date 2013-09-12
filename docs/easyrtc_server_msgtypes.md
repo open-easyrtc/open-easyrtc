@@ -164,7 +164,7 @@ Sets user configurable options. User must be authenticated.
 **msgData Fields:**
 
  - **setUserCfg** 
-   - **connectionList** (optional) Map of all connections with their statistics. The map key is the easyrtcid's. Unlike userSettings and apiField, this field must contain all current connections. Any connections not mentioned will be removed.
+   - **p2pList** (optional) Map of all connections with their statistics. The map key is the easyrtcid's. Unlike userSettings and apiField, this field must contain all current connections. Any connections not mentioned will be removed.
    - **userSettings** (optional) Map of fields related to the user's settings, WebRTC, browser, and OS capabilities/status. Any settings not mentioned will be left as-is. To remove a setting, give it a value of `null`.
    - **apiField** (optional) Map of fields for the special appDefinedFields value which gets transferred in the broadcast list. Any fields not mentioned will be left as-is. To remove a field, give it a value of `null`.
 
