@@ -46,27 +46,27 @@ function connect() {
     console.log("Initializing.");
     
     var userName = document.getElementById('userName').value;
-    if( !easyRTC.isNameValid(userName)) {
-        easyRTC.showError("BAD-USER-NAME", "illegal user name");
+    if( !easyrtc.isNameValid(userName)) {
+        easyrtc.showError("BAD-USER-NAME", "illegal user name");
         return;
     }
     
-    easyRTC.setUserName(userName);
+    easyrtc.setUserName(userName);
     if( window.localStorage ) {
         window.localStorage.easyrtcUserName = document.getElementById('userName').value;
     }   
     
     
-    easyRTC.enableAudio(document.getElementById('shareAudio').checked);
-    easyRTC.enableVideo(false);
-    easyRTC.setRoomOccupantListener(convertListToButtons);
-    easyRTC.connect("easyrtc.videoScreen", loginSuccess, loginFailure);
+    easyrtc.enableAudio(document.getElementById('shareAudio').checked);
+    easyrtc.enableVideo(false);
+    easyrtc.setRoomOccupantListener(convertListToButtons);
+    easyrtc.connect("easyrtc.videoScreen", loginSuccess, loginFailure);
 
 }
 
 
 function hangup() {
-    easyRTC.hangupAll();
+    easyrtc.hangupAll();
     disable('hangupButton');
 }
 
@@ -106,7 +106,7 @@ function requestFullScreen() {
         elem.webkitRequestFullscreen();
     }  
     var hideBox = document.getElementById('shrinkBox');
-    hideBox.className = 'yesShrink'
+    hideBox.className = 'yesShrink';
     hideBox.onclick = function() {
         hideBox.className = 'noShrink';
         if (document.exitFullscreen) {
@@ -119,43 +119,43 @@ function requestFullScreen() {
             document.webkitCancelFullScreen();
         }
         elem.className = 'smallBox';
-    }
+    };
     
 }
 
 
-easyRTC.setDataListener(function(peer, data){
+easyrtc.setDataListener(function(peer, data){
     var otherClientDiv = document.getElementById('otherClients');
     var button = document.createElement('button');
     button.onclick = function(easyrtcid) {
         return function() {
             performCall(peer);
-        }
+        };
     }(peer);
     button.id = "callbutton_" +peer;
     console.log("adding button for id =" + peer);
-    var label = document.createTextNode("Get screen of " + easyRTC.idToName(peer));
+    var label = document.createTextNode("Get screen of " + easyrtc.idToName(peer));
     button.appendChild(label);
     otherClientDiv.appendChild(button);
 });
 
 
 function performCall(otherEasyrtcid) {
-    easyRTC.hangupAll();
+    easyrtc.hangupAll();
     var acceptedCB = function(accepted, caller) {
         if( !accepted ) {
-            easyRTC.showError("CALL-REJECTED", "Sorry, your call to " + easyRTC.idToName(caller) + " was rejected");
+            easyrtc.showError("CALL-REJECTED", "Sorry, your call to " + easyrtc.idToName(caller) + " was rejected");
             enable('otherClients');
         }
-    }
+    };
     
     var successCB = function() {
         enable('hangupButton');
-    }
+    };
     var failureCB = function() {
         enable('otherClients');
-    }
-    easyRTC.call(otherEasyrtcid, successCB, failureCB, acceptedCB);
+    };
+    easyrtc.call(otherEasyrtcid, successCB, failureCB, acceptedCB);
     enable('hangupButton');
 }
 
@@ -170,30 +170,30 @@ function loginSuccess(easyRTCId) {
 
 
 function loginFailure(message) {
-    easyRTC.showError("LOGIN-FAILURE", "failure to login");
+    easyrtc.showError("LOGIN-FAILURE", "failure to login");
 }
 
 
 function disconnect() {
     document.getElementById("iam").innerHTML = "logged out";
-    easyRTC.disconnect();
+    easyrtc.disconnect();
     console.log("disconnecting from server");
     enable("connectButton");
     disable("disconnectButton");
 }
 
 
-easyRTC.setStreamAcceptor( function(caller, stream) {
+easyrtc.setStreamAcceptor( function(caller, stream) {
     var video = document.getElementById('callerVideo');
-    easyRTC.setVideoObjectSrc(video,stream);
+    easyrtc.setVideoObjectSrc(video,stream);
     console.log("saw video from " + caller);
     enable("hangupButton");
 });
 
 
 
-easyRTC.setOnStreamClosed( function (caller) {
-    easyRTC.setVideoObjectSrc(document.getElementById('callerVideo'), "");
+easyrtc.setOnStreamClosed( function (caller) {
+    easyrtc.setVideoObjectSrc(document.getElementById('callerVideo'), "");
     document.cancelFullScreen();
     disable("hangupButton");
 });
@@ -201,8 +201,8 @@ easyRTC.setOnStreamClosed( function (caller) {
 
 var callerPending = null;
 
-easyRTC.setCallCancelled( function(caller){
-    if( caller == callerPending) {
+easyrtc.setCallCancelled( function(caller){
+    if( caller === callerPending) {
         document.getElementById('acceptCallBox').style.display = "none";
         callerPending = false;
     }

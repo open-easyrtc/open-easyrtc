@@ -29,39 +29,38 @@ var noCallersDiv;
 
 
 function connect() {
-    //easyRTC.enableDebug(true);
     noCallersDiv = document.createElement("div");
     noCallersDiv.innerHTML = "<em>Nobody else logged in yet</em>";
     var otherClientsDiv = document.getElementById('otherClients');
     otherClientsDiv.appendChild(noCallersDiv);
     
-    easyRTC.enableDataChannels(true);
-    easyRTC.enableVideo(false);
-    easyRTC.enableAudio(false);
-    easyRTC.setRoomOccupantListener(convertListToButtons);
-    easyRTC.setAcceptChecker( function(easyrtcid, responsefn) {
+    easyrtc.enableDataChannels(true);
+    easyrtc.enableVideo(false);
+    easyrtc.enableAudio(false);
+    easyrtc.setRoomOccupantListener(convertListToButtons);
+    easyrtc.setAcceptChecker( function(easyrtcid, responsefn) {
         peerDivs[easyrtcid].className ="dragndrop connecting";
         responsefn(true);
     });
-    easyRTC.setDataChannelOpenListener(function(easyrtcid) {
+    easyrtc.setDataChannelOpenListener(function(easyrtcid) {
         peerDivs[easyrtcid].className ="dragndrop connected";
     });
-    easyRTC.setDataChannelCloseListener(function(easyrtcid) {
+    easyrtc.setDataChannelCloseListener(function(easyrtcid) {
         if( peerDivs[easyrtcid]) {
             peerDivs[easyrtcid].className ="dragndrop notconnected";
         }
     });
     var fileDescriptions = {};
-    easyRTC.setDataListener(function(easyrtcid, data){
-        if( typeof data == 'string') {
+    easyrtc.setDataListener(function(easyrtcid, data){
+        if( typeof data === 'string') {
             fileDescriptions[easyrtcid] = JSON.parse(data);
         }
         else {
             saveFile(fileDescriptions[easyrtcid], data);
         }
-        console.log("received data from " + easyRTC.idToName(easyrtcid));
+        console.log("received data from " + easyrtc.idToName(easyrtcid));
     });
-    easyRTC.connect("easyrtc.dataFileTransfer", loginSuccess, loginFailure);
+    easyrtc.connect("easyrtc.dataFileTransfer", loginSuccess, loginFailure);
 }
 
    
@@ -101,7 +100,7 @@ function convertListToButtons (roomName, data, isPrimary) {
         if( !peerDivs[i]) {
             var div = document.createElement("div");
             div.className = "dragndrop notConnected";
-            div.innerHTML = "File drop area for <br>" + easyRTC.idToName(i);
+            div.innerHTML = "File drop area for <br>" + easyrtc.idToName(i);
             initDropSupport(div, i);
             otherClientsDiv.appendChild(div);    
             peerDivs[i] = div;
@@ -116,7 +115,7 @@ function initDropSupport(target, destUser) {
         e.stopPropagation();
         e.preventDefault();
         return false;
-    }
+    };
 
     var drop = function(e) {
         e.stopPropagation();
@@ -127,7 +126,7 @@ function initDropSupport(target, destUser) {
             sendFiles(target, destUser, files);
         }
         return false;
-    }
+    };
     
     target.addEventListener("drop", drop, false);
     target.addEventListener("dragenter", ignore, false);
@@ -139,8 +138,8 @@ function sendFiles(div, destUser, files) {
     var i;
     var fileSizeLIMIT = 30000; // approximate message size limit for firefox.
     
-    switch( easyRTC.getConnectStatus(destUser)) {
-        case easyRTC.IS_CONNECTED:
+    switch( easyrtc.getConnectStatus(destUser)) {
+        case easyrtc.IS_CONNECTED:
             for(i = 0; i < files.length; i++) {
                 if( files[i].size > fileSizeLIMIT ) {
                     showMessage('File ' + files[i].name +
@@ -155,14 +154,14 @@ function sendFiles(div, destUser, files) {
                 //
                 // can't send an object, only a primitive type
                 //
-                easyRTC.sendDataP2P(destUser, JSON.stringify(txData));
-                easyRTC.sendDataP2P(destUser, files[i]);
+                easyrtc.sendDataP2P(destUser, JSON.stringify(txData));
+                easyrtc.sendDataP2P(destUser, files[i]);
             }       
             break;
             
-        case easyRTC.NOT_CONNECTED:
+        case easyrtc.NOT_CONNECTED:
             div.className = "dragndrop connecting";
-            easyRTC.call(destUser, 
+            easyrtc.call(destUser, 
                 function(caller, media) { // success callback                    
                     div.className = "dragndrop connected";
                     sendFiles(div, caller, files);
@@ -188,5 +187,5 @@ function loginSuccess(easyRTCId) {
 
 
 function loginFailure(message) {
-    easyRTC.showError("LOGIN-FAILURE", message);
+    easyrtc.showError("LOGIN-FAILURE", message);
 }

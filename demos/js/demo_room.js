@@ -26,13 +26,13 @@ function reshapeTextEntryBox(parentw, parenth) {
         top:parenth/4,
         width:parentw/2,
         height: parenth/4
-    }
+    };
 }
 
 function reshapeTextEntryField(parentw, parenth) {
     return {
         width:parentw -40
-    }
+    };
 }
 
 var margin = 20;
@@ -113,7 +113,7 @@ var sharedVideoWidth  = 1;
 var sharedVideoHeight = 1;
 
 function reshape1of2(parentw, parenth) {
-    if( layout== 'p' ) {
+    if( layout=== 'p' ) {
         return {
             left: (parentw-sharedVideoWidth)/2,
             top:  (parenth -sharedVideoHeight*2)/3,
@@ -127,14 +127,14 @@ function reshape1of2(parentw, parenth) {
             top:  (parenth -sharedVideoHeight)/2,
             width: sharedVideoWidth,
             height: sharedVideoHeight            
-        }
+        };
     }  
 }    
 
 
 
 function reshape2of2(parentw, parenth){
-    if( layout== 'p' ) {
+    if( layout=== 'p' ) {
         return {
             left: (parentw-sharedVideoWidth)/2,
             top:  (parenth -sharedVideoHeight*2)/3 *2 + sharedVideoHeight,
@@ -148,12 +148,12 @@ function reshape2of2(parentw, parenth){
             top:  (parenth -sharedVideoHeight)/2,
             width: sharedVideoWidth,
             height: sharedVideoHeight            
-        }
+        };
     }      
 }
 
 function reshape1of3(parentw, parenth) {
-    if( layout== 'p' ) {
+    if( layout=== 'p' ) {
         return {
             left: (parentw-sharedVideoWidth)/2,
             top:  (parenth -sharedVideoHeight*3)/4 ,
@@ -167,12 +167,12 @@ function reshape1of3(parentw, parenth) {
             top:  (parenth -sharedVideoHeight*2)/3,
             width: sharedVideoWidth,
             height: sharedVideoHeight            
-        }
+        };
     }  
 }
 
 function reshape2of3(parentw, parenth){
-    if( layout== 'p' ) {
+    if( layout=== 'p' ) {
         return {
             left: (parentw-sharedVideoWidth)/2,
             top:  (parenth -sharedVideoHeight*3)/4*2+ sharedVideoHeight,
@@ -186,12 +186,12 @@ function reshape2of3(parentw, parenth){
             top:  (parenth -sharedVideoHeight*2)/3,
             width: sharedVideoWidth,
             height: sharedVideoHeight            
-        }
+        };
     }       
 }
 
 function reshape3of3(parentw, parenth) {
-    if( layout== 'p' ) {
+    if( layout=== 'p' ) {
         return {
             left: (parentw-sharedVideoWidth)/2,
             top:  (parenth -sharedVideoHeight*3)/4*3+ sharedVideoHeight*2,
@@ -205,7 +205,7 @@ function reshape3of3(parentw, parenth) {
             top:  (parenth -sharedVideoHeight*2)/3*2+ sharedVideoHeight,
             width: sharedVideoWidth,
             height: sharedVideoHeight            
-        }
+        };
     }       
 }
 
@@ -216,7 +216,7 @@ function reshape1of4(parentw, parenth) {
         top: (parenth - sharedVideoHeight*2)/3,
         width: sharedVideoWidth,
         height: sharedVideoHeight
-    }
+    };
 }
 
 function reshape2of4(parentw, parenth) {
@@ -225,7 +225,7 @@ function reshape2of4(parentw, parenth) {
         top: (parenth - sharedVideoHeight*2)/3,
         width: sharedVideoWidth,
         height: sharedVideoHeight
-    }
+    };
 }
 function reshape3of4(parentw, parenth) {
     return {
@@ -233,7 +233,7 @@ function reshape3of4(parentw, parenth) {
         top: (parenth - sharedVideoHeight*2)/3*2 + sharedVideoHeight,
         width: sharedVideoWidth,
         height: sharedVideoHeight
-    }
+    };
 }
 
 function reshape4of4(parentw, parenth) {
@@ -242,7 +242,7 @@ function reshape4of4(parentw, parenth) {
         top: (parenth - sharedVideoHeight*2)/3*2 + sharedVideoHeight,
         width: sharedVideoWidth,
         height: sharedVideoHeight
-    }
+    };
 }
 
 var boxUsed = [true, false, false, false];
@@ -293,7 +293,7 @@ var reshapeThumbs = [
             return setThumbSize(0.20, 0.01, 0.01, parentw, parenth);
         }
         else {
-            setSharedVideoSize(parentw, parenth)
+            setSharedVideoSize(parentw, parenth);
             switch(connectCount) {
                 case 0:return reshapeToFullSize(parentw, parenth); 
                 case 1:return reshape1of2(parentw, parenth);
@@ -351,7 +351,7 @@ var reshapeThumbs = [
                     return reshape4of4(parentw, parenth);
             }
         }
-    },                
+    }                
 ];
 
 
@@ -394,7 +394,7 @@ function handleWindowResize() {
     var fullpage = document.getElementById('fullpage');
     fullpage.style.width = window.innerWidth + "px";
     fullpage.style.height = window.innerHeight + "px";
-    connectCount = easyRTC.getConnectionCount();
+    connectCount = easyrtc.getConnectionCount();
             
     function applyReshape(obj,  parentw, parenth) {
         var myReshape = obj.reshapeMe(parentw, parenth);
@@ -479,7 +479,7 @@ function expandThumb(whichBox) {
     if( activeBox >= 0 ) {
         collapseToThumbHelper();
     }
-    if( lastActiveBox != whichBox) {
+    if( lastActiveBox !== whichBox) {
         var id = getIdOfBox(whichBox);
         activeBox = whichBox;
         setReshaper(id, reshapeToFullSize);
@@ -505,11 +505,11 @@ function prepVideoBox(whichBox) {
 
 function killActiveBox() {
     if( activeBox > 0) {
-        var caller = easyRTC.getIthCaller(activeBox-1);
+        var caller = easyrtc.getIthCaller(activeBox-1);
         collapseToThumb();
         setTimeout( function() {
-            easyRTC.hangup(caller);
-            easyRTC.sendDataWS(null, {hangupEasyrtcid:caller});
+            easyrtc.hangup(caller);
+            easyrtc.sendDataWS(null, {hangupEasyrtcid:caller});
         }, 400);
     }  
 }
@@ -524,7 +524,7 @@ function muteActiveBox() {
 
 function callEverybodyElse(roomName, otherPeople) {
     
-    easyRTC.setRoomOccupantListener(null, null); // so we're only called once.
+    easyrtc.setRoomOccupantListener(null, null); // so we're only called once.
 
     var list = [];
     var connectCount = 0;
@@ -545,12 +545,12 @@ function callEverybodyElse(roomName, otherPeople) {
             }
         }
         function callFailure() {
-            easyRTC.showError("CALL-REJECTED", "Rejected by other party");
+            easyrtc.showError("CALL-REJECTED", "Rejected by other party");
             if( connectCount < maxCALLERS && position > 0) {
                 establishConnection(position-1);
             }            
         }
-        easyRTC.call(list[position], callSuccess, callFailure);    
+        easyrtc.call(list[position], callSuccess, callFailure);    
         
     }
     if( list.length > 0) {
@@ -575,11 +575,11 @@ function sendText(e) {
     document.getElementById('textentryBox').style.display = "none";
     document.getElementById('textEntryButton').style.display = "block";
     var stringToSend = document.getElementById('textentryField').value;
-    if( stringToSend && stringToSend != "") {
+    if( stringToSend && stringToSend !== "") {
         for(var i = 0; i < maxCALLERS; i++ ) {
-            var caller = easyRTC.getIthCaller(i);
-            if( caller && caller != "") {
-                easyRTC.sendData(caller, stringToSend);
+            var caller = easyrtc.getIthCaller(i);
+            if( caller && caller !== "") {
+                easyrtc.sendData(caller, stringToSend);
             }        
         }
     } 
@@ -650,12 +650,12 @@ function showMessage(startX, startY, content) {
         setTimeout(function(){
             fullPage.removeChild(cloudObject);
         }, 10000);
-    }
+    };
 }
 
 function messageListener(who, content) {
     for(var i = 0; i < maxCALLERS; i++) {
-        if( easyRTC.getIthCaller(i) == who) {
+        if( easyrtc.getIthCaller(i) === who) {
             var startArea = document.getElementById(getIdOfBox(i+1));
             var startX = parseInt(startArea.offsetLeft) + parseInt(startArea.offsetWidth)/2;
             var startY = parseInt(startArea.offsetTop) + parseInt(startArea.offsetHeight)/2;
@@ -682,17 +682,16 @@ function appInit() {
     window.onresize = handleWindowResize;
     handleWindowResize(); //initial call of the top-down layout manager
     
-    // easyRTC.setVideoBandwidth(20);
-    easyRTC.setRoomOccupantListener(callEverybodyElse);
-    easyRTC.initManaged("easyrtc.room", "box0", ["box1", "box2", "box3"], loginSuccess);
-    easyRTC.setDataListener(messageListener);
-    easyRTC.setDisconnectListener( function() {
-        easyRTC.showError("LOST-CONNECTION", "Lost connection to signalling server");
-        easyRTC.initM
+    // easyrtc.setVideoBandwidth(20);
+    easyrtc.setRoomOccupantListener(callEverybodyElse);
+    easyrtc.initManaged("easyrtc.room", "box0", ["box1", "box2", "box3"], loginSuccess);
+    easyrtc.setDataListener(messageListener);
+    easyrtc.setDisconnectListener( function() {
+        easyrtc.showError("LOST-CONNECTION", "Lost connection to signalling server");
     });   
-    easyRTC.setOnCall( function(caller, slot) {
+    easyrtc.setOnCall( function(caller, slot) {
         boxUsed[slot+1] = true;
-        if(activeBox == 0 &&  easyRTC.getConnectionCount() == 1) { // first connection
+        if(activeBox === 0 &&  easyrtc.getConnectionCount() === 1) { // first connection
             collapseToThumb();
             document.getElementById('textEntryButton').style.display = 'block';
         }
@@ -701,16 +700,16 @@ function appInit() {
     });
 
 
-    easyRTC.setOnHangup(function(caller, slot) {
+    easyrtc.setOnHangup(function(caller, slot) {
         boxUsed[slot+1] = false;
         console.log("hanging up on " + caller);
-        if(activeBox > 0 && slot+1 == activeBox) {
+        if(activeBox > 0 && slot+1 === activeBox) {
             collapseToThumb(); 
         }
         setTimeout(function() {
             document.getElementById(getIdOfBox(slot+1)).style.visibility = "hidden";
 
-            if( easyRTC.getConnectionCount() == 0 ) { // no more connections
+            if( easyrtc.getConnectionCount() === 0 ) { // no more connections
                 expandThumb(0);
                 document.getElementById('textEntryButton').style.display = 'none';
                 document.getElementById('textentryBox').style.display = 'none';

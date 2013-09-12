@@ -45,24 +45,24 @@ var contactedListeners = {};
 var nameToIdMap = {};
 
 function connect() {
-    easyRTC.enableDebug(false);
+    easyrtc.enableDebug(false);
     var tempName = document.getElementById('userName').value;
-    if(  !easyRTC.isNameValid(tempName)) {
-        easyRTC.showError("BAD-USER-NAME", "illegal user name");
+    if(  !easyrtc.isNameValid(tempName)) {
+        easyrtc.showError("BAD-USER-NAME", "illegal user name");
         return;
     }
-    easyRTC.setUserName(tempName);
+    easyrtc.setUserName(tempName);
     if( window.localStorage && window.localStorage.easyrtcUserName ) {
         window.localStorage.easyrtcUserName = tempName;        
     }  
     console.log("Initializing with username " + tempName);
-    easyRTC.setScreenCapture();
-    easyRTC.enableAudio(document.getElementById("shareAudio").checked);
-    easyRTC.setRoomOccupantListener(function (roomName, otherPeers){
+    easyrtc.setScreenCapture();
+    easyrtc.enableAudio(document.getElementById("shareAudio").checked);
+    easyrtc.setRoomOccupantListener(function (roomName, otherPeers){
         var peer;
         for(peer in otherPeers ) {
             if( !contactedListeners[peer]) {
-                easyRTC.sendDataWS(peer, {
+                easyrtc.sendDataWS(peer, {
                     sender:true
                 });
             }        
@@ -70,14 +70,14 @@ function connect() {
         contactedListeners = otherPeers;
     });
     
-    easyRTC.setDataListener(function(peer, data){});
+    easyrtc.setDataListener(function(peer, data){});
     
-    easyRTC.connect("easyrtc.videoScreen", loginSuccess, loginFailure);
+    easyrtc.connect("easyrtc.videoScreen", loginSuccess, loginFailure);
 }
 
 
 function hangup() {
-    easyRTC.hangupAll();
+    easyrtc.hangupAll();
     disable('hangupButton');
 }
 
@@ -92,57 +92,57 @@ function loginSuccess(easyRTCId) {
 
 
 function loginFailure(message) {
-    easyRTC.showError("LOGIN-FAILURE", message);
+    easyrtc.showError("LOGIN-FAILURE", message);
 }
 
 
 function disconnect() {
     document.getElementById("iam").innerHTML = "logged out";
-    easyRTC.disconnect();
+    easyrtc.disconnect();
     enable("shareAudio");
     console.log("disconnecting from server");
     enable("connectButton");
     disable("disconnectButton");
-    easyRTC.setVideoObjectSrc(document.getElementById('callerAudio'), "");
+    easyrtc.setVideoObjectSrc(document.getElementById('callerAudio'), "");
 }
 
 
-easyRTC.setStreamAcceptor( function(caller, stream) {
+easyrtc.setStreamAcceptor( function(caller, stream) {
     var audio = document.getElementById('callerAudio');
-    easyRTC.setVideoObjectSrc(audio,stream);
-    console.log("got audio from " + easyRTC.idToName(caller));
+    easyrtc.setVideoObjectSrc(audio,stream);
+    console.log("got audio from " + easyrtc.idToName(caller));
     enable("hangupButton");
 });
 
 
 
-easyRTC.setOnStreamClosed( function (caller) {
-    easyRTC.setVideoObjectSrc(document.getElementById('callerAudio'), "");
+easyrtc.setOnStreamClosed( function (caller) {
+    easyrtc.setVideoObjectSrc(document.getElementById('callerAudio'), "");
     disable("hangupButton");
 });
 
 
 var callerPending = null;
 
-easyRTC.setCallCancelled( function(caller){
-    if( caller == callerPending) {
+easyrtc.setCallCancelled( function(caller){
+    if( caller === callerPending) {
         document.getElementById('acceptCallBox').style.display = "none";
         callerPending = false;
     }
 });
 
 
-easyRTC.setAcceptChecker(function(caller, cb) {
+easyrtc.setAcceptChecker(function(caller, cb) {
     document.getElementById('acceptCallBox').style.display = "block";
     callerPending = caller;
 
-   document.getElementById('acceptCallLabel').innerHTML = "Accept incoming call from " + easyRTC.idToName(caller) + " ?";
+   document.getElementById('acceptCallLabel').innerHTML = "Accept incoming call from " + easyrtc.idToName(caller) + " ?";
 
     var acceptTheCall = function(wasAccepted) {
         document.getElementById('acceptCallBox').style.display = "none";
         cb(wasAccepted);
         callerPending = null;
-    }
+    };
     document.getElementById("callAcceptButton").onclick = function() {
         console.log("accepted the call");
         acceptTheCall(true);

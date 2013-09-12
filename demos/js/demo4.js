@@ -28,9 +28,9 @@ var selfEasyrtcid = "";
 
 function connect() {
     console.log("Initializing.");
-    easyRTC.enableDebug(false);
-    easyRTC.setRoomOccupantListener(convertListToButtons);
-    easyRTC.initManaged("easyrtc.audioVideo", "selfVideo", 
+    easyrtc.enableDebug(false);
+    easyrtc.setRoomOccupantListener(convertListToButtons);
+    easyrtc.initManaged("easyrtc.audioVideo", "selfVideo", 
        ["callerVideo", "callerVideo2", "callerVideo3"], loginSuccess);
 }
 
@@ -51,7 +51,7 @@ function convertListToButtons (roomName, data, isPrimary) {
         button.onclick = function(easyrtcid) {
             return function() {
                 performCall(easyrtcid);
-            }
+            };
         }(i);
 
         label = document.createTextNode(i);
@@ -66,16 +66,16 @@ function performCall(otherEasyrtcid) {
         if( !accepted ) {
             alert("Sorry, your call to " + caller + " was rejected");
         }
-    }
+    };
     var successCB = function() {};
     var failureCB = function() {};
-    easyRTC.call(otherEasyrtcid, successCB, failureCB, acceptedCB);
+    easyrtc.call(otherEasyrtcid, successCB, failureCB, acceptedCB);
 }
 
 
 function loginSuccess(easyRTCId) {
     selfEasyrtcid = easyRTCId;
-    document.getElementById("iam").innerHTML = "I am " + easyRTC.cleanId(easyRTCId);
+    document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyRTCId);
 }
 
 
@@ -85,6 +85,6 @@ function loginFailure(message) {
 
 
 // Sets calls so they are automatically accepted (this is default behaviour)
-easyRTC.setAcceptChecker(function(caller, cb) {
+easyrtc.setAcceptChecker(function(caller, cb) {
     cb(true);
 } );

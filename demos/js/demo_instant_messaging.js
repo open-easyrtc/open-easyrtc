@@ -24,7 +24,6 @@
 //POSSIBILITY OF SUCH DAMAGE.
 //
 var selfEasyrtcid = "";
-easyRTC.enableDebug(true);
 function addToConversation(who, msgType, content) {
     // Escape html special characters, then add linefeeds.
     content = content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -35,9 +34,9 @@ function addToConversation(who, msgType, content) {
 
 
 function connect() {
-    easyRTC.setDataListener(addToConversation);
-    easyRTC.setRoomOccupantListener(convertListToButtons);
-    easyRTC.connect("easyrtc.instantMessaging", loginSuccess, loginFailure);
+    easyrtc.setDataListener(addToConversation);
+    easyrtc.setRoomOccupantListener(convertListToButtons);
+    easyrtc.connect("easyrtc.instantMessaging", loginSuccess, loginFailure);
 }
 
 
@@ -52,9 +51,9 @@ function convertListToButtons (roomName, data, isPrimary) {
         button.onclick = function(easyrtcid) {        
             return function() {
                 sendStuffWS(easyrtcid);
-            }
+            };
         }(i);        
-        var label = document.createTextNode("Send to " + easyRTC.idToName(i));
+        var label = document.createTextNode("Send to " + easyrtc.idToName(i));
         button.appendChild(label);
                 
         otherClientDiv.appendChild(button);        
@@ -67,11 +66,11 @@ function convertListToButtons (roomName, data, isPrimary) {
 
 function sendStuffWS(otherEasyrtcid) {    
     var text = document.getElementById('sendMessageText').value;    
-    if(text.replace(/\s/g, "").length == 0) { // Don't send just whitespace
+    if(text.replace(/\s/g, "").length === 0) { // Don't send just whitespace
         return;
     }
     
-    easyRTC.sendDataWS(otherEasyrtcid, "message",  text);
+    easyrtc.sendDataWS(otherEasyrtcid, "message",  text);
     addToConversation("Me", "message", text);
     document.getElementById('sendMessageText').value = "";        
 }
@@ -84,5 +83,5 @@ function loginSuccess(easyRTCId) {
 
 
 function loginFailure(message) {
-    easyRTC.showError("LOGIN-FAILURE", message);
+    easyrtc.showError("LOGIN-FAILURE", message);
 }
