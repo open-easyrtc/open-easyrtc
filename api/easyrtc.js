@@ -2565,7 +2565,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 language: navigator.language
             }
         };
-        if (!forAuthentication || !isEmptyObj(easyrtc.appDefinedFields)) {
+        if (!isEmptyObj(easyrtc.appDefinedFields)) {
             newConfig.apiField = easyrtc.appDefinedFields;
         }
         if (!forAuthentication || !isEmptyObj(connectionList)) {
@@ -2589,7 +2589,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 easyrtc.debugPrinter("cfg=" + JSON.stringify(alteredData.added));
             }
             if (easyrtc.webSocket) {
-                sendSignalling(null, "setUserCfg", alteredData.added, null, null);
+                sendSignalling(null, "setUserCfg", {setUserCfg:alteredData.added}, null, null);
             }
             easyrtc.oldConfig = newConfig;
         };
