@@ -2540,9 +2540,9 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     // do the actual sending.
     //
     easyrtc.collectConfigurationInfo = function(forAuthentication) {
-        var connectionList = {};
+        var p2pList = {};
         for (var i in easyrtc.peerConns) {
-            connectionList[i] = {
+            p2pList[i] = {
                 connectTime: easyrtc.peerConns[i].connectTime,
                 isInitiator: easyrtc.peerConns[i].isInitiator ? true : false
             };
@@ -2568,8 +2568,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         if (!isEmptyObj(easyrtc.appDefinedFields)) {
             newConfig.apiField = easyrtc.appDefinedFields;
         }
-        if (!forAuthentication || !isEmptyObj(connectionList)) {
-            newConfig.connectionList = connectionList;
+        if (!forAuthentication || !isEmptyObj(p2pList)) {
+            newConfig.p2pList = p2pList;
         }
         return newConfig;
     };
