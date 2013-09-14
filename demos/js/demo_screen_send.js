@@ -91,8 +91,8 @@ function loginSuccess(easyRTCId) {
 }
 
 
-function loginFailure(message) {
-    easyrtc.showError("LOGIN-FAILURE", message);
+function loginFailure(errorCode, message) {
+    easyrtc.showError(errorCode, message);
 }
 
 

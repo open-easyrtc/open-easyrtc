@@ -46,7 +46,7 @@ function connect() {
             easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
             easyrtc.connect("easyrtc.videoOnly", loginSuccess, loginFailure);
         },
-        function(errmesg){
+        function(errorCode, errmesg){
             easyrtc.showError("MEDIA-ERROR", errmesg);
         }  // failure callback
         );
@@ -121,8 +121,8 @@ function loginSuccess(easyRTCId) {
 }
 
 
-function loginFailure(message) {
-    easyrtc.showError("LOGIN-FAILURE", message);
+function loginFailure(errorCode, message) {
+    easyrtc.showError(errorCode, message);
 }
 
 

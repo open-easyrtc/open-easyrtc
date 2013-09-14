@@ -1,1 +1,1 @@
-jsdoc -d ..\..\docs ..\..\api\easyrtc.js
+jsdoc -d ..\..\docs  -t jsdoc_templates ..\..\api\easyrtc.js

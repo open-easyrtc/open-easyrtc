@@ -48,7 +48,7 @@ function loginSuccess(easyRTCId) {
 }
 
 
-function loginFailure(message) {
+function loginFailure(errorCode, message) {
     document.getElementById("stateLabel").innerHTML = "disconnected";
 }
 

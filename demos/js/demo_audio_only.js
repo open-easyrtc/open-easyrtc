@@ -43,8 +43,8 @@ function connect() {
         function(){        // success callback
             easyrtc.connect("easyrtc.audioOnly", loginSuccess, loginFailure);
         },
-        function(errmesg){
-            easyrtc.showError("MEDIA-ERROR", errmesg);
+        function(errorCode, errmesg){
+            easyrtc.showError(errorCode, errmesg);
         }  // failure callback
         );
 }
@@ -116,8 +116,8 @@ function loginSuccess(easyRTCId) {
 }
 
 
-function loginFailure(message) {
-    easyrtc.showError("LOGIN-FAILURE", message);
+function loginFailure(errorCode, message) {
+    easyrtc.showError(errorCode, message);
 }
 
 
