@@ -2596,7 +2596,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         if (!isEmptyObj(easyrtc.appDefinedFields)) {
             newConfig.apiField = easyrtc.appDefinedFields;
         }
-        if (!forAuthentication || !isEmptyObj(p2pList)) {
+        if ( !isEmptyObj(p2pList)) {
             newConfig.p2pList = p2pList;
         }
         return newConfig;
