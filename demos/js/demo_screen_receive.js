@@ -160,12 +160,12 @@ function performCall(otherEasyrtcid) {
 }
 
 
-function loginSuccess(easyRTCId) {
+function loginSuccess(easyrtcId) {
     disable("connectButton");
     enable("disconnectButton");
     enable('otherClients');
     document.getElementById("iam").innerHTML = "Connected";
-    selfEasyrtcid = easyRTCId;
+    selfEasyrtcid = easyrtcId;
 }
 
 

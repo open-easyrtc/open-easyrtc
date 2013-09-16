@@ -76,9 +76,9 @@ function sendStuffWS(otherEasyrtcid) {
 }
 
 
-function loginSuccess(easyRTCId) {
-    selfEasyrtcid = easyRTCId;
-    document.getElementById("iam").innerHTML = "I am " + easyRTCId;
+function loginSuccess(easyrtcId) {
+    selfEasyrtcid = easyrtcId;
+    document.getElementById("iam").innerHTML = "I am " + easyrtcId;
 }
 
 

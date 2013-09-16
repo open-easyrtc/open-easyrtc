@@ -82,11 +82,11 @@ function hangup() {
 }
 
 
-function loginSuccess(easyRTCId) {
+function loginSuccess(easyrtcId) {
     disable("connectButton");
     disable("shareAudio");
     enable("disconnectButton");
-    selfEasyrtcid = easyRTCId;
+    selfEasyrtcid = easyrtcId;
     document.getElementById("iam").innerHTML = "Connected";
 }
 

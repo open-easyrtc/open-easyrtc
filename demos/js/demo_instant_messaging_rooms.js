@@ -110,7 +110,7 @@ function addRoom(roomName, userAdded) {
         console.log("calling joinRoom(" + roomName + ") because it was a user action ");
         easyrtc.joinRoom(roomName, null, isConnected ? addRoomButton : null,
                 function(errorCode, errorText, roomName) {
-                    easyrtc.showError("errorCode", errorText + ": room name was(" + roomName + ")");
+                    easyrtc.showError(errorCode, errorText + ": room name was(" + roomName + ")");
                 });
     }
 }
@@ -283,16 +283,21 @@ function sendMessage(destTargetId, destRoom) {
 }
 
 
-function loginSuccess(easyRTCId) {
-    selfEasyrtcid = easyRTCId;
-    document.getElementById("iam").innerHTML = "I am " + easyRTCId;
+function loginSuccess(easyrtcId) {
+    selfEasyrtcid = easyrtcId;
+    document.getElementById("iam").innerHTML = "I am " + easyrtcId;
     refreshRoomList();
+    document.getElementById('connectButton').disabled = true;
+    document.getElementById('reconnectButton').disabled = false;
     isConnected = true;
 }
 
 
 function loginFailure(errorCode, message) {
     easyrtc.showError("LOGIN-FAILURE", message);
+    document.getElementById('reconnectButton').disabled = true;
+    document.getElementById('connectButton').disabled = false;
+    jQuery('#rooms').empty();   
 }
 
 var currentShowState = 'chat';
