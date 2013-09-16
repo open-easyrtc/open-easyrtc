@@ -1,4 +1,4 @@
-![easyRTC](./api/img/easyrtc.png "easyRTC")
+![EasyRTC](./api/img/easyrtc.png "EasyRTC")
 
 EasyRTC - ALPHA
 =======
@@ -68,7 +68,7 @@ Folder Structure
 Included Demos
 --------------
 
-easyRTC comes with a number of demo's which work immediatly after installation.
+EasyRTC comes with a number of demo's which work immediatly after installation.
 
  * Video and/or Audio connections
  * Multi-party video chat

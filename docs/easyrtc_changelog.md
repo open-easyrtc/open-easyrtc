@@ -31,8 +31,8 @@ v0.9.0
 ------
 
 New Features:
- * API - new easyRTC.setPeerListener() function. Sets a listener for data sent from another client. Replacement for set data listener.
- * API - new easyRTC.setServerListener() function. Listens for messages from the server which are not from another peer.
+ * API - new easyrtc.setPeerListener() function. Sets a listener for data sent from another client. Replacement for set data listener.
+ * API - new easyrtc.setServerListener() function. Listens for messages from the server which are not from another peer.
 
 Changes:
  * API - Implementing methods used in Google's adapter.js for cross browser support
@@ -63,7 +63,7 @@ New Features:
  * Server - Added socket.io options to config.js. Note that socketIoClientGzipEnabled is now false by default as gzip causes issues on some servers (often Windows).
  * Demos - Added a screen sending and screen receiving demo. These tend to crash the browser at this point. Hopefully Google will get that feature working properly again.
  * Demos - Added a multiperson tablet-oriented chat demo that runs very nicely on your Android devices.
- * Documentation - Moved the client API documentation from mark-down format to jsDoc and added inline examples. Check out the easyRTC.html file in the docs directory. The easyrtcjs.html file is a helper file that shouldn't be looked at directly.
+ * Documentation - Moved the client API documentation from mark-down format to jsDoc and added inline examples. Check out the easyrtc.html file in the docs directory. The easyrtcjs.html file is a helper file that shouldn't be looked at directly.
 
 Changes:
  * Demos - In demos which show the local media stream as both audio and video (as a mirror), the video object with the local media stream is muted and given a volume of 0.
@@ -82,10 +82,10 @@ v0.7.0
 New Features:
 
  * API - Added initial support for Data Channels.
- * API - Added more debugging output and provided a means to control it through the easyRTC.debugPrinter variable and easyRTC.enableDebug function.
+ * API - Added more debugging output and provided a means to control it through the easyrtc.debugPrinter variable and easyrtc.enableDebug function.
  * API - Added code to log application state (WRT webrtc) to the server.
- * API - New function setSocketUrl() to point to web socket server. Allows website to be hosted using a seperate server (suchs as Apache). The default remains for the easyRTC server to function as both the web and socket server.
- * API - Support for hanging up on calls still being set up - on the initiating side by extending the easyRTC.hangup function, and on the receiving side by adding the easyRTC.setCallCancelled callback setter.
+ * API - New function setSocketUrl() to point to web socket server. Allows website to be hosted using a seperate server (suchs as Apache). The default remains for the EasyRTC server to function as both the web and socket server.
+ * API - Support for hanging up on calls still being set up - on the initiating side by extending the easyrtc.hangup function, and on the receiving side by adding the easyrtc.setCallCancelled callback setter.
  * API - Added easyrtc.getConnectStatus function to get the state of a connection to a peer.
  * Server - SSL support for web and socket server including non-ssl forwarding.
  * Server - Logging features. Both console and file based logging with fine-grained configuration.
@@ -96,8 +96,8 @@ New Features:
 
 Changes:
 
- * API - The callSuccessCB argument to easyRTC.call now has a second argument, which can be either 'audiovideo' or 'datachannel'. The callSuccessCB function may be get called twice if the peer connection is using data channels as well as audio or video.
- * API - Fixed easyRTC.connect so that you can reconnect after calling disconnect.
+ * API - The callSuccessCB argument to easyrtc.call now has a second argument, which can be either 'audiovideo' or 'datachannel'. The callSuccessCB function may be get called twice if the peer connection is using data channels as well as audio or video.
+ * API - Fixed easyrtc.connect so that you can reconnect after calling disconnect.
  * Server - Websocket 'onMessage' section moved to external function for easier editing.
  * Server - Much of the general server code moved to external functions.
  * Demos - Various visual html fixes and changes.
