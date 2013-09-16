@@ -468,10 +468,10 @@ easyrtc.setAppDefinedFields = function(fields) {
     }
 };
 /** Default error reporting function. The default implementation displays error messages
- *  in a programatically created div with the id easyRTCErrorDialog. The div has title
- *  component with a classname of easyRTCErrorDialog_title. The error messages get added to a
- *  container with the id easyRTCErrorDialog_body. Each error message is a text node inside a div
- *  with a class of easyRTCErrorDialog_element. There is an "okay" button with the className of easyRTCErrorDialog_okayButton.
+ *  in a programatically created div with the id easyrtcErrorDialog. The div has title
+ *  component with a classname of easyrtcErrorDialog_title. The error messages get added to a
+ *  container with the id easyrtcErrorDialog_body. Each error message is a text node inside a div
+ *  with a class of easyrtcErrorDialog_element. There is an "okay" button with the className of easyrtcErrorDialog_okayButton.
  *  @param {String} messageCode An error message code
  *  @param {String} message the error message text without any markup.
  *  @example
@@ -713,7 +713,7 @@ easyrtc.getLocalStream = function() {
  * 
  * @param {type} element the video object.
  * @example 
- *    easyRTC.clearMediaStream( document.getElementById('selfVideo'));
+ *    easyrtc.clearMediaStream( document.getElementById('selfVideo'));
  * 
  */
 easyrtc.clearMediaStream = function(element) {
@@ -733,8 +733,8 @@ easyrtc.clearMediaStream = function(element) {
  *  uses the mozSrcObject and expects a stream. This procedure hides
  *  that from you.
  *  If the media stream is from a local webcam, you may want to add the 
- *  easyRTCMirror class to the video object so it looks like a proper mirror.
- *  The easyRTCMirror class is defined in easyrtc.css, which is automatically added
+ *  easyrtcMirror class to the video object so it looks like a proper mirror.
+ *  The easyrtcMirror class is defined in easyrtc.css, which is automatically added
  *  when you add the easyrtc.js file to an HTML file.
  *  @param {DOMObject} videoObject an HTML5 video object 
  *  @param {MediaStream} stream a media stream as returned by easyrtc.getLocalStream or your stream acceptor.
@@ -1169,7 +1169,7 @@ easyrtc.pc_config = {};
 /** @private  */
 easyrtc.closedChannel = null;
 /**
- * Connects to the easyRTC signalling server. You must connect before trying to
+ * Connects to the easyrtc signalling server. You must connect before trying to
  * call other users.
  * @param {String} applicationName is a string that identifies the application so that different applications can have different
  *        lists of users.
@@ -1179,7 +1179,7 @@ easyrtc.closedChannel = null;
  * @param {Function} errorCallback (errorCode, errorText) - is called on unsuccessful connect. if null, an alert is called instead.
  *  The errorCode takes it's value from easyrtc.errCodes.
  * @example 
- *   easyRTC.connect("mychat_app", 
+ *   easyrtc.connect("mychat_app", 
  *                   function(easyrtcid, cookieOwner) {
  *                       if( cookieOwner) { console.log("I'm the room owner"); }
  *                       console.log("my id is " + easyrtcid);
@@ -2817,7 +2817,7 @@ easyrtc.dontAddCloseButtons = function() {
  * the video objects identified by videoIds, and then call onReady. One of it's
  * side effects is to add hangup buttons to the remote video objects, buttons
  * that only appear when you hover over them with the mouse cursor. This method will also add the 
- * easyRTCMirror class to the monitor video object so that it behaves like a mirror.
+ * easyrtcMirror class to the monitor video object so that it behaves like a mirror.
  *  @param {String} applicationName - name of the application.
  *  @param {String} monitorVideoId - the id of the video object used for monitoring the local stream.
  *  @param {Array} videoIds - an array of video object ids (strings)
@@ -3017,7 +3017,7 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
             var parentDiv = video.parentNode;
             video.caller = "";
             var closeButton = document.createElement("div");
-            closeButton.className = "easyRTC_closeButton";
+            closeButton.className = "easyrtc_closeButton";
             closeButton.onclick = function() {
                 if (video.caller) {
                     easyrtc.hangup(video.caller);
@@ -3087,7 +3087,7 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
     );
 };
 
-var easyRTC = easyrtc; // an alias for the deprecated name 
+var easyrtc = easyrtc; // an alias for the deprecated name 
 
 //
 // the below code is a copy of the standard polyfill adapter.js
