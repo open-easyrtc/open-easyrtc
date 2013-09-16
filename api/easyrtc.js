@@ -151,7 +151,7 @@ easyrtc.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
             newRoomData[key] = roomParameters[key];
         }
     }
-    easyrtc.roomJoin[roomName] = newRoomData;
+
     if (failureCB === null) {
         failureCB = function(why) {
             easyrtc.showError("Unable to enter room " + roomName + " because " + why);
@@ -161,28 +161,32 @@ easyrtc.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
         var entry = {};
         entry[roomName] = newRoomData;
         easyrtc.sendSignalling(null, "roomJoin", {roomJoin: entry},
-        function(msgType, msg) {
-            var roomData = msg.roomData;
-            if (successCB) {
-                successCB(roomName);
-                easyrtc.lastLoggedInList[roomName] = {};
-                for (var key in roomData[roomName].clientList) {
-                    if (key !== easyrtc.myEasyrtcid) {
-                        easyrtc.lastLoggedInList[roomName][key] = roomData[roomName].clientList[key];
+            function(msgType, msg) {
+                easyrtc.roomJoin[roomName] = newRoomData;
+                var roomData = msg.roomData;
+                if (successCB) {
+                    successCB(roomName);
+                    easyrtc.lastLoggedInList[roomName] = {};
+                    for (var key in roomData[roomName].clientList) {
+                        if (key !== easyrtc.myEasyrtcid) {
+                            easyrtc.lastLoggedInList[roomName][key] = roomData[roomName].clientList[key];
+                        }
                     }
+                    easyrtc.roomOccupantListener(roomName, easyrtc.lastLoggedInList[roomName]);
                 }
-                easyrtc.roomOccupantListener(roomName, easyrtc.lastLoggedInList[roomName]);
+            },
+            function(errorCode, errorText) {
+                if (failureCB) {
+                    failureCB(errorCode, errorText, roomName);
+                }
+                else {
+                    easyrtc.showError("Unable to enter room " + roomName + " because " + why);
+                }
             }
-        },
-                function(errorCode, errorText) {
-                    if (failureCB) {
-                        failureCB(errorCode, errorText, roomName);
-                    }
-                    else {
-                        easyrtc.showError("Unable to enter room " + roomName + " because " + why);
-                    }
-                }
         );
+    }
+    else {
+        easyrtc.roomJoin[roomName] = newRoomData;
     }
 };
 
@@ -483,21 +487,21 @@ easyrtc.onError = function(errorObject) {
     if (easyrtc.debugPrinter) {
         easyrtc.debugPrinter("saw error " + errorObject.errText);
     }
-    var errorDiv = document.getElementById('easyRTCErrorDialog');
+    var errorDiv = document.getElementById('easyrtcErrorDialog');
     var errorBody;
     if (!errorDiv) {
         errorDiv = document.createElement("div");
-        errorDiv.id = 'easyRTCErrorDialog';
+        errorDiv.id = 'easyrtcErrorDialog';
         var title = document.createElement("div");
         title.innerHTML = "Error messages";
-        title.className = "easyRTCErrorDialog_title";
+        title.className = "easyrtcErrorDialog_title";
         errorDiv.appendChild(title);
         errorBody = document.createElement("div");
-        errorBody.id = "easyRTCErrorDialog_body";
+        errorBody.id = "easyrtcErrorDialog_body";
         errorDiv.appendChild(errorBody);
         var clearButton = document.createElement("button");
         clearButton.appendChild(document.createTextNode("Okay"));
-        clearButton.className = "easyRTCErrorDialog_okayButton";
+        clearButton.className = "easyrtcErrorDialog_okayButton";
         clearButton.onclick = function() {
             errorBody.innerHTML = ""; // remove all inner nodes
             errorDiv.style.display = "none";
@@ -506,9 +510,9 @@ easyrtc.onError = function(errorObject) {
         document.body.appendChild(errorDiv);
     }
     ;
-    errorBody = document.getElementById("easyRTCErrorDialog_body");
+    errorBody = document.getElementById("easyrtcErrorDialog_body");
     var messageNode = document.createElement("div");
-    messageNode.className = 'easyRTCErrorDialog_element';
+    messageNode.className = 'easyrtcErrorDialog_element';
     messageNode.appendChild(document.createTextNode(errorObject.errText));
     errorBody.appendChild(messageNode);
     errorDiv.style.display = "block";
@@ -1503,7 +1507,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     easyrtc.haveVideoTrack = function(easyrtcid) {
         return haveTracks(easyrtcid, false);
     };
-    
+
     /** Value returned by easyrtc.getConnectStatus if the other user isn't connected. */
     easyrtc.NOT_CONNECTED = "not connected";
     /** Value returned by easyrtc.getConnectStatus if the other user is in the process of getting connected */
@@ -2208,7 +2212,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             if (msg.targetGroup) {
                 targetting.targetGroup = msg.targetGroup;
             }
-            if( easyrtc.receivePeerCB) {
+            if (easyrtc.receivePeerCB) {
                 easyrtc.receivePeerCB(msg.senderEasyrtcid, msg.msgType, msg.msgData, targetting);
             }
         }
@@ -2381,9 +2385,6 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
 
         switch (msgType) {
-            case "token":
-                processToken(msg);
-                break;
             case "roomData":
                 processRoomData(msgData.roomData);
                 break;
@@ -2430,7 +2431,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         easyrtc.onError("Your HTML has not included the socket.io.js library");
     }
 
-    function connectToWSServer() {
+    function connectToWSServer(successCallback, errorCallback) {
 
         if (!easyrtc.webSocket) {
             easyrtc.webSocket = io.connect(easyrtc.serverPath, {
@@ -2473,7 +2474,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             }
             if (easyrtc.webSocketConnected) {
                 // sendAuthenticate();
-                sendAuthenticate();
+                sendAuthenticate(successCallback, errorCallback);
             }
             else {
                 errorCallback(easyrtc.errCodes.SIGNAL_ERROR, "Internal communications failure.");
@@ -2493,7 +2494,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             }
         });
     }
-    connectToWSServer();
+    connectToWSServer(successCallback, errorCallback);
 
     function  getStatistics(pc, track, results) {
         var successcb = function(stats) {
@@ -2616,7 +2617,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 easyrtc.debugPrinter("cfg=" + JSON.stringify(alteredData.added));
             }
             if (easyrtc.webSocket) {
-                sendSignalling(null, "setUserCfg", {setUserCfg:alteredData.added}, null, null);
+                sendSignalling(null, "setUserCfg", {setUserCfg: alteredData.added}, null, null);
             }
             easyrtc.oldConfig = newConfig;
         };
@@ -2694,60 +2695,47 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         if (easyrtc.debugPrinter) {
             easyrtc.debugPrinter("entered process token");
         }
-        if (msg.msgType === "token") {
-            var msgData = msg.msgData;
-            if (msgData.easyrtcid) {
-                easyrtc.myEasyrtcid = msgData.easyrtcid;
-            }
-            if (msgData.iceConfig) {
 
-                easyrtc.pc_config = {iceServers: []};
-                for (var i in msgData.iceConfig.iceServers) {
-                    var item = msgData.iceConfig.iceServers[i];
-                    var fixedItem;
-                    if (item.url.indexOf('turn:') === 0) {
-                        if (item.username) {
-                            fixedItem = createIceServer(item.url, item.username, item.credential);
-                        }
-                        else {
-                            var parts = item.url.substring("turn:".length).split("@");
-                            if (parts.length != 2) {
-                                easyrtc.showError("badparam", "turn server url looked like " + item.url);
-                            }
-                            var username = parts[0];
-                            var url = parts[1];
-                            fixedItem = createIceServer(url, username, item.credential);
-                        }
+        var msgData = msg.msgData;
+        if (msgData.easyrtcid) {
+            easyrtc.myEasyrtcid = msgData.easyrtcid;
+        }
+        if (msgData.iceConfig) {
+
+            easyrtc.pc_config = {iceServers: []};
+            for (var i in msgData.iceConfig.iceServers) {
+                var item = msgData.iceConfig.iceServers[i];
+                var fixedItem;
+                if (item.url.indexOf('turn:') === 0) {
+                    if (item.username) {
+                        fixedItem = createIceServer(item.url, item.username, item.credential);
                     }
-                    else { // is stun server entry
-                        fixedItem = item;
+                    else {
+                        var parts = item.url.substring("turn:".length).split("@");
+                        if (parts.length != 2) {
+                            easyrtc.showError("badparam", "turn server url looked like " + item.url);
+                        }
+                        var username = parts[0];
+                        var url = parts[1];
+                        fixedItem = createIceServer(url, username, item.credential);
                     }
-                    easyrtc.pc_config.iceServers.push(fixedItem);
                 }
+                else { // is stun server entry
+                    fixedItem = item;
+                }
+                easyrtc.pc_config.iceServers.push(fixedItem);
             }
-
-
-
-            if (successCallback) {
-                successCallback(easyrtc.myEasyrtcid, easyrtc.cookieOwner);
-            }
-
-            if (msgData.roomData) {
-                processRoomData(msg.msgData.roomData);
-            }
-
-
         }
-        else if (msg.msgType === "error") { // authenticate error
-            console.log(msg.msgType + ": " + msg.msgData.errorText);
-            easyrtc.showError(msg.msgData.errorCode, msg.msgData.errorText);
+
+
+
+        if (msgData.roomData) {
+            processRoomData(msg.msgData.roomData);
         }
-        else {
-            alert("Unexpected response to authentication message");
-        }
+
     }
 
-    function sendAuthenticate() {
+    function sendAuthenticate(successCallback, errorCallback) {
 
         //
         // find our easyrtsid
@@ -2788,12 +2776,24 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         if (easyrtc.credential) {
             msgData.credential = easyrtc.credential;
         }
-        // easyrtc.sendServer("authenticate", msgData, processToken);
+
         easyrtc.webSocket.json.emit("easyrtcAuth",
                 {msgType: "authenticate",
                     msgData: msgData
                 },
-        processToken);
+            function(msg) {
+                if (msg.msgType === "error") {
+                    errorCallback(msg.msgData.errorCode, msg.msgData.errorText);
+                    easyrtc.roomJoin = {};
+                }
+                else {
+                    processToken(msg);                
+                    if (successCallback) {
+                        successCallback(easyrtc.myEasyrtcid, easyrtc.cookieOwner);
+                    }
+                }
+            }
+        );
     }
 
 
