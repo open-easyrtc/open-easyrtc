@@ -42,8 +42,8 @@ function sendDummy() {
     easyrtc.sendDataWS(null, {msgType: "xxx", burp: "burp"});
 }
 
-function loginSuccess(easyRTCId) {
-    document.getElementById("stateLabel").innerHTML = " connected as " + easyRTCId;
+function loginSuccess(easyrtcId) {
+    document.getElementById("stateLabel").innerHTML = " connected as " + easyrtcId;
     console.log("logged in");
 }
 

@@ -283,9 +283,9 @@ function sendMessage(destTargetId, destRoom) {
 }
 
 
-function loginSuccess(easyRTCId) {
-    selfEasyrtcid = easyRTCId;
-    document.getElementById("iam").innerHTML = "I am " + easyRTCId;
+function loginSuccess(easyrtcId) {
+    selfEasyrtcid = easyrtcId;
+    document.getElementById("iam").innerHTML = "I am " + easyrtcId;
     refreshRoomList();
     document.getElementById('connectButton').disabled = true;
     document.getElementById('reconnectButton').disabled = false;

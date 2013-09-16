@@ -110,12 +110,12 @@ function performCall(otherEasyrtcid) {
 }
 
 
-function loginSuccess(easyRTCId) {
+function loginSuccess(easyrtcId) {
     disable("connectButton");
   //  enable("disconnectButton");
     enable('otherClients');
-    selfEasyrtcid = easyRTCId;
-    document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyRTCId);
+    selfEasyrtcid = easyrtcId;
+    document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyrtcId);
 }
 
 

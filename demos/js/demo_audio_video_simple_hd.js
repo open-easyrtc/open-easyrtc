@@ -75,9 +75,9 @@ function performCall(otherEasyrtcid) {
 }
 
 
-function loginSuccess(easyRTCId) {
-    selfEasyrtcid = easyRTCId;
-    document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyRTCId);
+function loginSuccess(easyrtcId) {
+    selfEasyrtcid = easyrtcId;
+    document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyrtcId);
 }
 
 
