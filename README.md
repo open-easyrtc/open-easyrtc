@@ -8,8 +8,8 @@ EasyRTC - ALPHA
 Priologic's EasyRTC beta, a bundle of Open Source WebRTC joy, incorporates an EasyRTC server install and client API, and working, HTML5 and Javascript, application source code under a BSD 2 license.
 
 
-ALPHA NOTE:
------
+ALPHA NOTE
+----------
 This *alpha* version of EasyRTC is rebuilt to be run as a node module, not as a complete application as previous versions were. There are many significant changes which should be understood before updating existing implementations.
 
 It is hoped that remaking EasyRTC as a module, along with the event driven server architecture, will make it much easier for developers to extend and customize their WebRTC applications with an easy upgrade method.
@@ -80,7 +80,7 @@ Folder Structure
 Included Demos
 --------------
 
-EasyRTC comes with a number of demo's which work immediatly after installation.
+EasyRTC comes with a number of demo's which work immediately after installation.
 
  * Video and/or Audio connections
  * Multi-party video chat
