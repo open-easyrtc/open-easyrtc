@@ -9,7 +9,7 @@
   },
 
   "dependencies" : {
-    "easyrtc"   : "git://github.com/dryswabbie/easyrtc.git#beta",
+    "easyrtc"   : "git://github.com/priologic/easyrtc.git#alpha",
     "express"   : "*",
     "socket.io" : "*"
   },

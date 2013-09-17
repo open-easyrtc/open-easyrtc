@@ -41,8 +41,10 @@ Documentation
 Installation In A Nutshell
 --------------------------
  1. Install [Node.js](http://nodejs.org)
- 2. Download and uncompress EasyRTC in the folder of your choice
- 3. Run `npm install` from the installation folder to install dependant packages
+ 2. Download files from the server_example(./server_example/) and place them in a local folder of your choice. 
+    - [package.json](./server_example/package.json)
+    - [server.js](./server_example/server.js)
+ 3. Run `npm install` from the installation folder to install dependant packages (including EasyRTC)
  4. Start EasyRTC by running `node server.js`
  5. Browse the examples using a WebRTC enabled browser. *(defaults to port `8080`)*
 
