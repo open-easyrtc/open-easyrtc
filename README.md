@@ -28,8 +28,8 @@ All documentation can be found within [the docs folder](./docs/).
 
 **EasyRTC Server**
 
- * [Install instructions for Ubuntu, Windows, and Mac](./docs/easyrtc_installing.md)
-     * `/docs/easyrtc_installing.md`
+ * [Install instructions for Ubuntu, Windows, and Mac](./docs/easyrtc_server_install.md)
+     * `/docs/easyrtc_server_install.md`
  * [Configuration options](./docs/easyrtc_server_configuration.md)
      * `/docs/easyrtc_server_configuration.md`
 
