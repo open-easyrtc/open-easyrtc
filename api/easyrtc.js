@@ -1,7 +1,7 @@
 /** @class
  *@version 0.8.1
  *<p>
- * Provides client side support for the easyrtc framework.
+ * Provides client side support for the EasyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
  * for more details.</p>
  *
@@ -40,21 +40,21 @@
 
 
 var easyrtc = {};
-/** Error codes that the easyrtc will use in the errCode field of error object passed
+/** Error codes that the EasyRTC will use in the errCode field of error object passed
  *  to error handler set by easyrtc.setOnError. The error codes are short printable strings.
  * @type Dictionary
  */
 easyrtc.errCodes = {
     BAD_NAME: "BAD_NAME", // a user name wasn't of the desired form 
-    DEVELOPER_ERR: "DEVELOPER_ERR", // the developer using the easyrtc library made a mistake
+    DEVELOPER_ERR: "DEVELOPER_ERR", // the developer using the EasyRTC library made a mistake
     SYSTEM_ERR: "SYSTEM_ERR", // probably an error related to the network
-    CONNECT_ERR: "CONNECT_ERR", // error occured when trying to create a connection
+    CONNECT_ERR: "CONNECT_ERR", // error occurred when trying to create a connection
     MEDIA_ERR: "MEDIA_ERR", // unable to get the local media
     MEDIA_WARNING: "MEDIA_WARNING", // didn't get the desired resolution
     INTERNAL_ERR: "INTERNAL_ERR"
 };
 easyrtc.apiVersion = "0.9.0a";
-/** Most basic message acknowledgement object */
+/** Most basic message acknowledgment object */
 easyrtc.ackMessage = {msgType: "ack", msgData: {}};
 /** Regular expression pattern for user ids. This will need modification to support non US character sets */
 easyrtc.userNamePattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,30}[a-zA-Z0-9]$/;
@@ -257,7 +257,7 @@ easyrtc.setApiKey = function(key) {
     easyrtc.credential = {apiKey: key};
 };
 /** Set the application name. Applications can only communicate with other applications
- * that share the sname API Key and application name. There is no predefined set of application
+ * that share the same API Key and application name. There is no predefined set of application
  * names. Maximum length is
  * @param {String} name
  * @example
@@ -416,7 +416,7 @@ easyrtc.acceptancePending = {};
 /** @private */
 var maxAppDefinedFieldsLength = 128;
 /**
- * Disconnect from the easyrtc server.
+ * Disconnect from the EasyRTC server.
  * @example 
  *    easyrtc.disconnect();
  */
@@ -468,8 +468,8 @@ easyrtc.setAppDefinedFields = function(fields) {
     }
 };
 /** Default error reporting function. The default implementation displays error messages
- *  in a programatically created div with the id easyrtcErrorDialog. The div has title
- *  component with a classname of easyrtcErrorDialog_title. The error messages get added to a
+ *  in a programmatically created div with the id easyrtcErrorDialog. The div has title
+ *  component with a class name of easyrtcErrorDialog_title. The error messages get added to a
  *  container with the id easyrtcErrorDialog_body. Each error message is a text node inside a div
  *  with a class of easyrtcErrorDialog_element. There is an "okay" button with the className of easyrtcErrorDialog_okayButton.
  *  @param {String} messageCode An error message code
@@ -675,8 +675,8 @@ easyrtc.enableVideo = function(enabled) {
     easyrtc.videoEnabled = enabled;
 };
 /**
- * Sets whether webrtc data channels are used to send inter-client messages.
- * This is only the messages that applications explicitly send to other applications, not the webrtc signalling messages.
+ * Sets whether WebRTC data channels are used to send inter-client messages.
+ * This is only the messages that applications explicitly send to other applications, not the WebRTC signaling messages.
  * @param {Boolean} enabled  true to use data channels, false otherwise. The default is false.
  * @example
  *     easyrtc.enableDataChannels(true);
@@ -687,7 +687,7 @@ easyrtc.enableDataChannels = function(enabled) {
 /**
  * Returns a URL for your local camera and microphone.
  *  It can be called only after easyrtc.initMediaSource has succeeded.
- *  It returns a url that can be used as a source by the chrome video element or the &lt;canvas&gt; element.
+ *  It returns a url that can be used as a source by the Chrome video element or the &lt;canvas&gt; element.
  *  @return {URL}
  *  @example
  *      document.getElementById("myVideo").src = easyrtc.getLocalStreamAsUrl();
@@ -784,7 +784,7 @@ easyrtc.formatError = function(x) {
     }
 };
 /** Initializes your access to a local camera and microphone.
- *  Failure could be caused a browser that didn't support webrtc, or by the user
+ *  Failure could be caused a browser that didn't support WebRTC, or by the user
  * not granting permission.
  * If you are going to call easyrtc.enableAudio or easyrtc.enableVideo, you need to do it before
  * calling easyrtc.initMediaSource. 
@@ -1035,11 +1035,11 @@ easyrtc.setVideoBandwidth = function(kbitsPerSecond) {
 
 /**
  * Sets a listener for data sent from another client (either peer to peer or via websockets).
- * @param {Function} listener has the signature (easyrtcid, msgType, data, targetting).
- *   msgType is a string. targetting is null if the message was received using WebRTC data channels, otherwise it
+ * @param {Function} listener has the signature (easyrtcid, msgType, data, targeting).
+ *   msgType is a string. targeting is null if the message was received using WebRTC data channels, otherwise it
  *   is an object that contains one or more of the following string valued elements {targetEasyrtcid, targetGroup, targetRoom}.
  * @example
- *     easyrtc.setPeerListener( function(easyrtcid, msgType, data, targetting) {
+ *     easyrtc.setPeerListener( function(easyrtcid, msgType, data, targeting) {
  *         ("From " + easyrtc.idToName(easyrtcid) + 
  *             " sent the follow data " + JSON.stringify(data));
  *     });
@@ -1082,7 +1082,7 @@ easyrtc.setServerListener = function(listener) {
  * The node.js server is great as a socket server, but it doesn't have
  * all the hooks you'd like in a general web server, like PHP or Python
  * plug-ins. By setting the serverPath your application can get it's regular
- * pages from a regular webserver, but the easyrtc library can still reach the
+ * pages from a regular webserver, but the EasyRTC library can still reach the
  * socket server.
  * @param {DOMString} socketUrl
  * @example
@@ -1090,7 +1090,7 @@ easyrtc.setServerListener = function(listener) {
  */
 easyrtc.setSocketUrl = function(socketUrl) {
     if (easyrtc.debugPrinter) {
-        easyrtc.debugPrinter("webrtc signaling server URL set to " + socketUrl);
+        easyrtc.debugPrinter("WebRTC signaling server URL set to " + socketUrl);
     }
     easyrtc.serverPath = socketUrl;
 };
@@ -1143,7 +1143,7 @@ easyrtc.setDisconnectListener = function(disconnectListener) {
     easyrtc.disconnectListener = disconnectListener;
 };
 /**
- * Convert an easyrtcid to a user name. This is useful for labelling buttons and messages
+ * Convert an easyrtcid to a user name. This is useful for labeling buttons and messages
  * regarding peers. 
  * @param {String} easyrtcid
  * @return {String} the username associated with the easyrtcid, or the easyrtcid if there is
@@ -1169,7 +1169,7 @@ easyrtc.pc_config = {};
 /** @private  */
 easyrtc.closedChannel = null;
 /**
- * Connects to the easyrtc signalling server. You must connect before trying to
+ * Connects to the EasyRTC signaling server. You must connect before trying to
  * call other users.
  * @param {String} applicationName is a string that identifies the application so that different applications can have different
  *        lists of users.
@@ -1193,7 +1193,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     easyrtc.closedChannel = null;
 
     if (easyrtc.debugPrinter) {
-        easyrtc.debugPrinter("attempt to connect to webrtc signalling server with application name=" + applicationName);
+        easyrtc.debugPrinter("attempt to connect to WebRTC signalling server with application name=" + applicationName);
     }
     var mediaConstraints = {
         'mandatory': {
@@ -1238,7 +1238,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     };
     easyrtc.disconnect = function() {
         if (easyrtc.debugPrinter) {
-            easyrtc.debugPrinter("attempt to disconnect from webrtc signalling server");
+            easyrtc.debugPrinter("attempt to disconnect from WebRTC signalling server");
         }
 
 
@@ -1277,7 +1277,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     }
 
     //
-    // This function is used to send webrtc signalling messages to another client. These messages all the form:
+    // This function is used to send WebRTC signaling messages to another client. These messages all the form:
     //   msgType: one of ["offer"/"answer"/"candidate","reject","hangup", "getRoomList"]
     //   targetEasyrtcid: someid or null
     //   msgData: either null or an SDP record
@@ -1362,14 +1362,14 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
      * Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).
      * @param {String msgType
      * @param {String} data - an object which can be JSON'ed.
-     * @param {Function} ackhandler - by default, the ackhandler handles acknowledgements from the server that your message was delivered to it's destination.
+     * @param {Function} ackhandler - by default, the ackhandler handles acknowledgments from the server that your message was delivered to it's destination.
      * However, application logic in the server can over-ride this. If you leave this null, a stub ackHandler will be used. The ackHandler
      * gets passed a message with the same msgType as your outgoing message, or a message type of "error" in which case
      * msgData will contain a errorCode and errorText fields.
      * @example 
      *    easyrtc.sendDataWS(someEasyrtcid, "setPostalAddress", {room:499, bldgNum:'asd'}, 
      *      function(ackmessage){
-     *          console.log("saw the following acknowledgement " + JSON.stringify(ackmessage));
+     *          console.log("saw the following acknowledgment " + JSON.stringify(ackmessage));
      *      }
      *    );
      */
@@ -1419,7 +1419,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
      * @param {String} destUser (an easyrtcid)
      * @param {String} msgType
      * @param {String} data - an object which can be JSON'ed.
-     * @param {Function} ackHandler - a function which receives acknowledgements. May only be invoked in
+     * @param {Function} ackHandler - a function which receives acknowledgments. May only be invoked in
      *  the websocket case.
      * @example 
      *    easyrtc.sendData(someEasyrtcid, {room:499, bldgNum:'asd'});
@@ -2870,16 +2870,16 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
     easyrtc.setGotMedia = function(gotMediaCB) {
         gotMediaCallback = gotMediaCB;
     };
-    /** Sets an event handler that gets called when a connection to the signalling
+    /** Sets an event handler that gets called when a connection to the signaling
      * server has or has not been made. Can only be called after calling easyrtc.initManaged.
      * @param {Function} gotConnectionCB has the signature (gotConnection, why)
      * @example 
      *    easyrtc.setGotConnection( function(gotConnection, why) {
      *        if( gotConnection ) {
-     *            console.log("Successfully connected to signalling server");
+     *            console.log("Successfully connected to signaling server");
      *        }
      *        else {
-     *            console.log("Failed to connect to signalling server because: " + why);
+     *            console.log("Failed to connect to signaling server because: " + why);
      *        }
      *    });
      */
