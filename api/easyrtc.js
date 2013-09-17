@@ -42,7 +42,7 @@
 var easyrtc = {};
 /** Error codes that the easyrtc will use in the errCode field of error object passed
  *  to error handler set by easyrtc.setOnError. The error codes are short printable strings.
- * @type Dictionary.
+ * @type Dictionary
  */
 easyrtc.errCodes = {
     BAD_NAME: "BAD_NAME", // a user name wasn't of the desired form 
