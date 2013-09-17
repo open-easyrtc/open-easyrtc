@@ -24,18 +24,28 @@ Features
 
 Documentation
 -------------
+All documentation can be found within [the docs folder](./docs/).
+
+**EasyRTC Server**
+
  * [Install instructions for Ubuntu, Windows, and Mac](./docs/easyrtc_installing.md)
      * `/docs/easyrtc_installing.md`
- * [Configuration options](./docs/easyrtc_configuration.md)
-     * `/docs/easyrtc_configuration.md`
+ * [Configuration options](./docs/easyrtc_server_configuration.md)
+     * `/docs/easyrtc_server_configuration.md`
+
+**EasyRTC Client API**
  * [Client API documentation](./docs/easyrtc_client_api.md)
      * `/docs/easyrtc_client_api.md`
  * [Client API tutorial](./docs/easyrtc_client_tutorial.md)
      * `/docs/easyrtc_client_tutorial.md`
+
+**General Development**
  * [Frequently asked questions](./docs/easyrtc_faq.md)
      * `/docs/easyrtc_faq.md`
  * [Upcoming features](./docs/easyrtc_upcoming_features.md)
      * `/docs/easyrtc_upcoming_features.md`
+ * [Changelog](./docs/easyrtc_changelog.md)
+     * `/docs/easyrtc_changelog.md`
 
 
 Installation In A Nutshell

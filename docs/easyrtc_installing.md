@@ -19,7 +19,7 @@ Ubuntu EasyRTC Install Steps:
     * chown the nodes folder to be owned by this user
     * ensure the node is run as that user.
 	
-4. Uncompress the EasyRTC package into the easyrtc folder
+4. Download files from the [server_example folder](../server_example/) into your EasyRTC application folder.
 
 5. Change to the easyrtc folder and then install node modules locally
     * `cd /var/nodes/easyrtc`
@@ -34,16 +34,18 @@ Windows EasyRTC Install Steps:
     * Click 'Install' to download the .msi file
     * Run the Node.js installer
 
-2. Uncompress the EasyRTC package into a folder of your choice.
+2. Create an EasyRTC application folder.
     * Note: Node is defaulted to browse to `%HOMEDRIVE%%HOMEPATH%`
     * ex: `C:\Users\USERNAME\nodes\easyrtc`
 
-3. In the start menu, launch the Node.js command prompt
+3. Download files from the [server_example folder](../server_example/) into your EasyRTC application folder.
 
-4. Navigate to the easyrtc folder. There should be a server.js and package.json file.
+4. In the start menu, launch the Node.js command prompt
+
+5. Navigate to the easyrtc folder. There should be a server.js and package.json file.
     * ex: `cd C:\Users\USERNAME\nodes\easyrtc`
 
-5. Run the node package manager to download dependencies. This will create a new folder called node_modules
+6. Run the node package manager to download dependencies. This will create a new folder called node_modules
     * `npm install`
 
 
@@ -57,7 +59,7 @@ Mac EasyRTC Install Steps:
     * By default node.js will be installed in /usr/local/bin/node and npm will be installed in /usr/local/bin/npm
     * Make sure /usr/local/bin is in your $PATH variable (echo $PATH)
 
-2. Uncompress the EasyRTC package into a folder of your choice.
+2. Download files from the [server_example folder](../server_example/) into a folder of your choice.
     * ex: `/Users/USERNAME/nodes/easyrtc`
 
 3. Open a terminal window by double-clicking on Terminal within the Applications/Utilities directory in finder
@@ -73,30 +75,7 @@ Mac EasyRTC Install Steps:
 Configuring EasyRTC (all platforms)
 -----------------------------------
 
-Open "config.js" in your favorite text editor. The file is located in the project root folder.
-
-**Changing the port:**
-
-1. The web/socket server port can be changed by altering config.httpPort (defaults to 8080).
-2. Ensure firewalls are set to allow connections to the ports
-
-**Enabling The Internal Experimental STUN Server: (optional)**
-
-Note 1: External public stun servers are freely provided by several companies. The default is one from Google.
-
-Note 2: The internal stun server is disabled by default but can be used in those circumstances where firewalls prevent their use or if corporate policy discourages outside server connections.
-
-Note 3: Before you begin, your server "should" have two addresses which resolve to itself. For simple development purposes, I've found duplicating a single address still can work.
-
-1. Set `config.experimentalStunServerEnable = true`
-2. Set the following address lines to IP addresses or domains which resolve to your server.
-    * `config.experimentalStunServerAddr0`
-    * `config.experimentalStunServerAddr1`
-3. Set the following ports to ones you wish to have open to answer STUN requests (defaults to 3478 and 3479).
-    * `config.experimentalStunServerPort0`
-    * `config.experimentalStunServerPort1`
-4. Ensure firewalls are set to allow connections to the ports
-
+Configuring EasyRTC is done within your application. See [easyrtc_server_configuration.md](easyrtc_server_configuration.md) for details.
 
 Running EasyRTC Server From Console
 -----------------------------------
