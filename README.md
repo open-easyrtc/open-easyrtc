@@ -41,7 +41,7 @@ Documentation
 Installation In A Nutshell
 --------------------------
  1. Install [Node.js](http://nodejs.org)
- 2. Download files from the server_example(./server_example/) and place them in a local folder of your choice. 
+ 2. Download files from [server_example/](./server_example/) and place them in a local folder of your choice. 
     - [package.json](./server_example/package.json)
     - [server.js](./server_example/server.js)
  3. Run `npm install` from the installation folder to install dependant packages (including EasyRTC)
