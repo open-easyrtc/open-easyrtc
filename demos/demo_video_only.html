@@ -3,6 +3,8 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  <!--skip-->
         <title>EasyRTC Demo: Video Only</title>
+                <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.js" />
+
         <!--hide-->
         <link rel="stylesheet" type="text/css" href="css/landing.css" />
 
@@ -116,7 +118,7 @@
                 <!-- Runs the SyntaxHighlighter -->
                 <script type="text/javascript">
                     loadAndFilter(window.location.href, "prettyHtml",2 );
-                    loadAndFilter(window.location.href.replace("/demos/", "/demos/js/").replace(/.html$/, ".js"), "prettyJS", 2);
+                    loadAndFilter(getHelperPath("js"), "prettyJS", 2);
                 </script>
                 
                 <!-- End Main Content -->

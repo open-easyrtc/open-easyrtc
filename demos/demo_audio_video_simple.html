@@ -3,6 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
         <title>EasyRTC Demo: Simple Audio and Video Chat</title>
+        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.js" />
 
         <!--hide-->
         <link rel="stylesheet" type="text/css" href="css/landing.css" />
@@ -35,7 +36,7 @@
 
                 <p>Connection is handled using an onload statement in the body. Requests are automatically accepted.<p>
 
-                <p>To hang-up on a call, hover your mouse over the upper right of the video, and click on the 'X' which appears.</p>
+                <p>To hang-up on a call, hover your mouse over the upper right of the video, and click on the 'X' which appears at the top right of other person's video object.</p>
 
                 <hr />
                 <h2>The Demo</h2>
@@ -66,7 +67,7 @@
                 </pre>
 
                 <h3>CSS</h3>
-                <p>In order to show the 'X' in the upper right corner, the callerVideo video tag must be in a div with relative positioning. Also the class of 'closeButton' should be defined as seen below. Ensure the button_close.png is available in the path.:</p>
+                <p>In order to show the 'X' in the upper right corner, the callerVideo video tag must be in a div with relative positioning.:</p>
                 <pre id="prettyCSS" class="prettyprint linenums:1">
                 </pre>
 
@@ -79,8 +80,8 @@
                 <!-- Runs the SyntaxHighlighter -->
                 <script type="text/javascript">
                     loadAndFilter(window.location.href, "prettyHtml",2 );
-                    loadAndFilter(window.location.href.replace("/demos/", "/demos/js/").replace(/.html$/, ".js"), "prettyJS", 2);
-                    loadAndFilter(window.location.href.replace("/demos/", "/demos/css/").replace(/.html$/, ".css"), "prettyCSS", 2);
+                    loadAndFilter(getHelperPath("js"), "prettyJS", 2);
+                    loadAndFilter(getHelperPath("css"), "prettyCSS", 2);
                 </script>
 
                 <!-- End Main Content -->
