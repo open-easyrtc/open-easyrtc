@@ -27,7 +27,6 @@ var selfEasyrtcid = "";
 
 
 function connect() {
-    console.log("Initializing.");
     easyrtc.enableDebug(false);
     easyrtc.setRoomOccupantListener(convertListToButtons);
     easyrtc.initManaged("easyrtc.audioVideo", "selfVideo", 
