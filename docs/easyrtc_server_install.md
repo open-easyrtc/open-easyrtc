@@ -19,7 +19,7 @@ Ubuntu EasyRTC Install Steps:
     * chown the nodes folder to be owned by this user
     * ensure the node is run as that user.
 	
-4. Uncompress the EasyRTC package into the easyrtc folder
+4. Download files from the [server_example folder](../server_example/) into your EasyRTC application folder.
 
 5. Change to the easyrtc folder and then install node modules locally
     * `cd /var/nodes/easyrtc`
@@ -34,16 +34,18 @@ Windows EasyRTC Install Steps:
     * Click 'Install' to download the .msi file
     * Run the Node.js installer
 
-2. Uncompress the EasyRTC package into a folder of your choice.
+2. Create an EasyRTC application folder.
     * Note: Node is defaulted to browse to `%HOMEDRIVE%%HOMEPATH%`
     * ex: `C:\Users\USERNAME\nodes\easyrtc`
 
-3. In the start menu, launch the Node.js command prompt
+3. Download files from the [server_example folder](../server_example/) into your EasyRTC application folder.
 
-4. Navigate to the easyrtc folder. There should be a server.js and package.json file.
+4. In the start menu, launch the Node.js command prompt
+
+5. Navigate to the easyrtc folder. There should be a server.js and package.json file.
     * ex: `cd C:\Users\USERNAME\nodes\easyrtc`
 
-5. Run the node package manager to download dependencies. This will create a new folder called node_modules
+6. Run the node package manager to download dependencies. This will create a new folder called node_modules
     * `npm install`
 
 
@@ -57,7 +59,7 @@ Mac EasyRTC Install Steps:
     * By default node.js will be installed in /usr/local/bin/node and npm will be installed in /usr/local/bin/npm
     * Make sure /usr/local/bin is in your $PATH variable (echo $PATH)
 
-2. Uncompress the EasyRTC package into a folder of your choice.
+2. Download files from the [server_example folder](../server_example/) into a folder of your choice.
     * ex: `/Users/USERNAME/nodes/easyrtc`
 
 3. Open a terminal window by double-clicking on Terminal within the Applications/Utilities directory in finder
@@ -79,9 +81,42 @@ Running the server from the console may be the best approach for development. It
 
 1. Open your console on the server.
     * In Windows you can use the provided Node.js console program located in the Start Menu.
-2. Navigate to the EasyRTC project folder
+2. Navigate to your EasyRTC application folder
 3. Run the server using the node command.
     * `node server.js`
+
+
+Running EasyRTC as a Service in Ubuntu
+--------------------------------------
+
+Below is a small upstart script which can be saved as /etc/init/easyrtc.conf
+
+    description "EasyRTC Node.js server"
+    author "Priologic Software Inc."
+
+    # Saves log to /var/log/upstart/easyrtc.log
+    console log
+
+    # Starts only after drives are mounted.
+    start on started mountall
+
+    stop on shutdown
+
+    # Automatically Respawn. But fail permanently if it respawns 10 times in 5 seconds:
+    respawn
+    respawn limit 10 5
+
+    script
+        # Note: To run as a non root user, use exec sudu -u USERNAME /var/nodes/easyrtc/server.js
+        exec /usr/bin/node /var/nodes/easyrtc/server.js
+    end script
+
+This will start EasyRTC at boot and allow you to start and stop the service in the console using the following:
+
+    sudo start easyrtc  
+    sudo stop easyrtc
+
+There are improvements which can be made such as increasing the open file limit, running the service as a non-root user, and adding notification commands to let administrators know of problems.
 
 
 Your First EasyRTC Server Program
@@ -118,190 +153,24 @@ or
 
 Note that some options can not be set after the `listen()` function has been run.
 
-
-Configuration Options
-=====================
+For complete details, read [server_configuration.md](server_configuration.md)
 
 
-Application Options
--------------------
+Start Browsing!
+---------------
 
-**appDefaultName**
-The default application a connection belongs to if it is not initially specified.
+Browsing EasyRTC should be a snap. If you have installed the server on your desktop machine with the default settings, you can browse to it by going to:
 
-Default Value:
- - "default"
+ * [http://localhost:8080/](http://localhost:8080/)
+ * [http://localhost:8080/demos/](http://localhost:8080/demos/)
 
-**appAutoCreateEnable**
-Enables the creation of rooms from the API. Occurs when client joins a nonexistent room.
+If the server is located on another computer, you can browse to it by knowing the IP address or domain name:
 
-Default Value:
- - true
+ * http://IPADDRESS:PORT/
 
 
-Room Options
-------------
+If You Run Into Problems
+------------------------
+Please feel free to post on our discussion forum:
 
-**roomDefaultName**
-The default room a connection joins if it is not initially specified.
-
-Default Value:
- - "default"
- 
-
-**roomAutoCreateEnable**
-Enables the creation of rooms from the API. Occurs when client joins a nonexistent room.
-
-Default Value:
- - false
-
-
-Connection Options
-------------------
-
-**connectionDefaultField**
-The defaults fields the server is expecting from the client API after a connection.
-
-
-Default Value:
- - {
-    browserFamily:  {share:true, regex:null, data:null},
-    browserMajor:   {share:true, regex:null, data:null},
-    osFamily:       {share:true, regex:null, data:null},
-    deviceFamily:   {share:true, regex:null, data:null}
-}
-
-
-API Hosting Options
--------------------
-
-**apiEnable**
-Enables hosting of the EasyRTC API files.
-
-Default Value:
- - true
-
-**apiPublicFolder**
-Api public folder without trailing slash. Note that the demos expect this to be '/easyrtc'
-
-Default Value:
- - "/easyrtc"
-
-**apiMinifyJsEnable**
-Minify's the API Javascript for faster transfer.
-
-Default Value:
- - true
-
-
-Demo Options
-------------
-
-**demosEnable**
-Enables the built in EasyRTC Demos. This should be disabled for a production site.
-
-Default Value:
- - true
- 
-**demosPublicFolder**
-Demos public folder without trailing slash.
-
-Default Value:
- - "/demos"
- 
-
-Log options
------------
-Only applies if internal 'log' event is used
-
-**logLevel**
-The minimum log level to show. (debug|info|warning|error|none)
-
-Default Value:
- - "info"
-
-**logDateEnable**
-Display timestamp in each log entry
-
-Default Value:
- - false
-
-**logErrorStackEnable**
-print the stack trace in logged errors when available
-
-Default Value:
- - true
-
-**logWarningStackEnable**
-print the stack trace in logged warnings when available
-
-Default Value:
- - true
-
-**logColorEnable**
-include console colors. Disable if forwarding logs to files or databases
-
-Default Value:
- - true
-
-**logObjectDepth**
-When objects are included in the log, this is the max depth the log will display
-
-Default Value:
- - 7
-
-
-Miscellaneous Server Options
-----------------------------
-
-**updateCheckEnable**
-Checks for updates
-
-Default Value:
- - true
-
-Regular expressions
--------------------
-For validating names and other input.
-
-**appNameRegExp**
-Application name
-
-Default Value:
- - /^[a-z0-9_.-]{1,32}$/i
-
-**roomNameRegExp**
-Room name
-
-Default Value:
- - /^[a-z0-9_.-]{1,32}$/i
-
-**groupNameRegExp**
-Group name
-
-Default Value:
- - /^[a-z0-9_.-]{1,32}$/i
-
-**fieldNameRegExp**
-Field names (for defining app and room custom fields)
-
-Default Value:
- - /^[a-z0-9_. -]{1,32}$/i
-
-**optionNameRegExp**
-Option names (for defining server options)
-
-Default Value:
- - /^[a-z0-9_. -]{1,32}$/i
-
-**easyrtcidRegExp**
-EasyRTC socket id (easyrtcid)
-
-Default Value:
- - /^[a-z0-9_.-]{1,32}$/i
-
-**sessionKeyRegExp**
-Session key (easyrtcsid)
-
-Default Value:
- - /^[a-z0-9_.-]{1,32}$/i
+ * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
