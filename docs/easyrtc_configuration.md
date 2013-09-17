@@ -1,6 +1,11 @@
 EasyRTC: Configuration
 ======================
 
+---
+**OLD FILE - See easyrtc_server_configuration.md**
+
+---
+
 config.js
 ---------
 

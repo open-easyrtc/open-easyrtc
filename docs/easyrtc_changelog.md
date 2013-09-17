@@ -6,7 +6,6 @@ v0.10.0a (note, alpha means alpha... please let us know of issues.)
 New Features:
  * Server/API - Rooms. An EasyRTC application can have multiple rooms. A user can be in one or more rooms at the same time. Users can only see other users in the same room. If no room is provided, connections will be entered into a room named `default`.
  * Server/API - Custom authentication method. Username / Credential can be provided. Username is broadcast to other authenticated users, so it may be used by apps.  
- * Server/API - Groups. A user can be in one or more groups. This is intended to be set via the authentication method.   
  * Server - Reworked to be node.js module. (BIGGEST NEW FEATURE)
  * Server - New server options handler. Allows possibility of server/application/room level options. Many new options available.
  * Server - Many new server events. This is intended to be the new primary way for developers to interact with EasyRTC server.
@@ -15,10 +14,13 @@ New Features:
 Changes:
  * Server/API - Delta lists. When the online list is changed, only the changed connections are broadcast. This should reduce bandwidth and improve scalability.
  * Server/API - Initial authentication and application setup now handled by a separate socket.io message type called 'easyrtcAuth'. This allows us to easily ignore other messages until a client has authenticated.
+ * Server - Better incoming message validation. Now it's handled once right after the message is received.
+ * Documentation - While the EasyRTC logo remains, when in text form, EasyRTC will have a capitol "E", which should make writing about it in sentences easier.
+
+Removed Features: 
  * Server - No longer includes modules for express, socket.io. These must now be included in your server app. (See our server examples)
  * Server - No longer uses the winston module for logging. The default listener logs to the console. This can be easily overruled by setting your own `log` listener.
- * Server - Better incoming message validation. Now it's handled once right after the message is received.
- * Documentation - While the EasyRTC logo remains, when in text form, EasyRTC will have a capitol "E", which should make writing about it in sentences easier.   
+ * Server - No longer includes the experimental STUN server. If there is enough demand we can release it as a separate module, otherwise there are several good STUN and TURN solutions now available.
 
 Fixes:
  * Lots. But please let us know if there's any others which need doing.
