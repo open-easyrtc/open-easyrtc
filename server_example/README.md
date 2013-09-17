@@ -9,7 +9,7 @@ Files and Folders:
  - package.json - Provides project information allowing npm to find and install required modules.
  - server.js - Server code.
  - /static/ - Root folder for web server. Put html files here!
- 
+
  
 Installing Required Modules:
 ----------------------------
