@@ -8,27 +8,26 @@ Overview
 
 EasyRTC is a framework built on top of WebRTC an emerging W3C/IETF standard for real time communication of audio, video, and data directly between web browsers.  WebRTC supports the transfer of audio, video and data on a peer-to-peer basis putting very little load on supporting servers. 
 
-The EasyRTC framework consists of a client or browser-side Javascript library and a backend Javascript server built on top of a node.js.  Because the WebRTC libraries is built into each browser there is no need for a browser plug-in. 
+The EasyRTC framework consists of a client or browser-side Javascript library and a backend Javascript server built on top of a node.js.  Because the WebRTC libraries will be built into each browser there is no need for a browser plug-in. 
 
 Google's Chrome browser version 23 or higher has the broadest support for the WebRTC API and other browsers are making great strides in incorporating WebRTC, including: Mozilla's Firefox and Opera. 
- 
+  
+This document is a tutorial for writing applications with the EasyRTC framework.  
 
 WebRTC has the potential once it is fully standardized to support audio and video chats and conferencing, multiplayer games and many other audio, video and data-based applications.
 
-As is often the case with software, with power comes complexity. WebRTC has a learning curve that is likely to hamper its use by web developers. To hide that complexity, Priologic has built the EasyRTC framework.
+As is often the case with software, with power comes complexity. WebRTC has a learning curve that is likely to hamper it's use by web developers. To hide that complexity, Priologic has built the EasyRTC framework.
 
 A WebRTC application usually needs to do most of the following steps.
 
 + Get access to the local camera and microphone in the form of a "media stream".
-+ Establish a connection to a signaling server.
++ Establish a connection to an EasyRTC server.
 + Initiate a call to a person on another browser.
 + Connect media streams to video tags.
 
 Using the EasyRTC framework, several of these steps can be collapsed into a single call, 
 vastly simplifying the developers job, particularly if the web developer is 
 trying to support multiple platforms.
-
-This document is a tutorial for writing applications with the EasyRTC framework. 
 
 Terminology
 -----------
@@ -296,7 +295,7 @@ We'll need two more calls for the involved version:
             
 The entire "involved" version of the Javascript looks like the below:
 
-    The mylogic2.js file:
+    The application2.js file:
          easyrtc.setStreamAcceptor( function(callerEasyrtcid, stream) {  
             var video = document.getElementById('caller');
             easyrtc.setVideoObjectSrc(video, stream);
@@ -431,7 +430,7 @@ of a second check coming in before the first has been responded to.
 
 ### Listening For Errors ###
 
-You can register an error callback to find out about errors using easyrtc.setOnError. The callback gets passed two arguments, an error cde and an error message.
+You can register an error callback to find out about errors using easyrtc.setOnError. The callback gets passed a single argument, an error message.
 Example usage:
 
     easyrtc.setOnError( function(errorCode, errorMessage) { console.log(errorMessage);}
@@ -439,7 +438,7 @@ Example usage:
 The errorCode parameter is a short string that is more intended for programmatic use than human consumption.
 
 ### Trading Notes ###
-
+destination, msgType, data, ackhandler
 You can send data (via websockets) to someone by calling easyrtc.sendDataWS as below:
 
     // easyrtc.sendDataWS( destination, messageType, messageData, ackHandler);    
@@ -466,7 +465,7 @@ The targetting parameter is present if the destination was specified as an objec
 To use data channels, each peer must enable data channels before calling (or accepting a call):
     easyrtc.enableDataChannels(true);
     
-It's then a good idea to listen for the events telling you that the datachannel to a particular peer is ready to be used,
+It's then a good idea to listen for the events telling you that datachannel to a particular peer is ready to be used,
 or that it's been closed.
     easyrtc.setDataChannelOpenListener(
         function(otherEasyrtcId) { console.log("channel is open");}
@@ -484,7 +483,7 @@ easyrtc.sendDataP2P:
 Listening is done with the same peerListener as used when sending message using websockets.
 
 Caveat emptor: At this point in time, the production releases of Firefox and Chrome can't talk to each other using data channels because
-Chrome only supports udp-like data channels and Firefox only supports tcp-like data channels.
+Chrome only supports unreliable data channels and Firefox only supports reliable ones.
             
 ### Are You Connected ###
 
