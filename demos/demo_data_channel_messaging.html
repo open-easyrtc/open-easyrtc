@@ -2,7 +2,8 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
-        <title>easyRTC Demo: Instant Messaging</title>
+        <title>EasyRTC Demo: Instant Messaging</title>
+        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.js" />
 
         <!--hide-->
         <link rel="stylesheet" type="text/css" href="css/landing.css" />
@@ -45,17 +46,17 @@
         <!--hide-->
         <div id="container">
             <div id="header">
-                <a href="index.html"><img id="logo_easyrtc" src="images/easyrtc_logo.png" alt="easyRTC" style="" /></a>
+                <a href="index.html"><img id="logo_easyrtc" src="images/easyrtc_logo.png" alt="EasyRTC" style="" /></a>
             </div>
-            <div id="menu"><a class="menu_link" href="index.html"><div class="menu_item">Local Demos</div></a><a class="menu_link" href="https://github.com/priologic/easyrtc/tree/master/docs"><div class="menu_item">Documentation</div></a><a class="menu_link" href="https://groups.google.com/forum/#!forum/easyrtc"><div class="menu_item">Support: Discussion Group</div></a><a class="menu_link" href="http://www.easyrtc.com/"><div class="menu_item">easyRTC.com</div></a></div>
+            <div id="menu"><a class="menu_link" href="index.html"><div class="menu_item">Local Demos</div></a><a class="menu_link" href="https://github.com/priologic/easyrtc/tree/master/docs"><div class="menu_item">Documentation</div></a><a class="menu_link" href="https://groups.google.com/forum/#!forum/easyrtc"><div class="menu_item">Support: Discussion Group</div></a><a class="menu_link" href="http://www.easyrtc.com/"><div class="menu_item">EasyRTC.com</div></a></div>
             <div id="main">
                 <!-- Main Content -->
-                <h1>easyRTC Demo: Data Channel Messaging</h1>
-                <p>This application demonstrates text messaging using data channels via the easyRTC.sendDataWS method.</p>
+                <h1>EasyRTC Demo: Data Channel Messaging</h1>
+                <p>This application demonstrates text messaging using data channels via the easyrtc.sendDataP2P method.</p>
 
                 <p class="alert"><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" />
-                    The specification for data channels is in flux, with browsers currently taking different paths.<br />
-                    We are hoping the specification to solidify by mid 2013.</p>
+                    The specification for data channels is in flux, with Firefox and Chrome currently being incompatible.<br />
+                </p>
 
                 <hr />
 
@@ -71,6 +72,23 @@
                     <div id="conversation"></div>	  
                 </div>
 		  <!--hide-->
+                <hr />
+
+                <h2>Works In:</h2>
+                <table>
+                    <tr>
+                        <th><a href="http://www.chromium.org/getting-involved/dev-channel"><img title="Chrome Canary" alt="Chrome Canary" height="32" width="32" src="images/br_chrome_canary.png" /></a></th>
+                        <td>Requires RTCDataChannel flag to be set in chrome://flags</td>
+                    </tr>        
+                    <tr>
+                        <th><a href="http://www.mozilla.org/en-US/firefox/aurora/"><img title="Firefox Aurora" alt="Firefox Aurora" height="32" width="32" src="images/br_ff_aurora.png" /></a></th>
+                        <td>Requires PeerConnection flag to be set in about:config</td>
+                    </tr>        
+                    <tr>
+                        <th><a href="http://nightly.mozilla.org/"><img title="Firefox Nightly" alt="Firefox Nightly" height="32" width="32" src="images/br_ff_nightly.png" /></a></th>
+                        <td>Requires PeerConnection flag to be set in about:config</td>
+                    </tr>        
+                </table>
 
                 <hr />
 
@@ -88,7 +106,7 @@
                 <!-- Runs the SyntaxHighlighter -->
                 <script type="text/javascript">
                     loadAndFilter(window.location.href, "prettyHTML",2 );
-                    loadAndFilter(window.location.href.replace("/demos/", "/demos/js/").replace(/.html$/, ".js"), "prettyJS", 2);
+                    loadAndFilter(getHelperPath("js"), "prettyJS", 2);
                 </script>
 
                 <!-- End Main Content -->
@@ -96,9 +114,9 @@
 
             <div id="footer">
                 <a href="http://www.priologic.com/?from=landing"><img id="logo_priologic" src="images/priologic_logo_white.png" height="40" width="150" alt="Created By Priologic Software Inc." /></a>
-                <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="/easyrtc/img/powered_by_easyrtc.png" height="60" width="200" alt="Powered By easyRTC" /></a>
+                <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="/easyrtc/img/powered_by_easyrtc.png" height="60" width="200" alt="Powered By EasyRTC" /></a>
                 <p><em>&copy; 2013 - Priologic Software Inc., All Rights Reserved.</em></p>
-                <p id="license">easyRTC source code released under a BSD2 Lcense. <a href="https://github.com/priologic/easyrtc/blob/master/LICENSE">See LICENSE file in project folder</a> for details.</p>
+                <p id="license">EasyRTC source code released under a BSD2 Lcense. <a href="https://github.com/priologic/easyrtc/blob/master/LICENSE">See LICENSE file in project folder</a> for details.</p>
             </div>
 
             <br>

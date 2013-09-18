@@ -1,12 +1,40 @@
-easyRTC: Change Log
+EasyRTC: Change Log
 ===================
 
-v0.9.0b
+v0.10.0a (note, alpha means alpha... please let us know of issues.)
+-------
+New Features:
+ * Server/API - Rooms. An EasyRTC application can have multiple rooms. A user can be in one or more rooms at the same time. Users can only see other users in the same room. If no room is provided, connections will be entered into a room named `default`.
+ * Server/API - Custom authentication method. Username / Credential can be provided. Username is broadcast to other authenticated users, so it may be used by apps.  
+ * Server - Reworked to be node.js module. (BIGGEST NEW FEATURE)
+ * Server - New server options handler. Allows possibility of server/application/room level options. Many new options available.
+ * Server - Many new server events. This is intended to be the new primary way for developers to interact with EasyRTC server.
+ * Documentation - New documentation for internal EasyRTC command messages which highlight how the API and server communicate to each other.
+
+Changes:
+ * Server/API - Delta lists. When the online list is changed, only the changed connections are broadcast. This should reduce bandwidth and improve scalability.
+ * Server/API - Initial authentication and application setup now handled by a separate socket.io message type called 'easyrtcAuth'. This allows us to easily ignore other messages until a client has authenticated.
+ * Server - Better incoming message validation. Now it's handled once right after the message is received.
+ * Documentation - While the EasyRTC logo remains, when in text form, EasyRTC will have a capitol "E", which should make writing about it in sentences easier.
+
+Removed Features: 
+ * Server - No longer includes modules for express, socket.io. These must now be included in your server app. (See our server examples)
+ * Server - No longer uses the winston module for logging. The default listener logs to the console. This can be easily overruled by setting your own `log` listener.
+ * Server - No longer includes the experimental STUN server. If there is enough demand we can release it as a separate module, otherwise there are several good STUN and TURN solutions now available.
+
+Fixes:
+ * Lots. But please let us know if there's any others which need doing.
+
+Upgrade Note:
+ * This is a major release which will require existing installations to carefully upgrade.
+
+
+v0.9.0
 ------
 
 New Features:
- * API - new easyRTC.setPeerListener() function. Sets a listener for data sent from another client. Replacement for set data listener.
- * API - new easyRTC.setServerListener() function. Listens for messages from the server which are not from another peer.
+ * API - new easyrtc.setPeerListener() function. Sets a listener for data sent from another client. Replacement for set data listener.
+ * API - new easyrtc.setServerListener() function. Listens for messages from the server which are not from another peer.
 
 Changes:
  * API - Implementing methods used in Google's adapter.js for cross browser support
@@ -19,7 +47,7 @@ Changes:
 Fixes:
  * API - Firefox - Strips TURN servers from ICE config if they are present. Firefox doesn't currently handle TURN servers well.
  * API - Added one second delay to getUserMedia call to try and correct some page loading problems.
-
+ 
 
 v0.8.0
 ------
@@ -37,7 +65,7 @@ New Features:
  * Server - Added socket.io options to config.js. Note that socketIoClientGzipEnabled is now false by default as gzip causes issues on some servers (often Windows).
  * Demos - Added a screen sending and screen receiving demo. These tend to crash the browser at this point. Hopefully Google will get that feature working properly again.
  * Demos - Added a multiperson tablet-oriented chat demo that runs very nicely on your Android devices.
- * Documentation - Moved the client API documentation from mark-down format to jsDoc and added inline examples. Check out the easyRTC.html file in the docs directory. The easyrtcjs.html file is a helper file that shouldn't be looked at directly.
+ * Documentation - Moved the client API documentation from mark-down format to jsDoc and added inline examples. Check out the easyrtc.html file in the docs directory. The easyrtcjs.html file is a helper file that shouldn't be looked at directly.
 
 Changes:
  * Demos - In demos which show the local media stream as both audio and video (as a mirror), the video object with the local media stream is muted and given a volume of 0.
@@ -56,10 +84,10 @@ v0.7.0
 New Features:
 
  * API - Added initial support for Data Channels.
- * API - Added more debugging output and provided a means to control it through the easyRTC.debugPrinter variable and easyRTC.enableDebug function.
+ * API - Added more debugging output and provided a means to control it through the easyrtc.debugPrinter variable and easyrtc.enableDebug function.
  * API - Added code to log application state (WRT webrtc) to the server.
- * API - New function setSocketUrl() to point to web socket server. Allows website to be hosted using a seperate server (suchs as Apache). The default remains for the easyRTC server to function as both the web and socket server.
- * API - Support for hanging up on calls still being set up - on the initiating side by extending the easyRTC.hangup function, and on the receiving side by adding the easyRTC.setCallCancelled callback setter.
+ * API - New function setSocketUrl() to point to web socket server. Allows website to be hosted using a seperate server (suchs as Apache). The default remains for the EasyRTC server to function as both the web and socket server.
+ * API - Support for hanging up on calls still being set up - on the initiating side by extending the easyrtc.hangup function, and on the receiving side by adding the easyrtc.setCallCancelled callback setter.
  * API - Added easyrtc.getConnectStatus function to get the state of a connection to a peer.
  * Server - SSL support for web and socket server including non-ssl forwarding.
  * Server - Logging features. Both console and file based logging with fine-grained configuration.
@@ -70,8 +98,8 @@ New Features:
 
 Changes:
 
- * API - The callSuccessCB argument to easyRTC.call now has a second argument, which can be either 'audiovideo' or 'datachannel'. The callSuccessCB function may be get called twice if the peer connection is using data channels as well as audio or video.
- * API - Fixed easyRTC.connect so that you can reconnect after calling disconnect.
+ * API - The callSuccessCB argument to easyrtc.call now has a second argument, which can be either 'audiovideo' or 'datachannel'. The callSuccessCB function may be get called twice if the peer connection is using data channels as well as audio or video.
+ * API - Fixed easyrtc.connect so that you can reconnect after calling disconnect.
  * Server - Websocket 'onMessage' section moved to external function for easier editing.
  * Server - Much of the general server code moved to external functions.
  * Demos - Various visual html fixes and changes.

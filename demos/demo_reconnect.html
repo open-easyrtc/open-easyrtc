@@ -2,7 +2,8 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
-        <title>easyRTC Demo: Reconnect</title>
+        <title>EasyRTC Demo: Reconnect</title>
+        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.js" />
 
         <!--show-->    
         <!-- Assumes global locations for socket.io.js and easyrtc.js -->
@@ -12,7 +13,7 @@
     </head>
     <body onload="initApp()">
         State = <div id="stateLabel">Unconnected</div>
-        <button onclick="easyRTC.updateConfigurationInfo()">Update ConfigurationInfo</button>
+        <button onclick="easyrtc.updateConfigurationInfo()">Update ConfigurationInfo</button>
         <button onclick="sendDummy()">send message</button>
     </body>
 </html>

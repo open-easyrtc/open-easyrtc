@@ -1,66 +1,86 @@
-![easyRTC](./api/img/easyrtc.png "easyRTC")
-easyRTC
+![EasyRTC](./api/img/easyrtc.png "EasyRTC")
+
+EasyRTC - ALPHA
 =======
 
 **A bundle of Open Source WebRTC joy!**
 
-Priologic's easyRTC beta, a bundle of Open Source WebRTC joy, incorporates an easyRTC server install and client API, and working, HTML5 and Javascript, application source code under a BSD 2 license.
+Priologic's EasyRTC beta, a bundle of Open Source WebRTC joy, incorporates an EasyRTC server install and client API, and working, HTML5 and Javascript, application source code under a BSD 2 license.
+
+
+ALPHA NOTE
+----------
+This *alpha* version of EasyRTC is rebuilt to be run as a node module, not as a complete application as previous versions were. There are many significant changes which should be understood before updating existing implementations.
+
+It is hoped that remaking EasyRTC as a module, along with the event driven server architecture, will make it much easier for developers to extend and customize their WebRTC applications with an easy upgrade method.
 
 
 Features
 --------
- * Install easyRTC's WebRTC Server Kit on your own Linux, Windows, or Mac server in minutes not days.
- * Use our easyRTC API and sample application code to build and deploy your WebRTC app in hours not weeks.
- * easyRTC is completely free and open source under a BSD 2 license. No usage costs or other hidden fees.
+ * Install EasyRTC's WebRTC Server Kit on your own Linux, Windows, or Mac server in minutes not days.
+ * Use our EasyRTC API and sample application code to build and deploy your WebRTC app in hours not weeks.
+ * EasyRTC is completely free and open source under a BSD 2 license. No usage costs or other hidden fees.
 
 
 Documentation
 -------------
- * [Install instructions for Ubuntu, Windows, and Mac](./docs/easyrtc_installing.md)
- * [Configuration options](./docs/easyrtc_configuration.md)
- * [Client API documentation](http://htmlpreview.github.io/?https://raw.github.com/priologic/easyrtc/master/docs/easyRTC.html)
+All documentation can be found within [the docs folder](./docs/).
+
+**EasyRTC Server**
+
+ * [Install instructions for Ubuntu, Windows, and Mac](./docs/easyrtc_server_install.md)
+     * `/docs/easyrtc_server_install.md`
+ * [Configuration options](./docs/easyrtc_server_configuration.md)
+     * `/docs/easyrtc_server_configuration.md`
+
+**EasyRTC Client API**
+ * [Client API documentation](./docs/easyrtc_client_api.md)
+     * `/docs/easyrtc_client_api.md`
  * [Client API tutorial](./docs/easyrtc_client_tutorial.md)
+     * `/docs/easyrtc_client_tutorial.md`
+
+**General Development**
  * [Frequently asked questions](./docs/easyrtc_faq.md)
+     * `/docs/easyrtc_faq.md`
  * [Upcoming features](./docs/easyrtc_upcoming_features.md)
+     * `/docs/easyrtc_upcoming_features.md`
+ * [Changelog](./docs/easyrtc_changelog.md)
+     * `/docs/easyrtc_changelog.md`
 
 
 Installation In A Nutshell
 --------------------------
  1. Install [Node.js](http://nodejs.org)
- 2. Download and uncompress easyRTC in the folder of your choice
- 3. Run `npm install` from the installation folder to install dependant packages
- 4. Start easyRTC by running `node server.js`
+ 2. Download files from [server_example/](./server_example/) and place them in a local folder of your choice. 
+    - [package.json](./server_example/package.json)
+    - [server.js](./server_example/server.js)
+ 3. Run `npm install` from the installation folder to install dependant packages (including EasyRTC)
+ 4. Start EasyRTC by running `node server.js`
  5. Browse the examples using a WebRTC enabled browser. *(defaults to port `8080`)*
 
-Step by step instructions including additional setup options can be found in [/docs/easyrtc_installing.md](./docs/easyrtc_installing.md)
+Step by step instructions including additional setup options can be found in `/docs/easyrtc_installing.md`
 
 
 Folder Structure
 ----------------
 
 * / (root)
-  * Contains the main file (server.js) and the configuration file (config.js)
   * Licenses and package information
 * /demos/
-  * easyRTC live demos and example code
+  * EasyRTC live demos and example code
 * /docs/
   * Documentation for using the API and running the server
 * /lib/
   * Required libraries
-* /logs/
-  * Default location of file logs (disabled by default)
 * /node_modules/
   * Required node.js modules
   * This folder will be created during the install
-* /static/
-  * Where you can put your own WebRTC application.
-  * The easyrtc.js file is located in /static/js/
 
 
 Included Demos
 --------------
 
-easyRTC comes with a number of demo's which work immediatly after installation.
+EasyRTC comes with a number of demo's which work immediately after installation.
 
  * Video and/or Audio connections
  * Multi-party video chat
@@ -71,7 +91,7 @@ easyRTC comes with a number of demo's which work immediatly after installation.
 Links for help and information
 ------------------------------
 
-* The easyRTC website is at:
+* The EasyRTC website is at:
   * [http://www.easyrtc.com/](http://www.easyrtc.com/)
 * Use our support forum is at:
   * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
@@ -81,7 +101,6 @@ Links for help and information
   * [https://github.com/priologic/easyrtc/issues](https://github.com/priologic/easyrtc/issues)
 * Our YouTube channel has live demo's:
   * [http://www.youtube.com/user/priologic](http://www.youtube.com/user/priologic)
-  * [![Installing easyRTC Using Git](http://img.youtube.com/vi/Nq042zJ_em4/0.jpg)](http://www.youtube.com/watch?v=Nq042zJ_em4)
 
 
 License

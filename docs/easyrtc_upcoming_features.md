@@ -1,14 +1,11 @@
-easyRTC: Upcoming Features
+EasyRTC: Upcoming Features
 ==========================
 
-There are many exciting features we are looking to add to easyRTC in upcoming releases.
+There are many exciting features we are looking to add to EasyRTC in upcoming releases.
 
 General Features
 ----------------
-* Better authentication support
-* Rooms
-* Groups (aka roles)
-* Faster and better 'Who is online?' lists.
+* TURN server support
 
 API Specific Features
 ---------------------
