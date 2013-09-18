@@ -220,7 +220,7 @@ function convertListToButtons(roomName, data, isPrimary) {
                 presenceText += "show=" + data[i].presence.show + " ";
             }
             if( data[i].presence.status) {
-                presenceText += "status" + data[i].presence.status;
+                presenceText += "status=" + data[i].presence.status;
             }
             presenceText += ")";
         }
