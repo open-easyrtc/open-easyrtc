@@ -172,8 +172,6 @@ pip-log.txt
 node_modules
 
 #########
-# EasyRTC
+# easyRTC
 #########
 *.log
-config_override.js
-nbproject

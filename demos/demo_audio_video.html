@@ -2,8 +2,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
-        <title>EasyRTC Demo: Audio and Video Chat</title>
-        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.js" />
+        <title>easyRTC Demo: Audio and Video Chat</title>
 
         <!--hide-->
         <link rel="stylesheet" type="text/css" href="css/landing.css" />
@@ -67,14 +66,14 @@
         <div id="container">
 
             <div id="header">
-                <a href="index.html"><img id="logo_easyrtc" src="images/easyrtc_logo.png" alt="EasyRTC" style="" /></a>
+                <a href="index.html"><img id="logo_easyrtc" src="images/easyrtc_logo.png" alt="easyRTC" style="" /></a>
             </div>
-            <div id="menu"><a class="menu_link" href="index.html"><div class="menu_item">Local Demos</div></a><a class="menu_link" href="https://github.com/priologic/easyrtc/tree/master/docs"><div class="menu_item">Documentation</div></a><a class="menu_link" href="https://groups.google.com/forum/#!forum/easyrtc"><div class="menu_item">Support: Discussion Group</div></a><a class="menu_link" href="http://www.easyrtc.com/"><div class="menu_item">EasyRTC.com</div></a></div>
+            <div id="menu"><a class="menu_link" href="index.html"><div class="menu_item">Local Demos</div></a><a class="menu_link" href="https://github.com/priologic/easyrtc/tree/master/docs"><div class="menu_item">Documentation</div></a><a class="menu_link" href="https://groups.google.com/forum/#!forum/easyrtc"><div class="menu_item">Support: Discussion Group</div></a><a class="menu_link" href="http://www.easyrtc.com/"><div class="menu_item">easyRTC.com</div></a></div>
             <div id="main">
 
                 <!--hide-->
                 <!-- Main Content -->
-                <h1>EasyRTC Demo: Audio and Video Chat</h1>
+                <h1>easyRTC Demo: Audio and Video Chat</h1>
 
                 <p>The application provides an audio-video chat where sharing of audio and video can be controlled individually before connection.</p>
 
@@ -98,7 +97,7 @@
                     </div>
 
                     <div id="videos"> 
-                        <video autoplay="autoplay" id="selfVideo"  class="easyrtcMirror" muted="muted" volume="0"></video>
+                        <video autoplay="autoplay" id="selfVideo"  class="easyRTCMirror" muted="muted" volume="0"></video>
                         <video autoplay="autoplay" id="callerVideo"></video>
                         <div id="acceptCallBox"> <!-- Should be initially hidden using CSS -->
                             <div id="acceptCallLabel"></div>
@@ -108,6 +107,7 @@
                 </div>
                 <!--hide-->
                 <br style="clear:both;" />
+                <p><em>Browser Note: Until there is better interoperability among browsers, both clients may need to be using the same browser.</em></p>
                 <hr />
 
                 <h2>The Code</h2>
@@ -123,7 +123,7 @@
                 <!-- Runs the SyntaxHighlighter -->
                 <script type="text/javascript">
                     loadAndFilter(window.location.href, "prettyHTML",2 );
-                    loadAndFilter(getHelperPath("js"), "prettyJS", 2);
+                    loadAndFilter(window.location.href.replace("/demos/", "/demos/js/").replace(/.html$/, ".js"), "prettyJS", 2);
                 </script>
 
                 <!-- End Main Content -->
@@ -131,9 +131,9 @@
             </div>
             <div id="footer">
                 <a href="http://www.priologic.com/?from=landing"><img id="logo_priologic" src="images/priologic_logo_white.png" height="40" width="150" alt="Created By Priologic Software Inc." /></a>
-                <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="/easyrtc/img/powered_by_easyrtc.png" height="60" width="200" alt="Powered By EasyRTC" /></a>
+                <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="/easyrtc/img/powered_by_easyrtc.png" height="60" width="200" alt="Powered By easyRTC" /></a>
                 <p><em>&copy; 2013 - Priologic Software Inc., All Rights Reserved.</em></p>
-                <p id="license">EasyRTC source code released under a BSD2 License. <a href="https://github.com/priologic/easyrtc/blob/master/LICENSE">See LICENSE file in project folder</a> for details.</p>
+                <p id="license">easyRTC source code released under a BSD2 Lcense. <a href="https://github.com/priologic/easyrtc/blob/master/LICENSE">See LICENSE file in project folder</a> for details.</p>
             </div>
         </div>
         <!--show-->

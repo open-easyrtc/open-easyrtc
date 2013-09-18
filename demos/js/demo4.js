@@ -27,10 +27,11 @@ var selfEasyrtcid = "";
 
 
 function connect() {
-    easyrtc.enableDebug(false);
-    easyrtc.setRoomOccupantListener(convertListToButtons);
-    easyrtc.initManaged("easyrtc.audioVideo", "selfVideo", 
-       ["callerVideo", "callerVideo2", "callerVideo3"], loginSuccess, loginFailure);
+    console.log("Initializing.");
+    easyRTC.enableDebug(false);
+    easyRTC.setLoggedInListener(convertListToButtons);
+    easyRTC.initManaged("audioVideo", "selfVideo", 
+       ["callerVideo", "callerVideo2", "callerVideo3"], loginSuccess);
 }
 
 
@@ -42,7 +43,7 @@ function clearConnectList() {
 }
 
 
-function convertListToButtons (roomName, data, isPrimary) {
+function convertListToButtons (data) {
     clearConnectList();
     otherClientDiv = document.getElementById('otherClients');
     for(var i in data) {
@@ -50,7 +51,7 @@ function convertListToButtons (roomName, data, isPrimary) {
         button.onclick = function(easyrtcid) {
             return function() {
                 performCall(easyrtcid);
-            };
+            }
         }(i);
 
         label = document.createTextNode(i);
@@ -65,25 +66,25 @@ function performCall(otherEasyrtcid) {
         if( !accepted ) {
             alert("Sorry, your call to " + caller + " was rejected");
         }
-    };
+    }
     var successCB = function() {};
     var failureCB = function() {};
-    easyrtc.call(otherEasyrtcid, successCB, failureCB, acceptedCB);
+    easyRTC.call(otherEasyrtcid, successCB, failureCB, acceptedCB);
 }
 
 
-function loginSuccess(easyrtcId) {
-    selfEasyrtcid = easyrtcId;
-    document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyrtcId);
+function loginSuccess(easyRTCId) {
+    selfEasyrtcid = easyRTCId;
+    document.getElementById("iam").innerHTML = "I am " + easyRTC.cleanId(easyRTCId);
 }
 
 
-function loginFailure(errorCode, message) {
-    easyrtc.showError(errorCode, message);
+function loginFailure(message) {
+    alert("failure to login");
 }
 
 
 // Sets calls so they are automatically accepted (this is default behaviour)
-easyrtc.setAcceptChecker(function(caller, cb) {
+easyRTC.setAcceptChecker(function(caller, cb) {
     cb(true);
 } );

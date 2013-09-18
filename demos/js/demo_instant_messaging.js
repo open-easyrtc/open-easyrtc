@@ -24,7 +24,8 @@
 //POSSIBILITY OF SUCH DAMAGE.
 //
 var selfEasyrtcid = "";
-function addToConversation(who, msgType, content) {
+
+function addToConversation(who, content) {
     // Escape html special characters, then add linefeeds.
     content = content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     content = content.replace(/\n/g, '<br />');
@@ -34,13 +35,13 @@ function addToConversation(who, msgType, content) {
 
 
 function connect() {
-    easyrtc.setDataListener(addToConversation);
-    easyrtc.setRoomOccupantListener(convertListToButtons);
-    easyrtc.connect("easyrtc.instantMessaging", loginSuccess, loginFailure);
+    easyRTC.setDataListener(addToConversation);
+    easyRTC.setLoggedInListener(convertListToButtons);
+    easyRTC.connect("im", loginSuccess, loginFailure);
 }
 
 
-function convertListToButtons (roomName, data, isPrimary) {
+function convertListToButtons (data) {
     otherClientDiv = document.getElementById('otherClients');
     while (otherClientDiv.hasChildNodes()) {
         otherClientDiv.removeChild(otherClientDiv.lastChild);
@@ -51,9 +52,9 @@ function convertListToButtons (roomName, data, isPrimary) {
         button.onclick = function(easyrtcid) {        
             return function() {
                 sendStuffWS(easyrtcid);
-            };
+            }
         }(i);        
-        var label = document.createTextNode("Send to " + easyrtc.idToName(i));
+        var label = document.createTextNode("Send to " + easyRTC.idToName(i));
         button.appendChild(label);
                 
         otherClientDiv.appendChild(button);        
@@ -66,22 +67,22 @@ function convertListToButtons (roomName, data, isPrimary) {
 
 function sendStuffWS(otherEasyrtcid) {    
     var text = document.getElementById('sendMessageText').value;    
-    if(text.replace(/\s/g, "").length === 0) { // Don't send just whitespace
+    if(text.replace(/\s/g, "").length == 0) { // Don't send just whitespace
         return;
     }
     
-    easyrtc.sendDataWS(otherEasyrtcid, "message",  text);
-    addToConversation("Me", "message", text);
+    easyRTC.sendDataWS(otherEasyrtcid, text);
+    addToConversation("Me", text);
     document.getElementById('sendMessageText').value = "";        
 }
 
 
-function loginSuccess(easyrtcId) {
-    selfEasyrtcid = easyrtcId;
-    document.getElementById("iam").innerHTML = "I am " + easyrtcId;
+function loginSuccess(easyRTCId) {
+    selfEasyrtcid = easyRTCId;
+    document.getElementById("iam").innerHTML = "I am " + easyRTCId;
 }
 
 
-function loginFailure(errorCode, message) {
-    easyrtc.showError(errorCode, message);
+function loginFailure(message) {
+    easyRTC.showError("LOGIN-FAILURE", message);
 }

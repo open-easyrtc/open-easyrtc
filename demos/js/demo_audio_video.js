@@ -40,16 +40,16 @@ function enable(id) {
 
 function connect() {
     console.log("Initializing.");
-    easyrtc.enableAudio(document.getElementById('shareAudio').checked);
-    easyrtc.enableVideo(document.getElementById('shareVideo').checked);
-    easyrtc.setRoomOccupantListener(convertListToButtons);
-    easyrtc.connect("easyrtc.audioVideo", loginSuccess, loginFailure);
+    easyRTC.enableAudio(document.getElementById('shareAudio').checked);
+    easyRTC.enableVideo(document.getElementById('shareVideo').checked);
+    easyRTC.setLoggedInListener(convertListToButtons);
+    easyRTC.connect("audioVideo", loginSuccess, loginFailure);
 
 }
 
 
 function hangup() {
-    easyrtc.hangupAll();
+    easyRTC.hangupAll();
     disable('hangupButton');
 }
 
@@ -62,7 +62,7 @@ function clearConnectList() {
 }
 
 
-function convertListToButtons (roomName, data, isPrimary) {
+function convertListToButtons (data) {
     clearConnectList();
     otherClientDiv = document.getElementById('otherClients');
     for(var i in data) {
@@ -70,10 +70,10 @@ function convertListToButtons (roomName, data, isPrimary) {
         button.onclick = function(easyrtcid) {
             return function() {
                 performCall(easyrtcid);
-            };
+            }
         }(i);
 
-        label = document.createTextNode("Call " + easyrtc.idToName(i));
+        label = document.createTextNode("Call " + easyRTC.idToName(i));
         button.appendChild(label);
         otherClientDiv.appendChild(button);
     }
@@ -83,100 +83,100 @@ function convertListToButtons (roomName, data, isPrimary) {
 function setUpMirror() {
     if( !haveSelfVideo) {
         var selfVideo = document.getElementById("selfVideo");
-        easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
+        easyRTC.setVideoObjectSrc(selfVideo, easyRTC.getLocalStream());
         selfVideo.muted = true;
         haveSelfVideo = true;
     }    
 }
 
 function performCall(otherEasyrtcid) {
-    easyrtc.hangupAll();
+    easyRTC.hangupAll();
     var acceptedCB = function(accepted, caller) {
         if( !accepted ) {
-            easyrtc.showError("CALL-REJECTEd", "Sorry, your call to " + easyrtc.idToName(caller) + " was rejected");
+            easyRTC.showError("CALL-REJECTEd", "Sorry, your call to " + easyRTC.idToName(caller) + " was rejected");
             enable('otherClients');
         }
-    };
+    }
     
     var successCB = function() {
         setUpMirror();
         enable('hangupButton');
-    };
+    }
     var failureCB = function() {
         enable('otherClients');
-    };
-    easyrtc.call(otherEasyrtcid, successCB, failureCB, acceptedCB);
+    }
+    easyRTC.call(otherEasyrtcid, successCB, failureCB, acceptedCB);
     enable('hangupButton');
 }
 
 
-function loginSuccess(easyrtcId) {
+function loginSuccess(easyRTCId) {
     disable("connectButton");
   //  enable("disconnectButton");
     enable('otherClients');
-    selfEasyrtcid = easyrtcId;
-    document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyrtcId);
+    selfEasyrtcid = easyRTCId;
+    document.getElementById("iam").innerHTML = "I am " + easyRTC.cleanId(easyRTCId);
 }
 
 
-function loginFailure(errorCode, message) {
-    easyrtc.showError(errorCode, message);
+function loginFailure(message) {
+    easyRTC.showError("LOGIN-FAILURE", message);
 }
 
 
 function disconnect() {
     document.getElementById("iam").innerHTML = "logged out";
-    easyrtc.disconnect();
+    easyRTC.disconnect();
     enable("connectButton");
 //    disable("disconnectButton");
     clearConnectList();
-    easyrtc.setVideoObjectSrc(document.getElementById('selfVideo'), "");
+    easyRTC.setVideoObjectSrc(document.getElementById('selfVideo'), "");
 }
 
 
-easyrtc.setStreamAcceptor( function(caller, stream) {
+easyRTC.setStreamAcceptor( function(caller, stream) {
     setUpMirror();
     var video = document.getElementById('callerVideo');
-    easyrtc.setVideoObjectSrc(video,stream);
+    easyRTC.setVideoObjectSrc(video,stream);
     console.log("saw video from " + caller);
     enable("hangupButton");
 });
 
 
 
-easyrtc.setOnStreamClosed( function (caller) {
-    easyrtc.setVideoObjectSrc(document.getElementById('callerVideo'), "");
+easyRTC.setOnStreamClosed( function (caller) {
+    easyRTC.setVideoObjectSrc(document.getElementById('callerVideo'), "");
     disable("hangupButton");
 });
 
 
 var callerPending = null;
 
-easyrtc.setCallCancelled( function(caller){
-    if( caller === callerPending) {
+easyRTC.setCallCancelled( function(caller){
+    if( caller == callerPending) {
         document.getElementById('acceptCallBox').style.display = "none";
         callerPending = false;
     }
 });
 
 
-easyrtc.setAcceptChecker(function(caller, cb) {
+easyRTC.setAcceptChecker(function(caller, cb) {
     document.getElementById('acceptCallBox').style.display = "block";
     callerPending = caller;
-    if( easyrtc.getConnectionCount() > 0 ) {
-        document.getElementById('acceptCallLabel').innerHTML = "Drop current call and accept new from " + easyrtc.idToName(caller) + " ?";
+    if( easyRTC.getConnectionCount() > 0 ) {
+        document.getElementById('acceptCallLabel').innerHTML = "Drop current call and accept new from " + easyRTC.idToName(caller) + " ?";
     }
     else {
-        document.getElementById('acceptCallLabel').innerHTML = "Accept incoming call from " + easyrtc.idToName(caller) + " ?";
+        document.getElementById('acceptCallLabel').innerHTML = "Accept incoming call from " + easyRTC.idToName(caller) + " ?";
     }
     var acceptTheCall = function(wasAccepted) {
         document.getElementById('acceptCallBox').style.display = "none";
-        if( wasAccepted && easyrtc.getConnectionCount() > 0 ) {
-            easyrtc.hangupAll();
+        if( wasAccepted && easyRTC.getConnectionCount() > 0 ) {
+            easyRTC.hangupAll();
         }
         cb(wasAccepted);
         callerPending = null;
-    };
+    }
     document.getElementById("callAcceptButton").onclick = function() {
         acceptTheCall(true);
     };

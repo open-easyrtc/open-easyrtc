@@ -1,9 +1,14 @@
 {
-  "name"        : "easyrtc",
-  "version"     : "0.10.0a",
-  "homepage"    : "http://www.easyrtc.com/",
-  "author"      : "Priologic Software Inc. <info@priologic.com> (http://priologic.com/)",
-  "description" : "EasyRTC enables quick development of webRTC",
+  "name": "easyrtc",
+
+  "version": "0.9.0",
+
+  "homepage": "http://www.easyrtc.com/",
+
+  "author": "Priologic Software Inc. <info@priologic.com> (http://priologic.com/)",
+
+  "description": "easyRTC enables quick development of webRTC",
+
   "contributors": [ 
     "Doug Pelton <doug@priologic.com>",
     "Rod Apeldoorn <rod.apeldoorn@priologic.com>",
@@ -13,35 +18,35 @@
   "keywords": [
     "webRTC",
     "easy",
-    "EasyRTC",
+    "easyRTC",
     "RTC",
     "server"
   ],
 
   "repository": {
-    "type"      : "git",
-    "url"       : "https://github.com/priologic/easyrtc.git"
+    "type": "git",
+    "url": "https://github.com/priologic/easyrtc.git"
   },
 
   "bugs": {
-    "url"       : "https://github.com/priologic/easyrtc/issues"
+    "url": "https://github.com/priologic/easyrtc/issues"
   },
 
-  "main"        : "index",
+  "scripts": {
+    "start": "node server.js"
+  },
 
   "dependencies" : {
-    "async"     : "0.2.x",
-    "clone"     : "0.1.x",
-    "colors"    : "*", 
-    "underscore": "1.4.x"
+    "express" : "3.3.x",
+    "socket.io" : "0.9.x",
+    "winston" : "0.7.x"
   },
 
+  "analyze": false,
 
-  "analyze"     : false,
-
-  "license"     : "BSD2",
+  "license": "BSD2",
 
   "engines": {
-    "node"      : ">=0.8"
+    "node": ">=0.8"
   }
 }
