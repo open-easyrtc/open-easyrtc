@@ -1884,7 +1884,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 easyrtc.peerConns[otherUser].dataChannelR = dataChannel;
             }
 
-            if (!easyrtc.isMozillia) {
+            if (!easyrtc.isMozilla) {
                 dataChannel.onmessage = function(event) {
                     if (easyrtc.debugPrinter) {
                         easyrtc.debugPrinter("saw dataChannel.onmessage event");
