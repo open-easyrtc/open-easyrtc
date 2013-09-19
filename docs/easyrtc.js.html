@@ -1954,7 +1954,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 easyRTC.peerConns[otherUser].dataChannelR = dataChannel;
             }
 
-            if (!easyRTC.isMozillia) {
+            if (!easyRTC.isMozilla) {
                 dataChannel.onmessage = function(event) {
                     if (easyRTC.debugPrinter) {
                         easyRTC.debugPrinter("saw dataChannel.onmessage event");
