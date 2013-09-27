@@ -14,6 +14,7 @@ This *alpha* version of EasyRTC is rebuilt to be run as a node module, not as a 
 
 It is hoped that remaking EasyRTC as a module, along with the event driven server architecture, will make it much easier for developers to extend and customize their WebRTC applications with an easy upgrade method.
 
+Visit the [EasyRTC Google Groups Forum](https://groups.google.com/forum/#!forum/easyrtc) for more information and support.
 
 Features
 --------
