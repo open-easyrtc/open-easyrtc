@@ -41,14 +41,8 @@ function connect() {
 }
 
 
-function addToConversation(who, msg) {
+function addToConversation(who, msgType, content) {
     // Escape html special characters, then add linefeeds.
-    if( msg.msgData) {
-        var content = msg.msgData;    
-    }
-    else {
-        content = msg;
-    }
     content = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     content = content.replace(/\n/g, '<br />');    
     document.getElementById('conversation').innerHTML +=
@@ -145,13 +139,31 @@ function sendStuffP2P(otherEasyrtcid) {
     if (text.replace(/\s/g, "").length === 0) { // Don't send just whitespace
         return;
     }
+    console.log("++text was ", text)
     if (easyrtc.getConnectStatus(otherEasyrtcid) === easyrtc.IS_CONNECTED) {
-        easyrtc.sendDataP2P(otherEasyrtcid, 'msg', text);
+        // start of test code
+        var xxx = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" + 
+                  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" + 
+                  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" + 
+                  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" + 
+                  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" + 
+                  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" + 
+                  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" + 
+                  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+          console.log("message length = " + (xxx.length));
+          for(var i = 0; i < 50; i++) {
+            setTimeout( function() {
+                easyrtc.sendDataP2P(otherEasyrtcid, 'msg', xxx);
+                }, i *1);
+          }
+        // end of test code
+//        easyrtc.sendDataP2P(otherEasyrtcid, 'msg', text);
     }
     else {
         easyrtc.showError("NOT-CONNECTED", "not connected to " + easyrtc.idToName(otherEasyrtcid) + " yet.");
     }
-    addToConversation("Me", text);
+    console.log("--text was ", text)
+    addToConversation("Me", "msgtype", text);
     document.getElementById('sendMessageText').value = "";
 }
 

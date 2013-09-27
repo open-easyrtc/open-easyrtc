@@ -3,16 +3,15 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
         <title>EasyRTC Demo: Data Channel File-sharing</title>
-        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.js" />
-
+        <link rel="stylesheet" type="text/css" href="css/landing.css" />  
+        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
         <!--hide-->
-        <link rel="stylesheet" type="text/css" href="css/landing.css" />
 
         <!-- Prettify Code -->
         <script type="text/javascript" src="js/prettify/prettify.js"></script>
         <link rel="stylesheet" type="text/css" href="js/prettify/prettify.css" />
                 <script type="text/javascript" src="js/prettify/loadAndFilter.js"></script>
-        <script type="text/javascript" src="js/prettify/jquery.min.js"></script>
+        <script type="text/javascript" src="js/prettify/jquery-1.9.1.min.js"></script>
         
         <!--show-->
         <!-- Assumes global locations for socket.io.js and easyrtc.js -->
@@ -27,25 +26,29 @@
                 padding-right: 10px;
             }
 
-            #stuffToSend {width:300px;}
-            #sendMessageArea{
-                float:left;
-                width:400px;
-                padding-right:20px;
-            }
-            #sendMessageText{
-                width:100%;
-            }
-            #conversation {
-                height:300px;
-                border:solid 1px gray;
-                overflow-y:scroll;
+            .peerblock {
+                width: 800px;  
+                border-radius:2px;
+                border:1px solid gray;
+            }            
+            
+            .receiveBlock {
+                width: 500px;
+                margin:10px;
+                display: inline-block;
+                
             }
             .dragndrop {
+                display: inline-block;
                 padding:2em;
                 margin: 2px;
                 border:2px solid black;
                 border-radius: 5px;
+            }            
+            .dragndropStatus {
+                color: #ffffff;
+                background-color: transparent;
+                text-shadow: 0px 0px 5px rgba(0, 0, 0, 1)
             }
             .connecting {
                 background-color: yellow;
@@ -64,17 +67,7 @@
                 margin: 1px;
                 border-width:3px;
             }
-            .receivedFile {
-                margin: 4px;
-                padding: 1em;
-                border: 1px solid black;
-                border-radius: 5px;
-                background-color: #e0e0e0;
-            }
-            .receivedFile:hover {
-                margin: 3px;
-                border-width: 2px;
-            }
+
         </style>
         <!--show-->
     </head>
@@ -95,19 +88,14 @@
                 </p>
 
                 <p class="alert"><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" />
-                    This demo requires data channels that support blobs, which means it only runs on Mozilla
-                    currently and only with files less than 30KB.</p>
+                    This demo requires reliable data channels which means it needs Firefox or Chrome (version 32+).</p>
                 <hr />
                 <h2>The Demo</h2>
                 <!--show-->
-                <div id="sendMessageArea">
-                    <div id="iam">Obtaining ID...</div>
-                    <div id="otherClients"></div>
+                <div id="iam">Obtaining ID...</div><BR />
+                <div id="peerZone">
                 </div>
-                <div id="receiveMessageArea">
-                    Received files:
-                    <div id="conversation"></div>	  
-                </div>
+
                 <!--hide-->
                 <hr />
 

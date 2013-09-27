@@ -24,165 +24,231 @@
 //POSSIBILITY OF SUCH DAMAGE.
 //
 var selfEasyrtcid = "";
-var peerDivs = {};
-var noCallersDiv;
+var peers = {};
+
+function buildPeerBlockName(peerid) {
+    return "peerzone_" + peerid;
+}
+
+function buildDragNDropName(peerid) {
+    return "dragndrop_" + peerid;
+}
+
+function buildReceiveAreaName(peerid) {
+    return "receivearea_" + peerid;
+}
 
 
 function connect() {
-    noCallersDiv = document.createElement("div");
-    noCallersDiv.innerHTML = "<em>Nobody else logged in yet</em>";
+
     var otherClientsDiv = document.getElementById('otherClients');
-    otherClientsDiv.appendChild(noCallersDiv);
-    
+
+
     easyrtc.enableDataChannels(true);
     easyrtc.enableVideo(false);
     easyrtc.enableAudio(false);
     easyrtc.setRoomOccupantListener(convertListToButtons);
-    easyrtc.setAcceptChecker( function(easyrtcid, responsefn) {
-        peerDivs[easyrtcid].className ="dragndrop connecting";
+
+    easyrtc.setAcceptChecker(function(easyrtcid, responsefn) {
         responsefn(true);
     });
+
     easyrtc.setDataChannelOpenListener(function(easyrtcid) {
-        peerDivs[easyrtcid].className ="dragndrop connected";
+        jQuery(buildDragNDropName(easyrtcid)).addClass("connected");
+        jQuery(buildDragNDropName(easyrtcid)).removeClass("unconnected");
     });
+
     easyrtc.setDataChannelCloseListener(function(easyrtcid) {
-        if( peerDivs[easyrtcid]) {
-            peerDivs[easyrtcid].className ="dragndrop notconnected";
-        }
+        jQuery(buildDragNDropName(easyrtcid)).addClass("unconnected");
+        jQuery(buildDragNDropName(easyrtcid)).removeClass("connected");
     });
-    var fileDescriptions = {};
-    easyrtc.setDataListener(function(easyrtcid, data){
-        if( typeof data === 'string') {
-            fileDescriptions[easyrtcid] = JSON.parse(data);
-        }
-        else {
-            saveFile(fileDescriptions[easyrtcid], data);
-        }
-        console.log("received data from " + easyrtc.idToName(easyrtcid));
-    });
+
     easyrtc.connect("easyrtc.dataFileTransfer", loginSuccess, loginFailure);
 }
 
-   
-function showMessage(message) { 
-    document.getElementById('conversation').appendChild(document.createTextNode(message));
-}
 
-
-function saveFile(fileInfo, body) {
-    //  saveAs(body, fileInfo.name);
-    var conversation = document.getElementById('conversation'); 
-    var div = document.createElement('div');
-    div.innerHTML = "Received file " + fileInfo.name + ". Click here to display/save";
-    div.className = "receivedFile";
-    div.onclick = function() {
-        var url = URL.createObjectURL(body);
-        window.open(url, '_blank', '');
-        setTimeout( function() { 
-            URL.revokeObjectURL(url);
-        }, 30000);
-        conversation.removeChild(div);
-    };
-    conversation.appendChild(div);   
-}
-
-
-function convertListToButtons (roomName, data, isPrimary) {
-    var otherClientsDiv = document.getElementById('otherClients');
-    for(var oldPeer in  peerDivs) {
-        if( !data[oldPeer] ) {
-            otherClientsDiv.removeChild(peerDivs[oldPeer]);
-            delete peerDivs[oldPeer];
-        } 
+function removeIfPresent(parent, childname) {
+    var item = document.getElementById(childname);
+    if (item) {
+        parent.removeChild(item);
     }
-    
-    for(var i in data) {
-        if( !peerDivs[i]) {
-            var div = document.createElement("div");
-            div.className = "dragndrop notConnected";
-            div.innerHTML = "File drop area for <br>" + easyrtc.idToName(i);
-            initDropSupport(div, i);
-            otherClientsDiv.appendChild(div);    
-            peerDivs[i] = div;
+    else {
+        console.log("didn't see item " + childname + " for delete eh");
+    }
+}
+
+
+
+function convertListToButtons(roomName, data, isPrimary) {
+    var peerZone = document.getElementById('peerZone');
+    for (var oldPeer in  peers) {
+        if (!data[oldPeer]) {
+            removeIfPresent(peerZone, buildPeerBlockName(oldPeer));
+            delete peers[oldPeer];
         }
     }
-    noCallersDiv.style.display = (peerDivs == {})?"block":"none";
-}
 
 
-function initDropSupport(target, destUser) {
-    var ignore = function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        return false;
-    };
+    function buildDropDiv(peerid) {
+        var statusDiv = document.createElement("div");
+        statusDiv.className = ".dragndropStatus";
 
-    var drop = function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        var dt = e.dataTransfer;
-        var files = dt.files;
-        if( dt.files.length >0) {
-            sendFiles(target, destUser, files);
+        var div = document.createElement("div");
+        div.id = buildDragNDropName(peerid);
+        div.className = "dragndrop notConnected";
+        div.innerHTML = "File drop area";
+        div.appendChild(statusDiv);
+
+        function updateStatusDiv(state) {
+            switch (state.status) {
+                case "waiting":
+                    statusDiv.innerHTML = "waiting for other party<br\>to accept transmission";
+                    break;
+                case "working":
+                    statusDiv.innerHTML = state.name + ":" + state.position + "/" + state.size + "(" + state.numFiles + " files)";
+                    break;
+                case "cancelled":
+                    statusDiv.innerHTML = "cancelled";
+                    div.className = "dragndrop notConnected";
+                    setTimeout(function() {
+                        statusDiv.innerHTML = "";
+                    }, 2000);
+                    break;
+                case "done":
+                    statusDiv.innerHTML = "done";
+                    div.className = "dragndrop notConnected";
+                    setTimeout(function() {
+                        statusDiv.innerHTML = "";
+                    }, 3000);
+                    break;
+            }
+            return true;
         }
-        return false;
-    };
-    
-    target.addEventListener("drop", drop, false);
-    target.addEventListener("dragenter", ignore, false);
-    target.addEventListener("dragover", ignore, false);
-}
 
-   
-function sendFiles(div, destUser, files) {
-    var i;
-    var fileSizeLIMIT = 30000; // approximate message size limit for firefox.
-    
-    switch( easyrtc.getConnectStatus(destUser)) {
-        case easyrtc.IS_CONNECTED:
-            for(i = 0; i < files.length; i++) {
-                if( files[i].size > fileSizeLIMIT ) {
-                    showMessage('File ' + files[i].name +
-                        ' is too big too send (' + files[i].size + ' bytes)');
-                    continue;
+        var fileSender = null;
+        function filesHandler(files) {
+            // if we haven't eastablished a connection to the other party yet, do so now,
+            // and on completion, send the files. Otherwise send the files now.
+            if (easyrtc.getConnectStatus(peerid) === easyrtc.NOT_CONNECTED) {
+                easyrtc.call(peerid, 
+                        function(caller, mediatype) {
+                            filesHandler(files);
+                        },
+                        function(errorCode, errorText) {
+                            tawk.showError(errorCode, errorText)
+                        },
+                        function wasAccepted(yup) {
+                        }
+                    );
+            }
+            else if (easyrtc.getConnectStatus(peerid) === easyrtc.IS_CONNECTED) {
+                if( !fileSender) {
+                    fileSender = easyrtc.buildFileSender(peerid, updateStatusDiv);
                 }
-                var txData = {
-                    name: files[i].name,
-                    type: files[i].type,
-                    size: files[i].size
-                };
-                //
-                // can't send an object, only a primitive type
-                //
-                easyrtc.sendDataP2P(destUser, JSON.stringify(txData));
-                easyrtc.sendDataP2P(destUser, files[i]);
-            }       
-            break;
-            
-        case easyrtc.NOT_CONNECTED:
-            div.className = "dragndrop connecting";
-            easyrtc.call(destUser, 
-                function(caller, media) { // success callback                    
-                    div.className = "dragndrop connected";
-                    sendFiles(div, caller, files);
-                }, 
-                function(errText) {
-                    showMessage(errText);
-                }, 
-                function(wasAccepted) {}
-                );
-            break;
-            
-        case BECOMING_CONNECTED:
-            showMessage("Wait for connection to finish before adding more files");
-            break;
+                fileSender(files);
+            }
+            else {
+                tawk.showError("Wait for the connection to complete before adding more files!");
+            }
+        }        
+        easyrtc.buildDragNDropRegion(div, filesHandler);
+        easyrtc.buildFileSender(div, peerid, updateStatusDiv);
+        return div;
+    }
+
+
+    function buildReceiveDiv(i) {
+        var div = document.createElement("div");
+        div.id = buildReceiveAreaName(i);
+        div.className = "receiveBlock";
+        div.style.display = "none";
+        return div;
+    }
+
+
+    for (var i in data) {
+        if (!peers[i]) {
+            var peerBlock = document.createElement("div");
+            peerBlock.id = buildPeerBlockName(i);
+            peerBlock.className = "peerblock";
+            peerBlock.appendChild( document.createTextNode(" For peer " + i));
+            peerBlock.appendChild( document.createElement("br"));
+            peerBlock.appendChild(buildDropDiv(i));
+            peerBlock.appendChild(buildReceiveDiv(i));
+            peerZone.appendChild(peerBlock);
+            peers[i] = true;
+        }
     }
 }
-      
+
+
+
+function acceptRejectCB(otherGuy, fileNameList, wasAccepted) {
+
+    var receiveBlock = document.getElementById(buildReceiveAreaName(otherGuy));
+    jQuery(receiveBlock).empty();
+    receiveBlock.style.display = "inline-block";
+
+    //
+    // list the files being offered
+    //
+    receiveBlock.appendChild(document.createTextNode("Files offered"));
+    receiveBlock.appendChild(document.createElement("br"));
+    for (var i = 0; i < fileNameList.length; i++) {
+        receiveBlock.appendChild(
+                document.createTextNode("  " + fileNameList[i].name + "(" + fileNameList[i].size + ")"));
+        receiveBlock.appendChild(document.createElement("br"));
+    }
+    //
+    // provide accept/reject buttons
+    //
+    var button = document.createElement("button");
+    button.appendChild(document.createTextNode("Accept"));
+    button.onclick = function() {
+        jQuery(receiveBlock).empty();
+        wasAccepted(true);
+    };
+    receiveBlock.appendChild(button);
+
+    button = document.createElement("button");
+    button.appendChild(document.createTextNode("Reject"));
+    button.onclick = function() {
+        wasAccepted(false);
+        receiveBlock.style.display = "none";
+    };
+    receiveBlock.appendChild(button);
+}
+
+
+function receiveStatusCB(otherGuy, msg) {
+    var receiveBlock = document.getElementById(buildReceiveAreaName(otherGuy));
+    switch (msg.status) {
+        case "eof":
+            receiveBlock.innerHTML = "Finished file";
+            break;
+        case "done":
+            receiveBlock.innerHTML = "Stopped because " + msg.reason;
+            setTimeout(function() {
+                receiveBlock.style.display = "none";
+            }, 1000);
+            break;
+        case "started":
+            receiveBlock.innerHTML = "Beginning receive";
+            break;
+        case "progress":
+            receiveBlock.innerHTML = msg.name + " " + msg.received + "/" + msg.size;
+            break;
+        default: 
+           console.log("strange file receive cb message = " + msg);
+    }
+    return true;
+}
+
 
 function loginSuccess(easyrtcId) {
     selfEasyrtcid = easyrtcId;
     document.getElementById("iam").innerHTML = "I am " + easyrtcId;
+    easyrtc.buildFileReceiver(acceptRejectCB, receiveStatusCB);
 }
 
 
