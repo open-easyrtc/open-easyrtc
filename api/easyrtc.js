@@ -2527,7 +2527,6 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         );
         addSocketListener("easyrtcMsg", onChannelMsg);
         addSocketListener("easyrtcCmd", onChannelCmd);
-        addSocketListener("")
         addSocketListener("disconnect", function(code, reason, wasClean) {
             easyrtc.webSocketConnected = false;
             easyrtc.updateConfigurationInfo = function() {
@@ -2861,7 +2860,8 @@ easyrtc.getRoomsJoined = function() {
         roomsIn[key] = true;
     }
     return roomsIn;
-}
+};
+
 /** Get server defined fields associated with a particular room. Only valid
  * after a connection has been made.
  * @param {String} Roomname - the name of the room you want the fields for.
@@ -2869,7 +2869,7 @@ easyrtc.getRoomsJoined = function() {
  */
 easyrtc.getRoomFields = function(roomName) {
     return easyrtc.fields.rooms[roomName];
-}
+};
 
 /** Get server defined fields associated with the current application. Only valid
  * after a connection has been made.
@@ -2877,7 +2877,7 @@ easyrtc.getRoomFields = function(roomName) {
  */
 easyrtc.getApplicationFields = function() {
     return easyrtc.fields.application;
-}
+};
 
 /** Get server defined fields associated with the connection. Only valid
  * after a connection has been made.
@@ -2885,7 +2885,7 @@ easyrtc.getApplicationFields = function() {
  */
 easyrtc.getConnectionFields = function() {
     return easyrtc.fields.connection;
-}
+};
 
 // this flag controls whether the initManaged routine adds close buttons to the caller
 // video objects
