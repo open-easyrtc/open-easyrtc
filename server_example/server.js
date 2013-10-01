@@ -17,4 +17,4 @@ var webServer = http.createServer(httpApp).listen(8080);
 var socketServer = io.listen(webServer);
 
 // Start EasyRTC server
-var easyrtcServer = easyrtc.listen(httpApp, socketServer);
+var rtc = easyrtc.listen(httpApp, socketServer);
