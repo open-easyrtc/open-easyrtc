@@ -1,8 +1,34 @@
 EasyRTC: Change Log
 ===================
 
-v0.10.0a (note, alpha means alpha... please let us know of issues.)
--------
+v0.10.1a (note, alpha means alpha... please let us know of issues.)
+--------
+New Features:
+  - API - easyrtc_ft.js - A separate official EasyRTC module for handling file transfers. See the updated file sharing demo for an example.
+  - API - Function to get list of currently subscribed rooms - getRoomsJoined()
+  - API - Functions to support fields - getRoomFields(), getApplicationFields(), getConnectionFields()
+  - Server/API - Support for fields (Application, room, and connection level)
+  - Server - Capability to set server options for specific applications, and rooms. Added parameter to createApp() and createRoom() to support this.
+  - Server - Added setOption() and getOption() methods to application and room objects. 
+  - Server - Support for setting fields with new functions added to the application, room, and connection objects.
+    - getField()
+    - getFields()
+    - setField()
+  - Server - New server options for setting default field variables at the application, room, and connection level.
+    - "appDefaultFieldObj", "roomDefaultFieldObj", and "connectionDefaultFieldObj"
+
+Changes:
+  - API - setPeerListener() - Updated to allow the setting of listeners for specific message types and from specific peers.
+  - Documentation - Lots more updates to support new release. Much more to do.
+
+Fixes:
+ * Lots. But please let us know if there's any others which need doing.
+
+
+
+
+v0.10.0a
+--------
 New Features:
  * Server/API - Rooms. An EasyRTC application can have multiple rooms. A user can be in one or more rooms at the same time. Users can only see other users in the same room. If no room is provided, connections will be entered into a room named `default`.
  * Server/API - Custom authentication method. Username / Credential can be provided. Username is broadcast to other authenticated users, so it may be used by apps.  
