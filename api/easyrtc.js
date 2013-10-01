@@ -1,7 +1,7 @@
 /** @class
  *@version 0.8.1
  *<p>
- * Provides client side support for the EasyRTC framework.
+ * Provides client side support for the EasyRTC framework.r
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
  * for more details.</p>
  *
@@ -1255,6 +1255,13 @@ easyrtc.closedChannel = null;
 easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     easyrtc.pc_config = {};
     easyrtc.closedChannel = null;
+
+    easyrtc.fields = {
+        rooms:{},
+        application:{},
+        connection:{}
+    };
+
 
     if (easyrtc.debugPrinter) {
         easyrtc.debugPrinter("attempt to connect to WebRTC signalling server with application name=" + applicationName);
@@ -2730,19 +2737,25 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     }
                 }
             }
+            if (easyrtc.roomJoin[roomname] && roomData[roomname]) {
+                easyrtc.fields.rooms[roomname] = roomData[roomname].field;
+            }
             processList(roomname, easyrtc.lastLoggedInList[roomname]);
         }
     }
+
 
 
     function processToken(msg) {
         if (easyrtc.debugPrinter) {
             easyrtc.debugPrinter("entered process token");
         }
-
         var msgData = msg.msgData;
         if (msgData.easyrtcid) {
             easyrtc.myEasyrtcid = msgData.easyrtcid;
+        }
+        if( msgData.field) {
+            easyrtc.fields.connection = msgData.field;
         }
         if (msgData.iceConfig) {
 
@@ -2774,7 +2787,11 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
 
         if (msgData.roomData) {
-            processRoomData(msg.msgData.roomData);
+            processRoomData(msgData.roomData);
+        }
+        
+        if( msgData.application) {
+            easyrtc.fields.application =msgData.application.field;
         }
 
     }
@@ -2839,9 +2856,43 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         }
         );
     }
-
-
 };
+
+/** Get a list of the rooms you are in. You must be connected to call this function.
+ * @returns {Map} A map whose keys are the room names
+ */
+easyrtc.getRoomsInside = function() {
+    var roomsIn = {};
+    for(var key in easyrtc.roomJoin) {
+        roomsIn[key] = true;
+    }
+    return roomsIn;
+}
+/** Get server defined fields associated with a particular room. Only valid 
+ * after a connection has been made.
+ * @param {String} Roomname - the name of the room you want the fields for.
+ * @returns {Dictionary} A dictionary containing entries of the form {key:{'fieldname':key, 'fieldvalue':value1}}
+ */
+easyrtc.getRoomFields = function(roomName) {
+    return easyrtc.fields.rooms[roomName];
+}
+
+/** Get server defined fields associated with the current application. Only valid 
+ * after a connection has been made.
+ * @returns {Dictionary} A dictionary containing entries of the form {key:{'fieldname':key, 'fieldvalue':value1}}
+ */
+easyrtc.getApplicationFields = function() {
+    return easyrtc.fields.application;
+}
+
+/** Get server defined fields associated with the connection. Only valid 
+ * after a connection has been made.
+ * @returns {Dictionary} A dictionary containing entries of the form {key:{'fieldname':key, 'fieldvalue':value1}}
+ */
+easyrtc.getConnectionFields = function() {
+    return easyrtc.fields.connection;
+}
+
 // this flag controls whether the initManaged routine adds close buttons to the caller
 // video objects
 
@@ -3320,7 +3371,7 @@ easyrtc.buildFileSender = function(destUser, progressListener) {
         }
 
         var amountToRead = Math.min(maxChunkSize, curFileSize - filePosition);
-        if (!progressListener({status: "working", name:curFile.name, position: filePosition, size: curFileSize, numFiles: filesOffered.length})) {
+        if (!progressListener({status: "working", name: curFile.name, position: filePosition, size: curFileSize, numFiles: filesOffered.length})) {
             filesOffered.length = 0;
             filePosition = 0;
             easyrtc.sendDataP2P(destUser, "files_chunk", {done: "cancelled"});
@@ -3404,11 +3455,11 @@ easyrtc.buildFileReceiver = function(acceptRejectCB, statusCB) {
             var ackHandler = function(ackMesg) {
 
                 if (ackMesg.msgType === "error") {
-                    statusCB(otherGuy, {status:"done", reason: "accept_failed"});
+                    statusCB(otherGuy, {status: "done", reason: "accept_failed"});
                     delete userStreams[otherGuy];
                 }
                 else {
-                    statusCB(otherGuy, {status:"started"});
+                    statusCB(otherGuy, {status: "started"});
                 }
             };
             if (wasAccepted) {
