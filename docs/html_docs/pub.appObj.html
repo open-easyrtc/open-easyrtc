@@ -80,7 +80,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line809">line 809</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line869">line 869</a>
     </li></ul></dd>
     
     
@@ -245,7 +245,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1006">line 1006</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1075">line 1075</a>
     </li></ul></dd>
     
     
@@ -385,7 +385,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1714">line 1714</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1740">line 1740</a>
     </li></ul></dd>
     
     
@@ -413,7 +413,7 @@
         
             
 <dt>
-    <h4 class="name" id="appObj.createRoom"><span class="type-signature">&lt;static> </span>appObj.createRoom<span class="signature">(roomName, callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="appObj.createRoom"><span class="type-signature">&lt;static> </span>appObj.createRoom<span class="signature">(roomName, options, callback)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -443,6 +443,8 @@
 		<th>Type</th>
 		
 		
+		<th>Argument</th>
+		
 		
 		
 		
@@ -468,10 +470,51 @@
             </td>
             
             
+                <td class="attributes">
+                
+                    
+                
+                    
+                
+                </td>
+            
             
             
             
             <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                    &lt;nullable><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last">Options object with options to apply to the room. May be null.</td>
         </tr>
 	
 	
@@ -490,6 +533,14 @@
             
             </td>
             
+            
+                <td class="attributes">
+                
+                    
+                
+                    
+                
+                </td>
             
             
             
@@ -525,7 +576,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1757">line 1757</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1804">line 1804</a>
     </li></ul></dd>
     
     
@@ -665,7 +716,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1788">line 1788</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1871">line 1871</a>
     </li></ul></dd>
     
     
@@ -734,7 +785,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line834">line 834</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line894">line 894</a>
     </li></ul></dd>
     
     
@@ -873,7 +924,287 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line845">line 845</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line905">line 905</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="appObj.getField"><span class="type-signature">&lt;static> </span>appObj.getField<span class="signature">(Field, callback)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Returns application level field object for a given field name.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>Field</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">name</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Callback with error and field value (any type)</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line921">line 921</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="appObj.getFields"><span class="type-signature">&lt;static> </span>appObj.getFields<span class="signature">(limitToIsShared, callback)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Returns an object containing all field names and values within the application. Can be limited to fields with isShared option set to true.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>limitToIsShared</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Limits returned fields to those which have the isShared option set to true.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Callback with error and object containing field names and values.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line938">line 938</a>
     </li></ul></dd>
     
     
@@ -990,7 +1321,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line894">line 894</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line958">line 958</a>
     </li></ul></dd>
     
     
@@ -1107,7 +1438,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line910">line 910</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line974">line 974</a>
     </li></ul></dd>
     
     
@@ -1246,7 +1577,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line921">line 921</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line985">line 985</a>
     </li></ul></dd>
     
     
@@ -1363,7 +1694,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line936">line 936</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1000">line 1000</a>
     </li></ul></dd>
     
     
@@ -1503,7 +1834,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1828">line 1828</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1911">line 1911</a>
     </li></ul></dd>
     
     
@@ -1620,7 +1951,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1815">line 1815</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1898">line 1898</a>
     </li></ul></dd>
     
     
@@ -1760,7 +2091,231 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1918">line 1918</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1947">line 1947</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="appObj.setField"><span class="type-signature">&lt;static> </span>appObj.setField<span class="signature">(fieldName, fieldValue, fieldOption, <span class="optional">next</span>)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sets application field value for a given field name.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>fieldName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last">Must be formatted according to "fieldNameRegExp" option.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>fieldValue</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>fieldOption</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                    &lt;nullable><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last">Field options (such as isShared which defaults to false)</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>next</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#nextCallback">nextCallback</a></span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last">A success callback of form next(err). Possible err will be instanceof (ApplicationWarning).</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1046">line 1046</a>
     </li></ul></dd>
     
     
@@ -1920,7 +2475,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line978">line 978</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1017">line 1017</a>
     </li></ul></dd>
     
     
@@ -1989,7 +2544,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Tue Sep 17 2013 16:06:52 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Sep 30 2013 15:45:02 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
