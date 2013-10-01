@@ -1115,27 +1115,11 @@ easyrtc.receivePeerDistribute = function(easyrtcid, msg, targeting) {
 };
 
 /**
- * Sets a listener for data sent from another client (either peer to peer or via websockets).
- * @deprecated This is now a synonym for setPeerListener.
- * @param {Function} listener has the signature (easyrtcid, data)
- * @example
- *     easyrtc.setDataListener( function(easyrtcid, data) {
- *         ("From " + easyrtc.idToName(easyrtcid) + 
- *             " sent the follow data " + JSON.stringify(data));
- *     });
- *     
- *     
- */
-easyrtc.setDataListener = function(listener) {
-    easyrtc.setPeerListener(listener, null, null);
-};
-
-/**
  * Sets a listener for messages from the server.
- * @param {Function} listener has the signature (data)
+ * @param {Function} listener has the signature (msgType, msgData, targeting)
  * @example
- *     easyrtc.setPeerListener( function(msg) {
- *         ("From Server sent the following message " + JSON.stringify(msg));
+ *     easyrtc.setServerListener( function(msgType, msgData, targeting) {
+ *         ("The Server sent the following message " + JSON.stringify(msgData));
  *     });     
  */
 easyrtc.setServerListener = function(listener) {
@@ -1347,8 +1331,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
     //
     // This function is used to send WebRTC signaling messages to another client. These messages all the form:
+    //   destUser: someid or null
     //   msgType: one of ["offer"/"answer"/"candidate","reject","hangup", "getRoomList"]
-    //   targetEasyrtcid: someid or null
     //   msgData: either null or an SDP record
     //   successCallback: a function with the signature  function(msgType, wholeMsg);
     //   errorCallback: a function with signature function(errorCode, errorText)
@@ -2268,7 +2252,17 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         if (msg.targetGroup) {
             targetting.targetGroup = msg.targetGroup;
         }
-        easyrtc.receivePeerDistribute(msg.senderEasyrtcid, msg, targetting);
+        if( msg.senderEasyrtcid) {
+            easyrtc.receivePeerDistribute(msg.senderEasyrtcid, msg, targetting);
+        }
+        else {
+            if( easyrtc.receiveServerCB) {
+                easyrtc.receiveServerCB(msg.msgType, msg.msgData, targetting);
+            }
+            else {
+                console.log("Unhandled server message " + JSON.stringify(msg));
+            }
+        }
     };
 
 
@@ -2477,6 +2471,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             ackAcceptorFn(easyrtc.ackMessage);
         }
     };
+    
     if (!window.io) {
         easyrtc.onError("Your HTML has not included the socket.io.js library");
     }
@@ -2533,6 +2528,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         );
         addSocketListener("easyrtcMsg", onChannelMsg);
         addSocketListener("easyrtcCmd", onChannelCmd);
+        addSocketListener("")
         addSocketListener("disconnect", function(code, reason, wasClean) {
             easyrtc.webSocketConnected = false;
             easyrtc.updateConfigurationInfo = function() {
