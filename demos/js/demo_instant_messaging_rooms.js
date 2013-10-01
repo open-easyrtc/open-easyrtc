@@ -153,7 +153,7 @@ function connect() {
     easyrtc.setDisconnectListener(function() {
         jQuery('#rooms').empty();
     });
-    easyrtc.setAppDefinedFields({randomnum: Math.round(Math.random() * 100), everyonelikes: 'kitkats'});
+    easyrtc.setApiFields({randomnum: Math.round(Math.random() * 100), everyonelikes: 'kitkats'});
     updatePresence();
     var username = document.getElementById("userNameField").value;
     var password = document.getElementById("credentialField").value;

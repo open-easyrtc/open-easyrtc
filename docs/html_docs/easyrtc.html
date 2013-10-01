@@ -466,290 +466,6 @@
         <dl>
             
 <dt>
-    <h3 class="name" id="buildFileReceiver"><span class="type-signature">&lt;static> </span>buildFileReceiver<span class="signature">(acceptRejectCB, statusCB)</span><span class="type-signature"></span></h3>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Enable datachannel based file receiving.
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>acceptRejectCB</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Function(otherGuy,fileNameList, wasAccepted</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">this function is called when another peer(otherGuy) offers to send you a list of files. this function should call it's wasAccepted function with true toallow those files to be sent, or false to disallow them.</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>statusCB</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">type</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">this function is called with the current state of file receiving. It is passed two arguments:otherGuy - the easyrtcid of the person sending the files.msg - one of the following structures:{status:"done", reason:"accept_failed"}{status:"done", reason:"success"}{status:"done", reason:"cancelled"}{status:"eof"}{status:"started"}{status:"progress" name:filename,   received:received_size_in_bytes,    size:file_size_in_bytes }</td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h3 class="name" id="buildFileSender"><span class="type-signature">&lt;static> </span>buildFileSender<span class="signature">(destUser, progressListener)</span><span class="type-signature"> &rarr; {Function}</span></h3>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Establishes a DOM object as a dragndrop destination for a particular user.
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>destUser</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">easyrtcId of the person being sent to.</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>progressListener</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Function</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">if provided, is called with the following objects:   {status:"waiting"}  // once a file offer has been sent but not accepted or rejected yet   {status:"working", position:position_in_file, size:size_of_current_file, numFiles:number_of_files_left}    {status:"cancelled"}  // if the remote user cancels the sending   {status:"done"}       // when the file is done   the progressListener should always return true for normal operation, false to cancel a filetransfer.</td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    an object that accepts an array of File (the Files to be sent).
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Function</span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-</dd>
-
-        
-            
-<dt>
     <h3 class="name" id="call"><span class="type-signature">&lt;static> </span>call<span class="signature">(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB)</span><span class="type-signature"></span></h3>
     
     
@@ -2730,7 +2446,7 @@
         
             
 <dt>
-    <h3 class="name" id="getRoomsInside"><span class="type-signature">&lt;static> </span>getRoomsInside<span class="signature">()</span><span class="type-signature"> &rarr; {Map}</span></h3>
+    <h3 class="name" id="getRoomsJoined"><span class="type-signature">&lt;static> </span>getRoomsJoined<span class="signature">()</span><span class="type-signature"> &rarr; {Map}</span></h3>
     
     
 </dt>
@@ -4613,6 +4329,119 @@
         
             
 <dt>
+    <h3 class="name" id="setApiFields"><span class="type-signature">&lt;static> </span>setApiFields<span class="signature">(fields)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Provide a set of application defined fields that will be part of this instancesconfiguration information. This data will get sent to other peers via the websocketpath.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>fields</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">type</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">just be JSON serializable to a length of not more than 128 bytes.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>   easyrtc.setApiFields( { favorite_alien:'Mr Spock'});  easyrtc.setRoomOccupantListener( function(roomName, list, isPrimaryOwner) {     for( var i in list ){        console.log("easyrtcid=" + i + " favorite alien is " + list[i].apiFields.favorite_alien);     }  });</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
     <h3 class="name" id="setApiKey"><span class="type-signature">&lt;static> </span>setApiKey<span class="signature">(key)</span><span class="type-signature"></span></h3>
     
     
@@ -4719,119 +4548,6 @@
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>     easyrtc.setApiKey('cmhslu5vo57rlocg');</code></pre>
-
-    
-</dd>
-
-        
-            
-<dt>
-    <h3 class="name" id="setAppDefinedFields"><span class="type-signature">&lt;static> </span>setAppDefinedFields<span class="signature">(fields)</span><span class="type-signature"></span></h3>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Provide a set of application defined fields that will be part of this instancesconfiguration information. This data will get sent to other peers via the websocketpath.
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>fields</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">type</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">just be JSON serializable to a length of not more than 128 bytes.</td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-    
-    
-    
-    
-    
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>   easyrtc.setAppDefinedFields( { favorite_alien:'Mr Spock'});  easyrtc.setRoomOccupantListener( function(roomName, list, isPrimaryOwner) {     for( var i in list ){        console.log("easyrtcid=" + i + " favorite alien is " + list[i].appDefinedFields.favorite_alien);     }  });</code></pre>
 
     
 </dd>
@@ -8177,7 +7893,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Sep 30 2013 16:59:36 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Tue Oct 01 2013 13:18:42 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

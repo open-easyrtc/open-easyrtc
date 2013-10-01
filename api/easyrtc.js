@@ -1,11 +1,11 @@
 /** @class
  *@version 0.10.1a
  *<p>
- * Provides client side support for the EasyRTC framework.r
+ * Provides client side support for the EasyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
  * for more details.</p>
  *
- *</p>
+ *<p>
  *copyright Copyright (c) 2013, Priologic Software Inc.
  *All rights reserved.</p>
  *
@@ -380,7 +380,7 @@ easyrtc.receivePeer = {msgTypes: {}};
 easyrtc.receiveServerCB = null;
 
 /** @private */
-easyrtc.appDefinedFields = {};
+easyrtc.apiFields = {};
 /** @private */
 easyrtc.updateConfigurationInfo = function() {
 
@@ -413,11 +413,11 @@ easyrtc.peerConns = {};
 /** @private */
 easyrtc.acceptancePending = {};
 /* 
- * the maximum length of the appDefinedFields. This is defined on the
+ * the maximum length of the apiFields. This is defined on the
  * server side as well, so changing it here alone is insufficient.
  */
 /** @private */
-var maxAppDefinedFieldsLength = 128;
+var maxApiFieldsLength = 128;
 /**
  * Disconnect from the EasyRTC server.
  * @example 
@@ -453,21 +453,21 @@ easyrtc.callCancelled = function(easyrtcid) {
  * path. 
  * @param {type} fields just be JSON serializable to a length of not more than 128 bytes.
  * @example 
- *   easyrtc.setAppDefinedFields( { favorite_alien:'Mr Spock'});
+ *   easyrtc.setApiFields( { favorite_alien:'Mr Spock'});
  *   easyrtc.setRoomOccupantListener( function(roomName, list, isPrimaryOwner) {
  *      for( var i in list ){
- *         console.log("easyrtcid=" + i + " favorite alien is " + list[i].appDefinedFields.favorite_alien);
+ *         console.log("easyrtcid=" + i + " favorite alien is " + list[i].apiFields.favorite_alien);
  *      }
  *   });
  */
-easyrtc.setAppDefinedFields = function(fields) {
+easyrtc.setApiFields = function(fields) {
     var fieldAsString = JSON.stringify(fields);
     if (JSON.stringify(fieldAsString).length <= 128) {
-        easyrtc.appDefinedFields = JSON.parse(fieldAsString);
+        easyrtc.apiFields = JSON.parse(fieldAsString);
         easyrtc.updateConfigurationInfo();
     }
     else {
-        throw "Developer error: your appDefinedFields were too big";
+        throw "Developer error: your apiFields were too big";
     }
 };
 /** Default error reporting function. The default implementation displays error messages
@@ -2643,8 +2643,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 language: navigator.language
             }
         };
-        if (!isEmptyObj(easyrtc.appDefinedFields)) {
-            newConfig.apiField = easyrtc.appDefinedFields;
+        if (!isEmptyObj(easyrtc.apiFields)) {
+            newConfig.apiField = easyrtc.apiFields;
         }
         if (!isEmptyObj(p2pList)) {
             newConfig.p2pList = p2pList;
