@@ -1,16 +1,4 @@
-html
-{
-    overflow: auto;
-    background-color: #fff;
-}
 
-body
-{
-	font: 14px "DejaVu Sans Condensed", "Liberation Sans", "Nimbus Sans L", Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans serif;
-	line-height: 130%;
-	color: #000;
-	background-color: #fff;
-}
 
 a {
     color: #444;
@@ -66,50 +54,7 @@ section
 	font-weight: lighter;
 }
 
-nav
-{
-	display: block;
-	float: left;
-    margin-left: -230px;
-    margin-top: 28px;
-    width: 220px;
-    border-left: 1px solid #ccc;
-    padding-left: 9px;
-}
 
-nav ul {
-    font-family: 'Lucida Grande', 'Lucida Sans Unicode', arial, sans-serif;
-    font-size: 100%;
-    line-height: 17px;
-    padding:0;
-    margin:0;
-    list-style-type:none;
-}
-
-nav h2 a, nav h2 a:visited {
-    color: #A35A00;
-    text-decoration: none;
-}
-
-nav h3 {
-    margin-top: 12px;
-}
-
-nav li {
-    margin-top: 6px;
-}
-
-nav a {
-    color: #5C5954;
-}
-
-nav a:visited {
-    color: #5C5954;
-}
-
-nav a:active {
-    color: #5C5954;
-}
 
 footer {
     display: block;
@@ -162,6 +107,12 @@ h5, .container-overview .subsection-title
 	margin: 8px 0 3px -16px;
 }
 
+.subsection-title {
+    padding-top: 4em;
+    padding-bottom: 1em;
+} 
+
+
 h6
 {
 	font-size: 100%;
@@ -195,14 +146,17 @@ h6
 	font-family: Consolas, "Lucida Console", Monaco, monospace;
 }
 
-.details { margin-top: 14px; border-left: 2px solid #DDD; }
-.details dt { width:100px; float:left; padding-left: 10px;  padding-top: 6px; }
+.name {
+   border-top: 3px solid gray;
+   padding-top: 2em;
+}
+
+.details { margin-top: 14px; }
+.details dt { width:100px; float:left; border-left: 2px solid #DDD; padding-left: 10px;  padding-top: 6px; }
 .details dd { margin-left: 50px; }
 .details ul { margin: 0; }
 .details ul { list-style-type: none; }
 .details li { margin-left: 30px; padding-top: 6px; }
-.details pre.prettyprint { margin: 0 }
-.details .object-value { padding-top: 0; }
 
 .description {
 	margin-bottom: 1em;
@@ -240,11 +194,6 @@ h6
 	background-color: #fff;
 	color: #000;
 	border-left: 3px #ddd solid;
-}
-
-.prettyprint code span.line
-{
-  display: inline-block;
 }
 
 .params, .props
