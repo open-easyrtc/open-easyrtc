@@ -31,7 +31,6 @@
 
   "dependencies" : {
     "async"     : "0.2.x",
-    "clone"     : "0.1.x",
     "colors"    : "*", 
     "underscore": "1.4.x"
   },
