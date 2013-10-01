@@ -4,7 +4,7 @@
   "homepage"    : "http://www.easyrtc.com/",
   "author"      : "Priologic Software Inc. <info@priologic.com> (http://priologic.com/)",
   "description" : "EasyRTC enables quick development of webRTC",
-  "contributors": [ 
+  "contributors": [
     "Doug Pelton <doug@priologic.com>",
     "Rod Apeldoorn <rod.apeldoorn@priologic.com>",
     "Eric Davies <eric.davies@priologic.com>"
@@ -31,10 +31,9 @@
 
   "dependencies" : {
     "async"     : "0.2.x",
-    "colors"    : "*", 
+    "colors"    : "*",
     "underscore": "1.4.x"
   },
-
 
   "analyze"     : false,
 

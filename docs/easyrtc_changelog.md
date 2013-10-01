@@ -9,7 +9,7 @@ New Features:
   - API - Functions to support fields - getRoomFields(), getApplicationFields(), getConnectionFields()
   - Server/API - Support for fields (Application, room, and connection level)
   - Server - Capability to set server options for specific applications, and rooms. Added parameter to createApp() and createRoom() to support this.
-  - Server - Added setOption() and getOption() methods to application and room objects. 
+  - Server - Added setOption() and getOption() methods to application and room objects.
   - Server - Support for setting fields with new functions added to the application, room, and connection objects.
     - getField()
     - getFields()
@@ -31,7 +31,7 @@ v0.10.0a
 --------
 New Features:
  * Server/API - Rooms. An EasyRTC application can have multiple rooms. A user can be in one or more rooms at the same time. Users can only see other users in the same room. If no room is provided, connections will be entered into a room named `default`.
- * Server/API - Custom authentication method. Username / Credential can be provided. Username is broadcast to other authenticated users, so it may be used by apps.  
+ * Server/API - Custom authentication method. Username / Credential can be provided. Username is broadcast to other authenticated users, so it may be used by apps.
  * Server - Reworked to be node.js module. (BIGGEST NEW FEATURE)
  * Server - New server options handler. Allows possibility of server/application/room level options. Many new options available.
  * Server - Many new server events. This is intended to be the new primary way for developers to interact with EasyRTC server.
@@ -43,7 +43,7 @@ Changes:
  * Server - Better incoming message validation. Now it's handled once right after the message is received.
  * Documentation - While the EasyRTC logo remains, when in text form, EasyRTC will have a capitol "E", which should make writing about it in sentences easier.
 
-Removed Features: 
+Removed Features:
  * Server - No longer includes modules for express, socket.io. These must now be included in your server app. (See our server examples)
  * Server - No longer uses the winston module for logging. The default listener logs to the console. This can be easily overruled by setting your own `log` listener.
  * Server - No longer includes the experimental STUN server. If there is enough demand we can release it as a separate module, otherwise there are several good STUN and TURN solutions now available.
@@ -64,7 +64,7 @@ New Features:
 
 Changes:
  * API - Implementing methods used in Google's adapter.js for cross browser support
- * Server/API - Renamed easyRTCcmd socket message type to easyrtcCmd. Should have no outside effect. 
+ * Server/API - Renamed easyRTCcmd socket message type to easyrtcCmd. Should have no outside effect.
  * Server - Moved API files to the /api/ folder thus cleaning up the /static/. API files are publicly linked using /easyrtc/easyrtc.js and /easyrtc/easyrtc.css. For transitional purposes, the old public file locations are still accessible.
  * Server - Version bump for express to 3.3.x
  * Demos - Renamed mobile rooms demo to multiparty char room demo so its capabilities were more clear
@@ -73,14 +73,14 @@ Changes:
 Fixes:
  * API - Firefox - Strips TURN servers from ICE config if they are present. Firefox doesn't currently handle TURN servers well.
  * API - Added one second delay to getUserMedia call to try and correct some page loading problems.
- 
+
 
 v0.8.0
 ------
 
 New Features:
 
- * API - Added support for grabbing the screen as the local media source. Currently this only works in Canary, and causes the browser to crash if you try to use it in a peer connection. 
+ * API - Added support for grabbing the screen as the local media source. Currently this only works in Canary, and causes the browser to crash if you try to use it in a peer connection.
  * API - Added support for grabbing video at high-definition instead of the default standard definition. Warning: the browser may cheat and give you a lower resolution than you asked for that has the desired aspect ratio.
  * API - Added a number of callbacks to the initManaged method to support richer interactions with the client.
  * API - Added a cleaner error reporting mechanism. The code now calls showError(errCode, errText) to report an error. showError will in turn call onError (which you can still override).
@@ -98,10 +98,10 @@ Changes:
  * Demos - Removed references to Firefox requiring flags
  * Server - Version bumps for node modules express (3.2.x) and winston (0.7.x).
  * Server - Added additional public stun servers
- 
+
 Fixes:
  * API - The mozRTCSessionDescription object didn't used to work properly in Firefox. Now it appears to be required.
- * API - When initMediaSource is called, the API creates a temporary video object to determine the pixel dimensions of the local camera. Until this version, that video object wasn't being explicitly destroyed, which resulted in a feedback shriek in Firefox and the most recent versions of Chrome. The temporary video object is now being destroyed.   
+ * API - When initMediaSource is called, the API creates a temporary video object to determine the pixel dimensions of the local camera. Until this version, that video object wasn't being explicitly destroyed, which resulted in a feedback shriek in Firefox and the most recent versions of Chrome. The temporary video object is now being destroyed.
 
 
 v0.7.0
