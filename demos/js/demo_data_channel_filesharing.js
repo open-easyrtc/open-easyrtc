@@ -143,16 +143,15 @@ function convertListToButtons(roomName, data, isPrimary) {
             }
             else if (easyrtc.getConnectStatus(peerid) === easyrtc.IS_CONNECTED) {
                 if( !fileSender) {
-                    fileSender = easyrtc.buildFileSender(peerid, updateStatusDiv);
+                    fileSender = easyrtc_ft.buildFileSender(peerid, updateStatusDiv);
                 }
-                fileSender(files);
+                fileSender(files, true /* assume binary */);
             }
             else {
                 tawk.showError("Wait for the connection to complete before adding more files!");
             }
         }        
-        easyrtc.buildDragNDropRegion(div, filesHandler);
-        easyrtc.buildFileSender(div, peerid, updateStatusDiv);
+        easyrtc_ft.buildDragNDropRegion(div, filesHandler);
         return div;
     }
 
@@ -244,11 +243,14 @@ function receiveStatusCB(otherGuy, msg) {
     return true;
 }
 
+function blobAcceptor(otherGuy, blob, filename) {
+    easyrtc_ft.saveAs(blob, filename);
+}
 
 function loginSuccess(easyrtcId) {
     selfEasyrtcid = easyrtcId;
     document.getElementById("iam").innerHTML = "I am " + easyrtcId;
-    easyrtc.buildFileReceiver(acceptRejectCB, receiveStatusCB);
+    easyrtc_ft.buildFileReceiver(acceptRejectCB, blobAcceptor, receiveStatusCB);
 }
 
 

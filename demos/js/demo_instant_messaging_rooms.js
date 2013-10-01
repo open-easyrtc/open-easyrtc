@@ -301,7 +301,7 @@ function displayFields() {
     outstr += "Connection fields<div style='margin-left:1em'>";
     outstr += JSON.stringify(easyrtc.getConnectionFields());
     outstr += "</div><br>";
-    var roomlist = easyrtc.getRoomsInside();
+    var roomlist = easyrtc.getRoomsJoined();
     for (var roomname in roomlist) {
         var roomfields = easyrtc.getRoomFields(roomname);
         if (roomfields != null) {
