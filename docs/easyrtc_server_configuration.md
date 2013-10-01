@@ -48,7 +48,7 @@ The following server.js code snippet includes three ways of setting EasyRTC opti
 	var easyrtcListener;
 	
 	
-	// Configure EasyRTC to load demos from /easyrtcdemos/ 
+	// Configure EasyRTC to load demos from /easyrtcdemos/
 	easyrtc.setOption("demosPublicFolder", "/easyrtcdemos");
 	
 	// Start EasyRTC server with options to change the log level and add dates to the log.
@@ -63,7 +63,7 @@ The following server.js code snippet includes three ways of setting EasyRTC opti
 	
 	            // Creates a new application called MyApp with a default room named "SectorOne".
 	            rtc.createApp(
-	                "easyrtc.instantMessaging", 
+	                "easyrtc.instantMessaging",
 	                {"roomDefaultName":"SectorOne"},
 	                myEasyrtcApp
 	            );
@@ -97,46 +97,46 @@ Available Server Options
    - Defaults to: true
  - appDefaultFieldObj
    - Default fields which are set when an application is created. In form of {"fieldName":{fieldValue:<JsonObj>, fieldOption:{isShared:<boolean>}}[, ...]}
-   - Defaults to: null               
+   - Defaults to: null
  - appDefaultName
    - The default application a connection belongs to if it is not initially specified.
    - Defaults to: "default"
 
 **Room Options**
- - roomAutoCreateEnable 
+ - roomAutoCreateEnable
    - Enables the creation of rooms from the API. Occurs when client joins a nonexistent room.
    - Defaults to: true
- - roomDefaultEnable    
+ - roomDefaultEnable
    -  Enables connections joining a default room if it is not initially specified. If false, than a connection initially may be in no room.
-   - Defaults to: true                        
+   - Defaults to: true
  - roomDefaultFieldObj
    - Default fields which are set when a room is created. In form of {"fieldName":{fieldValue:<JsonObj>, fieldOption:{isShared:<boolean>}}[, ...]}
    - Defaults to: null
- - roomDefaultName      
+ - roomDefaultName
    - The default room a connection joins if it is not initially specified.
-   - Defaults to: "default"                   
+   - Defaults to: "default"
 
 
 **Connection Options**
- - connectionDefaultField 
+ - connectionDefaultField
    - Default connection fields.
    - Defaults to: {browserFamily:  {share:true, regex:null, data:null},browserMajor:   {share:true, regex:null, data:null},osFamily:       {share:true, regex:null, data:null},deviceFamily:   {share:true, regex:null, data:null}}
 
 
 **API Hosting Options**
- - apiEnable            
+ - apiEnable
    - Enables hosting of the EasyRTC API files.
-   - Defaults to: true                       
- - apiPublicFolder      
+   - Defaults to: true
+ - apiPublicFolder
    - Api public folder without trailing slash. Note that the demos expect this to be '/easyrtc'
-   - Defaults to: "/easyrtc"       
- - apiMinifyJsEnable    
+   - Defaults to: "/easyrtc"
+ - apiMinifyJsEnable
    - Minify's the API Javascript for faster transfer.
    - NOT YET IMPLEMENTED
-   - Defaults to: true                         
- - apiOldLocationEnable 
+   - Defaults to: true
+ - apiOldLocationEnable
    - [Depreciated] Listens for requests to core API files in old locations (in addition to the new standard locations)
-   - Defaults to: true         
+   - Defaults to: true
 
 
 **Demo Options**
@@ -145,23 +145,23 @@ Available Server Options
    - Defaults to: true
  - demosPublicFolder
    - Demos public folder without trailing slash.
-   - Defaults to: "/demos"                      
+   - Defaults to: "/demos"
 
 
 **Log options** - Only apply if internal 'log' event is used
  - logLevel
    - The minimum log level to show. (debug|info|warning|error|none)
    - Defaults to: "info"
- - logDateEnable     
+ - logDateEnable
    -  Display timestamp in each entry
    - Defaults to: false
- - logErrorStackEnable 
+ - logErrorStackEnable
    - print the stack trace in logged errors when available
    - Defaults to: true
  - logWarningStackEnable
    - print the stack trace in logged warnings when available
    - Defaults to: true
- - logColorEnable     
+ - logColorEnable
    - include console colors. Disable if forwarding logs to files or databases
    - Defaults to: true
  - logObjectDepth
@@ -180,36 +180,36 @@ Available Server Options
    - API Version
    - Defaults to: /^[a-z0-9_.-]{1,32}$/i
  - appNameRegExp
-   - Application name 
-   - Defaults to: /^[a-z0-9_.-]{1,32}$/i       
+   - Application name
+   - Defaults to: /^[a-z0-9_.-]{1,32}$/i
  - easyrtcidRegExp
    - EasyRTC socket id (easyrtcid)
-   - Defaults to: /^[a-z0-9_.-]{1,32}$/i       
+   - Defaults to: /^[a-z0-9_.-]{1,32}$/i
  - easyrtcsidRegExp
    - EasyRTC session id (easyrtcsid)
-   - Defaults to: /^[a-z0-9_.-]{1,64}$/i       
+   - Defaults to: /^[a-z0-9_.-]{1,64}$/i
  - groupNameRegExp
    - Group name
-   - Defaults to: /^[a-z0-9_.-]{1,32}$/i       
+   - Defaults to: /^[a-z0-9_.-]{1,32}$/i
  - fieldNameRegExp
    - Field names (for defining app and room custom fields)
-   - Defaults to: /^[a-z0-9_. -]{1,32}$/i      
+   - Defaults to: /^[a-z0-9_. -]{1,32}$/i
  - optionNameRegExp
    - Option names (for defining server options)
-   - Defaults to: /^[a-z0-9_. -]{1,32}$/i      
+   - Defaults to: /^[a-z0-9_. -]{1,32}$/i
  - presenceShowRegExp
    - Allowed presence "show" values (for setPresence command)
-   - Defaults to: /^(away|chat|dnd|xa)$/       
+   - Defaults to: /^(away|chat|dnd|xa)$/
  - presenceStatusRegExp
    - Allowed presence "status" value
-   - Defaults to: /^(.){0,255}$/               
+   - Defaults to: /^(.){0,255}$/
  - roomNameRegExp
    - Room name
-   - Defaults to: /^[a-z0-9_.-]{1,32}$/i       
+   - Defaults to: /^[a-z0-9_.-]{1,32}$/i
  - sessionKeyRegExp
    - Session key (easyrtcsid)
-   - Defaults to: /^[a-z0-9_.-]{1,32}$/i       
+   - Defaults to: /^[a-z0-9_.-]{1,32}$/i
  - usernameRegExp
    - Username
-   - Defaults to: /^(.){1,64}$/i                
+   - Defaults to: /^(.){1,64}$/i
 

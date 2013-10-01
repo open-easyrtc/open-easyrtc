@@ -1,12 +1,12 @@
 EasyRTC: Server Events
 ======================
 
-Customizing the server behavior of an EasyRTC application is done by creating listeners and associating them with EasyRTC events. 
+Customizing the server behavior of an EasyRTC application is done by creating listeners and associating them with EasyRTC events.
 
 
 ## Setting Event Listeners
 
-Setting event listeners in EasyRTC is similar to the node.js events module method. Any differences are noted below. 
+Setting event listeners in EasyRTC is similar to the node.js events module method. Any differences are noted below.
 
     easyrtc.on(event, listener);
 
@@ -22,20 +22,19 @@ Removing event listeners in EasyRTC is similar to the node.js events module meth
  - Removing a listener automatically re-adds the EasyRTC default listener.
 
 
-
 ## EasyRTC Event Callback Convention
 
 Many EasyRTC listeners include a callback as the last parameter. Conventions will differ depending on if it is named 'next' or 'callback'.
 
 - **next**
   - Informs EasyRTC that your listener is done processing and to move onto the next stage of the operation.
-  - Expects a single 'err' parameter which should be null unless there is an error which should stop the operation and be logged. 
+  - Expects a single 'err' parameter which should be null unless there is an error which should stop the operation and be logged.
 
 - **callback**
   - Informs EasyRTC that your listener is done processing and to move onto the next stage of the operation.
   - The first parameter is always an 'err' type which should be null unless there is an error which should stop the operation and be logged.
   - The remaining parameter list will match that of the listener with the exception of the final callback parameter which is omitted.
-  
+
 ## Calling Default EasyRTC Listeners
 
 Setting a listener overrides the default EasyRTC listener. Depending on your application you may wish to release control back to the default EasyRTC listener.

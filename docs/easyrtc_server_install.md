@@ -113,7 +113,7 @@ Below is a small upstart script which can be saved as /etc/init/easyrtc.conf
 
 This will start EasyRTC at boot and allow you to start and stop the service in the console using the following:
 
-    sudo start easyrtc  
+    sudo start easyrtc
     sudo stop easyrtc
 
 There are improvements which can be made such as increasing the open file limit, running the service as a non-root user, and adding notification commands to let administrators know of problems.
@@ -122,20 +122,20 @@ There are improvements which can be made such as increasing the open file limit,
 Your First EasyRTC Server Program
 =================================
 
-Below is the initial server program which will run an EasyRTC server along with all the demos. This server program is also included within the EasyRTC download. 
+Below is the initial server program which will run an EasyRTC server along with all the demos. This server program is also included within the EasyRTC download.
 
     // Load required modules
     var http    = require("http");              // http server core module
     var express = require("express");           // web framework external module
     var io      = require("socket.io");         // web socket external module
     var easyrtc = require("easyrtc");           // EasyRTC external module
-    
+
     // Start Express http server on port 8080
     var webServer = http.createServer(httpApp).listen(8080);
-    
+
     // Start Socket.io so it attaches itself to Express server
     var socketServer = io.listen(webServer);
-    
+
     // Start EasyRTC server
     var easyrtcServer = easyrtc.listen(httpApp, socketServer);
 

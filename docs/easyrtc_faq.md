@@ -6,7 +6,7 @@ What is WebRTC?
 
 WebRTC allows real-time communications within the browser without the need for plugins. A few of its greatest benefits include:
 
- * Standardized methods of connecting to web cameras and microphones. 
+ * Standardized methods of connecting to web cameras and microphones.
  * Peer to peer connections. Improves latency and reduces bottlenecks on the servers.
  * Standardized negotiation for steaming audio, video and data.
 

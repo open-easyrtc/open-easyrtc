@@ -25,8 +25,6 @@ Fixes:
  * Lots. But please let us know if there's any others which need doing.
 
 
-
-
 v0.10.0a
 --------
 New Features:

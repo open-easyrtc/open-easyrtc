@@ -3,7 +3,7 @@
  */
 #easyrtcErrorDialog {
     background-color: #ffe0e0;
-    
+
     position:fixed;
     right: 10px;
     top:20px;
@@ -37,7 +37,7 @@
     position:static;
     font-style: italic;
     font-size: 12px;
-    width:300px;    
+    width:300px;
     margin-bottom: 0.5em;
     clear: both;
     float:left;
@@ -51,10 +51,10 @@
 
 .easyrtcMirror {
     -webkit-transform: scaleX(-1);
-    -moz-transform: scaleX(-1); 
-    -ms-transform: scaleX(-1); 
-    -o-transform: scaleX(-1); 
-    transform: scaleX(-1);    
+    -moz-transform: scaleX(-1);
+    -ms-transform: scaleX(-1);
+    -o-transform: scaleX(-1);
+    transform: scaleX(-1);
 }
 
 .easyrtc_closeButton {

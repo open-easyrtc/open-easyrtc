@@ -4,7 +4,7 @@ EasyRTC socket messages are sent via socket.io using three custom emit types:
 
  - **easyrtcAuth** - Initial negotiation and authentication
  - **easyrtcCmd** - All standard EasyRTC communications including WebRTC messages
- - **easyrtcMsg** - Custom application specific messages 
+ - **easyrtcMsg** - Custom application specific messages
 
 
 ----------
@@ -12,7 +12,7 @@ EasyRTC socket messages are sent via socket.io using three custom emit types:
 
 # easyrtcAuth
 
-"easyrtcAuth" is the socket.io emit type which EasyRTC expects to initialize (or re-initialize) a connection. No other messages are handled by EasyRTC until a connection is authenticated. 
+"easyrtcAuth" is the socket.io emit type which EasyRTC expects to initialize (or re-initialize) a connection. No other messages are handled by EasyRTC until a connection is authenticated.
 
 ## Incoming (to server)
 
@@ -25,7 +25,7 @@ Includes fields needed for authentication. Sender and target must be online, aut
 
 **msgData Fields:**
 
- - **apiVersion** (required) Api version string. 
+ - **apiVersion** (required) Api version string.
  - **applicationName** (optional) Will default to the server default application.
  - **easyrtcsid** (optional) The EasyRTC session ID which should be available in the browser cookie variables.
  - **username** (optional)
@@ -67,15 +67,15 @@ WebRTC signal. Sends WebRTC offer for establishing peer-connection. Sender and t
 
  - **targetEasyrtcid** (required)
  - **msgData** (required)
-   - Contains candidate data (SDP's) 
- 
+   - Contains candidate data (SDP's)
+
 
 ### msgType - 'answer'
 WebRTC signal. Accepts WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
 
- - **targetEasyrtcid** (required) 
+ - **targetEasyrtcid** (required)
  - **msgData** (required)
    - Contains session description (SDP)
 
@@ -145,7 +145,7 @@ Sets user online presence which is re-broadcast as part of the list. User must b
 
 **msgData Fields:**
 
-   - **setPresence** 
+   - **setPresence**
      - **show** (optional) [`away`|`chat`|`dnd`|`xa`]
      - **status** (optional) User configurable status string. TODO: Set regex for max length and allowed characters.
 
@@ -163,7 +163,7 @@ Sets user configurable options. User must be authenticated.
 
 **msgData Fields:**
 
- - **setUserCfg** 
+ - **setUserCfg**
    - **p2pList** (optional) Map of all connections with their statistics. The map key is the easyrtcid's. Unlike userSettings and apiField, this field must contain all current connections. Any connections not mentioned will be removed.
    - **userSettings** (optional) Map of fields related to the user's settings, WebRTC, browser, and OS capabilities/status. Any settings not mentioned will be left as-is. To remove a setting, give it a value of `null`.
    - **apiField** (optional) Map of fields for the special appDefinedFields value which gets transferred in the broadcast list. Any fields not mentioned will be left as-is. To remove a field, give it a value of `null`.
@@ -191,8 +191,8 @@ Sends WebRTC offer for establishing peer-connection. Sender and target must be o
  - **serverTime** (required)
  - **senderEasyrtcid** (required)
  - **msgData** (required)
-   - Contains candidate data (SDP's) 
- 
+   - Contains candidate data (SDP's)
+
 
 ### msgType - 'answer'
 Accepts WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
@@ -232,12 +232,12 @@ Initiates an authenticated EasyRTC application. Note this may be sent multiple t
  - **msgData** (required)
 
 **msgData Fields:**
- 
+
  - **easyrtcid** (required)
  - **easyrtcsid** (if available)
  - **field** (optional - map of connection fields)
    - **fieldName**
-   - **fieldValue** 
+   - **fieldValue**
  - **iceConfig** (required)
  - **groupList** (optional - default to no group)
  - **roomData** (required) See roomData msgType for contents
@@ -245,7 +245,7 @@ Initiates an authenticated EasyRTC application. Note this may be sent multiple t
    - **applicationName** (required - defaults to 'default')
    - **field** (optional - map of application fields)
      - **fieldName**
-     - **fieldValue** 
+     - **fieldValue**
    - May contain other application options which user is permitted to view.
 
 
@@ -279,7 +279,7 @@ Provides room information for all rooms the user is currently in. This includes 
      - **removeClient** (optional) Map of easyrtcids to remove from the client list.
    - **field** (optional) - map of room fields
      - **fieldName**
-     - **fieldValue** 
+     - **fieldValue**
 
 
 ### msgType - 'roomList'
@@ -297,7 +297,7 @@ Provides rooms which the client has access to. By default authenticated users ca
 
 
 ### msgType - 'forwardToUrl'
-Instructs API to forward user to specified URL. Useful for server handled error handling and user support techniques. 
+Instructs API to forward user to specified URL. Useful for server handled error handling and user support techniques.
 
 **Fields:**
 

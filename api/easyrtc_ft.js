@@ -34,7 +34,6 @@
  */
 
 
-
 easyrtc_ft = {};
 
 /**
@@ -150,12 +149,12 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
  * @param {String} destUser easyrtcId of the person being sent to.
  * @param {Function} progressListener - if provided, is called with the following objects:
  *    {status:"waiting"}  // once a file offer has been sent but not accepted or rejected yet
- *    {status:"working", position:position_in_file, size:size_of_current_file, numFiles:number_of_files_left} 
+ *    {status:"working", position:position_in_file, size:size_of_current_file, numFiles:number_of_files_left}
  *    {status:"cancelled"}  // if the remote user cancels the sending
  *    {status:"done"}       // when the file is done
  *    the progressListener should always return true for normal operation, false to cancel a filetransfer.
- * @return {Function} an object that accepts an array of File (the Files to be sent), and a boolean 
- *   argument that is true if the files are binary, false if they are text. 
+ * @return {Function} an object that accepts an array of File (the Files to be sent), and a boolean
+ *   argument that is true if the files are binary, false if they are text.
  *   It is safe to treat all files as binary, it will just require more bandwidth.
  */
 easyrtc_ft.buildFileSender = function(destUser, progressListener) {
@@ -211,7 +210,6 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
     easyrtc.setPeerListener(fileOfferRejected, "files_reject", destUser);
     easyrtc.setPeerListener(fileOfferAccepted, "files_accept", destUser);
     easyrtc.setPeerListener(fileCancelReceived, destUser, "files_cancel");
-
 
 
     var maxChunkSize = 50000;
@@ -304,10 +302,10 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
  * @param {Function(otherGuy,fileNameList, wasAccepted} acceptRejectCB - this function is called when another peer
  * (otherGuy) offers to send you a list of files. this function should call it's wasAccepted function with true to
  * allow those files to be sent, or false to disallow them.
- * @param {Function} blobAcceptor - this function is called three arguments arguments: the suppliers easyrtcid, a blob and a filename. It is responsible for 
+ * @param {Function} blobAcceptor - this function is called three arguments arguments: the suppliers easyrtcid, a blob and a filename. It is responsible for
  * saving the blob to the file, usually using easyrtc_ft.saveAs.
  * @param {type} statusCB  - this function is called with the current state of file receiving. It is passed two arguments:
- * otherGuy - the easyrtcid of the person sending the files. * 
+ * otherGuy - the easyrtcid of the person sending the files. *
  * msg - one of the following structures:
  * {status:"done", reason:"accept_failed"}
  * {status:"done", reason:"success"}
@@ -315,10 +313,10 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
  * {status:"eof"},
  * {status:"started"}
  * {status:"progress" name:filename,
- *    received:received_size_in_bytes, 
+ *    received:received_size_in_bytes,
  *    size:file_size_in_bytes }
- *  @example 
- *    
+ *  @example
+ *
  *    easyrtc_ft(
  *       function(otherGuy, filenamelist, wasAccepted) {  wasAccepted(true);},
  *       function(otherGuy, blob, filename) { easyrtc_ft(blob, filename);},
@@ -385,7 +383,7 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
             userStream.lengthExpected = msgData.size;
             userStream.currentData = [];
         }
-        else if (msgData.data64 || msgData.datatxt) {            
+        else if (msgData.data64 || msgData.datatxt) {
             var binData;
             if( msgData.data64) {
                   binData = atob(msgData.data64);
