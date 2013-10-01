@@ -235,11 +235,17 @@ Initiates an authenticated EasyRTC application. Note this may be sent multiple t
  
  - **easyrtcid** (required)
  - **easyrtcsid** (if available)
+ - **field** (optional - map of connection fields)
+   - **fieldName**
+   - **fieldValue** 
  - **iceConfig** (required)
  - **groupList** (optional - default to no group)
  - **roomData** (required) See roomData msgType for contents
  - **application**
    - **applicationName** (required - defaults to 'default')
+   - **field** (optional - map of application fields)
+     - **fieldName**
+     - **fieldValue** 
    - May contain other application options which user is permitted to view.
 
 
@@ -271,6 +277,9 @@ Provides room information for all rooms the user is currently in. This includes 
    - **clientListDelta** (optional)
      - **updateClient** (optional) Map of easyrtcids to update. Will contain same fields as 'clientList'
      - **removeClient** (optional) Map of easyrtcids to remove from the client list.
+   - **field** (optional) - map of room fields
+     - **fieldName**
+     - **fieldValue** 
 
 
 ### msgType - 'roomList'

@@ -32,7 +32,6 @@ Setting Server Options Example
 ------------------------------
 The following server.js code snippet includes three ways of setting EasyRTC options.
 
-
 	var http    = require("http");              // http server core module
 	var express = require("express");           // web framework external module
 	var io      = require("socket.io");         // web socket external module
@@ -43,27 +42,43 @@ The following server.js code snippet includes three ways of setting EasyRTC opti
 	httpApp.configure(function() {
 	    httpApp.use(express.static(__dirname + "/static/"));
 	});
-
+	
 	var webServer = http.createServer(httpApp).listen(8080);
 	var socketServer = io.listen(webServer);
-
+	var easyrtcListener;
+	
 	
 	// Configure EasyRTC to load demos from /easyrtcdemos/ 
 	easyrtc.setOption("demosPublicFolder", "/easyrtcdemos");
-
+	
 	// Start EasyRTC server with options to change the log level and add dates to the log.
 	var easyrtcServer = easyrtc.listen(
-			httpApp,
-			socketServer,
-			{logLevel:"debug", logDateEnable:true},
-			easyrtcListener
-	);
+	        httpApp,
+	        socketServer,
+	        {logLevel:"debug", logDateEnable:true},
+	        function(err, rtc) {
 
+	            // After the server has started, we can still change the default room name
+	            rtc.setOption("roomDefaultName", "SectorZero");
 	
-	var easyrtcListener = function(err, ei) {
-		// After the server has started, we can still change the default room name
-		ei.setOption("roomDefaultName", "SectorZero");
+	            // Creates a new application called MyApp with a default room named "SectorOne".
+	            rtc.createApp(
+	                "easyrtc.instantMessaging", 
+	                {"roomDefaultName":"SectorOne"},
+	                myEasyrtcApp
+	            );
+	        }
+	);
+	
+	// Setting option for specific application
+	var myEasyrtcApp = function(err, appObj) {
+	    // All newly created rooms get a field called roomColor.
+	    // Note this does not affect the room "SectorOne" as it was created already.
+	    appObj.setOption("roomDefaultFieldObj",
+	         {"roomColor":{fieldValue:"orange", fieldOption:{isShared:true}}}
+	    );
 	};
+
 
 Available Server Options
 ------------------------
@@ -76,23 +91,30 @@ Available Server Options
 
 
 **Application Options**
+ - appAutoCreateEnable
+   - Enables the creation of application from the API. Occurs when client joins a nonexistent application.
+   - This should be set to false for production use.
+   - Defaults to: true
+ - appDefaultFieldObj
+   - Default fields which are set when an application is created. In form of {"fieldName":{fieldValue:<JsonObj>, fieldOption:{isShared:<boolean>}}[, ...]}
+   - Defaults to: null               
  - appDefaultName
    - The default application a connection belongs to if it is not initially specified.
    - Defaults to: "default"
- - appAutoCreateEnable
-   - Enables the creation of rooms from the API. Occurs when client joins a nonexistent room.
-   - Defaults to: true             
 
 **Room Options**
- - roomDefaultEnable    
-   -  Enables connections joining a default room if it is not initially specified. If false, than a connection initially may be in no room.
-   - Defaults to: true                        
- - roomDefaultName      
-   - The default room a connection joins if it is not initially specified.
-   - Defaults to: "default"                   
  - roomAutoCreateEnable 
    - Enables the creation of rooms from the API. Occurs when client joins a nonexistent room.
    - Defaults to: true
+ - roomDefaultEnable    
+   -  Enables connections joining a default room if it is not initially specified. If false, than a connection initially may be in no room.
+   - Defaults to: true                        
+ - roomDefaultFieldObj
+   - Default fields which are set when a room is created. In form of {"fieldName":{fieldValue:<JsonObj>, fieldOption:{isShared:<boolean>}}[, ...]}
+   - Defaults to: null
+ - roomDefaultName      
+   - The default room a connection joins if it is not initially specified.
+   - Defaults to: "default"                   
 
 
 **Connection Options**
