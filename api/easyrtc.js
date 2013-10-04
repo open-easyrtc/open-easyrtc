@@ -3057,6 +3057,10 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
         videoIds = [];
     }
 
+    function videoIsFree(obj) {
+        return ( obj.caller === "" || obj.caller=== null || obj.caller === undefined);
+    }
+    
 // verify that video ids were not typos.
     if (monitorVideoId && !document.getElementById(monitorVideoId)) {
         easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "The monitor video id passed to initManaged was bad, saw " + monitorVideoId);
@@ -3176,7 +3180,7 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
     easyrtc.setAcceptChecker(function(caller, helper) {
         for (var i = 0; i < numPEOPLE; i++) {
             var video = getIthVideo(i);
-            if (video.caller === "") {
+            if (videoIsFree(video)) {
                 helper(true);
                 return;
             }
@@ -3188,7 +3192,7 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
             easyrtc.debugPrinter("stream acceptor called");
         }
         var i, video;
-        if (refreshPane && refreshPane.caller === "") {
+        if (refreshPane && videoIsFree(refreshPane)) {
             easyrtc.setVideoObjectSrc(video, stream);
             if (onCall) {
                 onCall(caller);
@@ -3209,7 +3213,7 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
 
         for (i = 0; i < numPEOPLE; i++) {
             video = getIthVideo(i);
-            if (!video.caller || video.caller === "") {
+            if (!video.caller || videoIsFree(video)) {
                 video.caller = caller;
                 if (onCall) {
                     onCall(caller, i);

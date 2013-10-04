@@ -534,7 +534,6 @@ function callEverybodyElse(roomName, otherPeople) {
     for(var i in otherPeople ) {
         list.push(i);
     }
-    console.log("call everybody else");
     //
     // Connect in reverse order. Latter arriving people are more likely to have
     // empty slots.
@@ -542,7 +541,6 @@ function callEverybodyElse(roomName, otherPeople) {
     function establishConnection(position) {
         function callSuccess() {
             connectCount++;
-            console.log("saw call success");
             if( connectCount < maxCALLERS && position > 0) {
                 establishConnection(position-1);
             }
