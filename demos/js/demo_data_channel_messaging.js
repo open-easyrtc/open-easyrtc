@@ -35,7 +35,7 @@ function connect() {
     easyrtc.enableAudio(false);
     easyrtc.setDataChannelOpenListener(openListener);
     easyrtc.setDataChannelCloseListener(closeListener);
-    easyrtc.setDataListener(addToConversation);
+    easyrtc.setPeerListener(addToConversation);
     easyrtc.setRoomOccupantListener(convertListToButtons);
     easyrtc.connect("easyrtc.dataMessaging", loginSuccess, loginFailure);
 }

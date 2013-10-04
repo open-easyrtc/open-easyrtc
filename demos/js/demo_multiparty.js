@@ -512,7 +512,6 @@ function killActiveBox() {
         collapseToThumb();
         setTimeout( function() {
             easyrtc.hangup(caller);
-            easyrtc.sendDataWS(null, {hangupEasyrtcid:caller});
         }, 400);
     }  
 }
@@ -535,7 +534,7 @@ function callEverybodyElse(roomName, otherPeople) {
     for(var i in otherPeople ) {
         list.push(i);
     }
-    
+    console.log("call everybody else");
     //
     // Connect in reverse order. Latter arriving people are more likely to have
     // empty slots.
@@ -543,6 +542,7 @@ function callEverybodyElse(roomName, otherPeople) {
     function establishConnection(position) {
         function callSuccess() {
             connectCount++;
+            console.log("saw call success");
             if( connectCount < maxCALLERS && position > 0) {
                 establishConnection(position-1);
             }
@@ -582,7 +582,7 @@ function sendText(e) {
         for(var i = 0; i < maxCALLERS; i++ ) {
             var caller = easyrtc.getIthCaller(i);
             if( caller && caller != "") {
-                easyrtc.sendData(caller, stringToSend);
+                easyrtc.sendPeerMessage(caller, "im",  stringToSend);
             }        
         }
     } 
@@ -656,7 +656,7 @@ function showMessage(startX, startY, content) {
     }
 }
 
-function messageListener(who, content) {
+function messageListener(who, msgType, content) {
     for(var i = 0; i < maxCALLERS; i++) {
         if( easyrtc.getIthCaller(i) == who) {
             var startArea = document.getElementById(getIdOfBox(i+1));
@@ -688,7 +688,7 @@ function appInit() {
 
     easyrtc.setRoomOccupantListener(callEverybodyElse);
     easyrtc.initManaged("roomDemo", "box0", ["box1", "box2", "box3"], loginSuccess);
-    easyrtc.setDataListener(messageListener);
+    easyrtc.setPeerListener(messageListener);
     easyrtc.setDisconnectListener( function() {
         easyrtc.showError("LOST-CONNECTION", "Lost connection to signalling server");
     });   

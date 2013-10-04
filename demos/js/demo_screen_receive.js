@@ -124,7 +124,7 @@ function requestFullScreen() {
 }
 
 
-easyrtc.setDataListener(function(peer, data){
+easyrtc.setPeerListener(function(peer, msgType, data){
     var otherClientDiv = document.getElementById('otherClients');
     var button = document.createElement('button');
     button.onclick = function(easyrtcid) {

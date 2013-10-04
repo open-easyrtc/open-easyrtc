@@ -70,7 +70,7 @@ function connect() {
         contactedListeners = otherPeers;
     });
     
-    easyrtc.setDataListener(function(peer, data){});
+    easyrtc.setPeerListener(function(peer, msgType, data){});
     
     easyrtc.connect("easyrtc.videoScreen", loginSuccess, loginFailure);
 }

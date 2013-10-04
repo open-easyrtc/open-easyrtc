@@ -73,7 +73,11 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
         var dt = e.dataTransfer;
         var files = dt.files;
         if (dt.files.length > 0) {
+            try {
             filesHandler(files);
+            }catch( errorEvent) {
+                console.log("dragndrop errorEvent", errorEvent);
+            }
         }
         return ignore(e);
     }

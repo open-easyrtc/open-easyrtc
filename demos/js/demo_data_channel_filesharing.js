@@ -53,13 +53,24 @@ function connect() {
         responsefn(true);
     });
 
-    easyrtc.setDataChannelOpenListener(function(easyrtcid) {
-        jQuery(buildDragNDropName(easyrtcid)).addClass("connected");
-        jQuery(buildDragNDropName(easyrtcid)).removeClass("unconnected");
+    easyrtc.setDataChannelOpenListener(function(easyrtcid, works) {
+        var obj = document.getElementById(buildDragNDropName(easyrtcid));        
+        if( !obj) {
+            console.log("no such object ");
+        }
+        console.log("open listener saw value of " + works);
+        if( works) {
+            jQuery(obj).removeClass("usesSockets");
+            jQuery(obj).addClass("connected");
+        }
+        else {
+            jQuery(obj).addClass("usesSockets");
+        }
+        jQuery(obj).removeClass("notConnected");
     });
 
     easyrtc.setDataChannelCloseListener(function(easyrtcid) {
-        jQuery(buildDragNDropName(easyrtcid)).addClass("unconnected");
+        jQuery(buildDragNDropName(easyrtcid)).addClass("notConnected");
         jQuery(buildDragNDropName(easyrtcid)).removeClass("connected");
     });
 
@@ -91,7 +102,7 @@ function convertListToButtons(roomName, data, isPrimary) {
 
     function buildDropDiv(peerid) {
         var statusDiv = document.createElement("div");
-        statusDiv.className = ".dragndropStatus";
+        statusDiv.className = "dragndropStatus";
 
         var div = document.createElement("div");
         div.id = buildDragNDropName(peerid);
@@ -116,7 +127,7 @@ function convertListToButtons(roomName, data, isPrimary) {
                     break;
                 case "done":
                     statusDiv.innerHTML = "done";
-                    div.className = "dragndrop notConnected";
+                    // div.className = "dragndrop notConnected";
                     setTimeout(function() {
                         statusDiv.innerHTML = "";
                     }, 3000);

@@ -509,7 +509,7 @@ function killActiveBox() {
         collapseToThumb();
         setTimeout( function() {
             easyrtc.hangup(caller);
-            easyrtc.sendDataWS(null, {hangupEasyrtcid:caller});
+            easyrtc.sendServerMessage(null, "hangup", {hangupEasyrtcid:caller});
         }, 400);
     }  
 }
@@ -583,7 +583,7 @@ function sendText(e) {
         for(var i = 0; i < maxCALLERS; i++ ) {
             var caller = easyrtc.getIthCaller(i);
             if( caller && caller !== "") {
-                easyrtc.sendData(caller, stringToSend);
+                easyrtc.sendPeerMessage(caller, "img", stringToSend);
             }        
         }
     } 
@@ -657,7 +657,7 @@ function showMessage(startX, startY, content) {
     };
 }
 
-function messageListener(who, content) {
+function messageListener(who, msgType, content) {
     for(var i = 0; i < maxCALLERS; i++) {
         if( easyrtc.getIthCaller(i) === who) {
             var startArea = document.getElementById(getIdOfBox(i+1));
@@ -689,7 +689,7 @@ function appInit() {
     // easyrtc.setVideoBandwidth(20);
     easyrtc.setRoomOccupantListener(callEverybodyElse);
     easyrtc.initManaged("easyrtc.room", "box0", ["box1", "box2", "box3"], loginSuccess, loginFailure);
-    easyrtc.setDataListener(messageListener);
+    easyrtc.setPeerListener(messageListener);
     easyrtc.setDisconnectListener( function() {
         easyrtc.showError("LOST-CONNECTION", "Lost connection to signalling server");
     });   
