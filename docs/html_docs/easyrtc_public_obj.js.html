@@ -47,7 +47,7 @@ var eu              = require("./easyrtc_util");            // EasyRTC utility f
  * The public object which is returned by the EasyRTC listen() function. Contains all public methods for interacting with EasyRTC server.
  *
  * @class
- */ 
+ */
 var pub = module.exports;
 
 
@@ -63,7 +63,7 @@ pub.socketServer = null;
 
 /**
  * Alias for Express app object. Set during Listen()
- * 
+ *
  * @member  {Object}    pub.httpApp
  */
 pub.httpApp = null;
@@ -79,13 +79,13 @@ pub.getAppNames = function (callback) {
     for (var key in e.app) {
         appNames.push(key);
     };
-    callback(null, appNames);   
+    callback(null, appNames);
 };
 
 
 /**
  * Gets app object for application which has an authenticated client with a given easyrtcid
- *  
+ *
  * @param       {string}    easyrtcid   EasyRTC unique identifier for a socket connection.
  * @param       {function(Error, Object)} callback Callback with error and application object
  */
@@ -128,7 +128,7 @@ pub.getConnectionWithEasyrtcid = function(easyrtcid, callback) {
 /**
  * Gets individual option value
  *
- * @param       {Object}    option      Option name    
+ * @param       {Object}    option      Option name
  * @return      {string}                Option value (can be any type)
  */
 pub.getOption = function(optionName) {
@@ -149,7 +149,7 @@ pub.getVersion = function() {
 /**
  * Sets individual option.
  *
- * @param       {Object}    option      Option name    
+ * @param       {Object}    option      Option name
  * @param       {Object}    value       Option value
  * @return      {Boolean}               true on success, false on failure
  */
@@ -180,7 +180,7 @@ pub.events = {};
 
 /**
  * Resets the listener for a given event to the default listener. Removes other listeners.
- * 
+ *
  * @param       {string}    eventName   EasyRTC event name.
  */
 pub.events.setDefaultListener = function(eventName) {
@@ -208,7 +208,7 @@ pub.events.setDefaultListeners = function() {
 
 
 /**
- * Map of EasyRTC event listener names to their default functions. This map can be used to run a default function manually. 
+ * Map of EasyRTC event listener names to their default functions. This map can be used to run a default function manually.
  */
 pub.events.defaultListeners = {
     "authenticate":     eventFunctions.onAuthenticate,
@@ -265,7 +265,7 @@ pub.events.removeAllListeners = function(eventName) {
 
 /**
  * General utility functions are grouped in this util object.
- * @class 
+ * @class
  */
 pub.util = {};
 
@@ -292,7 +292,7 @@ pub.util.nextToNowhere  =   function(err) {};
  * Determines if an Error object is an instance of ApplicationError, ConnectionError, or ServerError. If it is, it will return true.
  *
  * @function
- * @param       {Error}     err    
+ * @param       {Error}     err
  * @return      {Boolean}
  */
 pub.util.isError              = eu.isError;
@@ -302,7 +302,7 @@ pub.util.isError              = eu.isError;
  * Determines if an Error object is an instance of ApplicationWarning, ConnectionWarning, or ServerWarning. If it is, it will return true.
  *
  * @function
- * @param   {Error}         err    
+ * @param   {Error}         err
  * @return  {Boolean}
  */
 pub.util.isWarning            = eu.isWarning;
@@ -374,7 +374,7 @@ pub.util.getErrorMsg = function(errorCode) {
         msgData: {
             errorCode: errorCode,
             errorText: pub.util.getErrorText(errorCode)
-        }       
+        }
     };
 
     if (!msg.msgData.errorText) {
@@ -421,7 +421,7 @@ pub.util.getErrorText = function(errorCode) {
 /**
  * General logging function which emits a log event so long as the log level has a severity equal or greater than e.option.logLevel
  *
- * @param       {string}    level       Log severity level. Can be ("debug"|"info"|"warning"|"error")    
+ * @param       {string}    level       Log severity level. Can be ("debug"|"info"|"warning"|"error")
  * @param       {string}    logText     Text for log
  * @param       {?*}        [logFields] Simple JSON object which contains extra fields to be logged.
  */
@@ -776,7 +776,6 @@ pub.util.isValidIncomingMessage = function(type, msg, appObj, callback) {
 };
 
 
-
 /**
  * Determine if a given application name has been defined.
  *
@@ -837,6 +836,7 @@ pub.createApp = function(appName, options, callback) {
         // Set all options in options object. If any fail, an error will be sent to the callback.
         async.each(Object.keys(options), function(currentOptionName, asyncCallback){
             appObj.setOption(currentOptionName, options[currentOptionName]);
+            asyncCallback(null);
         },
         function(err) {
             if(err) {
@@ -1261,7 +1261,7 @@ pub.app = function(appName, callback) {
                 fieldValue:fieldValue,
                 fieldOption:{isShared: ((_.isObject(fieldOption) && fieldOption.isShared)?true:false)}
             };
-    
+
             next(null);
         };
 
@@ -1427,7 +1427,7 @@ pub.app = function(appName, callback) {
                         };
                     }
                 };
-                
+
                 // Updating timestamp of when clientList was retrieved. Useful for sending delta's later on.
                 connectionRoom.gotListOn = Date.now();
             };
@@ -1600,7 +1600,7 @@ pub.app = function(appName, callback) {
                                 callback(err);
                                 return;
                             }
-                            createConnectionRoom(roomName, appRoomObj, callback);
+                            createConnectionRoom(roomName, roomObj, callback);
                         });
                 } else {
                     pub.util.logWarning("[" + easyrtcid + "] Can not enter room which doesn't exist: '" + roomName +"'");
@@ -1795,7 +1795,7 @@ pub.app = function(appName, callback) {
             toApp: e.app[appName]
         };
 
-        // Initialize a new connection object        
+        // Initialize a new connection object
         appObj.connection(easyrtcid, function(err, connectionObj) {
             if(err) {
                 callback(err);
@@ -1842,6 +1842,7 @@ pub.app = function(appName, callback) {
         if (!_.isObject(options)){
             options = {};
         }
+        pub.util.logDebug("Creating room: '" + roomName +"' with options:", options);
 
         e.app[appName].room[roomName] = {
             roomName:           roomName,
@@ -1861,6 +1862,7 @@ pub.app = function(appName, callback) {
             // Set all options in options object. If any fail, an error will be sent to the callback.
             async.each(Object.keys(options), function(currentOptionName, asyncCallback){
                 roomObj.setOption(currentOptionName, options[currentOptionName]);
+                asyncCallback(null);
             },
             function(err) {
                 if(err) {
@@ -1870,6 +1872,7 @@ pub.app = function(appName, callback) {
 
                 // Set default room fields
                 var roomDefaultFieldObj = roomObj.getOption("roomDefaultFieldObj");
+
                 if(_.isObject(roomDefaultFieldObj)) {
                     for (var currentFieldName in roomDefaultFieldObj) {
                         roomObj.setField(
@@ -1978,6 +1981,12 @@ pub.app = function(appName, callback) {
             return;
         }
 
+        /**
+         * EasyRTC Room Object. Contains methods for handling a specific room including determining which connections have joined.
+         *
+         * @class       roomObj
+         * @memberof    pub.appObj
+         */
         var roomObj = {};
 
 
@@ -1996,8 +2005,8 @@ pub.app = function(appName, callback) {
             }
             callback(null, pub.util.deepCopy(e.app[appName].room[roomName].field[fieldName]));
         };
-    
-    
+
+
         /**
          * Returns an object containing all field names and values within the room. Can be limited to fields with isShared option set to true.
          *
@@ -2086,7 +2095,7 @@ pub.app = function(appName, callback) {
             if (!_.isFunction(next)) {
                 next = pub.util.nextToNowhere;
             }
-    
+
             if (!pub.getOption("fieldNameRegExp").test(fieldName)) {
                 pub.util.logWarning("Can not create room field with improper name: '" + fieldName +"'");
                 next(new pub.util.ApplicationWarning("Can not create room field with improper name: '" + fieldName +"'"));
@@ -2098,7 +2107,7 @@ pub.app = function(appName, callback) {
                 fieldValue:fieldValue,
                 fieldOption:{isShared: ((_.isObject(fieldOption) && fieldOption.isShared)?true:false)}
             };
-    
+
             next(null);
         };
 
@@ -2194,13 +2203,13 @@ pub.events.setDefaultListeners();
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-easyrtc_public_obj.html">easyrtc_public_obj</a></li></ul><h3>Classes</h3><ul><li><a href="module-easyrtc_public_obj-pub.html">pub</a></li><li><a href="module-easyrtc_public_obj-pub.events.html">events</a></li><li><a href="module-easyrtc_public_obj-pub.util.html">util</a></li><li><a href="pub.appObj.html">appObj</a></li><li><a href="pub.appObj.connectionObj.html">connectionObj</a></li><li><a href="pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-easyrtc_public_obj.html">easyrtc_public_obj</a></li></ul><h3>Classes</h3><ul><li><a href="module-easyrtc_public_obj-pub.html">pub</a></li><li><a href="module-easyrtc_public_obj-pub.events.html">events</a></li><li><a href="module-easyrtc_public_obj-pub.util.html">util</a></li><li><a href="pub.appObj.html">appObj</a></li><li><a href="pub.appObj.connectionObj.html">connectionObj</a></li><li><a href="pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li><li><a href="pub.appObj.roomObj.html">roomObj</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Sep 30 2013 15:45:01 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Wed Oct 02 2013 12:10:32 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
