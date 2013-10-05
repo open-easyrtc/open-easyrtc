@@ -27,10 +27,20 @@ var selfEasyrtcid = "";
 
 
 function connect() {
+    function openListener() {
+        console.log("openListener called");
+    }
+    function closeListener() {
+        console.log("closeListener called");
+    }
     easyrtc.enableDebug(false);
     console.log("Initializing.");
     easyrtc.setRoomOccupantListener(convertListToButtons);
     easyrtc.initManaged("easyrtc.audioVideo", "selfVideo", ["callerVideo"], loginSuccess, loginFailure);
+    easyrtc.setDataChannelOpenListener(openListener);
+    easyrtc.setDataChannelCloseListener(closeListener);
+    
+
  }
 
 

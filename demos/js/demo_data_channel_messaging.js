@@ -29,7 +29,7 @@ var channelIsActive = {}; // tracks which channels are active
 
 
 function connect() {
-    easyrtc.enableDebug(false);
+    easyrtc.enableDebug(true);
     easyrtc.enableDataChannels(true);
     easyrtc.enableVideo(false);
     easyrtc.enableAudio(false);
@@ -113,6 +113,7 @@ function updateButtonState(otherEasyrtcid) {
 
 function startCall(otherEasyrtcid) {
     if (easyrtc.getConnectStatus(otherEasyrtcid) === easyrtc.NOT_CONNECTED) {
+     
         easyrtc.call(otherEasyrtcid,
                 function(caller, media) { // success callback
                     if (media === 'datachannel') {
@@ -141,23 +142,7 @@ function sendStuffP2P(otherEasyrtcid) {
     }
     console.log("++text was ", text)
     if (easyrtc.getConnectStatus(otherEasyrtcid) === easyrtc.IS_CONNECTED) {
-        // start of test code
-        var xxx = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" + 
-                  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" + 
-                  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" + 
-                  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" + 
-                  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" + 
-                  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" + 
-                  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" + 
-                  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
-          console.log("message length = " + (xxx.length));
-          for(var i = 0; i < 50; i++) {
-            setTimeout( function() {
-                easyrtc.sendDataP2P(otherEasyrtcid, 'msg', xxx);
-                }, i *1);
-          }
-        // end of test code
-//        easyrtc.sendDataP2P(otherEasyrtcid, 'msg', text);
+        easyrtc.sendDataP2P(otherEasyrtcid, 'msg', text);
     }
     else {
         easyrtc.showError("NOT-CONNECTED", "not connected to " + easyrtc.idToName(otherEasyrtcid) + " yet.");

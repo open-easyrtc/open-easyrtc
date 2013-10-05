@@ -1463,6 +1463,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 outgoingMessage.targetGroup = destination.targetGroup;
             }
         }
+        
+      
 
         if (easyrtc.webSocket) {
             easyrtc.webSocket.json.emit("easyrtcMsg", outgoingMessage, ackhandler);
@@ -1711,6 +1713,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
      *        });
      */
     easyrtc.call = function(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB) {
+        console.log("entered call");
+            
         if (easyrtc.debugPrinter) {
             easyrtc.debugPrinter("initiating peer to peer call to " + otherUser +
                     " audio=" + easyrtc.audioEnabled +
@@ -1884,7 +1888,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         if (!easyrtc.peerConns[otherUser]) {
             return false;
         }
-        return !!easyrtc.peerConns[otherUser].dataChannelWorks;
+        return !!easyrtc.peerConns[otherUser].dataChannelReady;
     };
 
 
@@ -2025,35 +2029,16 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
 
         /*
-         * This function handles data channel message events. Of particular interest,
-         * if it receives a message with a msgType of easyrtcDCTest, it replies with a
-         * msgType of easyrtcDCTest2. If it sees a message of type easyrtcDCTest2, it 
-         * marks the peer connection as supporting data channels. The data channel onOpen
-         * event handler is responsible for sending the original easyrtcDCTest message.
-         * This way, we can determine whether data channels work properly between two peers
-         * without relying on version numbers.
+         * This function handles data channel message events.
          */
         function dataChannelMessageHandler(event) {
             if (easyrtc.debugPrinter) {
                 easyrtc.debugPrinter("saw dataChannel.onmessage event: " + JSON.stringify(event.data));
             }
             var msg = JSON.parse(event.data);
-            if (!msg)
-                return;
-            if (msg.msgType) {
-                if (msg.msgType === "easyrtcDCTest") {
-                    easyrtc.sendDataP2P(otherUser, "easyrtcDCTest2", "echoed");
-                    return;
-                }
-                else if (msg.msgType === "easyrtcDCTest2") {
-                    easyrtc.peerConns[otherUser].dataChannelWorks = true;
-                    if (easyrtc.onDataChannelOpen) {
-                        easyrtc.onDataChannelOpen(otherUser, true);
-                    }
-                    return;
-                }
+            if (msg) {
+                easyrtc.receivePeerDistribute(otherUser, msg, null);
             }
-            easyrtc.receivePeerDistribute(otherUser, msg, null);
         }
 
         function initOutGoingChannel(otherUser) {
@@ -2081,20 +2066,14 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     if (easyrtc.peerConns[otherUser].callSuccessCB) {
                         easyrtc.peerConns[otherUser].callSuccessCB(otherUser, "datachannel");
                     }
-                    try {
-                        easyrtc.sendDataP2P(otherUser, 'easyrtcDCTest', "Hello");
-                    }
-                    catch (error) {
-                        easyrtc.peerConns[otherUser].dataChannelWorks = false;
-                        if (easyrtc.onDataChannelOpen) {
-                            easyrtc.onDataChannelOpen(otherUser, false);
-                        }
-                    }
+                    if (easyrtc.onDataChannelOpen) {
+                        easyrtc.onDataChannelOpen(otherUser, true);
+                    }                   
                     easyrtc.updateConfigurationInfo();
                 }
             };
-            
-            
+
+
             dataChannel.onclose = function(event) {
                 if (easyrtc.debugPrinter) {
                     easyrtc.debugPrinter("saw dataChannelS.onclose event");
@@ -2144,13 +2123,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 };
 
                 // the data channel is open implicitly because it was incoming
-                try {
-                    easyrtc.sendDataP2P(otherUser, "easyrtcDCTest", "hello");
-                } catch (error) {
-                    easyrtc.peerConns[otherUser].dataChannelWorks = false;
-                    if (easyrtc.onDataChannelOpen) {
-                        easyrtc.onDataChannelOpen(otherUser, false);
-                    }
+                if (easyrtc.onDataChannelOpen) {
+                    easyrtc.onDataChannelOpen(otherUser, true);
                 }
 
             };
@@ -2285,7 +2259,10 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             pc.setRemoteDescription(sd, invokeCreateAnswer, function(message) {
                 easyrtc.showError(easyrtc.errCodes.INTERNAL_ERR, "set-remote-description: " + message);
             });
+            console.log("set remote description finished");
+
         } catch (srdError) {
+            console.log("set remote description failed");
             if (easyrtc.debugPrinter) {
                 easyrtc.debugPrinter("saw exception in setRemoteDescription");
             }
@@ -2527,15 +2504,22 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             if (easyrtc.debugPrinter) {
                 easyrtc.debugPrinter("about to call initiating setRemoteDescription");
             }
-            pc.setRemoteDescription(sd, function() {
-                if (pc.connectDataConnection) {
-                    if (easyrtc.debugPrinter) {
-                        easyrtc.debugPrinter("calling connectDataConnection(5001,5002)");
+            try {
+                pc.setRemoteDescription(sd, function() {
+                    console.log("srd callback entered");
+                    if (pc.connectDataConnection) {
+                        if (easyrtc.debugPrinter) {
+                            easyrtc.debugPrinter("calling connectDataConnection(5001,5002)");
+                        }
+                        pc.connectDataConnection(5001, 5002); // these are like ids for data channels
                     }
-                    pc.connectDataConnection(5001, 5002); // these are like ids for data channels
-                }
-            });
+                });
+                console.log("set remote description finished");
+            }catch(smdException) {
+                console.log("setRemoteDescription failed ", smdException);
+            }
             flushCachedCandidates(caller);
+            console.log("finished with processAnswer");
         }
 
         function processCandidate(caller, msgData) {
@@ -3058,9 +3042,9 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
     }
 
     function videoIsFree(obj) {
-        return ( obj.caller === "" || obj.caller=== null || obj.caller === undefined);
+        return (obj.caller === "" || obj.caller === null || obj.caller === undefined);
     }
-    
+
 // verify that video ids were not typos.
     if (monitorVideoId && !document.getElementById(monitorVideoId)) {
         easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "The monitor video id passed to initManaged was bad, saw " + monitorVideoId);

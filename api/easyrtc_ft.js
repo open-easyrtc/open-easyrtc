@@ -164,6 +164,7 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
 easyrtc_ft.buildFileSender = function(destUser, progressListener) {
     var droptarget;
     var seq = 0;
+    var positionAcked = 0;
     var filePosition = 0;
     var filesOffered = [];
     var filesBeingSent = [];
@@ -171,7 +172,9 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
     var curFile = null;
     var curFileSize;
     var filesAreBinary;
-
+    var maxChunkSize = 50000;
+    var waitingForAck = false;
+    var ackThreshold = maxChunkSize*3; // send is allowed to be 20KB ahead of receiver
 
     if (!progressListener) {
         progressListener = function() {
@@ -210,27 +213,36 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         sendStarted = false;
     }
 
+    function packageAckReceived(sender, msgType, msgData) {
+        positionAcked = msgData.positionAck;
+        if(waitingForAck) {
+            waitingForAck = false;
+            sendChunk();
+        }
+    }
 
     easyrtc.setPeerListener(fileOfferRejected, "files_reject", destUser);
     easyrtc.setPeerListener(fileOfferAccepted, "files_accept", destUser);
-    easyrtc.setPeerListener(fileCancelReceived, destUser, "files_cancel");
+    easyrtc.setPeerListener(fileCancelReceived, "files_cancel", destUser);
+    easyrtc.setPeerListener(packageAckReceived, "files_ack", destUser);
 
 
-    var maxChunkSize = 50000;
     var outseq = 0;
 
     function sendChunk() {
         if (!curFile) {
             if (filesBeingSent.length === 0) {
                 outseq = 0;
-                easyrtc.sendDataP2P(destUser, "files_chunk", {done: "all"});
+                easyrtc.sendData(destUser, "files_chunk", {done: "all"});
                 progressListener({status: "done"});
                 return;
             }
             else {
                 curFile = filesBeingSent.pop();
                 curFileSize = curFile.size;
-                easyrtc.sendDataP2P(destUser, "files_chunk", {name: curFile.name, type: curFile.type, outseq: outseq, size: curFile.size});
+                positionAcked = 0;
+                waitingForAck = false;
+                easyrtc.sendData(destUser, "files_chunk", {name: curFile.name, type: curFile.type, outseq: outseq, size: curFile.size});
                 outseq++;
             }
         }
@@ -239,7 +251,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         if (!progressListener({status: "working", name: curFile.name, position: filePosition, size: curFileSize, numFiles: filesOffered.length})) {
             filesOffered.length = 0;
             filePosition = 0;
-            easyrtc.sendDataP2P(destUser, "files_chunk", {done: "cancelled"});
+            easyrtc.sendData(destUser, "files_chunk", {done: "cancelled"});
             return;
         }
 
@@ -266,13 +278,18 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
                     else {
                         packetObject.datatxt =  packetData;
                     }
-                    easyrtc.sendDataP2P(destUser, "files_chunk", packetObject);
+                    easyrtc.sendData(destUser, "files_chunk", packetObject);
                     outseq++;
                 }
                 if (nextLocation >= curFileSize) {
-                    easyrtc.sendDataP2P(destUser, "files_chunk", {done: "file"});
+                    easyrtc.sendData(destUser, "files_chunk", {done: "file"});
                 }
-                sendChunk();
+                if( filePosition < positionAcked + ackThreshold) {
+                    sendChunk();
+                }
+                else {
+                    waitingForAck = true;
+                }
             }
         };
 
@@ -329,7 +346,9 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
  */
 easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) {
     var userStreams = {};
-
+    var ackThreshold = 30000; // receiver is allowed to be 10KB behind of sender
+    var positionAcked = 0;
+    
     function fileOfferHandler(otherGuy, msgType, msgData) {
         acceptRejectCB(otherGuy, msgData.fileNameList, function(wasAccepted) {
             var ackHandler = function(ackMesg) {
@@ -369,6 +388,7 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
                     blobAcceptor(otherGuy, blob, userStream.currentFileName);
                     statusCB(otherGuy, {status: "eof", name: userStream.currentFileName});
                     blob = null;
+                    positionAcked = 0;
                     userStream.currentData = [];
                     break;
                 case "all":
@@ -411,6 +431,10 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
                 name: userStream.currentFileName,
                 received: userStream.lengthReceived,
                 size: userStream.lengthExpected});
+            if( userStream.lengthReceived > positionAcked +ackThreshold ) {
+                positionAcked = userStream.lengthReceived;
+                easyrtc.sendData(otherGuy, "files_ack", {positionAck:positionAcked});
+            }
         }
         else {
             console.log("Unexpected data structure in files_chunk=", msgData);
