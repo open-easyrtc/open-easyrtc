@@ -115,7 +115,7 @@ easyrtc.roomJoin = {};
  * @example
  *    var name = document.getElementById('nameField').value;
  *    if( !easyrtc.isNameValid(name)){
- *        alert("Bad user name");
+ *        console.error("Bad user name");
  *    }
  */
 easyrtc.isNameValid = function(name) {
@@ -141,7 +141,7 @@ easyrtc.setCookieId = function(cookieId) {
  */
 easyrtc.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
     if (easyrtc.roomJoin[roomName]) {
-        alert("Programmer error: attempt to join room " + roomName + " which you are already in.");
+        console.error("Programmer error: attempt to join room " + roomName + " which you are already in.");
         return;
     }
     var newRoomData = {roomName: roomName};
@@ -825,7 +825,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
     }
 
     if (!successCallback) {
-        alert("easyrtc.initMediaSource not supplied a successCallback");
+        console.error("easyrtc.initMediaSource not supplied a successCallback");
         return;
     }
 
@@ -1147,7 +1147,7 @@ easyrtc.setSocketUrl = function(socketUrl) {
  * @returns {Boolean} true if the call succeeded, false if the username was invalid.
  * @example
  *    if ( !easyrtc.setUserName("JohnSmith") ){
- *        alert("bad user name);
+ *        console.error("bad user name);
  *
  */
 easyrtc.setUserName = function(userName) {
@@ -1239,8 +1239,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     easyrtc.pc_config = {};
     easyrtc.closedChannel = null;
 
-    if( easyrtc.webSocket ) {
-        alert("Developer error: attempt to connect when already connected to socket server");
+    if (easyrtc.webSocket) {
+        console.error("Developer error: attempt to connect when already connected to socket server");
         return;
     }
 
@@ -1330,7 +1330,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     };
     if (errorCallback === null) {
         errorCallback = function(errorCode, errorText) {
-            alert("easyrtc.connect: " + errorText);
+            console.error("easyrtc.connect: " + errorText);
         };
     }
 
@@ -1455,22 +1455,24 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             msgType: msgType,
             msgData: data
         };
-        if (typeof destination === 'string') {
-            outgoingMessage.targetEasyrtcid = destination;
+        if (destination) {
+            if (typeof destination === 'string') {
+                outgoingMessage.targetEasyrtcid = destination;
+            }
+            else if (typeof destination === 'object') {
+                if (destination.targetEasyrtcid) {
+                    outgoingMessage.targetEasyrtcid = destination.targetEasyrtcid;
+                }
+                if (destination.targetRoom) {
+                    outgoingMessage.targetRoom = destination.targetRoom;
+                }
+                if (destination.targetGroup) {
+                    outgoingMessage.targetGroup = destination.targetGroup;
+                }
+            }
         }
-        else if (typeof destination === 'object') {
-            if (destination.targetEasyrtcid) {
-                outgoingMessage.targetEasyrtcid = destination.targetEasyrtcid;
-            }
-            if (destination.targetRoom) {
-                outgoingMessage.targetRoom = destination.targetRoom;
-            }
-            if (destination.targetGroup) {
-                outgoingMessage.targetGroup = destination.targetGroup;
-            }
-        }
-        
-      
+
+
 
         if (easyrtc.webSocket) {
             easyrtc.webSocket.json.emit("easyrtcMsg", outgoingMessage, ackhandler);
@@ -1512,9 +1514,9 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
      * @param {Function(msgType, msgData)} successCB - a callback function with results from the server.
      * @param {Function(errorCode, errorText)} failureCB - a callback function to handle errors.
      * @example 
-     *     easyrtc.sendServerMessage('get_candy', {candy_name:'mars'}, 
-     *             function(msgType, msgData ) {
-     *                console.log("got candy count of " + msgData.barCount);
+     *     easyrtc.sendPeerMessage(otherUser, 'offer_candy', {candy_name:'mars'}, 
+     *             function(msgType, msgBody ) {
+     *                console.log("message was sent");
      *             },
      *             function(errorCode, errorText) {
      *                console.log("error was " + errorText);
@@ -1522,7 +1524,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
      */
     easyrtc.sendPeerMessage = function(destination, msgType, msgData, successCB, failureCB) {
         if (!destination) {
-            alert("Developer error, destination was null in sendPeerMessage");
+            console.error("Developer error, destination was null in sendPeerMessage");
         }
 
         if (easyrtc.debugPrinter) {
@@ -1615,7 +1617,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     function haveTracks(easyrtcid, checkAudio) {
         var peerConnObj = easyrtc.peerConns[easyrtcid];
         if (!peerConnObj) {
-            alert("Programmer error: haveTracks called about a peer you don't have a connection to");
+            console.error("Programmer error: haveTracks called about a peer you don't have a connection to");
         }
         var stream = peerConnObj.stream;
         if (!stream) {
@@ -1720,7 +1722,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
      */
     easyrtc.call = function(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB) {
         console.log("entered call");
-            
+
         if (easyrtc.debugPrinter) {
             easyrtc.debugPrinter("initiating peer to peer call to " + otherUser +
                     " audio=" + easyrtc.audioEnabled +
@@ -2074,7 +2076,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     }
                     if (easyrtc.onDataChannelOpen) {
                         easyrtc.onDataChannelOpen(otherUser, true);
-                    }                   
+                    }
                     easyrtc.updateConfigurationInfo();
                 }
             };
@@ -2521,7 +2523,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     }
                 });
                 console.log("set remote description finished");
-            }catch(smdException) {
+            } catch (smdException) {
                 console.log("setRemoteDescription failed ", smdException);
             }
             flushCachedCandidates(caller);
@@ -2578,7 +2580,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 easyrtc.showError(msg.errorCode, msg.errorText);
                 break;
             default:
-                alert("received unknown message type from server, msgType is " + msgType);
+                console.error("received unknown message type from server, msgType is " + msgType);
                 return;
                 break;
         }
@@ -3249,7 +3251,7 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
     if (easyrtc.videoEnabled && monitorVideoId !== null) {
         monitorVideo = document.getElementById(monitorVideoId);
         if (!monitorVideo) {
-            alert("Programmer error: no object called " + monitorVideoId);
+            console.error("Programmer error: no object called " + monitorVideoId);
             return;
         }
         monitorVideo.muted = "muted";
