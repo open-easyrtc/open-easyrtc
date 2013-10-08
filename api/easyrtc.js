@@ -2625,7 +2625,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     }
                     else {
                         /* socket server went down. this will generate a 'disconnect' event as well, so skip this event */
-                        console.warn("The Easyrtc socket server went down. It may come back by itself.")
+                        console.warn("The connection to the EasyRTC socket server went down. It may come back by itself.")
                     }
                 }
                 else {
