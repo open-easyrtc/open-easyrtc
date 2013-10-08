@@ -2614,14 +2614,26 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             easyrtc.webSocket.on(event, handler);
             easyrtc.websocketListeners.push({event: event, handler: handler});
         }
-
-        addSocketListener('error', function() {
-            if (easyrtc.myEasyrtcid) {
-                easyrtc.showError(easyrtc.errCodes.SIGNAL_ERROR, "Miscellaneous error from signalling server. It may be ignorable.");
+        addSocketListener("close", function(event) {
+            console.log("the web socket closed");
+        });
+        addSocketListener('error', function(event) {
+            function handleErrorEvent() {
+                if (easyrtc.myEasyrtcid) {
+                    if(easyrtc.webSocket.socket.connected) {
+                        easyrtc.showError(easyrtc.errCodes.SIGNAL_ERROR, "Miscellaneous error from signalling server. It may be ignorable.");
+                    }
+                    else {
+                        /* socket server went down. this will generate a 'disconnect' event as well, so skip this event */
+                        console.warn("The Easyrtc socket server went down. It may come back by itself.")
+                    }
+                }
+                else {
+                    errorCallback(easyrtc.errCodes.CONNECT_ERR, "Unable to reach the EasyRTC signalling server.");
+                }
             }
-            else {
-                errorCallback(easyrtc.errCodes.CONNECT_ERR, "Unable to reach the EasyRTC signalling server.");
-            }
+        
+            setTimeout(handleErrorEvent, 1);
         });
 
         addSocketListener("connect", function(event) {
