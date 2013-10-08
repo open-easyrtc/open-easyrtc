@@ -29,7 +29,7 @@ var channelIsActive = {}; // tracks which channels are active
 
 
 function connect() {
-    easyrtc.enableDebug(true);
+    easyrtc.enableDebug(false);
     easyrtc.enableDataChannels(true);
     easyrtc.enableVideo(false);
     easyrtc.enableAudio(false);
@@ -113,7 +113,7 @@ function updateButtonState(otherEasyrtcid) {
 
 function startCall(otherEasyrtcid) {
     if (easyrtc.getConnectStatus(otherEasyrtcid) === easyrtc.NOT_CONNECTED) {
-     
+        try {
         easyrtc.call(otherEasyrtcid,
                 function(caller, media) { // success callback
                     if (media === 'datachannel') {
@@ -129,6 +129,9 @@ function startCall(otherEasyrtcid) {
                     // console.log("was accepted=" + wasAccepted);
                 }
         );
+        }catch( callerror) {
+            console.log("saw call error ", callerror);
+        }
     }
     else {
         easyrtc.showError("ALREADY-CONNECTED", "already connected to " + easyrtc.idToName(otherEasyrtcid));

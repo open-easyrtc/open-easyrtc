@@ -1239,6 +1239,12 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     easyrtc.pc_config = {};
     easyrtc.closedChannel = null;
 
+    if( easyrtc.webSocket ) {
+        alert("Developer error: attempt to connect when already connected to socket server");
+        return;
+    }
+
+
     easyrtc.fields = {
         rooms: {},
         application: {},

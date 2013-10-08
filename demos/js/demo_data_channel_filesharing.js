@@ -41,7 +41,7 @@ function buildReceiveAreaName(peerid) {
 
 function connect() {
     var otherClientsDiv = document.getElementById('otherClients');
-    
+
     easyrtc.enableDataChannels(true);
     easyrtc.enableVideo(false);
     easyrtc.enableAudio(false);
@@ -127,29 +127,38 @@ function convertListToButtons(roomName, data, isPrimary) {
 
 
         var noDCs = {}; // which users don't support data channels
-        
+
         var fileSender = null;
         function filesHandler(files) {
             // if we haven't eastablished a connection to the other party yet, do so now,
             // and on completion, send the files. Otherwise send the files now.
             var timer = null;
             if (easyrtc.getConnectStatus(peerid) === easyrtc.NOT_CONNECTED && noDCs[peerid] === undefined) {
-                easyrtc.call(peerid,
-                        function(caller, mediatype) {
-                            if( noDCs[peerid] === undefined) {
-                                filesHandler(files);
+                //
+                // calls between firefrox and chrome ( version 30) have problems one way if you 
+                // use data channels.
+                //
+                try {
+                    easyrtc.call(peerid,
+                            function(caller, mediatype) {
+                                if (noDCs[peerid] === undefined) {
+                                    filesHandler(files);
+                                }
+                            },
+                            function(errorCode, errorText) {
+                                tawk.showError(errorCode, errorText)
+                            },
+                            function wasAccepted(yup) {
                             }
-                        },
-                        function(errorCode, errorText) {
-                            tawk.showError(errorCode, errorText)
-                        },
-                        function wasAccepted(yup) {
-                        }
-                );
-                timer = setTimeout(function(){
+                    );
+                    timer = setTimeout(function() {
+                        noDCs[peerid] = true;
+                        filesHandler(files);
+                    }, 4000);
+                } catch (callError) {
                     noDCs[peerid] = true;
                     filesHandler(files);
-                }, 7000);
+                }
             }
             else if (easyrtc.getConnectStatus(peerid) === easyrtc.IS_CONNECTED || noDCs[peerid]) {
                 if (!fileSender) {
@@ -205,7 +214,7 @@ function acceptRejectCB(otherGuy, fileNameList, wasAccepted) {
     receiveBlock.appendChild(document.createElement("br"));
     for (var i = 0; i < fileNameList.length; i++) {
         receiveBlock.appendChild(
-                document.createTextNode("  " + fileNameList[i].name + "(" + fileNameList[i].size + ")"));
+                document.createTextNode("  " + fileNameList[i].name + "(" + fileNameList[i].size +  " bytes)"));
         receiveBlock.appendChild(document.createElement("br"));
     }
     //

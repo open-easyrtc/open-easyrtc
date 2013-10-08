@@ -141,14 +141,17 @@ function roomEntryListener(entered, roomName) {
     refreshRoomList();
 }
 
-
 function refreshRoomList() {
     easyrtc.getRoomList(addRoomButtons, null);
 }
 
+function peerListener(who, msgType, content, targetting) {
+    addToConversation(who, msgType, content, targetting);
+}
+
 function connect() {
-    easyrtc.setPeerListener(addToConversation);
-    easyrtc.setRoomOccupantListener(convertListToButtons);
+    easyrtc.setPeerListener(peerListener);
+    easyrtc.setRoomOccupantListener(occupantListener);
     easyrtc.setRoomEntryListener(roomEntryListener);
     easyrtc.setDisconnectListener(function() {
         jQuery('#rooms').empty();
@@ -193,7 +196,7 @@ function addRoomButtons(roomList) {
 
 
 
-function convertListToButtons(roomName, data, isPrimary) {
+function occupantListener(roomName, data, isPrimary) {
     if (roomName === null) {
         return;
     }
@@ -288,7 +291,6 @@ function loginSuccess(easyrtcId) {
     document.getElementById("iam").innerHTML = "I am " + easyrtcId;
     refreshRoomList();
     document.getElementById('connectButton').disabled = true;
-    document.getElementById('reconnectButton').disabled = false;
     isConnected = true;
     displayFields();
 }
@@ -318,7 +320,6 @@ function displayFields() {
 
 function loginFailure(errorCode, message) {
     easyrtc.showError("LOGIN-FAILURE", message);
-    document.getElementById('reconnectButton').disabled = true;
     document.getElementById('connectButton').disabled = false;
     jQuery('#rooms').empty();
 }
