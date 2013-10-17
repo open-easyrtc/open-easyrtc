@@ -146,7 +146,7 @@ function convertListToButtons(roomName, data, isPrimary) {
                                 }
                             },
                             function(errorCode, errorText) {
-                                tawk.showError(errorCode, errorText)
+                                easyrtc.showError(errorCode, errorText)
                             },
                             function wasAccepted(yup) {
                             }
@@ -167,7 +167,7 @@ function convertListToButtons(roomName, data, isPrimary) {
                 fileSender(files, true /* assume binary */);
             }
             else {
-                tawk.showError("Wait for the connection to complete before adding more files!");
+                easyrtc.showError("user-error", "Wait for the connection to complete before adding more files!");
             }
         }
         easyrtc_ft.buildDragNDropRegion(div, filesHandler);
