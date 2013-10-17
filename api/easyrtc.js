@@ -61,6 +61,9 @@ easyrtc.ackMessage = {msgType: "ack", msgData: {}};
 easyrtc.userNamePattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,30}[a-zA-Z0-9]$/;
 
 /** @private */
+easyrtc.cookieId = "easyrtcsid";
+
+/** @private */
 easyrtc.userName = null;
 /** @private */
 easyrtc.loggingOut = false;
