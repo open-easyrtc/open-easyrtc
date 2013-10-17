@@ -2959,8 +2959,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         if (easyrtc.roomJoin && !isEmptyObj(easyrtc.roomJoin)) {
             msgData.roomJoin = easyrtc.roomJoin;
         }
-        if (easyrtc.easyrtcsid) {
-            msgData.easyrtcsid = easyrtc.easyrtcsid;
+        if (easyrtcsid) {
+            msgData.easyrtcsid = easyrtcsid;
         }
         if (easyrtc.credential) {
             msgData.credential = easyrtc.credential;
