@@ -241,6 +241,7 @@ Initiates an authenticated EasyRTC application. Note this may be sent multiple t
  - **iceConfig** (required)
  - **groupList** (optional - default to no group)
  - **roomData** (required) See roomData msgType for contents
+ - **sessionData** (optional) See sessionData msgType for contents
  - **application**
    - **applicationName** (required - defaults to 'default')
    - **field** (optional - map of application fields)
@@ -261,9 +262,9 @@ Provides room information for all rooms the user is currently in. This includes 
  - **roomData** (required) Map of room names
    - **roomName** (required) Room name (matches map key)
    - **roomStatus** (required) Instruction to API as to whether to join, update, or leave a given room.  [join|update|leave]
-   	 - `join` - Client is considered to be joined to the given room. `clientList` field will may be present to show other users who are visible in the room.
-   	 - `update` - Client should update what it knows about the room. `clientList` or `clientListDelta` field may be present.
-   	 - `leave` - Client is considered to have left the room, and should delete everything it knows about the room including the ids of other users.
+     - `join` - Client is considered to be joined to the given room. `clientList` field will may be present to show other users who are visible in the room.
+     - `update` - Client should update what it knows about the room. `clientList` or `clientListDelta` field may be present.
+     - `leave` - Client is considered to have left the room, and should delete everything it knows about the room including the ids of other users.
    - **clientList** (optional) Map of easyrtcid's for users online in the same room. If present, this should overrule the current list in memory.
      - **easyrtcid** (required) Matches map key
      - **username** (optional)
@@ -294,6 +295,22 @@ Provides rooms which the client has access to. By default authenticated users ca
  - **roomList** (required) Map of room names
    - **roomName** (required) Room name (matches map key)
    - **numberClients** (optional) The number of clients in the room. By default this is enabled.
+
+
+### msgType - 'sessionData'
+Provides session information for the user. This includes any session fields.
+
+**Fields:**
+
+ - **serverTime** (required)
+ - **msgData** (required)
+
+**msgData Fields:**
+ - **sessionData** (required) Object holding session information
+   - **easyrtcsid** (required) Session identifier
+   - **field** (optional) - map of room fields
+     - **fieldName**
+     - **fieldValue**
 
 
 ### msgType - 'forwardToUrl'
