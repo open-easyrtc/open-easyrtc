@@ -68,9 +68,10 @@ function setCredential(event, value) {
 }
 
 
-function addRoom(roomName, userAdded) {
+function addRoom(roomName, parmString, userAdded) {
     if (!roomName) {
         roomName = document.getElementById("roomToAdd").value;
+        parmString = document.getElementById("optRoomParms").value;
     }
     var roomid = genRoomDivName(roomName);
     if (document.getElementById(roomid)) {
@@ -90,6 +91,7 @@ function addRoom(roomName, userAdded) {
         };
         var roomLabel = (document.createTextNode(roomName));
         roomButton.appendChild(roomLabel);
+
         roomdiv.appendChild(roomButton);
         roomButtonHolder.appendChild(roomdiv);
         var roomOccupants = document.createElement("div");
@@ -99,6 +101,16 @@ function addRoom(roomName, userAdded) {
         $(roomdiv).append(" -<a href=\"javascript:\leaveRoom('" + roomName + "')\">leave</a>");
     }
 
+    var roomParms = null;
+    if (parmString && parmString !== "") {
+        try {
+            roomParms = JSON.parse(parmString);
+        } catch (error) {
+            roomParms = null;
+            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "non-jsonable parameter to easyrtc.joinRoom");
+            return;
+        }
+    }
     if (!isConnected || !userAdded) {
         addRoomButton();
         console.log("adding gui for room " + roomName);
@@ -108,7 +120,7 @@ function addRoom(roomName, userAdded) {
     }
     if (userAdded) {
         console.log("calling joinRoom(" + roomName + ") because it was a user action ");
-        easyrtc.joinRoom(roomName, null, isConnected ? addRoomButton : null,
+        easyrtc.joinRoom(roomName, roomParms, isConnected ? addRoomButton : null,
                 function(errorCode, errorText, roomName) {
                     easyrtc.showError(errorCode, errorText + ": room name was(" + roomName + ")");
                 });
@@ -130,7 +142,7 @@ function leaveRoom(roomName) {
 function roomEntryListener(entered, roomName) {
     if (entered) { // entered a room 
         console.log("saw add of room " + roomName);
-        addRoom(roomName, false);
+        addRoom(roomName, null, false);
     }
     else {
         var roomNode = document.getElementById(roomId);
@@ -181,13 +193,22 @@ function addRoomButtons(roomList) {
         if (document.getElementById(id)) {
             return; // already present so don't add again
         }
+        var div = document.createElement("div");
+        div.id = id;
+        div.appendChild(document.createTextNode(roomname + "(" + numberClients + ")"));
+        var parmsField = document.createElement("input");
+        parmsField.type = "text";
+        parmsField.size = 20;
+        parmsField.value = "";
+
+        div.appendChild(parmsField);
         var button = document.createElement("button");
-        button.id = id;
         button.onclick = function() {
-            addRoom(roomname, true);
+            addRoom(roomname, parmsField.value, true);
         };
-        button.appendChild(document.createTextNode(roomname + "(" + numberClients + ")"));
-        quickJoinBlock.appendChild(button);
+        button.appendChild(document.createTextNode("add"));
+        div.appendChild(button);
+        quickJoinBlock.appendChild(div);
     }
     for (var roomName in roomList) {
         addQuickJoinButton(roomName, roomList[roomName].numberClients);
@@ -203,7 +224,7 @@ function occupantListener(roomName, data, isPrimary) {
     var roomId = genRoomOccupantName(roomName);
     var roomDiv = document.getElementById(roomId);
     if (!roomDiv) {
-        addRoom(roomName, false);
+        addRoom(roomName, "", false);
         roomDiv = document.getElementById(roomId);
     }
     else {
@@ -297,19 +318,19 @@ function loginSuccess(easyrtcId) {
 
 
 function displayFields() {
-    
+
     var outstr = "Application fields<div style='margin-left:1em'>";
     outstr += JSON.stringify(easyrtc.getApplicationFields());
     outstr += "</div><br>";
-    
+
     outstr += "Session fields<div style='margin-left:1em'>";
     outstr += JSON.stringify(easyrtc.getSessionFields());
     outstr += "</div><br>";
-    
+
     outstr += "Connection fields<div style='margin-left:1em'>";
     outstr += JSON.stringify(easyrtc.getConnectionFields());
     outstr += "</div><br>";
-    
+
     var roomlist = easyrtc.getRoomsJoined();
     for (var roomname in roomlist) {
         var roomfields = easyrtc.getRoomFields(roomname);

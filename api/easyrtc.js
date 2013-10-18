@@ -148,11 +148,20 @@ easyrtc.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
         return;
     }
     var newRoomData = {roomName: roomName};
-    if (roomParameters) {
-        for (var key in roomParameters) {
-            newRoomData[key] = roomParameters[key];
+    if( roomParameters) {        
+        try {
+            JSON.stringify(roomParameters);
+        } catch( error) {
+            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "non-jsonable parameter to easyrtc.joinRoom");
+            throw "Developer error, see application error messages";
         }
+        var parameters = {};
+        for(var key in roomParameters) {
+            parameters[key] = roomParameters[key];
+        }
+        newRoomData.roomParameter = parameters;
     }
+    
 
     if (failureCB === null) {
         failureCB = function(errorCode, why) {
