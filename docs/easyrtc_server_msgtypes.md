@@ -28,8 +28,8 @@ Includes fields needed for authentication. Sender and target must be online, aut
  - **apiVersion** (required) Api version string.
  - **applicationName** (optional) Will default to the server default application.
  - **easyrtcsid** (optional) The EasyRTC session ID which should be available in the browser cookie variables.
- - **username** (optional)
- - **credential** (optional) (for enterprise, this would include the apiKey)
+ - **username** (optional) String containing the username for the client. May be shared to other clients in the room list.
+ - **credential** (optional) Can be any JSONable object.
  - **setUserCfg** (optional) Contains all values from setUserCfg
  - **setPresence** (optional) Contains all values from setPresence
  - **roomJoin** (optional) Contains all values from roomJoin. Will default to application default room.
@@ -113,6 +113,7 @@ Enters a room. If room doesn't exist, a new room may be created.
 
  - **roomJoin** (required) Map of room names
    - **roomName** (required) Room name (matches map key)
+   - **roomParameter** (optional) May be any JSONable object. This field is not looked at by EasyRTC, however it is available for custom server applications. May be used for room options or authentication needs.
 
 **Returns:**
  - **roomData** (with roomStatus of `join`)
