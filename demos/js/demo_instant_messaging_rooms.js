@@ -297,12 +297,19 @@ function loginSuccess(easyrtcId) {
 
 
 function displayFields() {
+    
     var outstr = "Application fields<div style='margin-left:1em'>";
     outstr += JSON.stringify(easyrtc.getApplicationFields());
     outstr += "</div><br>";
+    
+    outstr += "Session fields<div style='margin-left:1em'>";
+    outstr += JSON.stringify(easyrtc.getSessionFields());
+    outstr += "</div><br>";
+    
     outstr += "Connection fields<div style='margin-left:1em'>";
     outstr += JSON.stringify(easyrtc.getConnectionFields());
     outstr += "</div><br>";
+    
     var roomlist = easyrtc.getRoomsJoined();
     for (var roomname in roomlist) {
         var roomfields = easyrtc.getRoomFields(roomname);

@@ -2549,6 +2549,9 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
 
         switch (msgType) {
+            case "sessionData":
+                processSessionData(msgData.sessionData);
+                break;
             case "roomData":
                 processRoomData(msgData.roomData);
                 break;
@@ -2823,6 +2826,39 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         }
     };
 
+    /**
+     * Fetch the collection of session fields as a map. The map has the structure:
+     *  { key1: { "fieldName": key1, "fieldValue": value1}, ...,
+     *    key2: { "fieldName": key2, "fieldValue": value2}
+     *  }
+     * @returns 
+     */
+    easyrtc.getSessionFields = function() {
+        return easyrtc.sessionFields;
+    };
+    
+    /**
+     * Fetch the value of a session field by name. 
+     * @param {String} name - name of the session field to be fetched.
+     * @returns the field value (which can be anything). Returns undefined if the field does not exist.
+     */
+    easyrtc.getSessionField = function(name) {
+        if( easyrtc.sessionFields[name]) {
+            return easyrtc.sessionFields[name].fieldValue;
+        }
+        else {
+            return undefined;
+        }           
+    };
+    
+    function processSessionData(sessionData) {
+        if( sessionData.easyrtcsid) {
+            easyrtc.easyrtcsid = sessionData.easyrtcsid;
+        }
+        if(sessionData.field){
+            easyrtc.sessionFields = sessionData.field;
+        }
+    }
 
     function processRoomData(roomData) {
         for (var roomname in roomData) {
@@ -2921,7 +2957,10 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         if (msgData.application) {
             easyrtc.fields.application = msgData.application.field;
         }
-
+        
+        if( msgData.sessionData) {
+            processSessionData(msgData.sessionData);
+        }
     }
 
     function sendAuthenticate(successCallback, errorCallback) {
@@ -2985,6 +3024,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         );
     }
 };
+
+
 
 /** Get a list of the rooms you are in. You must be connected to call this function.
  * @returns {Map} A map whose keys are the room names
