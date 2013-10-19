@@ -83,7 +83,7 @@
                     <div id="quickJoinBlock"></div><br>                    
                     Room to join: <input id="roomToAdd" type="text" size="20" />
                     optional room parameters<input id="optRoomParms" type="text" size="20"/>
-                    <button onclick="addRoom(null, true);"> Join</button>                   
+                    <button onclick="addRoom(null, null, true);"> Join</button>                   
                 </div>
 
                 <div id="sendMessageArea">
@@ -147,7 +147,7 @@
         </div>
         <script type="text/javascript">
 
-                        addRoomButtons({
+                        addQuickJoinButtons({
                             room1: {roomName: "room1", numberClients: " "},
                             room2: {roomName: "room2", numberClients: " "},
                             room3: {roomName: "room3", numberClients: " "}

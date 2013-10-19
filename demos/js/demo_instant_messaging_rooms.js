@@ -75,7 +75,6 @@ function addRoom(roomName, parmString, userAdded) {
     }
     var roomid = genRoomDivName(roomName);
     if (document.getElementById(roomid)) {
-        console.log("room " + roomName + " already exists, don't need to add");
         return;
     }
     function addRoomButton() {
@@ -153,9 +152,13 @@ function roomEntryListener(entered, roomName) {
     refreshRoomList();
 }
 
+
 function refreshRoomList() {
-    easyrtc.getRoomList(addRoomButtons, null);
+    if( isConnected) {
+        easyrtc.getRoomList(addQuickJoinButtons, null);
+    }
 }
+
 
 function peerListener(who, msgType, content, targetting) {
     addToConversation(who, msgType, content, targetting);
@@ -182,17 +185,18 @@ function connect() {
 }
 
 
-function addRoomButtons(roomList) {
+function addQuickJoinButtons(roomList) {
     var quickJoinBlock = document.getElementById("quickJoinBlock");
     var n = quickJoinBlock.childNodes.length;
     for (var i = n - 1; i >= 0; i--) {
         quickJoinBlock.removeChild(quickJoinBlock.childNodes[i]);
     }
     function addQuickJoinButton(roomname, numberClients) {
-        var id = "quickjoin_" + roomname;
-        if (document.getElementById(id)) {
+        var checkid = "roomblock_" + roomname;
+        if (document.getElementById(checkid)) {
             return; // already present so don't add again
         }
+        var id = "quickjoin_" + roomname;
         var div = document.createElement("div");
         div.id = id;
         div.appendChild(document.createTextNode(roomname + "(" + numberClients + ")"));
@@ -205,10 +209,21 @@ function addRoomButtons(roomList) {
         var button = document.createElement("button");
         button.onclick = function() {
             addRoom(roomname, parmsField.value, true);
+            refreshRoomList();
         };
         button.appendChild(document.createTextNode("add"));
         div.appendChild(button);
         quickJoinBlock.appendChild(div);
+
+    }
+    if( !roomList["room1"]) {
+        roomList["room1"] = { numberClients:0};
+    }
+    if( !roomList["room2"]) {
+        roomList["room2"] = { numberClients:0};
+    }
+    if( !roomList["room3"]) {
+        roomList["room3"] = { numberClients:0};
     }
     for (var roomName in roomList) {
         addQuickJoinButton(roomName, roomList[roomName].numberClients);
