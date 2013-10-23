@@ -264,7 +264,7 @@ Provides room information for all rooms the user is currently in. This includes 
    - **roomName** (required) Room name (matches map key)
    - **roomStatus** (required) Instruction to API as to whether to join, update, or leave a given room.  [join|update|leave]
      - `join` - Client is considered to be joined to the given room. `clientList` field will may be present to show other users who are visible in the room.
-     - `update` - Client should update what it knows about the room. `clientList` or `clientListDelta` field may be present.
+     - `update` - Client should update what it knows about the room. `field` or `clientList` or `clientListDelta` field may be present.
      - `leave` - Client is considered to have left the room, and should delete everything it knows about the room including the ids of other users.
    - **clientList** (optional) Map of easyrtcid's for users online in the same room. If present, this should overrule the current list in memory.
      - **easyrtcid** (required) Matches map key
@@ -279,7 +279,7 @@ Provides room information for all rooms the user is currently in. This includes 
    - **clientListDelta** (optional)
      - **updateClient** (optional) Map of easyrtcids to update. Will contain same fields as 'clientList'
      - **removeClient** (optional) Map of easyrtcids to remove from the client list.
-   - **field** (optional) - map of room fields
+   - **field** (optional) - map of room fields. If this exists but is empty, than all fields should be removed.
      - **fieldName**
      - **fieldValue**
 
