@@ -173,10 +173,10 @@ easyrtc.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
     if (easyrtc.webSocket) {
         var entry = {};
         entry[roomName] = newRoomData;
-
-        function success(msgType, msgData) {
+        easyrtc.sendSignalling(null, "roomJoin", {roomJoin: entry},
+        function(msgType, msg) {
             easyrtc.roomJoin[roomName] = newRoomData;
-            var roomData = msgData.roomData;
+            var roomData = msg.roomData;
             if (successCB) {
                 successCB(roomName);
                 easyrtc.lastLoggedInList[roomName] = {};
@@ -187,17 +187,16 @@ easyrtc.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
                 }
                 easyrtc.roomOccupantListener(roomName, easyrtc.lastLoggedInList[roomName]);
             }
-        }
-        ;
-        function failure(errorCode, errorText) {
-            if (failureCB) {
-                failureCB(errorCode, errorText, roomName);
-            }
-            else {
-                easyrtc.showError("Unable to enter room " + roomName + " because " + why);
-            }
-        }
-        easyrtc.sendSignalling(null, "roomJoin", {roomJoin: entry}, success, failure);
+        },
+                function(errorCode, errorText) {
+                    if (failureCB) {
+                        failureCB(errorCode, errorText, roomName);
+                    }
+                    else {
+                        easyrtc.showError("Unable to enter room " + roomName + " because " + why);
+                    }
+                }
+        );
     }
     else {
         easyrtc.roomJoin[roomName] = newRoomData;
@@ -703,68 +702,6 @@ easyrtc.enableVideo = function(enabled) {
 easyrtc.enableDataChannels = function(enabled) {
     easyrtc.dataEnabled = enabled;
 };
-
-/**
- * @private
- * @param {type} enable
- * @param {type} tracks
- */
-easyrtc.enableMediaTracks = function(enable, tracks) {
-    if (tracks) {
-        for (var i = 0; i < tracks.length; i++) {
-            var track = tracks[i];
-            track.enabled = enable;
-        }
-    }
-};
-
-/**
- * This function is used to enable and disable the local camera. If you disable the
- * camera, video objects display it will "freeze" until the camera is re-enabled. * 
- * By default, a camera is enabled.
- * @param {type} enable - true to enable the camera, false to disable it.
- */
-easyrtc.enableCamera = function(enable) {
-    if (easyrtc.localStream && easyrtc.localStream.getVideoTracks) {
-        enableMediaTracks(enable, easyrtc.localStream.getVideoTracks());
-    }
-};
-
-/**
- * This function is used to enable and disable the local microphone. If you disable
- * the microphone, sounds stops being transmitted to your peers. By default, the microphone
- * is enabled.
- * @param {type} enable - true to enable the microphone, false to disable it.
- * @returns {undefined}
- */
-easyrtc.enableMicrophone = function(enable) {
-    if (easyrtc.localStream && easyrtc.localStream.getAudioTracks) {
-        enableMediaTracks(enable, easyrtc.localStream.getAudioTracks());
-    }
-};
-
-/** 
- * Mute a video object.
- * @param {type} videoObjectName - A DOMObject or the id of the DOMObject.
- * @param {type} mute - true to mute the video object, false to unmute it.
- */
-easyrtc.muteVideoObject = function(videoObjectName, mute) {
-    var videoObject;
-    if (typeof (videoObjectName) === 'string') {
-        videoObject = document.getElementById(videoObjectName);
-        if (!videoObject) {
-            throw "Unknown video object " + videoObjectName;
-        }
-    }
-    else if (!videoObjectName) {
-        throw "muteVideoObject passed a null";
-    }
-    else {
-        videoObject = videoObjectName;
-    }
-    videoObject.muted = !!mute;
-};
-
 /**
  * Returns a URL for your local camera and microphone.
  *  It can be called only after easyrtc.initMediaSource has succeeded.
@@ -1292,65 +1229,6 @@ easyrtc.webSocket = null;
 easyrtc.pc_config = {};
 /** @private  */
 easyrtc.closedChannel = null;
-
-
-
-/** @private 
- * Helper
- * @param {type} easyrtcid
- * @param {type} checkAudio
- * @returns {Boolean}
- */
-easyrtc._haveTracks = function(easyrtcid, checkAudio) {
-    var stream;
-
-    if (!easyrtcid) {
-        stream = easyrtc.localStream;
-    }
-    else {
-        var peerConnObj = easyrtc.peerConns[easyrtcid];
-        if (!peerConnObj) {
-            console.error("Programmer error: haveTracks called about a peer you don't have a connection to");
-            return false;
-        }
-        stream = peerConnObj.stream;
-    }
-    if (!stream) {
-        return false;
-    }
-
-    var tracks;
-    try {
-        if (checkAudio) {
-            tracks = stream.getAudioTracks();
-        }
-        else {
-            tracks = stream.getVideoTracks();
-        }
-    } catch (oops) {
-        return true;
-    }
-    if (!tracks)
-        return false;
-    return tracks.length > 0;
-};
-
-/** Determines if a particular peer2peer connection has an audio track.
- * @param easyrtcid - the id of the other caller in the connection. If easyrtcid is not supplied, checks the local media.
- * @return {Boolean} true if there is an audio track or the browser can't tell us.
- */
-easyrtc.haveAudioTrack = function(easyrtcid) {
-    return easyrtc._haveTracks(easyrtcid, true);
-};
-/** Determines if a particular peer2peer connection has a video track.
- * @param easyrtcid - the id of the other caller in the connection. If easyrtcid is not supplied, checks the local media.
- * @return {Boolean} true if there is an video track or the browser can't tell us.
- */
-easyrtc.haveVideoTrack = function(easyrtcid) {
-    return easyrtc._haveTracks(easyrtcid, false);
-};
-
-
 /**
  * Connects to the EasyRTC signaling server. You must connect before trying to
  * call other users.
@@ -1500,7 +1378,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     function(ackmsg) {
                         if (ackmsg.msgType !== "error") {
                             if (successCallback) {
-                                successCallback(ackmsg.msgType, ackmsg.msgData);
+                                successCallback(ackmsg.msgType, ackmsg);
                             }
                         }
                         else {
@@ -1734,21 +1612,62 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
      *    );
      */
     easyrtc.getRoomList = function(callback, errorCallback) {
-        easyrtc.sendSignalling(null, "getRoomList", null, 
-            function(msgType, msgData) {
-                 callback(msgData.roomList);
-             },
-           function(errorCode, errorText) {
+        easyrtc.sendSignalling(null, "getRoomList", null, function(ackType, ackMsg) {
+            if (ackType === 'error') {
                 if (errorCallback) {
-                    errorCallback(errorCode, errorText);
+                    errorCallback(ackMsg.msgData.errorCode, ackMsg.msgData.errorText);
                 }
                 else {
-                    easyrtc.showError(errorCode, errorText);
+                    easyrtc.showError(ackMsg.msgData.errorCode, ackMsg.msgData.errorText);
                 }
             }
-        );
+            else {
+                callback(ackMsg.roomList);
+            }
+        });
     };
 
+
+    function haveTracks(easyrtcid, checkAudio) {
+        var peerConnObj = easyrtc.peerConns[easyrtcid];
+        if (!peerConnObj) {
+            console.error("Programmer error: haveTracks called about a peer you don't have a connection to");
+        }
+        var stream = peerConnObj.stream;
+        if (!stream) {
+            return false;
+        }
+
+        var tracks;
+        try {
+            if (checkAudio) {
+                tracks = stream.getAudioTracks();
+            }
+            else {
+                tracks = stream.getVideoTracks();
+            }
+        } catch (oops) {
+            return true;
+        }
+        if (!tracks)
+            return false;
+        return tracks.length > 0;
+    }
+
+    /** Determines if a particular peer2peer connection has an audio track.
+     * @param easyrtcid - the id of the other caller in the connection.
+     * @return {Boolean} true if there is an audio track or the browser can't tell us.
+     */
+    easyrtc.haveAudioTrack = function(easyrtcid) {
+        return haveTracks(easyrtcid, true);
+    };
+    /** Determines if a particular peer2peer connection has a video track.
+     * @param easyrtcid - the id of the other caller in the connection.
+     * @return {Boolean} true if there is an video track or the browser can't tell us.
+     */
+    easyrtc.haveVideoTrack = function(easyrtcid) {
+        return haveTracks(easyrtcid, false);
+    };
 
     /** Value returned by easyrtc.getConnectStatus if the other user isn't connected. */
     easyrtc.NOT_CONNECTED = "not connected";
@@ -1970,9 +1889,9 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             hangupBody(otherUser);
             if (easyrtc.webSocket) {
                 sendSignalling(otherUser, "hangup", null, function() {
-                }, function(errorCode, errorText) {
+                }, function(msg) {
                     if (easyrtc.debugPrinter) {
-                        easyrtc.debugPrinter("hangup failed:" + errorText);
+                        easyrtc.debugPrinter("hangup failed:" + msg);
                     }
                 });
             }
@@ -2123,11 +2042,11 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             return null;
         }
 
-        if (easyrtc.forwardStreamEnabled) {
-            if (!easyrtc.localStream) {
+        if( easyrtc.forwardStreamEnabled) {
+            if( !easyrtc.localStream) { 
                 makeLocalStreamFromRemoteStream();
             }
-            if (easyrtc.localStream) {
+            if( easyrtc.localStream) {
                 pc.addStream(easyrtc.localStream);
             }
         }
@@ -2432,7 +2351,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     }
     ;
 
-    function processOccupantList(roomName, list) {
+    function processList(roomName, list) {
         var isPrimaryOwner = easyrtc.cookieOwner ? true : false;
         easyrtc.reducedList = {};
         for (var id in list) {
@@ -2656,7 +2575,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 processRoomData(msgData.roomData);
                 break;
             case "list":
-                processOccupantList(msgData);
+                processList(msgData);
                 break;
             case "forwardToUrl":
                 if (msgData.newWindow) {
@@ -2731,7 +2650,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     }
                     else {
                         /* socket server went down. this will generate a 'disconnect' event as well, so skip this event */
-                        console.warn("The connection to the EasyRTC socket server went down. It may come back by itself.");
+                        console.warn("The connection to the EasyRTC socket server went down. It may come back by itself.")
                     }
                 }
                 else {
@@ -3002,7 +2921,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             if (easyrtc.roomJoin[roomname] && roomData[roomname]) {
                 easyrtc.fields.rooms[roomname] = roomData[roomname].field;
             }
-            processOccupantList(roomname, easyrtc.lastLoggedInList[roomname]);
+            processList(roomname, easyrtc.lastLoggedInList[roomname]);
         }
     }
 
@@ -3048,9 +2967,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             }
         }
 
-        if (msgData.sessionData) {
-            processSessionData(msgData.sessionData);
-        }
+
 
         if (msgData.roomData) {
             processRoomData(msgData.roomData);
@@ -3060,6 +2977,9 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             easyrtc.fields.application = msgData.application.field;
         }
 
+        if (msgData.sessionData) {
+            processSessionData(msgData.sessionData);
+        }
     }
 
     function sendAuthenticate(successCallback, errorCallback) {
