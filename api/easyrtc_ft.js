@@ -225,10 +225,10 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         }
     }
 
-    easyrtc.setPeerListener(fileOfferRejected, "files_reject", destUser);
-    easyrtc.setPeerListener(fileOfferAccepted, "files_accept", destUser);
-    easyrtc.setPeerListener(fileCancelReceived, "files_cancel", destUser);
-    easyrtc.setPeerListener(packageAckReceived, "files_ack", destUser);
+    easyrtc.setPeerListener(fileOfferRejected, "filesReject", destUser);
+    easyrtc.setPeerListener(fileOfferAccepted, "filesAccept", destUser);
+    easyrtc.setPeerListener(fileCancelReceived, "filesCancel", destUser);
+    easyrtc.setPeerListener(packageAckReceived, "filesAck", destUser);
 
 
     var outseq = 0;
@@ -237,7 +237,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         if (!curFile) {
             if (filesBeingSent.length === 0) {
                 outseq = 0;
-                easyrtc.sendData(destUser, "files_chunk", {done: "all"});
+                easyrtc.sendData(destUser, "filesChunk", {done: "all"});
                 filesOffered.length = 0;
                 progressListener({status: "done"});
                 return;
@@ -247,7 +247,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
                 curFileSize = curFile.size;
                 positionAcked = 0;
                 waitingForAck = false;
-                easyrtc.sendData(destUser, "files_chunk", {name: curFile.name, type: curFile.type, outseq: outseq, size: curFile.size});
+                easyrtc.sendData(destUser, "filesChunk", {name: curFile.name, type: curFile.type, outseq: outseq, size: curFile.size});
                 outseq++;
             }
         }
@@ -256,7 +256,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         if (!progressListener({status: "working", name: curFile.name, position: filePosition, size: curFileSize, numFiles: filesBeingSent.length+1})) {
             filesOffered.length = 0;
             filePosition = 0;
-            easyrtc.sendData(destUser, "files_chunk", {done: "cancelled"});
+            easyrtc.sendData(destUser, "filesChunk", {done: "cancelled"});
             return;
         }
 
@@ -283,11 +283,11 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
                     else {
                         packetObject.datatxt = packetData;
                     }
-                    easyrtc.sendData(destUser, "files_chunk", packetObject);
+                    easyrtc.sendData(destUser, "filesChunk", packetObject);
                     outseq++;
                 }
                 if (nextLocation >= curFileSize) {
-                    easyrtc.sendData(destUser, "files_chunk", {done: "file"});
+                    easyrtc.sendData(destUser, "filesChunk", {done: "file"});
                 }
                 if (filePosition < positionAcked + ackThreshold) {
                     sendChunk();
@@ -317,7 +317,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         }
         seq++;
         filesOffered[seq] = files;
-        easyrtc.sendDataWS(destUser, "files_offer", {seq: seq, fileNameList: fileNameList});
+        easyrtc.sendDataWS(destUser, "filesOffer", {seq: seq, fileNameList: fileNameList});
     }
     return sendFilesOffer;
 };
@@ -371,10 +371,10 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
                     groupSeq: msgData.seq,
                     nextPacketSeq: 0
                 };
-                easyrtc.sendDataWS(otherGuy, "files_accept", {seq: msgData.seq}, ackHandler);
+                easyrtc.sendDataWS(otherGuy, "filesAccept", {seq: msgData.seq}, ackHandler);
             }
             else {
-                easyrtc.sendDataWS(otherGuy, "files_reject", {seq: msgData.seq});
+                easyrtc.sendDataWS(otherGuy, "filesReject", {seq: msgData.seq});
             }
         });
     }
@@ -438,16 +438,16 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
                 size: userStream.lengthExpected});
             if (userStream.lengthReceived > positionAcked + ackThreshold) {
                 positionAcked = userStream.lengthReceived;
-                easyrtc.sendData(otherGuy, "files_ack", {positionAck: positionAcked});
+                easyrtc.sendData(otherGuy, "filesAck", {positionAck: positionAcked});
             }
         }
         else {
-            console.log("Unexpected data structure in files_chunk=", msgData);
+            console.log("Unexpected data structure in filesChunk=", msgData);
         }
     }
 
-    easyrtc.setPeerListener(fileOfferHandler, "files_offer");
-    easyrtc.setPeerListener(fileChunkHandler, "files_chunk");
+    easyrtc.setPeerListener(fileOfferHandler, "filesOffer");
+    easyrtc.setPeerListener(fileChunkHandler, "filesChunk");
 };
 
 /** This is a wrapper around Eli Grey's saveAs function. This saves to the browser's downloads directory.

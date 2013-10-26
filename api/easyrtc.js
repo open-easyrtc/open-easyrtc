@@ -92,6 +92,8 @@ easyrtc.oldConfig = {};
 /** @private */
 easyrtc.offersPending = {};
 
+/** @private */
+easyrtc.selfRoomJoinTime = 0;
 
 /** The height of the local media stream video in pixels. This field is set an indeterminate period
  * of time after easyrtc.initMediaSource succeeds.
@@ -470,7 +472,7 @@ easyrtc.callCancelled = function(easyrtcid) {
  * @param {type} fields just be JSON serializable to a length of not more than 128 bytes.
  * @example
  *   easyrtc.setApiFields( { favorite_alien:'Mr Spock'});
- *   easyrtc.setRoomOccupantListener( function(roomName, list, isPrimaryOwner) {
+ *   easyrtc.setRoomOccupantListener( function(roomName, list) {
  *      for( var i in list ){
  *         console.log("easyrtcid=" + i + " favorite alien is " + list[i].apiFields.favorite_alien);
  *      }
@@ -624,13 +626,14 @@ easyrtc.setRoomEntryListener = function(handler) {
     easyrtc.roomEntryListener = handler;
 };
 /** Set the callback that will be invoked when the list of people logged in changes.
- * The callback expects to receive a map whose ideas are easyrtcids and whose values are in turn maps
+ * The callback expects to receive a room name argument, and 
+ *  a map whose ideas are easyrtcids and whose values are in turn maps
  * supplying user specific information. The inner maps have the following keys:
  *  userName, applicationName, browserFamily, browserMajor, osFamily, osMajor, deviceFamily.
- * The callback also receives a boolean that indicates whether the owner is the primary owner of a room.
+ *  The third argument is the listener is the innerMap for the connections own data (not needed by most applications).
  * @param {Function} listener
  * @example
- *   easyrtc.setRoomOccupantListener( function(roomName, list, isPrimaryOwner) {
+ *   easyrtc.setRoomOccupantListener( function(roomName, list, selfInfo) {
  *      for( var i in list ){
  *         ("easyrtcid=" + i + " belongs to user " + list[i].userName);
  *      }
@@ -1356,15 +1359,15 @@ easyrtc.haveVideoTrack = function(easyrtcid) {
  * call other users.
  * @param {String} applicationName is a string that identifies the application so that different applications can have different
  *        lists of users.
- * @param {Function} successCallback (easyrtcId, cookieOwner) - is called on successful connect. easyrtcId is the
+ * @param {Function} successCallback (easyrtcId, roomOwner) - is called on successful connect. easyrtcId is the
  *   unique name that the client is known to the server by. A client usually only needs it's own easyrtcId for debugging purposes.
- *       cookieOwner is true if the server sent back a isOwner:true field in response to a cookie.
+ *       roomOwner is true if the user is the owner of a room. It's value is random if the user is in multiple rooms.
  * @param {Function} errorCallback (errorCode, errorText) - is called on unsuccessful connect. if null, an alert is called instead.
  *  The errorCode takes it's value from easyrtc.errCodes.
  * @example
  *   easyrtc.connect("mychat_app",
- *                   function(easyrtcid, cookieOwner) {
- *                       if( cookieOwner) { console.log("I'm the room owner"); }
+ *                   function(easyrtcid, roomOwner) {
+ *                       if( roomOwner) { console.log("I'm the room owner"); }
  *                       console.log("my id is " + easyrtcid);
  *                   },
  *                   function(errText) {
@@ -2433,21 +2436,19 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     ;
 
     function processOccupantList(roomName, list) {
-        var isPrimaryOwner = easyrtc.cookieOwner ? true : false;
-        easyrtc.reducedList = {};
+        var myInfo = null;
+        easyrtc.reducedList = {};        
         for (var id in list) {
-            var item = list[id];
-            if (item.isOwner &&
-                    item.roomJoinTime < list[easyrtc.myEasyrtcid].roomJoinTime) {
-                isPrimaryOwner = false;
-            }
             if (id !== easyrtc.myEasyrtcid) {
                 easyrtc.reducedList[id] = list[id];
+            }
+            else {
+                myInfo = list[id];
             }
         }
         processConnectedList(easyrtc.reducedList);
         if (easyrtc.roomOccupantListener) {
-            easyrtc.roomOccupantListener(roomName, easyrtc.reducedList, isPrimaryOwner);
+            easyrtc.roomOccupantListener(roomName, easyrtc.reducedList, myInfo);
         }
     }
 
@@ -2654,9 +2655,6 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 break;
             case "roomData":
                 processRoomData(msgData.roomData);
-                break;
-            case "list":
-                processOccupantList(msgData);
                 break;
             case "forwardToUrl":
                 if (msgData.newWindow) {
@@ -2951,6 +2949,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         }
     };
 
+
     function processSessionData(sessionData) {
         if (sessionData.easyrtcsid) {
             easyrtc.easyrtcsid = sessionData.easyrtcsid;
@@ -2960,9 +2959,11 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         }
     }
 
+
     function processRoomData(roomData) {
-        for (var roomname in roomData) {
-            easyrtc.roomHasPassword = roomData[roomname].hasPassword;
+        easyrtc.roomData = roomData;
+
+        for (var roomname in easyrtc.roomData) {   
             if (roomData[roomname].roomStatus === "join") {
                 if (easyrtc.roomEntryListener) {
                     easyrtc.roomEntryListener(true, roomname);
@@ -2977,9 +2978,6 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 }
                 delete easyrtc.roomJoin[roomname];
                 continue;
-            }
-            if (roomData[roomname].field && roomData[roomname].field.isOwner) {
-                easyrtc.cookieOwner = true;
             }
 
             if (roomData[roomname].clientList) {
@@ -3116,7 +3114,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             else {
                 processToken(msg);
                 if (successCallback) {
-                    successCallback(easyrtc.myEasyrtcid, easyrtc.cookieOwner);
+                    successCallback(easyrtc.myEasyrtcid);
                 }
             }
         }
@@ -3416,11 +3414,11 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
 
     var nextInitializationStep;
 
-    nextInitializationStep = function(token, isOwner) {
+    nextInitializationStep = function(token) {
         if (gotConnectionCallback) {
             gotConnectionCallback(true, "");
         }
-        onReady(easyrtc.myEasyrtcid, easyrtc.cookieOwner);
+        onReady(easyrtc.myEasyrtcid);
     };
     easyrtc.initMediaSource(
             function() {
