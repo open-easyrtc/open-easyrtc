@@ -231,7 +231,7 @@
 <dd>
     
     <div class="description">
-        The height of the local media stream video in pixels. This field is set an indeterminate period of time after easyrtc.initMediaSource succeeds.
+        The height of the local media stream video in pixels. This field is set an indeterminate periodof time after easyrtc.initMediaSource succeeds.
     </div>
     
     
@@ -278,7 +278,7 @@
 <dd>
     
     <div class="description">
-        The width of the local media stream video in pixels. This field is set an indeterminate period of time after easyrtc.initMediaSource succeeds.
+        The width of the local media stream video in pixels. This field is set an indeterminate periodof time after easyrtc.initMediaSource succeeds.
     </div>
     
     
@@ -640,7 +640,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.call( otherEasyrtcid,        function(easyrtcid, mediaType) {          console.log("Got mediatype " + mediaType + " from " + easyrtc.idToName(easyrtcid);       },       function(errorCode, errMessage) {          console.log("call to  " + easyrtc.idToName(otherEasyrtcid) + " failed:" + errMessage);       },       function(wasAccepted, easyrtcid) {           if( wasAccepted ){              console.log("call accepted by " + easyrtc.idToName(easyrtcid));           }           else {               console.log("call rejected" + easyrtc.idToName(easyrtcid));           }       });       </code></pre>
+    <pre class="prettyprint"><code>   easyrtc.call( otherEasyrtcid,       function(easyrtcid, mediaType) {          console.log("Got mediatype " + mediaType + " from " + easyrtc.idToName(easyrtcid);       },       function(errorCode, errMessage) {          console.log("call to  " + easyrtc.idToName(otherEasyrtcid) + " failed:" + errMessage);       },       function(wasAccepted, easyrtcid) {           if( wasAccepted ){              console.log("call accepted by " + easyrtc.idToName(easyrtcid));           }           else {               console.log("call rejected" + easyrtc.idToName(easyrtcid));           }       });</code></pre>
 
     
 </dd>
@@ -888,7 +888,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.clearMediaStream( document.getElementById('selfVideo'));</code></pre>
+    <pre class="prettyprint"><code>   easyrtc.clearMediaStream( document.getElementById('selfVideo'));</code></pre>
 
     
 </dd>
@@ -977,7 +977,7 @@
             
             
             
-            <td class="description last">(easyrtcId, cookieOwner) - is called on successful connect. easyrtcId is the   unique name that the client is known to the server by. A client usually only needs it's own easyrtcId for debugging purposes.      cookieOwner is true if the server sent back a isOwner:true field in response to a cookie.</td>
+            <td class="description last">(easyrtcId, roomOwner) - is called on successful connect. easyrtcId is the  unique name that the client is known to the server by. A client usually only needs it's own easyrtcId for debugging purposes.      roomOwner is true if the user is the owner of a room. It's value is random if the user is in multiple rooms.</td>
         </tr>
 	
 	
@@ -1047,7 +1047,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.connect("mychat_app",                   function(easyrtcid, cookieOwner) {                      if( cookieOwner) { console.log("I'm the room owner"); }                      console.log("my id is " + easyrtcid);                  },                  function(errText) {                      console.log("failed to connect ", erFrText);                  });</code></pre>
+    <pre class="prettyprint"><code>  easyrtc.connect("mychat_app",                  function(easyrtcid, roomOwner) {                      if( roomOwner) { console.log("I'm the room owner"); }                      console.log("my id is " + easyrtcid);                  },                  function(errText) {                      console.log("failed to connect ", erFrText);                  });</code></pre>
 
     
 </dd>
@@ -1112,8 +1112,138 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.disconnect();</code></pre>
+    <pre class="prettyprint"><code>   easyrtc.disconnect();</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="doesDataChannelWork"><span class="type-signature">&lt;static> </span>doesDataChannelWork<span class="signature">(otherUser)</span><span class="type-signature"> &rarr; {Boolean}</span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Checks to see if data channels work between two peers.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>otherUser</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">the other peer.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    true if data channels work and are ready to be used  between the two peers.
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Boolean</span>
+
+
+	</dd>
+</dl>
+
+        
+    
     
 </dd>
 
@@ -1298,6 +1428,114 @@
         
             
 <dt>
+    <h3 class="name" id="enableCamera"><span class="type-signature">&lt;static> </span>enableCamera<span class="signature">(enable)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        This function is used to enable and disable the local camera. If you disable thecamera, video objects display it will "freeze" until the camera is re-enabled. * By default, a camera is enabled.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>enable</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">type</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">true to enable the camera, false to disable it.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h3 class="name" id="enableDataChannels"><span class="type-signature">&lt;static> </span>enableDataChannels<span class="signature">(enabled)</span><span class="type-signature"></span></h3>
     
     
@@ -1419,7 +1657,7 @@
     
     
     <div class="description">
-        Enable or disable logging to the console. Note: if you want to control the printing of debug messages, override the   easyrtc.debugPrinter variable with a function that takes a message string as it's argument.   This is exactly what easyrtc.enableDebug does when it's enable argument is true.
+        Enable or disable logging to the console.Note: if you want to control the printing of debug messages, override the   easyrtc.debugPrinter variable with a function that takes a message string as it's argument.   This is exactly what easyrtc.enableDebug does when it's enable argument is true.
     </div>
     
 
@@ -1516,8 +1754,134 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.enableDebug(true);  </code></pre>
+    <pre class="prettyprint"><code>   easyrtc.enableDebug(true);</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="enableMicrophone"><span class="type-signature">&lt;static> </span>enableMicrophone<span class="signature">(enable)</span><span class="type-signature"> &rarr; {undefined}</span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        This function is used to enable and disable the local microphone. If you disablethe microphone, sounds stops being transmitted to your peers. By default, the microphoneis enabled.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>enable</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">type</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">true to enable the microphone, false to disable it.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">undefined</span>
+
+
+	</dd>
+</dl>
+
+        
+    
     
 </dd>
 
@@ -1645,7 +2009,7 @@
     
     
     <div class="description">
-        Get server defined fields associated with the current application. Only valid after a connection has been made.
+        Get server defined fields associated with the current application. Only validafter a connection has been made.
     </div>
     
 
@@ -1810,7 +2174,7 @@
     
     
     <div class="description">
-        Get server defined fields associated with the connection. Only valid after a connection has been made.
+        Get server defined fields associated with the connection. Only validafter a connection has been made.
     </div>
     
 
@@ -2011,7 +2375,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    if( easyrtc.getConnectStatus(otherEasyrtcid) == easyrtc.NOT_CONNECTED ){        easyrtc.call(otherEasyrtcid,                  function (){ console.log("success"); },                 function (){ console.log("failure"); });    }</code></pre>
+    <pre class="prettyprint"><code>    if( easyrtc.getConnectStatus(otherEasyrtcid) == easyrtc.NOT_CONNECTED ){        easyrtc.call(otherEasyrtcid,                 function (){ console.log("success"); },                 function (){ console.log("failure"); });    }</code></pre>
 
     
 </dd>
@@ -2094,7 +2458,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());    </code></pre>
+    <pre class="prettyprint"><code>   easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());</code></pre>
 
     
 </dd>
@@ -2185,7 +2549,7 @@
         
             
 <dt>
-    <h3 class="name" id="getRoomFields"><span class="type-signature">&lt;static> </span>getRoomFields<span class="signature">(Roomname)</span><span class="type-signature"> &rarr; {Dictionary}</span></h3>
+    <h3 class="name" id="getRoomFields"><span class="type-signature">&lt;static> </span>getRoomFields<span class="signature">(roomName)</span><span class="type-signature"> &rarr; {Dictionary}</span></h3>
     
     
 </dt>
@@ -2193,7 +2557,7 @@
     
     
     <div class="description">
-        Get server defined fields associated with a particular room. Only valid after a connection has been made.
+        Get server defined fields associated with a particular room. Only validafter a connection has been made.
     </div>
     
 
@@ -2227,7 +2591,7 @@
 	
         <tr>
             
-                <td class="name"><code>Roomname</code></td>
+                <td class="name"><code>roomName</code></td>
             
             
             <td class="type">
@@ -2438,7 +2802,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.getRoomList(        function(roomList){          for(roomName in roomList) {             console.log("saw room " + roomName);          }        },        function(errorCode, errorText){           easyrtc.showError(errorCode, errorText);        }   );</code></pre>
+    <pre class="prettyprint"><code>   easyrtc.getRoomList(       function(roomList){          for(roomName in roomList) {             console.log("saw room " + roomName);          }        },        function(errorCode, errorText){           easyrtc.showError(errorCode, errorText);        }   );</code></pre>
 
     
 </dd>
@@ -2515,6 +2879,202 @@
 	<dd>
 		
 <span class="param-type">Map</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="getSessionField"><span class="type-signature">&lt;static> </span>getSessionField<span class="signature">(name)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Fetch the value of a session field by name.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">name of the session field to be fetched.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    the field value (which can be anything). Returns undefined if the field does not exist.
+</div>
+
+
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="getSessionFields"><span class="type-signature">&lt;static> </span>getSessionFields<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Fetch the collection of session fields as a map. The map has the structure: { key1: { "fieldName": key1, "fieldValue": value1}, ...,   key2: { "fieldName": key2, "fieldValue": value2} }
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
 
 
 	</dd>
@@ -2759,7 +3319,7 @@
             
             
             
-            <td class="description last">the id of the other caller in the connection.</td>
+            <td class="description last">the id of the other caller in the connection. If easyrtcid is not supplied, checks the local media.</td>
         </tr>
 	
 	
@@ -2884,7 +3444,7 @@
             
             
             
-            <td class="description last">the id of the other caller in the connection.</td>
+            <td class="description last">the id of the other caller in the connection. If easyrtcid is not supplied, checks the local media.</td>
         </tr>
 	
 	
@@ -3099,7 +3659,7 @@
     
     
     <div class="description">
-        Provides a layer on top of the easyrtc.initMediaSource and easyrtc.connect, assign the local media stream tothe video object identified by monitorVideoId, assign remote video streams tothe video objects identified by videoIds, and then call onReady. One of it'sside effects is to add hangup buttons to the remote video objects, buttonsthat only appear when you hover over them with the mouse cursor. This method will also add the easyrtcMirror class to the monitor video object so that it behaves like a mirror.
+        Provides a layer on top of the easyrtc.initMediaSource and easyrtc.connect, assign the local media stream tothe video object identified by monitorVideoId, assign remote video streams tothe video objects identified by videoIds, and then call onReady. One of it'sside effects is to add hangup buttons to the remote video objects, buttonsthat only appear when you hover over them with the mouse cursor. This method will also add theeasyrtcMirror class to the monitor video object so that it behaves like a mirror.
     </div>
     
 
@@ -3288,7 +3848,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.initManaged('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],              function (){                 console.log("successfully connected.");             },             function(errorCode, errorText) {                 console.log(errorText);             );</code></pre>
+    <pre class="prettyprint"><code>    easyrtc.initManaged('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],             function (){                 console.log("successfully connected.");             },             function(errorCode, errorText) {                 console.log(errorText);             );</code></pre>
 
     
 </dd>
@@ -3424,7 +3984,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>      easyrtc.initMediaSource(         function (){              easyrtc.setVideoObjectSrc( document.getElementById("mirrorVideo"), easyrtc.getLocalStream());          },         function (){              easyrtc.showError("no-media", "Unable to get local media");         });         </code></pre>
+    <pre class="prettyprint"><code>      easyrtc.initMediaSource(         function (){             easyrtc.setVideoObjectSrc( document.getElementById("mirrorVideo"), easyrtc.getLocalStream());         },         function (){              easyrtc.showError("no-media", "Unable to get local media");         });</code></pre>
 
     
 </dd>
@@ -3559,7 +4119,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   var name = document.getElementById('nameField').value;   if( !easyrtc.isNameValid(name)){       alert("Bad user name");   }</code></pre>
+    <pre class="prettyprint"><code>   var name = document.getElementById('nameField').value;   if( !easyrtc.isNameValid(name)){       console.error("Bad user name");   }</code></pre>
 
     
 </dd>
@@ -3575,7 +4135,7 @@
     
     
     <div class="description">
-        This method allows you to join a single room. It may be called multiple times to be in multiple rooms simultaneously. It may be called before or after connecting to the server.Note: the successCB and failureDB will only be called if you are already connected to the server.
+        This method allows you to join a single room. It may be called multiple times to be inmultiple rooms simultaneously. It may be called before or after connecting to the server.Note: the successCB and failureDB will only be called if you are already connected to the server.
     </div>
     
 
@@ -3849,8 +4409,139 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.leaveRoom("freds_room");</code></pre>
+    <pre class="prettyprint"><code>   easyrtc.leaveRoom("freds_room");</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="muteVideoObject"><span class="type-signature">&lt;static> </span>muteVideoObject<span class="signature">(videoObjectName, mute)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Mute a video object.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>videoObjectName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">type</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">A DOMObject or the id of the DOMObject.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>mute</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">type</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">true to mute the video object, false to unmute it.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
     
 </dd>
 
@@ -3915,7 +4606,7 @@
             
             
             
-            <td class="description last">(an easyrtcid)</td>
+            <td class="description last">a string containing the easyrtcId of the other user.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
         </tr>
 	
 	
@@ -4031,7 +4722,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.sendData(someEasyrtcid, {room:499, bldgNum:'asd'});</code></pre>
+    <pre class="prettyprint"><code>   easyrtc.sendData(someEasyrtcid, {room:499, bldgNum:'asd'});</code></pre>
 
     
 </dd>
@@ -4047,7 +4738,7 @@
     
     
     <div class="description">
-        Sends data to another user using websockets. Messages are received by the other party's peerListener.
+        Sends data to another user using websockets. The easyrtc.sendServerMessage or easyrtc.sendPeerMessage methodsare wrappers for this method; application code should use them instead.
     </div>
     
 
@@ -4208,7 +4899,394 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.sendDataWS(someEasyrtcid, "setPostalAddress", {room:499, bldgNum:'asd'},      function(ackmessage){         console.log("saw the following acknowledgment " + JSON.stringify(ackmessage));     }   );</code></pre>
+    <pre class="prettyprint"><code>   easyrtc.sendDataWS(someEasyrtcid, "setPostalAddress", {room:499, bldgNum:'asd'},     function(ackmessage){         console.log("saw the following acknowledgment " + JSON.stringify(ackmessage));     }   );</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="sendPeerMessage"><span class="type-signature">&lt;static> </span>sendPeerMessage<span class="signature">(destination, msgType, msgData, successCB, failureCB)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sends a message to another peer on the easyrtcMsg channel.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>destination</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">either a string containing the easyrtcId of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>msgType</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">the type of message being sent (application specific).</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>msgData</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">a JSONable object with the message contents.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>successCB</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function(msgType, msgData)</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">a callback function with results from the server.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>failureCB</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function(errorCode, errorText)</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">a callback function to handle errors.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>     easyrtc.sendPeerMessage(otherUser, 'offer_candy', {candy_name:'mars'},             function(msgType, msgBody ) {               console.log("message was sent");            },            function(errorCode, errorText) {               console.log("error was " + errorText);            });</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="sendServerMessage"><span class="type-signature">&lt;static> </span>sendServerMessage<span class="signature">(msgType, msgData, successCB, failureCB)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sends a message to the application code in the server (ie, on the easyrtcMsg channel).
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>msgType</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">the type of message being sent (application specific).</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>msgData</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">a JSONable object with the message contents.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>successCB</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function(msgType, msgData)</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">a callback function with results from the server.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>failureCB</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function(errorCode, errorText)</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">a callback function to handle errors.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>     easyrtc.sendServerMessage('get_candy', {candy_name:'mars'},             function(msgType, msgData ) {               console.log("got candy count of " + msgData.barCount);            },            function(errorCode, errorText) {               console.log("error was " + errorText);            });</code></pre>
 
     
 </dd>
@@ -4434,7 +5512,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.setApiFields( { favorite_alien:'Mr Spock'});  easyrtc.setRoomOccupantListener( function(roomName, list, isPrimaryOwner) {     for( var i in list ){        console.log("easyrtcid=" + i + " favorite alien is " + list[i].apiFields.favorite_alien);     }  });</code></pre>
+    <pre class="prettyprint"><code>  easyrtc.setApiFields( { favorite_alien:'Mr Spock'});  easyrtc.setRoomOccupantListener( function(roomName, list) {     for( var i in list ){        console.log("easyrtcid=" + i + " favorite alien is " + list[i].apiFields.favorite_alien);     }  });</code></pre>
 
     
 </dd>
@@ -4450,7 +5528,7 @@
     
     
     <div class="description">
-        Set the API Key. The API key identifies the owner of the application.  The API key has no meaning for the Open Source server.
+        Set the API Key. The API key identifies the owner of the application. The API key has no meaning for the Open Source server.
     </div>
     
 
@@ -4676,7 +5754,7 @@
     
     
     <div class="description">
-        Sets the callCancelled callback. This will be called when a remote user initiates a call to you, but does a "hangup" before you have a chance to get his video stream.
+        Sets the callCancelled callback. This will be called when a remote userinitiates a call to you, but does a "hangup" before you have a chance to get his video stream.
     </div>
     
 
@@ -4726,7 +5804,7 @@
             
             
             
-            <td class="description last">takes an easyrtcid as an argument and a boolean that indicates whether the call was explicitly cancelled remotely (true), or actually accepted by the user attempting a call to  the same party.</td>
+            <td class="description last">takes an easyrtcid as an argument and a boolean that indicates whether the call was explicitly cancelled remotely (true), or actually accepted by the user attempting a call to the same party.</td>
         </tr>
 	
 	
@@ -5102,7 +6180,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.setDataChannelCloseListener( function(easyrtcid) {           ("No longer connected to " + easyrtc.idToName(easyrtcid));          });</code></pre>
+    <pre class="prettyprint"><code>   easyrtc.setDataChannelCloseListener( function(easyrtcid) {           ("No longer connected to " + easyrtc.idToName(easyrtcid));   });</code></pre>
 
     
 </dd>
@@ -5216,121 +6294,6 @@
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>   easyrtc.setDataChannelOpenListener( function(easyrtcid) {        easyrtc.sendDataP2P(easyrtcid, "greeting", "hello");   });</code></pre>
-
-    
-</dd>
-
-        
-            
-<dt>
-    <h3 class="name" id="setDataListener"><span class="type-signature">&lt;static> </span>setDataListener<span class="signature">(listener)</span><span class="type-signature"></span></h3>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Sets a listener for data sent from another client (either peer to peer or via websockets).
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>listener</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Function</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">has the signature (easyrtcid, data)</td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-        <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>This is now a synonym for setPeerListener.</li><ul></dd>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-    
-    
-    
-    
-    
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>    easyrtc.setDataListener( function(easyrtcid, data) {        ("From " + easyrtc.idToName(easyrtcid) +             " sent the follow data " + JSON.stringify(data));    });        </code></pre>
 
     
 </dd>
@@ -5556,7 +6519,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.setGotConnection( function(gotConnection, why) {       if( gotConnection ){           console.log("Successfully connected to signaling server");       }       else {           console.log("Failed to connect to signaling server because: " + why);       }   });</code></pre>
+    <pre class="prettyprint"><code>   easyrtc.setGotConnection( function(gotConnection, why) {       if( gotConnection ){           console.log("Successfully connected to signaling server");       }       else {           console.log("Failed to connect to signaling server because: " + why);       }   });</code></pre>
 
     
 </dd>
@@ -5669,7 +6632,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>     easyrtc.setGotMedia( function(gotMediaCB, why) {        if( gotMedia ){            console.log("Got the requested user media");        }        else {            console.log("Failed to get media because: " +  why);        }    });</code></pre>
+    <pre class="prettyprint"><code>    easyrtc.setGotMedia( function(gotMediaCB, why) {        if( gotMedia ){            console.log("Got the requested user media");        }        else {            console.log("Failed to get media because: " +  why);        }    });</code></pre>
 
     
 </dd>
@@ -5782,7 +6745,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>  easyrtc.setOnCall( function(easyrtcid, slot) {      console.log("call with " + easyrtcid + "established");  }); </code></pre>
+    <pre class="prettyprint"><code>  easyrtc.setOnCall( function(easyrtcid, slot) {     console.log("call with " + easyrtcid + "established");  });</code></pre>
 
     
 </dd>
@@ -6009,7 +6972,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>  easyrtc.setOnHangup( function(easyrtcid, slot) {      console.log("call with " + easyrtcid + "ended");  }); </code></pre>
+    <pre class="prettyprint"><code>  easyrtc.setOnHangup( function(easyrtcid, slot) {     console.log("call with " + easyrtcid + "ended");  });</code></pre>
 
     
 </dd>
@@ -6025,7 +6988,7 @@
     
     
     <div class="description">
-        Sets a callback to receive notification of a media stream closing. The usual use of this is to clear the source of your video object so you aren't left with  the last frame of the video displayed on it.
+        Sets a callback to receive notification of a media stream closing. The usual use of this is to clear the source of your video object so you aren't left with the last frame of the video displayed on it.
     </div>
     
 
@@ -6281,7 +7244,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.setPeerListener( function(easyrtcid, msgType, data, targeting) {        ("From " + easyrtc.idToName(easyrtcid) +             " sent the follow data " + JSON.stringify(data));    });    easyrtc.setPeerListener( function(easyrtcid, msgType, data, targeting) {        ("From " + easyrtc.idToName(easyrtcid) +             " sent the follow data " + JSON.stringify(data));    }, 'food', 'dkdjdekj44--');    easyrtc.setPeerListener( function(easyrtcid, msgType, data, targeting) {        ("From " + easyrtcid +             " sent the follow data " + JSON.stringify(data));    }, 'drink');        </code></pre>
+    <pre class="prettyprint"><code>    easyrtc.setPeerListener( function(easyrtcid, msgType, data, targeting) {        ("From " + easyrtc.idToName(easyrtcid) +            " sent the follow data " + JSON.stringify(data));    });    easyrtc.setPeerListener( function(easyrtcid, msgType, data, targeting) {        ("From " + easyrtc.idToName(easyrtcid) +            " sent the follow data " + JSON.stringify(data));    }, 'food', 'dkdjdekj44--');    easyrtc.setPeerListener( function(easyrtcid, msgType, data, targeting) {        ("From " + easyrtcid +            " sent the follow data " + JSON.stringify(data));    }, 'drink');</code></pre>
 
     
 </dd>
@@ -6394,7 +7357,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.setRoomEntryListener(function(entry, roomName) {      if( entry ){          console.log("entering room " + roomName);      }      else {          console.log("leaving room " + roomName);      }  });</code></pre>
+    <pre class="prettyprint"><code>  easyrtc.setRoomEntryListener(function(entry, roomName) {      if( entry ){          console.log("entering room " + roomName);      }      else {          console.log("leaving room " + roomName);      }  });</code></pre>
 
     
 </dd>
@@ -6410,7 +7373,7 @@
     
     
     <div class="description">
-        Set the callback that will be invoked when the list of people logged in changes.The callback expects to receive a map whose ideas are easyrtcids and whose values are in turn mapssupplying user specific information. The inner maps have the following keys: userName, applicationName, browserFamily, browserMajor, osFamily, osMajor, deviceFamily.The callback also receives a boolean that indicates whether the owner is the primary owner of a room.
+        Set the callback that will be invoked when the list of people logged in changes.The callback expects to receive a room name argument, and  a map whose ideas are easyrtcids and whose values are in turn mapssupplying user specific information. The inner maps have the following keys: userName, applicationName, browserFamily, browserMajor, osFamily, osMajor, deviceFamily. The third argument is the listener is the innerMap for the connections own data (not needed by most applications).
     </div>
     
 
@@ -6507,7 +7470,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>  easyrtc.setRoomOccupantListener( function(roomName, list, isPrimaryOwner) {     for( var i in list ){        ("easyrtcid=" + i + " belongs to user " + list[i].userName);     }  });</code></pre>
+    <pre class="prettyprint"><code>  easyrtc.setRoomOccupantListener( function(roomName, list, selfInfo) {     for( var i in list ){        ("easyrtcid=" + i + " belongs to user " + list[i].userName);     }  });</code></pre>
 
     
 </dd>
@@ -6638,7 +7601,7 @@
             
             
             
-            <td class="description last">has the signature (data)</td>
+            <td class="description last">has the signature (msgType, msgData, targeting)</td>
         </tr>
 	
 	
@@ -6685,7 +7648,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.setPeerListener( function(msg) {        ("From Server sent the following message " + JSON.stringify(msg));    });     </code></pre>
+    <pre class="prettyprint"><code>    easyrtc.setServerListener( function(msgType, msgData, targeting) {        ("The Server sent the following message " + JSON.stringify(msgData));    });</code></pre>
 
     
 </dd>
@@ -6911,7 +7874,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code> easyrtc.setStreamAcceptor(function(easyrtcid, stream) {    document.getElementById('callerName').innerHTML = easyrtc.idToName(easyrtcid);    easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), stream);  });</code></pre>
+    <pre class="prettyprint"><code> easyrtc.setStreamAcceptor(function(easyrtcid, stream) {    document.getElementById('callerName').innerHTML = easyrtc.idToName(easyrtcid);    easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), stream); });</code></pre>
 
     
 </dd>
@@ -7046,7 +8009,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   if ( !easyrtc.setUserName("JohnSmith") ){       alert("bad user name);   </code></pre>
+    <pre class="prettyprint"><code>   if ( !easyrtc.setUserName("JohnSmith") ){       console.error("bad user name);</code></pre>
 
     
 </dd>
@@ -7313,7 +8276,7 @@
     
     
     <div class="description">
-        Sets a video or audio object from a media stream. Chrome uses the src attribute and expects a URL, while firefox uses the mozSrcObject and expects a stream. This procedure hides that from you. If the media stream is from a local webcam, you may want to add the  easyrtcMirror class to the video object so it looks like a proper mirror. The easyrtcMirror class is defined in easyrtc.css, which is automatically added when you add the easyrtc.js file to an HTML file.
+        Sets a video or audio object from a media stream. Chrome uses the src attribute and expects a URL, while firefox uses the mozSrcObject and expects a stream. This procedure hides that from you. If the media stream is from a local webcam, you may want to add the easyrtcMirror class to the video object so it looks like a proper mirror. The easyrtcMirror class is defined in easyrtc.css, which is automatically added when you add the easyrtc.js file to an HTML file.
     </div>
     
 
@@ -7433,7 +8396,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());        </code></pre>
+    <pre class="prettyprint"><code>   easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());</code></pre>
 
     
 </dd>
@@ -7893,7 +8856,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Tue Oct 01 2013 13:18:42 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Oct 25 2013 17:39:54 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

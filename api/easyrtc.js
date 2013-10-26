@@ -1298,12 +1298,7 @@ easyrtc.closedChannel = null;
 
 
 
-/** @private 
- * Helper
- * @param {type} easyrtcid
- * @param {type} checkAudio
- * @returns {Boolean}
- */
+/** @private */
 easyrtc._haveTracks = function(easyrtcid, checkAudio) {
     var stream;
 
@@ -2929,7 +2924,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
      *  { key1: { "fieldName": key1, "fieldValue": value1}, ...,
      *    key2: { "fieldName": key2, "fieldValue": value2}
      *  }
-     * @returns 
+     * @returns {Object}
      */
     easyrtc.getSessionFields = function() {
         return easyrtc.sessionFields;
