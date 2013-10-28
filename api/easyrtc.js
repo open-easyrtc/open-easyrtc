@@ -2135,7 +2135,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 if (easyrtc.debugPrinter) {
                     easyrtc.debugPrinter(message);
                 }
-                alert(message);
+                easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, message);
+                console.error(message);
             }
             else {
                 if (easyrtc.debugPrinter) {
