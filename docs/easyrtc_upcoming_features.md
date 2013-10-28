@@ -5,7 +5,7 @@ There are many exciting features we are looking to add to EasyRTC in upcoming re
 
 General Features
 ----------------
-* TURN server support
+* TURN server support **HERE NOW!**
 
 API Specific Features
 ---------------------
@@ -15,8 +15,8 @@ API Specific Features
 Server Specific Features
 ------------------------
 * Option to minimize easyrtc.js
-* Switch to become a proper Node.js module
-* Events for creating your own handlers easily
+* Switch to become a proper Node.js module **HERE NOW!**
+* Events for creating your own listeners easily **HERE NOW!**
 
 Demos
 -----
