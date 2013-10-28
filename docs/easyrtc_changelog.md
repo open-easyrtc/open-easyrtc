@@ -1,7 +1,28 @@
 EasyRTC: Change Log
 ===================
 
-v0.10.1a (note, alpha means alpha... please let us know of issues.)
+v0.10.2a (note, alpha means alpha... please let us know of issues.)
+--------
+
+New Features:
+ - Server - Many changes to public object to ease development, including exposing events and util objects at every level.
+ - Server - easyrtc_default_event_listeners.js has been improved by the addition of several new listeners. JSDoc's have been written for each default listener.
+ - Server - New events "authenticate", "roomJoin", "roomCreate", "roomLeave"
+ - Server - Initial support for Express sessions.
+ - Server - Support for checking for minified version of API (not yet provided).
+
+Changes:
+  - API - Added better treatment of server disconnect
+  - Server - Additional support for fields.
+  - Server - Many existing events have been renamed or improved. Too many to list here.
+  - Documentation - JSDoc's of client API and server code is in separate folders.
+
+Fixes:
+ * Lots. But please let us know if there's any others which need doing.
+ * Demos - Fixed several of the demos which broke in 0.10.1a
+ * 
+
+v0.10.1a
 --------
 New Features:
   - API - easyrtc_ft.js - A separate official EasyRTC module for handling file transfers. See the updated file sharing demo for an example.
