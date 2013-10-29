@@ -1,6 +1,6 @@
 {
   "name"        : "easyrtc_server_example",
-  "version"     : "0.1.0",
+  "version"     : "0.1.1",
   "author"      : "Priologic Software Inc. <info@priologic.com> (http://priologic.com/)",
   "description" : "Simple EasyRTC server example which includes EasyRTC, Express, and Socket.io",
 
@@ -9,7 +9,7 @@
   },
 
   "dependencies" : {
-    "easyrtc"   : "git://github.com/priologic/easyrtc.git#alpha",
+    "easyrtc"   : ">=0.10",
     "express"   : "*",
     "socket.io" : "*"
   },
