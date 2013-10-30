@@ -3016,11 +3016,18 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         if (msgData.iceConfig) {
 
             easyrtc.pc_config = {iceServers: []};
-            for (var i in msgData.iceConfig.iceServers) {
+            for (var i = 0; i < msg.iceConfig.iceServers.length; i++) {
                 var item = msgData.iceConfig.iceServers[i];
                 var fixedItem;
                 if (item.url.indexOf('turn:') === 0) {
-                    if (item.username) {
+                    //
+                    // firefox chokes on a transport=tcp entry so filter such out
+                    //
+                    if(webrtcDetectedBrowser === "firefox" &&
+                        item.url.indexOf('?transport=tcp') > 0) {
+                        fixedItem = null;
+                    }
+                    else if (item.username) {
                         fixedItem = createIceServer(item.url, item.username, item.credential);
                     }
                     else {
