@@ -137,6 +137,25 @@ Leaves a room. Upon leaving a room, the API should remove all room info (incl. c
  - **error**
 
 
+### msgType - 'setRoomApiField'
+Sets the apiField value for a connection. This apiField is sent to all other connections in the roomData. It is important to realize that this field is not unique to a room. Upon receiving 
+
+**Fields:**
+ - **msgData** (required)
+
+**msgData Fields:**
+
+   - **setRoomApiField** 
+     - **field** (map of field names)
+       - **fieldName** (required)
+       - **fieldValue** (required) Any JSONable object.
+     - **roomName**
+
+**Returns:**
+ - **roomData** (with roomStatus of `update`)
+ - **error**
+
+
 ### msgType - 'setPresence'
 Sets user online presence which is re-broadcast as part of the list. User must be authenticated.
 
