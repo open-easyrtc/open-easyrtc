@@ -96,10 +96,24 @@ WebRTC signal. Instructs target to hangup WebRTC peer-connection. Sender and tar
  - **targetEasyrtcid** (required)
 
 
+### msgType - 'getIceConfig'
+Requests a refreshed ICE configuration. This gives the ability to update STUN and TURN servers listing on a periodic basis for longer running connections.
+
+**Fields:**
+
+**Returns:**
+  - **iceConfig**
+  - **error**
+
+
 ### msgType - 'getRoomList'
 Requests a list of all rooms which the client has access to. It has no fields. The server should return a message to the callback with msgType of 'roomList'.
 
 **Fields:**
+
+**Returns:**
+  - **roomList**
+  - **error**
 
 
 ### msgType - 'roomJoin'
@@ -241,6 +255,25 @@ Instructs target to hangup WebRTC peer-connection. Sender and target must be onl
 
  - **serverTime** (required)
  - **senderEasyrtcid** (required)
+
+
+### msgType - 'iceConfig'
+ICE configuration object. This gives the ability to update the STUN and TURN server listing on a periodic basis for longer running connections. Upon reception, the client should refresh 
+
+**Fields:**
+ - **iceConfig**
+   - **iceServers** (array of objects)
+     - **url** (required) Format is `((stun|turn):ADDRESS:[PORT][?transport=tcp])`
+     - **username** (optional) May be used by TURN servers
+     - **credential** (optional) May be used by TURN servers
+
+
+**Returns:**
+  - **iceConfig**
+  - **error**
+
+
+
 
 
 ### msgType - 'token'
