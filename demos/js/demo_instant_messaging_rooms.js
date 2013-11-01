@@ -119,10 +119,20 @@ function addRoom(roomName, parmString, userAdded) {
     }
     if (userAdded) {
         console.log("calling joinRoom(" + roomName + ") because it was a user action ");
-        easyrtc.joinRoom(roomName, roomParms, isConnected ? addRoomButton : null,
+        
+        easyrtc.joinRoom(roomName, roomParms, 
+                function() {
+                   
+                    if( isConnected) {
+                        addRoomButton();
+                    }
+                },
                 function(errorCode, errorText, roomName) {
                     easyrtc.showError(errorCode, errorText + ": room name was(" + roomName + ")");
                 });
+                
+        easyrtc.setRoomApiField(roomName, "myroomname_is", "++" + roomName  + "++" );
+                
     }
 }
 
@@ -171,7 +181,6 @@ function connect() {
     easyrtc.setDisconnectListener(function() {
         jQuery('#rooms').empty();
     });
-    easyrtc.setApiFields({randomnum: Math.round(Math.random() * 100), everyonelikes: 'kitkats'});
     updatePresence();
     var username = document.getElementById("userNameField").value;
     var password = document.getElementById("credentialField").value;

@@ -396,8 +396,7 @@ easyrtc.receivePeer = {msgTypes: {}};
 /** @private */
 easyrtc.receiveServerCB = null;
 
-/** @private */
-easyrtc.apiFields = {};
+
 /** @private */
 easyrtc.updateConfigurationInfo = function() {
 
@@ -466,28 +465,83 @@ easyrtc.onStreamClosed = function(easyrtcid) {
  */
 easyrtc.callCancelled = function(easyrtcid) {
 };
+
+
 /** Provide a set of application defined fields that will be part of this instances
  * configuration information. This data will get sent to other peers via the websocket
  * path.
- * @param {type} fields just be JSON serializable to a length of not more than 128 bytes.
+ * @param roomName
+ * @param fieldName - the name of the field.
+ * @param {type} fieldValue - the value of the field.
  * @example
- *   easyrtc.setApiFields( { favorite_alien:'Mr Spock'});
+ *   easyrtc.setRoomApiFields("trekkieRoom",  "favorite_alien", "Mr Spock");
  *   easyrtc.setRoomOccupantListener( function(roomName, list) {
  *      for( var i in list ){
  *         console.log("easyrtcid=" + i + " favorite alien is " + list[i].apiFields.favorite_alien);
  *      }
  *   });
  */
-easyrtc.setApiFields = function(fields) {
-    var fieldAsString = JSON.stringify(fields);
-    if (JSON.stringify(fieldAsString).length <= 128) {
-        easyrtc.apiFields = JSON.parse(fieldAsString);
-        easyrtc.updateConfigurationInfo();
+easyrtc.setRoomApiField = function(roomName, fieldName, fieldValue) {
+    console.log("set api field");
+    //
+    // if we're not connected yet, we'll just cache the fields until we are.
+    //
+    if (!easyrtc._roomApiFields) {
+        easyrtc._roomApiFields = {};
+    }
+    if (!fieldName && !fieldValue) {
+        delete easyrtc._roomApiFields[roomName];
+        return;
+    }
+
+    if (!easyrtc._roomApiFields[roomName]) {
+        easyrtc._roomApiFields[roomName] = {};
+    }
+    if (fieldValue) {
+        try {
+            JSON.stringify(fieldValue);
+        }
+        catch (jsonError) {
+            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "easyrtc.setRoomApiField");
+            return;
+        }
+        easyrtc._roomApiFields[roomName][fieldName] = {fieldName: fieldName, fieldValue: fieldValue};
     }
     else {
-        throw "Developer error: your apiFields were too big";
+        delete easyrtc._roomApiFields[roomName][fieldName];
+    }
+    if (easyrtc.webSocketConnected) {
+        easyrtc._sendRoomApiFields(roomName, easyrtc._roomApiFields[roomName]);
     }
 };
+
+/**
+ *  @private 
+ *  @param roomName
+ * @param valuelist
+ */
+easyrtc._sendRoomApiFields = function(roomName, fields) {
+    console.log("sending room api fields");
+    var fieldAsString = JSON.stringify(fields);
+    JSON.parse(fieldAsString);
+    var dataToShip = {
+        msgType: "setRoomApiField",
+        msgData: {
+           setRoomApiField: {
+                roomName: roomName,
+                field: fields
+           }
+        }
+    };
+    easyrtc.webSocket.json.emit("easyrtcCmd", dataToShip,
+            function(ackmsg) {
+                if (ackmsg.msgType === "error") {
+                    easyrtc.showError(ackmsg.msgData.errorCode, ackmsg.msgData.errorText);
+                }
+            }
+    );
+};
+
 /** Default error reporting function. The default implementation displays error messages
  *  in a programmatically created div with the id easyrtcErrorDialog. The div has title
  *  component with a class name of easyrtcErrorDialog_title. The error messages get added to a
@@ -1732,18 +1786,18 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
      *    );
      */
     easyrtc.getRoomList = function(callback, errorCallback) {
-        easyrtc.sendSignalling(null, "getRoomList", null, 
-            function(msgType, msgData) {
-                 callback(msgData.roomList);
-             },
-           function(errorCode, errorText) {
-                if (errorCallback) {
-                    errorCallback(errorCode, errorText);
+        easyrtc.sendSignalling(null, "getRoomList", null,
+                function(msgType, msgData) {
+                    callback(msgData.roomList);
+                },
+                function(errorCode, errorText) {
+                    if (errorCallback) {
+                        errorCallback(errorCode, errorText);
+                    }
+                    else {
+                        easyrtc.showError(errorCode, errorText);
+                    }
                 }
-                else {
-                    easyrtc.showError(errorCode, errorText);
-                }
-            }
         );
     };
 
@@ -2433,7 +2487,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
     function processOccupantList(roomName, list) {
         var myInfo = null;
-        easyrtc.reducedList = {};        
+        easyrtc.reducedList = {};
         for (var id in list) {
             if (id !== easyrtc.myEasyrtcid) {
                 easyrtc.reducedList[id] = list[id];
@@ -2867,9 +2921,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 language: navigator.language
             }
         };
-        if (!isEmptyObj(easyrtc.apiFields)) {
-            newConfig.apiField = easyrtc.apiFields;
-        }
+
         if (!isEmptyObj(p2pList)) {
             newConfig.p2pList = p2pList;
         }
@@ -2959,7 +3011,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     function processRoomData(roomData) {
         easyrtc.roomData = roomData;
 
-        for (var roomname in easyrtc.roomData) {   
+        for (var roomname in easyrtc.roomData) {
             if (roomData[roomname].roomStatus === "join") {
                 if (easyrtc.roomEntryListener) {
                     easyrtc.roomEntryListener(true, roomname);
@@ -3016,35 +3068,37 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         if (msgData.iceConfig) {
 
             easyrtc.pc_config = {iceServers: []};
-            for (var i = 0; i < msg.iceConfig.iceServers.length; i++) {
-                var item = msgData.iceConfig.iceServers[i];
-                var fixedItem;
-                if (item.url.indexOf('turn:') === 0) {
-                    //
-                    // firefox chokes on a transport=tcp entry so filter such out
-                    //
-                    if(webrtcDetectedBrowser === "firefox" &&
-                        item.url.indexOf('?transport=tcp') > 0) {
-                        fixedItem = null;
-                    }
-                    else if (item.username) {
-                        fixedItem = createIceServer(item.url, item.username, item.credential);
-                    }
-                    else {
-                        var parts = item.url.substring("turn:".length).split("@");
-                        if (parts.length !== 2) {
-                            easyrtc.showError("badparam", "turn server url looked like " + item.url);
+            if (msg.iceConfig && msg.iceConfig.iceServers) {
+                for (var i = 0; i < msg.iceConfig.iceServers.length; i++) {
+                    var item = msgData.iceConfig.iceServers[i];
+                    var fixedItem;
+                    if (item.url.indexOf('turn:') === 0) {
+                        //
+                        // firefox chokes on a transport=tcp entry so filter such out
+                        //
+                        if (webrtcDetectedBrowser === "firefox" &&
+                                item.url.indexOf('?transport=tcp') > 0) {
+                            fixedItem = null;
                         }
-                        var username = parts[0];
-                        var url = parts[1];
-                        fixedItem = createIceServer(url, username, item.credential);
+                        else if (item.username) {
+                            fixedItem = createIceServer(item.url, item.username, item.credential);
+                        }
+                        else {
+                            var parts = item.url.substring("turn:".length).split("@");
+                            if (parts.length !== 2) {
+                                easyrtc.showError("badparam", "turn server url looked like " + item.url);
+                            }
+                            var username = parts[0];
+                            var url = parts[1];
+                            fixedItem = createIceServer(url, username, item.credential);
+                        }
                     }
-                }
-                else { // is stun server entry
-                    fixedItem = item;
-                }
-                if (fixedItem) {
-                    easyrtc.pc_config.iceServers.push(fixedItem);
+                    else { // is stun server entry
+                        fixedItem = item;
+                    }
+                    if (fixedItem) {
+                        easyrtc.pc_config.iceServers.push(fixedItem);
+                    }
                 }
             }
         }
@@ -3116,6 +3170,13 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             }
             else {
                 processToken(msg);
+
+                if (easyrtc._roomApiFields) {
+                    for (var room in easyrtc._roomApiFields) {
+                        easyrtc._sendRoomApiFields(room, easyrtc._roomApiFields[room]);
+                    }
+                }
+
                 if (successCallback) {
                     successCallback(easyrtc.myEasyrtcid);
                 }
