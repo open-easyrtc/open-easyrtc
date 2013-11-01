@@ -130,9 +130,6 @@ function addRoom(roomName, parmString, userAdded) {
                 function(errorCode, errorText, roomName) {
                     easyrtc.showError(errorCode, errorText + ": room name was(" + roomName + ")");
                 });
-                
-        easyrtc.setRoomApiField(roomName, "myroomname_is", "++" + roomName  + "++" );
-                
     }
 }
 
@@ -392,4 +389,19 @@ function updatePresenceStatus(value) {
 function updatePresence()
 {
     easyrtc.updatePresence(currentShowState, currentShowText);
+}
+
+
+function addApiField() {
+    var roomName = document.getElementById("apiroomname").value;
+    var fieldname = document.getElementById("apifieldname").value;
+    var fieldvaluetext = document.getElementById("apifieldvalue").value;
+    var fieldvalue;
+    if(fieldvaluetext.indexOf("{") >= 0) {
+        fieldvalue = JSON.parse(fieldvaluetext);
+    }
+    else {
+        fieldvalue = fieldvaluetext;
+    }
+    easyrtc.setRoomApiField(roomName, fieldname, fieldvalue);
 }

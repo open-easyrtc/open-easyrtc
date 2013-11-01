@@ -498,12 +498,14 @@ easyrtc.setRoomApiField = function(roomName, fieldName, fieldValue) {
         easyrtc._roomApiFields[roomName] = {};
     }
     if (fieldValue) {
-        try {
-            JSON.stringify(fieldValue);
-        }
-        catch (jsonError) {
-            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "easyrtc.setRoomApiField");
-            return;
+        if (typeof fieldValue === "object") {
+            try {
+                JSON.stringify(fieldValue);
+            }
+            catch (jsonError) {
+                easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "easyrtc.setRoomApiField passed bad object ");
+                return;
+            }
         }
         easyrtc._roomApiFields[roomName][fieldName] = {fieldName: fieldName, fieldValue: fieldValue};
     }
@@ -527,10 +529,10 @@ easyrtc._sendRoomApiFields = function(roomName, fields) {
     var dataToShip = {
         msgType: "setRoomApiField",
         msgData: {
-           setRoomApiField: {
+            setRoomApiField: {
                 roomName: roomName,
                 field: fields
-           }
+            }
         }
     };
     easyrtc.webSocket.json.emit("easyrtcCmd", dataToShip,
