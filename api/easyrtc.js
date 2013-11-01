@@ -3071,37 +3071,36 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
     function processIceConfig(iceConfig) {
         easyrtc.pc_config = {iceServers: []};
-        if (msg.iceConfig && iceConfig.iceServers) {
-            for (var i = 0; i < iceConfig.iceServers.length; i++) {
-                var item = iceConfig.iceServers[i];
-                var fixedItem;
-                if (item.url.indexOf('turn:') === 0) {
-                    //
-                    // firefox chokes on a transport=tcp entry so filter such out
-                    //
-                    if (webrtcDetectedBrowser === "firefox" &&
-                            item.url.indexOf('?transport=tcp') > 0) {
-                        fixedItem = null;
-                    }
-                    else if (item.username) {
-                        fixedItem = createIceServer(item.url, item.username, item.credential);
-                    }
-                    else {
-                        var parts = item.url.substring("turn:".length).split("@");
-                        if (parts.length !== 2) {
-                            easyrtc.showError("badparam", "turn server url looked like " + item.url);
-                        }
-                        var username = parts[0];
-                        var url = parts[1];
-                        fixedItem = createIceServer(url, username, item.credential);
-                    }
+
+        for (var i = 0; i < iceConfig.iceServers.length; i++) {
+            var item = iceConfig.iceServers[i];
+            var fixedItem;
+            if (item.url.indexOf('turn:') === 0) {
+                //
+                // firefox chokes on a transport=tcp entry so filter such out
+                //
+                if (webrtcDetectedBrowser === "firefox" &&
+                        item.url.indexOf('?transport=tcp') > 0) {
+                    fixedItem = null;
                 }
-                else { // is stun server entry
-                    fixedItem = item;
+                else if (item.username) {
+                    fixedItem = createIceServer(item.url, item.username, item.credential);
                 }
-                if (fixedItem) {
-                    easyrtc.pc_config.iceServers.push(fixedItem);
+                else {
+                    var parts = item.url.substring("turn:".length).split("@");
+                    if (parts.length !== 2) {
+                        easyrtc.showError("badparam", "turn server url looked like " + item.url);
+                    }
+                    var username = parts[0];
+                    var url = parts[1];
+                    fixedItem = createIceServer(url, username, item.credential);
                 }
+            }
+            else { // is stun server entry
+                fixedItem = item;
+            }
+            if (fixedItem) {
+                easyrtc.pc_config.iceServers.push(fixedItem);
             }
         }
     }
