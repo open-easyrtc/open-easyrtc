@@ -85,7 +85,7 @@ easyrtc.forwardStreamEnabled = false;
 easyrtc.datachannelName = "dc";
 /** @private */
 easyrtc.debugPrinter = null;
-/** @private */
+/** Your easyrtcid */
 easyrtc.myEasyrtcid = "";
 /** @private */
 easyrtc.oldConfig = {};
@@ -513,7 +513,17 @@ easyrtc.setRoomApiField = function(roomName, fieldName, fieldValue) {
         delete easyrtc._roomApiFields[roomName][fieldName];
     }
     if (easyrtc.webSocketConnected) {
-        easyrtc._sendRoomApiFields(roomName, easyrtc._roomApiFields[roomName]);
+        //
+        // Rather than issue the send request immediately, we set a timer so we can accumulate other 
+        // calls 
+        //
+        if (easyrtc.roomApiFieldTimer) {
+            clearTimeout(easyrtc.roomApiFieldTimer);
+            easyrtc.setRoomApiFieldTimer = setTimeout(function() {
+                easyrtc._sendRoomApiFields(roomName, easyrtc._roomApiFields[roomName]);
+                easyrtc.setRoomApiFieldTimer = null;
+            }, 10);
+        }
     }
 };
 
@@ -2708,6 +2718,9 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             case "roomData":
                 processRoomData(msgData.roomData);
                 break;
+            case "iceConfig":
+                processIceConfig(msgData.iceConfig);
+                break;
             case "forwardToUrl":
                 if (msgData.newWindow) {
                     window.open(msgData.forwardToUrl.url);
@@ -3056,6 +3069,65 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
 
 
+    function processIceConfig(iceConfig) {
+        easyrtc.pc_config = {iceServers: []};
+        if (msg.iceConfig && iceConfig.iceServers) {
+            for (var i = 0; i < iceConfig.iceServers.length; i++) {
+                var item = iceConfig.iceServers[i];
+                var fixedItem;
+                if (item.url.indexOf('turn:') === 0) {
+                    //
+                    // firefox chokes on a transport=tcp entry so filter such out
+                    //
+                    if (webrtcDetectedBrowser === "firefox" &&
+                            item.url.indexOf('?transport=tcp') > 0) {
+                        fixedItem = null;
+                    }
+                    else if (item.username) {
+                        fixedItem = createIceServer(item.url, item.username, item.credential);
+                    }
+                    else {
+                        var parts = item.url.substring("turn:".length).split("@");
+                        if (parts.length !== 2) {
+                            easyrtc.showError("badparam", "turn server url looked like " + item.url);
+                        }
+                        var username = parts[0];
+                        var url = parts[1];
+                        fixedItem = createIceServer(url, username, item.credential);
+                    }
+                }
+                else { // is stun server entry
+                    fixedItem = item;
+                }
+                if (fixedItem) {
+                    easyrtc.pc_config.iceServers.push(fixedItem);
+                }
+            }
+        }
+    }
+
+    /**
+     * Request fresh ice config information from the server.
+     * This should be done periodically by long running applications.
+     * There are no parameters or return values.
+     */
+    easyrtc.getFreshIceConfig = function() {
+        var dataToShip = {
+            msgType: "getIceConfig",
+            msgData: {}
+        };
+        easyrtc.webSocket.json.emit("easyrtcCmd", dataToShip,
+                function(ackmsg) {
+                    if (ackmsg.msgType === "iceConfig") {
+                        processIceConfig(ackmsg.msgData.iceConfig);
+                    }
+                    else {
+                        easyrtc.showError(ackmsg.msgData.errorCode, ackmsg.msgData.errorText);
+                    }
+                }
+        );
+    }
+
     function processToken(msg) {
         if (easyrtc.debugPrinter) {
             easyrtc.debugPrinter("entered process token");
@@ -3068,41 +3140,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             easyrtc.fields.connection = msgData.field;
         }
         if (msgData.iceConfig) {
-
-            easyrtc.pc_config = {iceServers: []};
-            if (msg.iceConfig && msg.iceConfig.iceServers) {
-                for (var i = 0; i < msg.iceConfig.iceServers.length; i++) {
-                    var item = msgData.iceConfig.iceServers[i];
-                    var fixedItem;
-                    if (item.url.indexOf('turn:') === 0) {
-                        //
-                        // firefox chokes on a transport=tcp entry so filter such out
-                        //
-                        if (webrtcDetectedBrowser === "firefox" &&
-                                item.url.indexOf('?transport=tcp') > 0) {
-                            fixedItem = null;
-                        }
-                        else if (item.username) {
-                            fixedItem = createIceServer(item.url, item.username, item.credential);
-                        }
-                        else {
-                            var parts = item.url.substring("turn:".length).split("@");
-                            if (parts.length !== 2) {
-                                easyrtc.showError("badparam", "turn server url looked like " + item.url);
-                            }
-                            var username = parts[0];
-                            var url = parts[1];
-                            fixedItem = createIceServer(url, username, item.credential);
-                        }
-                    }
-                    else { // is stun server entry
-                        fixedItem = item;
-                    }
-                    if (fixedItem) {
-                        easyrtc.pc_config.iceServers.push(fixedItem);
-                    }
-                }
-            }
+            processIceConfig(msgData.iceConfig);
         }
 
         if (msgData.sessionData) {
@@ -3187,6 +3225,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         );
     }
 };
+
 
 
 
