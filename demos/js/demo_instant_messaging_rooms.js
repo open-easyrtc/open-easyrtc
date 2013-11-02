@@ -404,4 +404,5 @@ function addApiField() {
         fieldvalue = fieldvaluetext;
     }
     easyrtc.setRoomApiField(roomName, fieldname, fieldvalue);
+    easyrtc.setRoomApiField(roomName, fieldname+"_copy", fieldvalue + "copy");
 }

@@ -519,11 +519,12 @@ easyrtc.setRoomApiField = function(roomName, fieldName, fieldValue) {
         //
         if (easyrtc.roomApiFieldTimer) {
             clearTimeout(easyrtc.roomApiFieldTimer);
-            easyrtc.setRoomApiFieldTimer = setTimeout(function() {
-                easyrtc._sendRoomApiFields(roomName, easyrtc._roomApiFields[roomName]);
-                easyrtc.setRoomApiFieldTimer = null;
-            }, 10);
         }
+        easyrtc.roomApiFieldTimer = setTimeout(function() {
+            console.log("sending api fields eh");
+            easyrtc._sendRoomApiFields(roomName, easyrtc._roomApiFields[roomName]);
+            easyrtc.roomApiFieldTimer = null;
+        }, 10);
     }
 };
 
@@ -3287,12 +3288,12 @@ easyrtc.dontAddCloseButtons = function() {
  *  @param {String} applicationName - name of the application.
  *  @param {String} monitorVideoId - the id of the video object used for monitoring the local stream.
  *  @param {Array} videoIds - an array of video object ids (strings)
- *  @param {Function} onReady - a callback function used on success.
+ *  @param {Function} onReady - a callback function used on success. It is called with the easyrtcId this peer is knopwn to the server as.
  *  @param {Function} onFailure - a callbackfunction used on failure (failed to get local media or a connection of the signaling server).
  *  @example
  *     easyrtc.initManaged('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],
- *              function (){
- *                  console.log("successfully connected.");
+ *              function (easyrtcId){
+ *                  console.log("successfully connected, I am " + easyrtcId);
  *              },
  *              function(errorCode, errorText) {
  *                  console.log(errorText);
