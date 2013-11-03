@@ -1,6 +1,6 @@
 {
   "name"        : "easyrtc",
-  "version"     : "0.10.2-alpha",
+  "version"     : "0.10.3-alpha",
   "homepage"    : "http://www.easyrtc.com/",
   "author"      : "Priologic Software Inc. <info@priologic.com> (http://priologic.com/)",
   "description" : "EasyRTC enables quick development of webRTC",
