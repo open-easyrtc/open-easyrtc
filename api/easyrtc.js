@@ -54,7 +54,7 @@ easyrtc.errCodes = {
     PEER_GONE: "PEER_GONE", // peer doesn't exist
     ALREADY_CONNECTED: "ALREADY_CONNECTED"
 };
-easyrtc.apiVersion = "0.9.1";
+easyrtc.apiVersion = "0.10.2a";
 /** Most basic message acknowledgment object */
 easyrtc.ackMessage = {msgType: "ack", msgData: {}};
 /** Regular expression pattern for user ids. This will need modification to support non US character sets */
@@ -482,7 +482,7 @@ easyrtc.callCancelled = function(easyrtcid) {
  *   });
  */
 easyrtc.setRoomApiField = function(roomName, fieldName, fieldValue) {
-    console.log("set api field");
+    console.log("set api field " + fieldName + " =" + JSON.stringify(fieldValue));
     //
     // if we're not connected yet, we'll just cache the fields until we are.
     //
@@ -513,20 +513,27 @@ easyrtc.setRoomApiField = function(roomName, fieldName, fieldValue) {
         delete easyrtc._roomApiFields[roomName][fieldName];
     }
     if (easyrtc.webSocketConnected) {
-        //
-        // Rather than issue the send request immediately, we set a timer so we can accumulate other 
-        // calls 
-        //
-        if (easyrtc.roomApiFieldTimer) {
-            clearTimeout(easyrtc.roomApiFieldTimer);
-        }
-        easyrtc.roomApiFieldTimer = setTimeout(function() {
-            console.log("sending api fields eh");
-            easyrtc._sendRoomApiFields(roomName, easyrtc._roomApiFields[roomName]);
-            easyrtc.roomApiFieldTimer = null;
-        }, 10);
+        easyrtc._enqueueSendRoomApi(roomName);
     }
 };
+
+/** @private
+ * @param {type} roomName
+ */
+easyrtc._enqueueSendRoomApi = function(roomName) {
+    //
+    // Rather than issue the send request immediately, we set a timer so we can accumulate other 
+    // calls 
+    //
+    if (easyrtc.roomApiFieldTimer) {
+        clearTimeout(easyrtc.roomApiFieldTimer);
+    }
+    easyrtc.roomApiFieldTimer = setTimeout(function() {
+        console.log("sending api fields eh");
+        easyrtc._sendRoomApiFields(roomName, easyrtc._roomApiFields[roomName]);
+        easyrtc.roomApiFieldTimer = null;
+    }, 10);
+}
 
 /**
  *  @private 
@@ -534,7 +541,7 @@ easyrtc.setRoomApiField = function(roomName, fieldName, fieldValue) {
  * @param valuelist
  */
 easyrtc._sendRoomApiFields = function(roomName, fields) {
-    console.log("sending room api fields");
+    console.log("sending room api fields: ", JSON.stringify(fields));
     var fieldAsString = JSON.stringify(fields);
     JSON.parse(fieldAsString);
     var dataToShip = {
@@ -3213,7 +3220,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
                 if (easyrtc._roomApiFields) {
                     for (var room in easyrtc._roomApiFields) {
-                        easyrtc._sendRoomApiFields(room, easyrtc._roomApiFields[room]);
+                        easyrtc._enqueueSendRoomApi(room, easyrtc._roomApiFields[room]);
                     }
                 }
 

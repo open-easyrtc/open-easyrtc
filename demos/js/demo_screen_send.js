@@ -62,7 +62,7 @@ function connect() {
         var peer;
         for(peer in otherPeers ) {
             if( !contactedListeners[peer]) {
-                easyrtc.sendDataWS(peer, {
+                easyrtc.sendDataWS(peer, "available", {
                     sender:true
                 });
             }        
