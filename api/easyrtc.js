@@ -38,7 +38,7 @@
 
 
 var easyrtc = {};
-/** Error codes that the EasyRTC will use in the errCode field of error object passed
+/** Error codes that the EasyRTC will use in the errorCode field of error object passed
  *  to error handler set by easyrtc.setOnError. The error codes are short printable strings.
  * @type Dictionary
  */
@@ -58,13 +58,13 @@ easyrtc.apiVersion = "0.10.2a";
 /** Most basic message acknowledgment object */
 easyrtc.ackMessage = {msgType: "ack", msgData: {}};
 /** Regular expression pattern for user ids. This will need modification to support non US character sets */
-easyrtc.userNamePattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,30}[a-zA-Z0-9]$/;
+easyrtc.usernamePattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,30}[a-zA-Z0-9]$/;
 
 /** @private */
 easyrtc.cookieId = "easyrtcsid";
 
 /** @private */
-easyrtc.userName = null;
+easyrtc.username = null;
 /** @private */
 easyrtc.loggingOut = false;
 /** @private */
@@ -103,8 +103,7 @@ easyrtc.nativeVideoHeight = 0;
  * of time after easyrtc.initMediaSource succeeds.
  */
 easyrtc.nativeVideoWidth = 0;
-/** @private */
-easyrtc.apiKey = "cmhslu5vo57rlocg"; // default key for now
+
 
 /** @private */
 easyrtc.credential = null;
@@ -126,7 +125,7 @@ easyrtc.roomJoin = {};
  *    }
  */
 easyrtc.isNameValid = function(name) {
-    return easyrtc.userNamePattern.test(name);
+    return easyrtc.usernamePattern.test(name);
 };
 /**
  * This function sets the name of the cookie that client side library will look for
@@ -262,15 +261,6 @@ easyrtc.setScreenCapture = function() {
         },
         optional: []
     };
-};
-/** Set the API Key. The API key identifies the owner of the application.
- *  The API key has no meaning for the Open Source server.
- * @param {String} key
- * @example
- *      easyrtc.setApiKey('cmhslu5vo57rlocg');
- */
-easyrtc.setApiKey = function(key) {
-    easyrtc.credential = {apiKey: key};
 };
 /** Set the application name. Applications can only communicate with other applications
  * that share the same API Key and application name. There is no predefined set of application
@@ -573,14 +563,14 @@ easyrtc._sendRoomApiFields = function(roomName, fields) {
  *      easyrtc.showError("BAD_NAME", "Invalid username");
  */
 easyrtc.showError = function(messageCode, message) {
-    easyrtc.onError({errCode: messageCode, errText: message});
+    easyrtc.onError({errorCode: messageCode, errorText: message});
 };
 /** @private
  * @param errorObject
  */
 easyrtc.onError = function(errorObject) {
     if (easyrtc.debugPrinter) {
-        easyrtc.debugPrinter("saw error " + errorObject.errText);
+        easyrtc.debugPrinter("saw error " + errorObject.errorText);
     }
     var errorDiv = document.getElementById('easyrtcErrorDialog');
     var errorBody;
@@ -608,7 +598,7 @@ easyrtc.onError = function(errorObject) {
     errorBody = document.getElementById("easyrtcErrorDialog_body");
     var messageNode = document.createElement("div");
     messageNode.className = 'easyrtcErrorDialog_element';
-    messageNode.appendChild(document.createTextNode(errorObject.errText));
+    messageNode.appendChild(document.createTextNode(errorObject.errorText));
     errorBody.appendChild(messageNode);
     errorDiv.style.display = "block";
 };
@@ -703,13 +693,13 @@ easyrtc.setRoomEntryListener = function(handler) {
  * The callback expects to receive a room name argument, and 
  *  a map whose ideas are easyrtcids and whose values are in turn maps
  * supplying user specific information. The inner maps have the following keys:
- *  userName, applicationName, browserFamily, browserMajor, osFamily, osMajor, deviceFamily.
+ *  username, applicationName, browserFamily, browserMajor, osFamily, osMajor, deviceFamily.
  *  The third argument is the listener is the innerMap for the connections own data (not needed by most applications).
  * @param {Function} listener
  * @example
  *   easyrtc.setRoomOccupantListener( function(roomName, list, selfInfo) {
  *      for( var i in list ){
- *         ("easyrtcid=" + i + " belongs to user " + list[i].userName);
+ *         ("easyrtcid=" + i + " belongs to user " + list[i].username);
  *      }
  *   });
  */
@@ -1128,10 +1118,10 @@ easyrtc.setStreamAcceptor = function(acceptor) {
     easyrtc.streamAcceptor = acceptor;
 };
 /** Sets the easyrtc.onError field to a user specified function.
- * @param {Function} errListener takes an object of the form { errCode: String, errText: String}
+ * @param {Function} errListener takes an object of the form { errorCode: String, errorText: String}
  * @example
  *    easyrtc.setOnError( function(errorObject) {
- *        document.getElementById("errMessageDiv").innerHTML += errorObject.errText;
+ *        document.getElementById("errMessageDiv").innerHTML += errorObject.errorText;
  *    });
  */
 easyrtc.setOnError = function(errListener) {
@@ -1196,23 +1186,23 @@ easyrtc.setVideoBandwidth = function(kbitsPerSecond) {
  * If a msgType but no source is provided, the listener applies to all messages of that msgType that aren't otherwise handled.
  * If a msgType and a source is provided, the listener applies to only message of the specified type coming from the specified peer.
  * The most specific case takes priority over the more general.
- * @param {Function} listener has the signature (easyrtcid, msgType, data, targeting).
+ * @param {Function} listener has the signature (easyrtcid, msgType, msgData, targeting).
  *   msgType is a string. targeting is null if the message was received using WebRTC data channels, otherwise it
  *   is an object that contains one or more of the following string valued elements {targetEasyrtcid, targetGroup, targetRoom}.
  * @param {String} msgType - a string, optional.
  * @param {String} source - the sender's easyrtcid, optional.
  * @example
- *     easyrtc.setPeerListener( function(easyrtcid, msgType, data, targeting) {
+ *     easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting) {
  *         ("From " + easyrtc.idToName(easyrtcid) +
- *             " sent the follow data " + JSON.stringify(data));
+ *             " sent the following data " + JSON.stringify(msgData));
  *     });
- *     easyrtc.setPeerListener( function(easyrtcid, msgType, data, targeting) {
+ *     easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting) {
  *         ("From " + easyrtc.idToName(easyrtcid) +
- *             " sent the follow data " + JSON.stringify(data));
+ *             " sent the following data " + JSON.stringify(msgData));
  *     }, 'food', 'dkdjdekj44--');
- *     easyrtc.setPeerListener( function(easyrtcid, msgType, data, targeting) {
+ *     easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting) {
  *         ("From " + easyrtcid +
- *             " sent the follow data " + JSON.stringify(data));
+ *             " sent the following data " + JSON.stringify(msgData));
  *     }, 'drink');
  *
  *
@@ -1242,28 +1232,25 @@ easyrtc.setPeerListener = function(listener, msgType, source) {
  */
 easyrtc.receivePeerDistribute = function(easyrtcid, msg, targeting) {
     var msgType = msg.msgType;
-    var data = msg.msgData;
+    var msgData = msg.msgData;
     if (!msgType) {
         console.log("received peer message without msgType", msg);
         return;
     }
-    if (!data) {
-        console.log("received peer message without msgData", msg);
-        return;
-    }
+
     if (easyrtc.receivePeer.msgTypes[msgType]) {
         if (easyrtc.receivePeer.msgTypes[msgType].sources[easyrtcid] &&
                 easyrtc.receivePeer.msgTypes[msgType].sources[easyrtcid].cb) {
-            easyrtc.receivePeer.msgTypes[msgType].sources[easyrtcid].cb(easyrtcid, msgType, data, targeting);
+            easyrtc.receivePeer.msgTypes[msgType].sources[easyrtcid].cb(easyrtcid, msgType, msgData, targeting);
             return;
         }
         if (easyrtc.receivePeer.msgTypes[msgType].cb) {
-            easyrtc.receivePeer.msgTypes[msgType].cb(easyrtcid, msgType, data, targeting);
+            easyrtc.receivePeer.msgTypes[msgType].cb(easyrtcid, msgType, msgData, targeting);
             return;
         }
     }
     if (easyrtc.receivePeer.cb) {
-        easyrtc.receivePeer.cb(easyrtcid, msgType, data, targeting);
+        easyrtc.receivePeer.cb(easyrtcid, msgType, msgData, targeting);
     }
 };
 
@@ -1297,21 +1284,21 @@ easyrtc.setSocketUrl = function(socketUrl) {
 };
 /**
  * Sets the user name associated with the connection.
- * @param {String} userName must obey standard identifier conventions.
+ * @param {String} username must obey standard identifier conventions.
  * @returns {Boolean} true if the call succeeded, false if the username was invalid.
  * @example
- *    if ( !easyrtc.setUserName("JohnSmith") ){
+ *    if ( !easyrtc.setUsername("JohnSmith") ){
  *        console.error("bad user name);
  *
  */
-easyrtc.setUserName = function(userName) {
+easyrtc.setUsername = function(username) {
 
-    if (easyrtc.isNameValid(userName)) {
-        easyrtc.userName = userName;
+    if (easyrtc.isNameValid(username)) {
+        easyrtc.username = username;
         return true;
     }
     else {
-        easyrtc.showError(easyrtc.errCodes.BAD_NAME, "Illegal username " + userName);
+        easyrtc.showError(easyrtc.errCodes.BAD_NAME, "Illegal username " + username);
         return false;
     }
 };
@@ -1439,7 +1426,7 @@ easyrtc.haveVideoTrack = function(easyrtcid) {
  *                       if( roomOwner) { console.log("I'm the room owner"); }
  *                       console.log("my id is " + easyrtcid);
  *                   },
- *                   function(errText) {
+ *                   function(errorText) {
  *                       console.log("failed to connect ", erFrText);
  *                   });
  */
@@ -1550,19 +1537,19 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     //   successCallback: a function with the signature  function(msgType, wholeMsg);
     //   errorCallback: a function with signature function(errorCode, errorText)
     //
-    function sendSignalling(destUser, instruction, data, successCallback, errorCallback) {
+    function sendSignalling(destUser, msgType, msgData, successCallback, errorCallback) {
         if (!easyrtc.webSocket) {
             throw "Attempt to send message without a valid connection to the server.";
         }
         else {
             var dataToShip = {
-                msgType: instruction
+                msgType: msgType
             };
             if (destUser) {
                 dataToShip.targetEasyrtcid = destUser;
             }
             if (data) {
-                dataToShip.msgData = data;
+                dataToShip.msgData = msgData;
             }
             ;
             if (easyrtc.debugPrinter) {
@@ -1596,14 +1583,14 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
      * What datatypes you can send, and how large a datatype depends on your browser.
      * @param {String} destUser (an easyrtcid)
      * @param {String} msgType
-     * @param {Object} data - an object which can be JSON'ed.
+     * @param {Object} msgData - an object which can be JSON'ed.
      * @example
      *     easyrtc.sendDataP2P(someEasyrtcid, "roomdata", {room:499, bldgNum:'asd'});
      */
     var totalLengthSent = 0;
-    easyrtc.sendDataP2P = function(destUser, msgType, data) {
+    easyrtc.sendDataP2P = function(destUser, msgType, msgData) {
 
-        var flattenedData = JSON.stringify({msgType: msgType, msgData: data});
+        var flattenedData = JSON.stringify({msgType: msgType, msgData: msgData});
         if (easyrtc.debugPrinter) {
             easyrtc.debugPrinter("sending p2p message to " + destUser + " with data=" + JSON.stringify(flattenedData));
         }
@@ -1635,7 +1622,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
      * @param {String} destination - either a string containing the easyrtcId of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.
      * Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).
      * @param {String msgType
-     * @param {String} data - an object which can be JSON'ed.
+     * @param {String} msgData - an object which can be JSON'ed.
      * @param {Function} ackhandler - by default, the ackhandler handles acknowledgments from the server that your message was delivered to it's destination.
      * However, application logic in the server can over-ride this. If you leave this null, a stub ackHandler will be used. The ackHandler
      * gets passed a message with the same msgType as your outgoing message, or a message type of "error" in which case
@@ -1647,9 +1634,9 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
      *      }
      *    );
      */
-    easyrtc.sendDataWS = function(destination, msgType, data, ackhandler) {
+    easyrtc.sendDataWS = function(destination, msgType, msgData, ackhandler) {
         if (easyrtc.debugPrinter) {
-            easyrtc.debugPrinter("sending client message via websockets to " + destination + " with data=" + JSON.stringify(data));
+            easyrtc.debugPrinter("sending client message via websockets to " + destination + " with data=" + JSON.stringify(msgData));
         }
         if (!ackhandler) {
             ackhandler = function(msg) {
@@ -1661,7 +1648,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
         var outgoingMessage = {
             msgType: msgType,
-            msgData: data
+            msgData: msgData
         };
         if (destination) {
             if (typeof destination === 'string') {
@@ -1697,18 +1684,18 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
      * @param {String} destUser - a string containing the easyrtcId of the other user.
      * Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).
      * @param {String} msgType
-     * @param {String} data - an object which can be JSON'ed.
+     * @param {String} msgData - an object which can be JSON'ed.
      * @param {Function} ackHandler - a function which receives acknowledgments. May only be invoked in
      *  the websocket case.
      * @example
      *    easyrtc.sendData(someEasyrtcid, {room:499, bldgNum:'asd'});
      */
-    easyrtc.sendData = function(destUser, msgType, data, ackHandler) {
+    easyrtc.sendData = function(destUser, msgType, msgData, ackHandler) {
         if (easyrtc.peerConns[destUser] && easyrtc.peerConns[destUser].dataChannelReady) {
-            easyrtc.sendDataP2P(destUser, msgType, data);
+            easyrtc.sendDataP2P(destUser, msgType, msgData);
         }
         else {
-            easyrtc.sendDataWS(destUser, msgType, data, ackHandler);
+            easyrtc.sendDataWS(destUser, msgType, msgData, ackHandler);
         }
     };
 
@@ -1736,7 +1723,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         }
 
         if (easyrtc.debugPrinter) {
-            easyrtc.debugPrinter("sending peer message " + JSON.stringify(dataToShip));
+            easyrtc.debugPrinter("sending peer message " + JSON.stringify(msgData));
         }
         function ackhandler(response) {
             if (response.msgType === "error") {
@@ -1868,12 +1855,12 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
      *  Initiates a call to another user. If it succeeds, the streamAcceptor callback will be called.
      * @param {String} otherUser - the easyrtcid of the peer being called.
      * @param {Function} callSuccessCB (otherCaller, mediaType) - is called when the datachannel is established or the mediastream is established. mediaType will have a value of "audiovideo" or "datachannel"
-     * @param {Function} callFailureCB (errCode, errMessage) - is called if there was a system error interfering with the call.
+     * @param {Function} callFailureCB (errorCode, errMessage) - is called if there was a system error interfering with the call.
      * @param {Function} wasAcceptedCB (wasAccepted:boolean,otherUser:string) - is called when a call is accepted or rejected by another party. It can be left null.
      * @example
      *    easyrtc.call( otherEasyrtcid,
      *        function(easyrtcid, mediaType) {
-     *           console.log("Got mediatype " + mediaType + " from " + easyrtc.idToName(easyrtcid);
+     *           console.log("Got mediatype " + mediaType + " from " + easyrtc.idToName(easyrtcid));
      *        },
      *        function(errorCode, errMessage) {
      *           console.log("call to  " + easyrtc.idToName(otherEasyrtcid) + " failed:" + errMessage);
@@ -1962,7 +1949,10 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             var sendOffer = function() {
                 sendSignalling(otherUser, "offer", sessionDescription, null, callFailureCB);
             };
-            pc.setLocalDescription(sessionDescription, sendOffer, callFailureCB);
+            pc.setLocalDescription(sessionDescription, sendOffer,
+               function(errorText) {
+                   callFailureCB(easyrtc.errCodes.CALL_ERR, errorText);
+               });
         };
         pc.createOffer(setLocalAndSendMessage0, function(errorObj) {
             callFailureCB(easyrtc.errCodes.CALL_ERR, JSON.stringify(errObj));
@@ -3193,8 +3183,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         if (easyrtc.presenceShow) {
             msgData.setPresence = {show: easyrtc.presenceShow, status: easyrtc.presenceStatus};
         }
-        if (easyrtc.userName) {
-            msgData.username = easyrtc.userName;
+        if (easyrtc.username) {
+            msgData.username = easyrtc.username;
         }
         if (easyrtc.roomJoin && !isEmptyObj(easyrtc.roomJoin)) {
             msgData.roomJoin = easyrtc.roomJoin;

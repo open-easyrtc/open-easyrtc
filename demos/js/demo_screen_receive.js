@@ -51,7 +51,7 @@ function connect() {
         return;
     }
     
-    easyrtc.setUserName(userName);
+    easyrtc.setUsername(userName);
     if( window.localStorage ) {
         window.localStorage.easyrtcUserName = document.getElementById('userName').value;
     }   

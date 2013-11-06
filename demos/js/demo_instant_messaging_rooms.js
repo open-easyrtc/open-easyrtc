@@ -29,6 +29,9 @@ var isConnected = false;
 
 function addToConversation(who, msgType, content, targetting) {
     // Escape html special characters, then add linefeeds.
+    if( !content) {
+        content = "**no body**";
+    }
     content = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     content = content.replace(/\n/g, '<br />');
     var targettingStr = "";
@@ -318,11 +321,16 @@ function sendMessage(destTargetId, destRoom) {
         return;
     }
 
+    if( text === "empty") {
+         easyrtc.sendPeerMessage(dest, "message");
+    }
+    else {
     easyrtc.sendDataWS(dest, "message", text, function(reply) {
         if (reply.msgType === "error") {
             easyrtc.showError(reply.msgData.errorCode, reply.msgData.errorText);
         }
     });
+    }
     addToConversation("Me", "message", text);
     document.getElementById('sendMessageText').value = "";
 }
