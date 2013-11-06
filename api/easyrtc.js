@@ -3262,13 +3262,13 @@ easyrtc.getConnectionFields = function() {
     return easyrtc.fields.connection;
 };
 
-// this flag controls whether the initManaged routine adds close buttons to the caller
+// this flag controls whether the easyApp routine adds close buttons to the caller
 // video objects
 
 /** @private */
 easyrtc.autoAddCloseButtons = true;
-/** By default, the initManaged routine sticks a "close" button on top of each caller
- * video object that it manages. Call this function (before calling initManaged) to disable that particular feature.
+/** By default, the easyApp routine sticks a "close" button on top of each caller
+ * video object that it manages. Call this function (before calling easyApp) to disable that particular feature.
  * @example
  *    easyrtc.dontAddCloseButtons();
  */
@@ -3288,7 +3288,7 @@ easyrtc.dontAddCloseButtons = function() {
  *  @param {Function} onReady - a callback function used on success. It is called with the easyrtcId this peer is knopwn to the server as.
  *  @param {Function} onFailure - a callbackfunction used on failure (failed to get local media or a connection of the signaling server).
  *  @example
- *     easyrtc.initManaged('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],
+ *     easyrtc.easyApp('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],
  *              function (easyrtcId){
  *                  console.log("successfully connected, I am " + easyrtcId);
  *              },
@@ -3296,7 +3296,7 @@ easyrtc.dontAddCloseButtons = function() {
  *                  console.log(errorText);
  *              );
  */
-easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onReady, onFailure) {
+easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, onFailure) {
     var numPEOPLE = videoIds.length;
     var refreshPane = 0;
     var onCall = null, onHangup = null, gotMediaCallback = null, gotConnectionCallback = null;
@@ -3310,7 +3310,7 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
 
 // verify that video ids were not typos.
     if (monitorVideoId && !document.getElementById(monitorVideoId)) {
-        easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "The monitor video id passed to initManaged was bad, saw " + monitorVideoId);
+        easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "The monitor video id passed to easyApp was bad, saw " + monitorVideoId);
         return;
     }
 
@@ -3320,12 +3320,12 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
     for (var i in videoIds) {
         var name = videoIds[i];
         if (!document.getElementById(name)) {
-            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "The caller video id '" + name + "' passed to initManaged was bad.");
+            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "The caller video id '" + name + "' passed to easyApp was bad.");
             return;
         }
     }
     /** Sets an event handler that gets called when the local media stream is
-     *  created or not. Can only be called after calling easyrtc.initManaged.
+     *  created or not. Can only be called after calling easyrtc.easyApp.
      *  @param {Function} gotMediaCB has the signature function(gotMedia, why)
      *  @example
      *     easyrtc.setGotMedia( function(gotMediaCB, why) {
@@ -3341,7 +3341,7 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
         gotMediaCallback = gotMediaCB;
     };
     /** Sets an event handler that gets called when a connection to the signaling
-     * server has or has not been made. Can only be called after calling easyrtc.initManaged.
+     * server has or has not been made. Can only be called after calling easyrtc.easyApp.
      * @param {Function} gotConnectionCB has the signature (gotConnection, why)
      * @example
      *    easyrtc.setGotConnection( function(gotConnection, why) {
@@ -3358,7 +3358,7 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
     };
     /** Sets an event handler that gets called when a call is established.
      * It's only purpose (so far) is to support transitions on video elements.
-     * This function is only defined after easyrtc.initManaged is called.
+     * This function is only defined after easyrtc.easyApp is called.
      * The slot argument is the index into the array of video ids.
      * @param {Function} cb has the signature function(easyrtcid, slot) {}
      * @example
@@ -3371,7 +3371,7 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
     };
     /** Sets an event handler that gets called when a call is ended.
      * it's only purpose (so far) is to support transitions on video elements.
-     x     * this function is only defined after easyrtc.initManaged is called.
+     x     * this function is only defined after easyrtc.easyApp is called.
      * The slot is parameter is the index into the array of video ids.
      * Note: if you call easyrtc.getConnectionCount() from inside your callback
      * it's count will reflect the number of connections before the hangup started.
@@ -3557,6 +3557,11 @@ easyrtc.initManaged = function(applicationName, monitorVideoId, videoIds, onRead
     );
 };
 
+/**
+ * 
+ * @deprecated
+ */
+easyrtc.initManaged = easyrtc.easyApp;
 
 //
 // the below code is a copy of the standard polyfill adapter.js
