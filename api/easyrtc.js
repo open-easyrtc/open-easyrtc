@@ -1548,7 +1548,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             if (destUser) {
                 dataToShip.targetEasyrtcid = destUser;
             }
-            if (data) {
+            if (msgData) {
                 dataToShip.msgData = msgData;
             }
             ;
