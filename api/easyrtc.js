@@ -303,7 +303,7 @@ easyrtc.supportsGetUserMedia = function() {
  * Determines if the local browser supports WebRTC Peer connections to the extent of being able to do video chats.
  * @returns {Boolean} True if Peer connections are supported.
  */
-easyrtc.supportsPeerConnection = function() {
+easyrtc.supportsPeerConnections = function() {
     if (!easyrtc.supportsGetUserMedia()) {
         return false;
     }
@@ -1146,7 +1146,7 @@ easyrtc.setVideoBandwidth = function(kbitsPerSecond) {
  * EasyRTC will not open up connections with the old data channels.
  * @returns {boolean}
  */
-easyrtc.supportDataChannels = function() {
+easyrtc.supportsDataChannels = function() {
     return (easyrtc.dataEnabled &&
             (webrtcDetectedBrowser === "firefox" || webrtcDetectedVersion >= 32));
 };
