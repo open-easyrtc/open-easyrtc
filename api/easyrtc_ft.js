@@ -43,7 +43,7 @@ easyrtc_ft = {};
  */
 easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
     var droptarget;
-    if (typeof droptargetName === 'String') {
+    if (typeof droptargetName === 'string') {
         droptarget = document.getElementById(droptargetName);
         if (!droptarget) {
             alert("Developer error: attempt to call BuildFileSender on unknown object " + droptargetName);
