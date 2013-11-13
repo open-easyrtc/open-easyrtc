@@ -244,6 +244,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
             }
             else {
                 curFile = filesBeingSent.pop();
+                progressListener({status:"started_file", name:curFile.name});
                 curFileSize = curFile.size;
                 positionAcked = 0;
                 waitingForAck = false;
@@ -406,6 +407,7 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
             }
         }
         else if (msgData.name) {
+            statusCB(otherGuy, {status: "started_file", name: msgData.name});
             userStream.currentFileName = msgData.name;
             userStream.currentFileType = msgData.type;
             userStream.lengthReceived = 0;
