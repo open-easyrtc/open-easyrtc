@@ -2960,7 +2960,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     }
                 }
             }
-            if (easyrtc.roomJoin[roomname] && roomData[roomname]) {
+            if (easyrtc.roomJoin[roomname] && roomData[roomname].field) {
                 easyrtc.fields.rooms[roomname] = roomData[roomname].field;
             }
             processOccupantList(roomname, easyrtc.lastLoggedInList[roomname]);
