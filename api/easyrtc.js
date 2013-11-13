@@ -1148,7 +1148,7 @@ easyrtc.setVideoBandwidth = function(kbitsPerSecond) {
  */
 easyrtc.supportsDataChannels = function() {
     return (easyrtc.dataEnabled &&
-            (webrtcDetectedBrowser === "firefox" || webrtcDetectedVersion >= 32));
+            (webrtcDetectedBrowser === "firefox" || webrtcDetectedVersion >= 31));
 };
 /**
  * Sets a listener for data sent from another client (either peer to peer or via websockets).
@@ -2014,7 +2014,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
 
 //
-// we don't support data channels on chrome versions < 32
+// we don't support data channels on chrome versions < 31
 //
 
 
