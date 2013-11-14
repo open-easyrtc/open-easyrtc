@@ -1147,8 +1147,7 @@ easyrtc.setVideoBandwidth = function(kbitsPerSecond) {
  * @returns {boolean}
  */
 easyrtc.supportsDataChannels = function() {
-    return (easyrtc.dataEnabled &&
-            (webrtcDetectedBrowser === "firefox" || webrtcDetectedVersion >= 32));
+    return (webrtcDetectedBrowser === "firefox" || webrtcDetectedVersion >= 31);
 };
 /**
  * Sets a listener for data sent from another client (either peer to peer or via websockets).
@@ -2014,7 +2013,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
 
 //
-// we don't support data channels on chrome versions < 32
+// we don't support data channels on chrome versions < 31
 //
 
 
@@ -2961,7 +2960,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     }
                 }
             }
-            if (easyrtc.roomJoin[roomname] && roomData[roomname]) {
+            if (easyrtc.roomJoin[roomname] && roomData[roomname].field) {
                 easyrtc.fields.rooms[roomname] = roomData[roomname].field;
             }
             processOccupantList(roomname, easyrtc.lastLoggedInList[roomname]);

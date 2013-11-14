@@ -154,7 +154,8 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
  * @param {String} destUser easyrtcId of the person being sent to.
  * @param {Function} progressListener - if provided, is called with the following objects:
  *    {status:"waiting"}  // once a file offer has been sent but not accepted or rejected yet
- *    {status:"working", position:position_in_file, size:size_of_current_file, numFiles:number_of_files_left}
+ *    {status:"started_file", name: filename}
+ *    {status:"working", name:filename, position:position_in_file, size:size_of_current_file, numFiles:number_of_files_left}
  *    {status:"cancelled"}  // if the remote user cancels the sending
  *    {status:"done"}       // when the file is done
  *    the progressListener should always return true for normal operation, false to cancel a filetransfer.
@@ -244,6 +245,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
             }
             else {
                 curFile = filesBeingSent.pop();
+                progressListener({status:"started_file", name:curFile.name});
                 curFileSize = curFile.size;
                 positionAcked = 0;
                 waitingForAck = false;
@@ -337,8 +339,8 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
  * {status:"done", reason:"success"}
  * {status:"done", reason:"cancelled"}
  * {status:"eof"},
- * {status:"started"}
- * {status:"progress" name:filename,
+ * {status:"started_file, name:"filename"}
+ * {status:"progress", name:filename,
  *    received:received_size_in_bytes,
  *    size:file_size_in_bytes }
  *  @example
@@ -406,6 +408,7 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
             }
         }
         else if (msgData.name) {
+            statusCB(otherGuy, {status: "started_file", name: msgData.name});
             userStream.currentFileName = msgData.name;
             userStream.currentFileType = msgData.type;
             userStream.lengthReceived = 0;
