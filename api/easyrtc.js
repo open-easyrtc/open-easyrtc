@@ -1790,6 +1790,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     easyrtc.buildPeerConstraints = function() {
         var options = [];
         options.push({'DtlsSrtpKeyAgreement': 'true'}); // for interoperability
+        options.push
         return {optional: options};
     };
     /**
@@ -2211,6 +2212,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 easyrtc.debugPrinter("initializing incoming channel handler for " + otherUser);
             }
             easyrtc.peerConns[otherUser].pc.ondatachannel = function(event) {
+
                 if (easyrtc.debugPrinter) {
                     easyrtc.debugPrinter("saw incoming data channel");
                 }
@@ -2256,12 +2258,14 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 delete mediaConstraints.mandatory.MozDontOfferDataChannel;
             }
         }
-
+        
         if (easyrtc.dataEnabled) {
             if (isInitiator || easyrtc.isMozilla) {
                 try {
+
                     initOutGoingChannel(otherUser);
                 } catch (channelErrorEvent) {
+                    console.log("failed to init outgoing channel");
                     failureCB(easyrtc.errCodes.SYSTEM_ERROR,
                             easyrtc.formatError(channelErrorEvent));
                 }
