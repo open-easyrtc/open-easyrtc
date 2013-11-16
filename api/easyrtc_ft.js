@@ -83,16 +83,18 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
     }
 
 
-    var dropCueClass = "easyrtc_filedrop";
+    var dropCueClass = "easyrtcfiledrop";
 
     function dragEnterHandler(e) {
         addClass(droptarget, dropCueClass);
+        console.log("entered file drop area");
         return drageventcancel(e);
     }
 
 
     function dragLeaveHandler(e) {
         removeClass(droptarget, dropCueClass);
+        console.log("left file drop area");
         return drageventcancel(e);
     }
 
@@ -139,6 +141,9 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
         else {
             target.className = classname;
         }
+        target.className = target.className.replace("  ", " ");
+        console.log("target is " + target.id);
+        console.log("class name is now " + target.className);
     }
 
     function removeClass(target, classname) {
@@ -146,6 +151,8 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
             return;
         }
         target.className = target.className.replace(classname, "").replace("  ", " ");
+        
+        console.log("class name is now " + target.className);
     }
 };
 
@@ -177,7 +184,9 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
     var maxChunkSize = 10*1024;
     var waitingForAck = false;
     var ackThreshold = 100*1024; // send is allowed to be 150KB ahead of receiver
-
+    var filesWaiting = [];
+    var haveFilesWaiting = false;
+    
     if (!progressListener) {
         progressListener = function() {
             return true;
@@ -192,6 +201,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
             return;
         delete filesOffered[msgData.seq];
         filesOffered.length = 0;
+        sendFilesWaiting();
     }
     //
     // if a file offer is accepted, initiate sending of files.
@@ -216,6 +226,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         filesOffered.length = 0;
         filesBeingSent.length = 0;
         sendStarted = false;
+        sendFilesWaiting();
     }
 
     function packageAckReceived(sender, msgType, msgData) {
@@ -241,6 +252,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
                 easyrtc.sendData(destUser, "filesChunk", {done: "all"});
                 filesOffered.length = 0;
                 progressListener({status: "done"});
+                sendFilesWaiting();
                 return;
             }
             else {
@@ -259,6 +271,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
             filesOffered.length = 0;
             filePosition = 0;
             easyrtc.sendData(destUser, "filesChunk", {done: "cancelled"});
+            sendFilesWaiting();
             return;
         }
 
@@ -310,16 +323,31 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         }
     }
 
-    function sendFilesOffer(files, areBinary) {
-        filesAreBinary = areBinary;
-        progressListener({status: "waiting"});
-        var fileNameList = [];
-        for (var i = 0; i < files.length; i++) {
-            fileNameList[i] = {name: files[i].name, size: files[i].size};
+    function sendFilesWaiting() {
+        haveFilesWaiting = false;
+        if( filesWaiting.length > 0) {
+            setTimeout( function() {
+                var fileset = filesWaiting.pop();
+                sendFilesOffer(fileset.files, fileset.areBinary);
+            }, 240);
         }
-        seq++;
-        filesOffered[seq] = files;
-        easyrtc.sendDataWS(destUser, "filesOffer", {seq: seq, fileNameList: fileNameList});
+    }
+    function sendFilesOffer(files, areBinary) {
+        if( haveFilesWaiting) {
+            filesWaiting.push({files:files, areBinary:areBinary});
+        }
+        else {
+            haveFilesWaiting = true;
+            filesAreBinary = areBinary;
+            progressListener({status: "waiting"});
+            var fileNameList = [];
+            for (var i = 0; i < files.length; i++) {
+                fileNameList[i] = {name: files[i].name, size: files[i].size};
+            }
+            seq++;
+            filesOffered[seq] = files;
+            easyrtc.sendDataWS(destUser, "filesOffer", {seq: seq, fileNameList: fileNameList});
+        }
     }
     return sendFilesOffer;
 };
