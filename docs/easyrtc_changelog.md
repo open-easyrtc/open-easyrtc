@@ -1,7 +1,24 @@
 EasyRTC: Change Log
 ===================
 
-v0.10.2a (note, alpha means alpha... please let us know of issues.)
+v0.10.3a (note, alpha means alpha... please let us know of issues.)
+--------
+
+New Features:
+ - API + Server - API fields. These are basically variables which are set by the client and shared to others in the room. Many possibilities!
+ - API + Server - ICE Config improvements. Client can now request an updated ICE configuration from the server, or server can force new one on client.
+ 
+ - Server - isConnected() function added to connection object.
+ - Server - Added convenience functions to several objects such as getAppName()
+
+Changes:
+  - API + Demos - Renaming initManaged() to easyApp(). Old name remains for the time being
+  - Server - isAuthenticated() now a synchronous function and returns a boolean 
+
+Fixes:
+ * Lots. But please let us know if there's any others which need doing.
+
+v0.10.2a
 --------
 
 New Features:
