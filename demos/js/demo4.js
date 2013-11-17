@@ -29,7 +29,7 @@ var selfEasyrtcid = "";
 function connect() {
     easyrtc.enableDebug(false);
     easyrtc.setRoomOccupantListener(convertListToButtons);
-    easyrtc.initManaged("easyrtc.audioVideo", "selfVideo", 
+    easyrtc.easyApp("easyrtc.audioVideo", "selfVideo", 
        ["callerVideo", "callerVideo2", "callerVideo3"], loginSuccess, loginFailure);
 }
 

@@ -31,7 +31,7 @@ function connect() {
     easyrtc.enableDebug(false);
     console.log("Initializing.");
     easyrtc.setRoomOccupantListener(convertListToButtons);
-    easyrtc.initManaged("easyrtc.videoChatHd", "selfVideo", ["callerVideo"], loginSuccess, loginFailure);
+    easyrtc.easyApp("easyrtc.videoChatHd", "selfVideo", ["callerVideo"], loginSuccess, loginFailure);
 }
 
 

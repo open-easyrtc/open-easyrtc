@@ -76,7 +76,7 @@ The second video tag should be in a &lt;div> block with a CSS _position_ value o
 
 Now we have to start writing some application logic for the application.js file,
 starting with an initialization function that will be called when the page gets loaded.
-The primary responsibility of the initialization function is to call the EasyRTC.initManaged method. It takes the following arguments:
+The primary responsibility of the initialization function is to call the EasyRTC.easyApp method. It takes the following arguments:
 
 + applicationName - some literal string like "Company Chat Line".
 + self-video-id - a string containing the id of the first video tag.
@@ -90,7 +90,7 @@ Here is an example initialization function:
 
      function my_init() {
          easyrtc.setRoomOccupantListener( loggedInListener);
-         easyrtc.initManaged("Company Chat Line", "self", ["caller"],
+         easyrtc.easyApp("Company Chat Line", "self", ["caller"],
              function(myId) {
                 console.log("My easyrtcid is " + myId);
              }
@@ -98,7 +98,7 @@ Here is an example initialization function:
      }
 
 The callback will be called whenever somebody else connects to
-or disconnects from the "Company Chat Line", and immediately after the call to easyrtc.initManaged.
+or disconnects from the "Company Chat Line", and immediately after the call to easyrtc.easyApp.
 
 The callback is passed a map whose keys are the ids (easyrtcids) of the other people connected to the server using the same application name.
 In our example, the callback will maintain a list of buttons
@@ -185,7 +185,7 @@ Here is the complete HTML and Javascript for this solution.
     The mylogic.js file:
         function my_init() {
              easyrtc.setRoomOccupantListener( loggedInListener);
-             easyrtc.initManaged("Company Chat Line", "self", ["caller"],
+             easyrtc.easyApp("Company Chat Line", "self", ["caller"],
                  function(myId) {
                     console.log("My easyrtcid is " + myId);
                  }
@@ -231,10 +231,10 @@ Video Conferencing - Trading Ease For Flexibility
 In the previous section, we outlined the approach that maximized the ease of getting a video conference page up and running.
 In this section, we trade off some the ease for greater flexibility and control.
 
-Instead of calling easyrtc.initManaged, you can call  easyrtc.initMediaSource
+Instead of calling easyrtc.easyApp, you can call  easyrtc.initMediaSource
 to get access to the local media stream,
 followed by a call to easyrtc.connect once the call to
-easyrtc.initMediaSource finished. This (and a bit more) is what easyrtc.initManaged does internally.
+easyrtc.initMediaSource finished. This (and a bit more) is what easyrtc.easyApp does internally.
 
 If you do it this way, you don't need the CSS file or the &lt;div> surrounding the second video
 because there won't be any automatically added hangup buttons. The HTML ends up looking like this:
