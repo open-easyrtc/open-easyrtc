@@ -106,6 +106,8 @@ function convertListToButtons(roomName, data, isPrimary) {
                 case "waiting":
                     statusDiv.innerHTML = "waiting for other party<br\>to accept transmission";
                     break;
+                case "started_file":
+                    statusDiv.innerHTML = "started file: " +state.name;
                 case "working":
                     statusDiv.innerHTML = state.name + ":" + state.position + "/" + state.size + "(" + state.numFiles + " files)";
                     break;
@@ -250,8 +252,8 @@ function receiveStatusCB(otherGuy, msg) {
                 receiveBlock.style.display = "none";
             }, 1000);
             break;
-        case "started":
-            receiveBlock.innerHTML = "Beginning receive";
+        case "started_file":
+            receiveBlock.innerHTML = "Beginning receive of " + msg.name;
             break;
         case "progress":
             receiveBlock.innerHTML = msg.name + " " + msg.received + "/" + msg.size;
