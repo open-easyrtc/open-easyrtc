@@ -1947,12 +1947,14 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 return;
             }
             var sendOffer = function() {
-                sendSignalling(otherUser, "offer", sessionDescription, null, callFailureCB);
+                setTimeout(function() {
+                    sendSignalling(otherUser, "offer", sessionDescription, null, callFailureCB);
+                }, 100);
             };
             pc.setLocalDescription(sessionDescription, sendOffer,
-               function(errorText) {
-                   callFailureCB(easyrtc.errCodes.CALL_ERR, errorText);
-               });
+                    function(errorText) {
+                        callFailureCB(easyrtc.errCodes.CALL_ERR, errorText);
+                    });
         };
         pc.createOffer(setLocalAndSendMessage0, function(errorObj) {
             callFailureCB(easyrtc.errCodes.CALL_ERR, JSON.stringify(errObj));
@@ -2388,12 +2390,14 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 if (easyrtc.debugPrinter) {
                     easyrtc.debugPrinter("sending answer");
                 }
-                sendSignalling(caller, "answer", sessionDescription,
-                        null,
-                        function(errorCode, errorText) {
-                            delete easyrtc.peerConns[caller];
-                            easyrtc.showError(errorCode, errorText);
-                        });
+                setTimeout(function() {
+                    sendSignalling(caller, "answer", sessionDescription,
+                            null,
+                            function(errorCode, errorText) {
+                                delete easyrtc.peerConns[caller];
+                                easyrtc.showError(errorCode, errorText);
+                            });
+                }, 100);
                 easyrtc.peerConns[caller].startedAV = true;
                 if (pc.connectDataConnection) {
                     if (easyrtc.debugPrinter) {
