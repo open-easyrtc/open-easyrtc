@@ -151,7 +151,7 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
             return;
         }
         target.className = target.className.replace(classname, "").replace("  ", " ");
-        
+
         console.log("class name is now " + target.className);
     }
 };
@@ -181,12 +181,12 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
     var curFile = null;
     var curFileSize;
     var filesAreBinary;
-    var maxChunkSize = 10*1024;
+    var maxChunkSize = 10 * 1024;
     var waitingForAck = false;
-    var ackThreshold = 100*1024; // send is allowed to be 150KB ahead of receiver
+    var ackThreshold = 100 * 1024; // send is allowed to be 150KB ahead of receiver
     var filesWaiting = [];
     var haveFilesWaiting = false;
-    
+
     if (!progressListener) {
         progressListener = function() {
             return true;
@@ -200,6 +200,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         if (!msgData.seq)
             return;
         delete filesOffered[msgData.seq];
+         progressListener({status: "rejected"});
         filesOffered.length = 0;
         sendFilesWaiting();
     }
@@ -257,7 +258,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
             }
             else {
                 curFile = filesBeingSent.pop();
-                progressListener({status:"started_file", name:curFile.name});
+                progressListener({status: "started_file", name: curFile.name});
                 curFileSize = curFile.size;
                 positionAcked = 0;
                 waitingForAck = false;
@@ -267,7 +268,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         }
 
         var amountToRead = Math.min(maxChunkSize, curFileSize - filePosition);
-        if (!progressListener({status: "working", name: curFile.name, position: filePosition, size: curFileSize, numFiles: filesBeingSent.length+1})) {
+        if (!progressListener({status: "working", name: curFile.name, position: filePosition, size: curFileSize, numFiles: filesBeingSent.length + 1})) {
             filesOffered.length = 0;
             filePosition = 0;
             easyrtc.sendData(destUser, "filesChunk", {done: "cancelled"});
@@ -325,16 +326,16 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
 
     function sendFilesWaiting() {
         haveFilesWaiting = false;
-        if( filesWaiting.length > 0) {
-            setTimeout( function() {
+        if (filesWaiting.length > 0) {
+            setTimeout(function() {
                 var fileset = filesWaiting.pop();
                 sendFilesOffer(fileset.files, fileset.areBinary);
             }, 240);
         }
     }
     function sendFilesOffer(files, areBinary) {
-        if( haveFilesWaiting) {
-            filesWaiting.push({files:files, areBinary:areBinary});
+        if (haveFilesWaiting) {
+            filesWaiting.push({files: files, areBinary: areBinary});
         }
         else {
             haveFilesWaiting = true;
@@ -405,6 +406,8 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
             }
             else {
                 easyrtc.sendDataWS(otherGuy, "filesReject", {seq: msgData.seq});
+                delete userStreams[otherGuy];
+                statusCB(otherGuy, {status: "rejected"});
             }
         });
     }
