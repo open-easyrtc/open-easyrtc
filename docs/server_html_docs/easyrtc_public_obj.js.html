@@ -194,13 +194,28 @@ pub.events.emit = pub.events._eventListener.emit.bind(pub.events._eventListener)
 
 
 /**
+ * Runs the default EasyRTC listener for a given event.
+ * 
+ * @param       {string} eventName      EasyRTC event name.
+ * @param       {...*} eventParam       The event parameters
+ */
+pub.events.emitDefault = function(){
+    if (!pub.events.defaultListeners[arguments['0']]) {
+        console.error("Error emitting listener. No default for event '" + arguments['0'] + "' exists.");
+        return;
+    }
+    pub.events.defaultListeners[Array.prototype.shift.call(arguments)].apply(this, arguments);
+};
+
+
+/**
  * Resets the listener for a given event to the default listener. Removes other listeners.
  *
  * @param       {string} eventName      EasyRTC event name.
  */
 pub.events.setDefaultListener = function(eventName) {
     if (!_.isFunction(pub.events.defaultListeners[eventName])) {
-        console.log("Error setting default listener. No default for event '" + eventName + "' exists.");
+        console.error("Error setting default listener. No default for event '" + eventName + "' exists.");
     }
     pub.events._eventListener.removeAllListeners(eventName);
     pub.events._eventListener.on(eventName, pub.events.defaultListeners[eventName]);
@@ -226,33 +241,36 @@ pub.events.setDefaultListeners = function() {
  * Map of EasyRTC event listener names to their default functions. This map can be used to run a default function manually.
  */
 pub.events.defaultListeners = {
-    "authenticate":         eventListener.onAuthenticate,
-    "authenticated":        eventListener.onAuthenticated,
-    "connection" :          eventListener.onConnection,
-    "disconnect":           eventListener.onDisconnect,
-    "roomCreate":           eventListener.onRoomCreate,
-    "roomJoin":             eventListener.onRoomJoin,
-    "roomLeave":            eventListener.onRoomLeave,
-    "log" :                 eventListener.onLog,
-    "shutdown":             eventListener.onShutdown,
-    "startup" :             eventListener.onStartup,
+    "authenticate":             eventListener.onAuthenticate,
+    "authenticated":            eventListener.onAuthenticated,
+    "connection" :              eventListener.onConnection,
+    "disconnect":               eventListener.onDisconnect,
+    "getIceConfig":             eventListener.onGetIceConfig,
+    "roomCreate":               eventListener.onRoomCreate,
+    "roomJoin":                 eventListener.onRoomJoin,
+    "roomLeave":                eventListener.onRoomLeave,
+    "log":                      eventListener.onLog,
+    "shutdown":                 eventListener.onShutdown,
+    "startup":                  eventListener.onStartup,
 
-    "easyrtcAuth" :         eventListener.onEasyrtcAuth,
-    "easyrtcCmd":           eventListener.onEasyrtcCmd,
-    "easyrtcMsg" :          eventListener.onEasyrtcMsg,
+    "easyrtcAuth":              eventListener.onEasyrtcAuth,
+    "easyrtcCmd":               eventListener.onEasyrtcCmd,
+    "easyrtcMsg":               eventListener.onEasyrtcMsg,
 
-    "emitEasyrtcCmd":       eventListener.onEmitEasyrtcCmd,
-    "emitEasyrtcMsg":       eventListener.onEmitEasyrtcMsg,
-    "emitError":            eventListener.onEmitError,
+    "emitEasyrtcCmd":           eventListener.onEmitEasyrtcCmd,
+    "emitEasyrtcMsg":           eventListener.onEmitEasyrtcMsg,
+    "emitError":                eventListener.onEmitError,
 
-    "emitReturnAck":        eventListener.onEmitReturnAck,
-    "emitReturnError":      eventListener.onEmitReturnError,
-    "emitReturnToken":      eventListener.onEmitReturnToken,
+    "emitReturnAck":            eventListener.onEmitReturnAck,
+    "emitReturnError":          eventListener.onEmitReturnError,
+    "emitReturnToken":          eventListener.onEmitReturnToken,
 
-    "msgTypeGetRoomList":   eventListener.onMsgTypeGetRoomList,
-    "msgTypeRoomJoin":      eventListener.onMsgTypeRoomJoin,
-    "msgTypeRoomLeave":     eventListener.onMsgTypeRoomLeave,
-    "msgTypeSetPresence":   eventListener.onMsgTypeSetPresence
+    "msgTypeGetIceConfig":      eventListener.onMsgTypeGetIceConfig,
+    "msgTypeGetRoomList":       eventListener.onMsgTypeGetRoomList,
+    "msgTypeRoomJoin":          eventListener.onMsgTypeRoomJoin,
+    "msgTypeRoomLeave":         eventListener.onMsgTypeRoomLeave,
+    "msgTypeSetPresence":       eventListener.onMsgTypeSetPresence,
+    "msgTypeSetRoomApiField":   eventListener.onMsgTypeSetRoomApiField
 };
 
 
@@ -430,8 +448,11 @@ pub.util.getErrorText = function(errorCode) {
         case "LOGIN_TIMEOUT":               return "Login has timed out. Socket will be disconnected."; break;
         case "MSG_REJECT_BAD_DATA":         return "Message rejected. The provided msgData is improper."; break;
         case "MSG_REJECT_BAD_ROOM":         return "Message rejected. Requested room is invalid or does not exist."; break;
+        case "MSG_REJECT_BAD_FIELD":        return "Message rejected. Problem with field structure or name."; break;
+        case "MSG_REJECT_BAD_SIZE":         return "Message rejected. Packet size is too large."; break;
         case "MSG_REJECT_BAD_STRUCTURE":    return "Message rejected. The provided structure is improper."; break;
         case "MSG_REJECT_BAD_TYPE":         return "Message rejected. The provided msgType is unsupported."; break;
+        case "MSG_REJECT_GEN_FAIL":         return "Message rejected. General failure occured."; break;
         case "MSG_REJECT_NO_AUTH":          return "Message rejected. Not logged in or client not authorized."; break;
         case "MSG_REJECT_NO_ROOM_LIST":     return "Message rejected. Room list unavailable."; break;
         case "MSG_REJECT_PRESENCE":         return "Message rejected. Presence could could not be set."; break;
@@ -676,6 +697,15 @@ pub.util.isValidIncomingMessage = function(type, msg, appObj, callback) {
                     }
                     break;
 
+                case "getIceConfig" :
+                    if (msg.msgData !== undefined && !_.isEmpty(msg.msgData )) {
+console.log("ACK1 ", msg.msgData !== undefined);
+console.log("ACK1 ", !_.isEmpty(msg.msgData));
+                        callback(null, false, "MSG_REJECT_BAD_DATA");
+                        return;
+                    }
+                    break;
+
                 case "getRoomList" :
                     if (msg.msgData !== undefined) {
                         callback(null, false, "MSG_REJECT_BAD_DATA");
@@ -738,6 +768,38 @@ pub.util.isValidIncomingMessage = function(type, msg, appObj, callback) {
                     }
                     break;
 
+                case "setRoomApiField" :
+                    if (!_.isObject(msg.msgData)) {
+                        callback(null, false, "MSG_REJECT_BAD_DATA");
+                        return;
+                    }
+                    if (!_.isObject(msg.msgData.setRoomApiField) || _.isEmpty(msg.msgData.setRoomApiField)) {
+                        callback(null, false, "MSG_REJECT_BAD_STRUCTURE");
+                        return;
+                    }
+                    if (!_.isString(msg.msgData.setRoomApiField.roomName) || !getOption("roomNameRegExp").test(msg.msgData.setRoomApiField.roomName)) {
+                        callback(null, false, "MSG_REJECT_BAD_ROOM");
+                        return;
+                    }
+                    if (msg.msgData.setRoomApiField.field !== undefined){
+                        if (!_.isObject(msg.msgData.setRoomApiField.field)){
+                            callback(null, false, "MSG_REJECT_BAD_STRUCTURE");
+                            return;
+                        }
+                        try {
+                            if (JSON.stringify(msg.msgData.setRoomApiField.field).length >= 4096) {
+                                callback(null, false, "MSG_REJECT_BAD_SIZE");
+                                return;
+                            }
+                        } catch (e){
+                            if (!_.isObject(msg.msgData.setRoomApiField.field)){
+                                callback(null, false, "MSG_REJECT_BAD_STRUCTURE");
+                                return;
+                            }
+                        }
+                    }
+                    break;
+
                 case "setUserCfg" :
                     if (!_.isObject(msg.msgData)) {
                         callback(null, false, "MSG_REJECT_BAD_DATA");
@@ -757,12 +819,6 @@ pub.util.isValidIncomingMessage = function(type, msg, appObj, callback) {
 
                     // setUserCfg.userSettings
                     if (msg.msgData.setUserCfg.userSettings !== undefined && (!_.isObject(msg.msgData.setUserCfg.userSettings) || _.isEmpty(msg.msgData.setUserCfg.userSettings))) {
-                        callback(null, false, "MSG_REJECT_BAD_STRUCTURE");
-                        return;
-                    }
-
-                    // setUserCfg.apiField
-                    if (msg.msgData.setUserCfg.apiField !== undefined && (!_.isObject(msg.msgData.setUserCfg.apiField) || _.isEmpty(msg.msgData.setUserCfg.apiField))) {
                         callback(null, false, "MSG_REJECT_BAD_STRUCTURE");
                         return;
                     }
@@ -980,7 +1036,7 @@ pub.app = function(appName, callback) {
 
 
     /**
-     * Returns the application name.
+     * Returns the application name for the application. Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
      *
      * @memberof    pub.appObj
      * @return      {string}    The application name.
@@ -1086,19 +1142,26 @@ pub.app = function(appName, callback) {
 
 
     /**
-     * Returns an array of all session keys within the application
+     * Returns an array of all easyrtcsid's within the application
      *
      * @memberof    pub.appObj
-     * @param       {function(Error, Array.&lt;string>)} callback Callback with error and array containing session keys.
+     * @param       {function(Error, Array.&lt;string>)} callback Callback with error and array containing easyrtcsid's.
      */
-    appObj.getSessionKeys = function(callback) {
-        var sessionKeys = new Array();
+    appObj.getEasyrtcsids = function(callback) {
+        var easyrtcsids = new Array();
         for (var key in e.app[appName].session) {
-            sessionKeys.push(key);
+            easyrtcsids.push(key);
         };
-        callback(null, sessionKeys);
+        callback(null, easyrtcsids);
     };
 
+    /**
+     * Returns an array of all easyrtcsid's within the application. Old SessionKey name kept for transition purposes. Use getEasyrtcsid();
+     *
+     * @memberof    pub.appObj
+     * @ignore
+     */
+    appObj.getSessionKeys = appObj.getEasyrtcsids;
 
     /**
      * Sets individual option. Set value to NULL to delete the option (thus reverting to global option).
@@ -1138,7 +1201,7 @@ pub.app = function(appName, callback) {
      * @param       {nextCallback} [next]       A success callback of form next(err).
      */
     appObj.setField = function(fieldName, fieldValue, fieldOption, next) {
-        pub.util.logDebug("Application [" + appName + "] - Setting field [" + fieldName + "]", fieldValue);
+        pub.util.logDebug("["+appName+"] Setting field [" + fieldName + "]", fieldValue);
         if (!_.isFunction(next)) {
             next = pub.util.nextToNowhere;
         }
@@ -1228,6 +1291,17 @@ pub.app = function(appName, callback) {
 
 
         /**
+         * Returns the application name for the application to which the connection belongs. Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
+         *
+         * @memberof    pub.appObj.connectionObj
+         * @return      {string}    The application name
+         */
+        connectionObj.getAppName = function() {
+            return appName;
+        };
+
+
+        /**
          * Returns the session object to which the connection belongs (if one exists). Returns a null if connection is not attached to a session (such as when sessions are disabled). Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
          *
          * @memberof    pub.appObj.connectionObj
@@ -1311,8 +1385,8 @@ pub.app = function(appName, callback) {
          */
         connectionObj.getSessionObj = function(callback) {
             // TODO: Remove this method. Use getSession() instead.
-            if (e.app[appName].connection[easyrtcid] && e.app[appName].connection[easyrtcid].toSession && e.app[appName].connection[easyrtcid].toSession.sessionKey){
-                appObj.session(e.app[appName].connection[easyrtcid].toSession.sessionKey, callback);
+            if (e.app[appName].connection[easyrtcid] && e.app[appName].connection[easyrtcid].toSession && e.app[appName].connection[easyrtcid].toSession.easyrtcsid){
+                appObj.session(e.app[appName].connection[easyrtcid].toSession.easyrtcsid, callback);
             }
             else {
                 callback(null,null);
@@ -1327,19 +1401,19 @@ pub.app = function(appName, callback) {
          * @param       {Boolean}   isAuthenticated True/false as to if the connection should be considered authenticated.
          * @param       {nextCallback} next         A success callback of form next(err).
          */
-        connectionObj.joinSession = function(sessionKey, next) {
-            if (!e.app[appName].session[sessionKey]) {
-                next(new pub.util.ConnectionWarning("[" + easyrtcid + "] [" + sessionKey + "]Session does not exist. Could not join session"));
+        connectionObj.joinSession = function(easyrtcsid, next) {
+            if (!e.app[appName].session[easyrtcsid]) {
+                next(new pub.util.ConnectionWarning("["+appName+"]["+easyrtcid+"] Session [" + easyrtcsid + "] does not exist. Could not join session"));
                 return;
             }
 
-            appObj.session(sessionKey, function(err, sessionObj){
+            appObj.session(easyrtcsid, function(err, sessionObj){
                 if (err) {
                     next(err);
                     return;
                 }
 
-                e.app[appName].connection[easyrtcid].toSession = e.app[appName].session[sessionKey];
+                e.app[appName].connection[easyrtcid].toSession = e.app[appName].session[easyrtcsid];
 
                 // Set local session object
                 _sessionObj = sessionObj;
@@ -1388,7 +1462,7 @@ pub.app = function(appName, callback) {
          * @param       {nextCallback} [next]       A success callback of form next(err). Possible err will be instanceof (ApplicationWarning).
          */
         connectionObj.setField = function(fieldName, fieldValue, fieldOption, next) {
-            pub.util.logDebug("Application [" + appName + "], Connection [" + easyrtcid + "] - Setting field [" + fieldName + "]", fieldValue);
+            pub.util.logDebug("["+appName+"]["+easyrtcid+"] - Setting field [" + fieldName + "]", fieldValue);
             if (!_.isFunction(next)) {
                 next = pub.util.nextToNowhere;
             }
@@ -1452,7 +1526,7 @@ pub.app = function(appName, callback) {
          * @param       {Object}    callback        Callback of form (err, roomDataObj) which will contain the roomDataObj including all updated rooms of the connection and is designed to be returnable to the connection.
          */
         connectionObj.emitRoomDataDelta = function(isLeavingAllRooms, callback) {
-            pub.util.logDebug("[" + easyrtcid + "] Running func 'connectionObj.emitRoomDataDelta'");
+            pub.util.logDebug("["+appName+"]["+easyrtcid+"] Running func 'connectionObj.emitRoomDataDelta'");
             if (!_.isFunction(callback)) {
                 callback = function(err, roomDataObj) {};
             }
@@ -1531,9 +1605,9 @@ pub.app = function(appName, callback) {
 
                 var connectionRoom = e.app[appName].connection[easyrtcid].room[currentRoomName];
                 roomData[currentRoomName] = {
-                    roomName: currentRoomName,
-                    roomStatus:roomStatus,
-                    clientList:{}
+                    "roomName":         currentRoomName,
+                    "roomStatus":       roomStatus,
+                    "clientList":       {}
                 };
 
                 // Empty current clientList
@@ -1541,20 +1615,25 @@ pub.app = function(appName, callback) {
 
                 // Fill connection clientList, and roomData clientList for current room
                 for (var currentEasyrtcid in connectionRoom.toRoom.clientList) {
+
+                    var currentToConnection = connectionRoom.toRoom.clientList[currentEasyrtcid].toConnection;
+
                     connectionRoom.clientList[currentEasyrtcid] = {
-                        toConnection:connectionRoom.toRoom.clientList[currentEasyrtcid].toConnection
+                        "toConnection": currentToConnection
                     };
 
                     roomData[currentRoomName].clientList[currentEasyrtcid] = {
-                        easyrtcid:      currentEasyrtcid,
-                        roomJoinTime:   connectionRoom.toRoom.clientList[currentEasyrtcid].toConnection.room[currentRoomName].enteredOn,
-                        presence:       connectionRoom.toRoom.clientList[currentEasyrtcid].toConnection.presence
+                        "easyrtcid":    currentEasyrtcid,
+                        "roomJoinTime": currentToConnection.room[currentRoomName].enteredOn,
+                        "presence":     currentToConnection.presence
                     };
-                    if(!_.isEmpty(connectionRoom.toRoom.clientList[currentEasyrtcid].toConnection.apiField)) {
-                        roomData[currentRoomName].clientList[currentEasyrtcid].apiField= connectionRoom.toRoom.clientList[currentEasyrtcid].toConnection.apiField;
+
+                    if (currentToConnection.room[currentRoomName] && (!_.isEmpty(currentToConnection.room[currentRoomName].apiField))){
+                        roomData[currentRoomName].clientList[currentEasyrtcid].apiField= currentToConnection.room[currentRoomName].apiField;
                     }
-                    if(connectionRoom.toRoom.clientList[currentEasyrtcid].toConnection.username) {
-                        roomData[currentRoomName].clientList[currentEasyrtcid].username= connectionRoom.toRoom.clientList[currentEasyrtcid].toConnection.username;
+
+                    if(currentToConnection.username) {
+                        roomData[currentRoomName].clientList[currentEasyrtcid].username= currentToConnection.username;
                     }
                 }
 
@@ -1565,8 +1644,8 @@ pub.app = function(appName, callback) {
                             roomData[currentRoomName].field = {};
                         }
                         roomData[currentRoomName].field[fieldName] = {
-                            fieldName:  fieldName,
-                            fieldValue: pub.util.deepCopy(connectionRoom.toRoom.field[fieldName].fieldValue)
+                            "fieldName":  fieldName,
+                            "fieldValue": pub.util.deepCopy(connectionRoom.toRoom.field[fieldName].fieldValue)
                         };
                     }
                 };
@@ -1586,7 +1665,7 @@ pub.app = function(appName, callback) {
          * @param       {Object}    callback        Callback of form (err, roomDataDelta).
          */
         connectionObj.generateRoomDataDelta = function(isLeavingRoom, callback) {
-            pub.util.logDebug("[" + easyrtcid + "] Running func 'connectionObj.generateRoomDataDelta'");
+            pub.util.logDebug("["+appName+"]["+easyrtcid+"] Running func 'connectionObj.generateRoomDataDelta'");
 
             var roomDataDelta = {};
 
@@ -1629,7 +1708,7 @@ pub.app = function(appName, callback) {
          * @param       {function(Error, Object)} callback Callback with error and roomList object.
          */
         connectionObj.generateRoomList = function(callback) {
-            pub.util.logDebug("[" + easyrtcid + "] Running func 'connectionObj.generateRoomList'");
+            pub.util.logDebug("["+appName+"]["+easyrtcid+"] Running func 'connectionObj.generateRoomList'");
             var roomList = {};
 
             for (var currentRoomName in e.app[appName].room) {
@@ -1643,23 +1722,39 @@ pub.app = function(appName, callback) {
 
 
         /**
-         * Gets connection authentication status for the connection.
+         * Gets connection authentication status for the connection. It is possible for a connection to become disconnected and keep the authenticated flag. Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
          *
          * @memberof    pub.appObj.connectionObj
-         * @param       {function(Error, Boolean)} callback Callback with error and authentication status.
+         * @returns     Boolean     Authentication status
          */
-        connectionObj.isAuthenticated = function(isAuthenticated, callback) {
-            if (e.app[appName].connection[easyrtcid].isAuthenticated == true) {
-                callback(null,true);
+        connectionObj.isAuthenticated = function(callback) {
+            if (e.app[appName].connection[easyrtcid] && e.app[appName].connection[easyrtcid].isAuthenticated == true) {
+                return true;
             } else {
-                callback(null,false);
+                return false;
             }
         };
 
 
         /**
-         * Returns a boolean to the callback indicating if connection is in a given room
+         * Gets connection status for the connection. It is possible for a connection to be considered connected without being authenticated. Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
          *
+         * @memberof    pub.appObj.connectionObj
+         * @returns     Boolean     Connection status
+         */
+        connectionObj.isConnected = function(callback) {
+            if (connectionObj.socket && connectionObj.socket.socket){
+                return connectionObj.socket.socket.connected;
+            }
+            else {
+                return false;
+            }
+        };
+
+
+        /**
+         * Returns a boolean to the callback indicating if connection is in a given group. NOT YET IMPLEMENTED
+         * @ignore
          * @memberof    pub.appObj.connectionObj
          * @param       {string}    groupName Group name to check.
          * @param       {function(Error, Boolean)} callback Callback with error and a boolean indicating if connection is in a room..
@@ -1700,7 +1795,7 @@ pub.app = function(appName, callback) {
          */
         connectionObj.joinRoom = function(roomName, callback) {
             if (!roomName || !appObj.getOption("roomNameRegExp").test(roomName)) {
-                pub.util.logWarning("[" + easyrtcid + "] Can not enter room with improper name: '" + roomName +"'");
+                pub.util.logWarning("["+appName+"]["+easyrtcid+"] Can not enter room with improper name: '" + roomName +"'");
                 callback(new pub.util.ConnectionWarning("Can not enter room with improper name: '" + roomName +"'"));
                 return;
             }
@@ -1716,7 +1811,7 @@ pub.app = function(appName, callback) {
             var createConnectionRoom = function(roomName, appRoomObj, callback) {
                 // Join room. Creates a default connection room object
                 e.app[appName].connection[easyrtcid].room[roomName] = {
-                    apiDefinedFields:   {},
+                    apiField:           {},
                     enteredOn:          Date.now(),
                     gotListOn:          Date.now(),
                     clientList:         {},
@@ -1746,7 +1841,7 @@ pub.app = function(appName, callback) {
                             createConnectionRoom(roomName, roomObj, callback);
                         });
                 } else {
-                    pub.util.logWarning("[" + easyrtcid + "] Can not enter room which doesn't exist: '" + roomName +"'");
+                    pub.util.logWarning("["+appName+"]["+easyrtcid+"] Can not enter room which doesn't exist: '" + roomName +"'");
                     callback(new pub.util.ConnectionWarning("Can not enter room which doesn't exist: '" + roomName +"'"));
                     return;
                 }
@@ -1818,6 +1913,17 @@ pub.app = function(appName, callback) {
 
 
             /**
+             * Returns the application name for the application to which the connection belongs. Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
+             *
+             * @memberof    pub.appObj.connectionObj.connectionRoomObj
+             * @return      {string}    The application name
+             */
+            connectionRoomObj.getAppName = function() {
+                return appName;
+            };
+
+
+            /**
              * Returns the connection object to which the connection belongs. Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
              *
              * @memberof    pub.appObj.connectionObj.connectionRoomObj
@@ -1867,7 +1973,7 @@ pub.app = function(appName, callback) {
              * @param       {boolean}   isLeavingRoom   Is connection leaving the room?
              */
             connectionRoomObj.emitRoomDataDelta = function(isLeavingRoom, callback) {
-                pub.util.logDebug("[" + easyrtcid + "][" + roomName + "] Running func 'connectionRoomObj.emitRoomDataDelta'");
+                pub.util.logDebug("["+appName+"]["+easyrtcid+"] Room [" + roomName + "] Running func 'connectionRoomObj.emitRoomDataDelta'");
                 if (!_.isFunction(callback)) {
                     callback = function(err, roomDataObj) {};
                 }
@@ -1900,7 +2006,7 @@ pub.app = function(appName, callback) {
              * @param       {boolean}   isLeavingRoom   Is connection leaving the room?
              */
             connectionRoomObj.generateRoomDataDelta = function(isLeavingRoom, callback) {
-                pub.util.logDebug("[" + easyrtcid + "][" + roomName + "] Running func 'connectionRoomObj.generateRoomDataDelta'");
+                pub.util.logDebug("["+appName+"]["+easyrtcid+"] Room [" + roomName + "] Running func 'connectionRoomObj.generateRoomDataDelta'");
                 if (!_.isFunction(callback)) {
                     next = pub.util.nextToNowhere;
                 }
@@ -1918,8 +2024,8 @@ pub.app = function(appName, callback) {
                         "presence":       e.app[appName].connection[easyrtcid].presence
                     };
 
-                    if(!_.isEmpty(e.app[appName].connection[easyrtcid].apiField)) {
-                        roomDataDelta.clientListDelta.updateClient[easyrtcid].apiField= e.app[appName].connection[easyrtcid].apiField;
+                    if(!_.isEmpty(e.app[appName].connection[easyrtcid].room[roomName].apiField)) {
+                        roomDataDelta.clientListDelta.updateClient[easyrtcid].apiField= e.app[appName].connection[easyrtcid].room[roomName].apiField;
                     }
                     if(e.app[appName].connection[easyrtcid].username) {
                         roomDataDelta.clientListDelta.updateClient[easyrtcid].username= e.app[appName].connection[easyrtcid].username;
@@ -1929,6 +2035,20 @@ pub.app = function(appName, callback) {
                 callback(null, roomDataDelta);
             };
 
+            /**
+             * Sets the API field for the current connection in a room.
+             *
+             * @memberof    pub.appObj.connectionObj.connectionRoomObj
+             * @param       {boolean}   isLeavingRoom   Is connection leaving the room?
+             */
+            connectionRoomObj.setApiField = function(apiFieldObj, next){
+                if (!_.isFunction(next)) {
+                    next = pub.util.nextToNowhere;
+                }
+
+                e.app[appName].connection[easyrtcid].room[roomName].apiField = pub.util.deepCopy(apiFieldObj);
+                next(null);
+            };
 
             // Set the roomObj before returning the connectioRoomObj
             appObj.room(roomName,
@@ -1957,7 +2077,7 @@ pub.app = function(appName, callback) {
 
         // Before returning connectionObj, join the connection to a session (if available).
         if (e.app[appName].connection[easyrtcid].toSession) {
-            appObj.session(e.app[appName].connection[easyrtcid].toSession.sessionKey, function(err, sessionObj){
+            appObj.session(e.app[appName].connection[easyrtcid].toSession.easyrtcsid, function(err, sessionObj){
                 if (err) {
                     callback(err);
                     return;
@@ -1998,7 +2118,6 @@ pub.app = function(appName, callback) {
             isAuthenticated:false,
             userName:       null,
             credential:     null,
-            apiField:       {},
             field:          {},
             group:          {},
             presence: {
@@ -2106,35 +2225,35 @@ pub.app = function(appName, callback) {
 
 
     /**
-     * Creates a new session with a provided session key
+     * Creates a new session with a provided easyrtcsid
      *
      * @memberof    pub.appObj
-     * @param       {string}    sessionKey  Session key. Must be formatted according to "sessionKeyRegExp" option.
-     * @param       {function(Error, Object)} callback Callback with error and object containing EasyRTC session object (same as calling session(sessionKey))
+     * @param       {string}    easyrtcsid  EasyRTC Session Identifier. Must be formatted according to "easyrtcsidRegExp" option.
+     * @param       {function(Error, Object)} callback Callback with error and object containing EasyRTC session object (same as calling session(easyrtcsid))
      */
-    appObj.createSession = function(sessionKey, callback) {
-        pub.util.logDebug("["+appObj.getAppName()+"] Creating session ["+sessionKey+"]");
+    appObj.createSession = function(easyrtcsid, callback) {
+        pub.util.logDebug("["+appObj.getAppName()+"] Creating session ["+easyrtcsid+"]");
 
-        if (!sessionKey || !appObj.getOption("sessionKeyRegExp").test(sessionKey)) {
-            pub.util.logWarning("Can not create session with improper name ["+sessionKey+"]");
-            callback(new pub.util.ConnectionWarning("Can not create session with improper name ["+sessionKey+"]"));
+        if (!easyrtcsid || !appObj.getOption("easyrtcsidRegExp").test(easyrtcsid)) {
+            pub.util.logWarning("Can not create session with improper name ["+easyrtcsid+"]");
+            callback(new pub.util.ConnectionWarning("Can not create session with improper name ["+easyrtcsid+"]"));
             return;
         }
 
-        if (e.app[appName].session[sessionKey]) {
-            pub.util.logWarning("Can not create session which already exists ["+sessionKey+"]");
-            callback(new pub.util.ConnectionWarning("Can not create session which already exists ["+sessionKey+"]"));
+        if (e.app[appName].session[easyrtcsid]) {
+            pub.util.logWarning("Can not create session which already exists ["+easyrtcsid+"]");
+            callback(new pub.util.ConnectionWarning("Can not create session which already exists ["+easyrtcsid+"]"));
             return;
         }
 
         // Set the session structure with some default values
-        e.app[appName].session[sessionKey] = {
-            "sessionKey": sessionKey,
+        e.app[appName].session[easyrtcsid] = {
+            "easyrtcsid": easyrtcsid,
             "startOn"   : Date.now(),
             "field"     : {}
         };
 
-        appObj.session(sessionKey, callback);
+        appObj.session(easyrtcsid, callback);
     };
 
 
@@ -2156,8 +2275,8 @@ pub.app = function(appName, callback) {
      * @memberof    pub.appObj
      * @param       {function(Error, {boolean})} callback Callback with error and boolean of whether session is defined.
      */
-    appObj.isSession = function (sessionKey, callback) {
-        callback(null, (e.app[appName].session[sessionKey]?true:false));
+    appObj.isSession = function (easyrtcsid, callback) {
+        callback(null, (e.app[appName].session[easyrtcsid]?true:false));
     };
 
 
@@ -2257,6 +2376,17 @@ pub.app = function(appName, callback) {
          */
         roomObj.getApp = function() {
             return appObj;
+        };
+
+
+        /**
+         * Returns the application name for the application to which the room belongs. Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
+         *
+         * @memberof    pub.appObj.roomObj
+         * @return      {string}    The application object
+         */
+        roomObj.getAppName = function() {
+            return appName;
         };
 
 
@@ -2405,7 +2535,7 @@ pub.app = function(appName, callback) {
          * @param       {nextCallback} [next]       A success callback of form next(err). Possible err will be instanceof (ApplicationWarning).
          */
         roomObj.setField = function(fieldName, fieldValue, fieldOption, next) {
-            pub.util.logDebug("Application [" + appName + "], Room [" + roomName + "] - Setting field [" + fieldName + "]", fieldValue);
+            pub.util.logDebug("["+appName+"] Room [" + roomName + "] - Setting field [" + fieldName + "]", fieldValue);
             if (!_.isFunction(next)) {
                 next = pub.util.nextToNowhere;
             }
@@ -2472,18 +2602,18 @@ pub.app = function(appName, callback) {
 
 
     /**
-     * NOT YET IMPLEMENTED - Gets session object for a given session key. Returns null if session not found.
+     * NOT YET IMPLEMENTED - Gets session object for a given easyrtcsid. Returns null if session not found.
      * The returned session object includes functions for managing session fields.
      *
      * @memberof    pub.appObj
-     * @param       {string}    Session key
+     * @param       {string}    easyrtcsid
      * @param       {function(Error, Object)} callback Callback with error and object containing EasyRTC session object.
      */
-    appObj.session = function(sessionKey, callback) {
+    appObj.session = function(easyrtcsid, callback) {
 
-        if (!e.app[appName].session[sessionKey]) {
-            pub.util.logWarning("Attempt to request non-existent session key: '" + sessionKey +"'");
-            callback(new pub.util.ApplicationWarning("Attempt to request non-existent session key: '" + sessionKey +"'"));
+        if (!e.app[appName].session[easyrtcsid]) {
+            pub.util.logWarning("Attempt to request non-existent easyrtcsid: '" + easyrtcsid +"'");
+            callback(new pub.util.ApplicationWarning("Attempt to request non-existent easyrtcsid: '" + easyrtcsid +"'"));
             return;
         }
 
@@ -2524,14 +2654,33 @@ pub.app = function(appName, callback) {
 
 
         /**
-         * Returns the session key for the session.  Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
+         * Returns the application name for the application to which the session belongs. Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
          *
          * @memberof    pub.appObj.sessionObj
-         * @return      {string}    Returns the session key, which is the EasyRTC unique identifier for a session.
+         * @return      {string}    The application name
          */
-        sessionObj.getSessionKey = function() {
-            return sessionKey;
+        sessionObj.getAppName = function() {
+            return appName;
         };
+
+
+        /**
+         * Returns the easyrtcsid for the session.  Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
+         *
+         * @memberof    pub.appObj.sessionObj
+         * @return      {string}    Returns the easyrtcsid, which is the EasyRTC unique identifier for a session.
+         */
+        sessionObj.getEasyrtcsid = function() {
+            return easyrtcsid;
+        };
+
+        /**
+         * Returns the easyrtcsid for the session. Old SessionKey name kept for transition purposes. Use getEasyrtcsid();
+         * 
+         * @memberof    pub.appObj.sessionObj
+         * @ignore
+         */
+        sessionObj.getSessionKey = sessionObj.getEasyrtcsid;
 
 
         /**
@@ -2542,12 +2691,12 @@ pub.app = function(appName, callback) {
          * @param       {function(Error, Object)} callback Callback with error and field value (any type)
          */
         sessionObj.getField = function(fieldName, callback) {
-            if (!e.app[appName].session[sessionKey].field[fieldName]) {
+            if (!e.app[appName].session[easyrtcsid].field[fieldName]) {
                 pub.util.logDebug("Can not find session field: '" + fieldName +"'");
                 callback(new pub.util.ApplicationWarning("Can not find session field: '" + fieldName +"'"));
                 return;
             }
-            callback(null, pub.util.deepCopy(e.app[appName].session[sessionKey].field[fieldName]));
+            callback(null, pub.util.deepCopy(e.app[appName].session[easyrtcsid].field[fieldName]));
         };
 
 
@@ -2560,11 +2709,11 @@ pub.app = function(appName, callback) {
          */
         sessionObj.getFields = function(limitToIsShared, callback) {
             var fieldObj = {};
-            for (var fieldName in e.app[appName].session[sessionKey].field) {
-                if (!limitToIsShared || e.app[appName].session[sessionKey].field[fieldName].fieldOption.isShared) {
+            for (var fieldName in e.app[appName].session[easyrtcsid].field) {
+                if (!limitToIsShared || e.app[appName].session[easyrtcsid].field[fieldName].fieldOption.isShared) {
                     fieldObj[fieldName] = {
                         fieldName:fieldName,
-                        fieldValue: pub.util.deepCopy(e.app[appName].session[sessionKey].field[fieldName].fieldValue)
+                        fieldValue: pub.util.deepCopy(e.app[appName].session[easyrtcsid].field[fieldName].fieldValue)
                     };
                 }
             };
@@ -2582,7 +2731,7 @@ pub.app = function(appName, callback) {
          * @param       {nextCallback} [next]       A success callback of form next(err). Possible err will be instanceof (ApplicationWarning).
          */
         sessionObj.setField = function(fieldName, fieldValue, fieldOption, next) {
-            pub.util.logDebug("Application [" + appName + "], Session [" + sessionKey + "] - Setting field [" + fieldName + "]", fieldValue);
+            pub.util.logDebug("["+appName+"] Session [" + easyrtcsid + "] - Setting field [" + fieldName + "]", fieldValue);
             if (!_.isFunction(next)) {
                 next = pub.util.nextToNowhere;
             }
@@ -2593,7 +2742,7 @@ pub.app = function(appName, callback) {
                 return;
             }
 
-            e.app[appName].session[sessionKey].field[fieldName] = {
+            e.app[appName].session[easyrtcsid].field[fieldName] = {
                 fieldName:fieldName,
                 fieldValue:fieldValue,
                 fieldOption:{isShared: ((_.isObject(fieldOption) && fieldOption.isShared)?true:false)}
@@ -2662,7 +2811,7 @@ pub.events.setDefaultListeners();
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Oct 28 2013 13:32:13 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Sun Nov 17 2013 20:03:35 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>

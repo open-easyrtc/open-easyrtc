@@ -80,7 +80,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line919">line 919</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line975">line 975</a>
     </li></ul></dd>
     
     
@@ -173,7 +173,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line944">line 944</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1000">line 1000</a>
     </li></ul></dd>
     
     
@@ -227,7 +227,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line952">line 952</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1008">line 1008</a>
     </li></ul></dd>
     
     
@@ -363,7 +363,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1142">line 1142</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1205">line 1205</a>
     </li></ul></dd>
     
     
@@ -503,7 +503,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1954">line 1954</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line2074">line 2074</a>
     </li></ul></dd>
     
     
@@ -694,7 +694,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line2018">line 2018</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line2137">line 2137</a>
     </li></ul></dd>
     
     
@@ -722,7 +722,7 @@
         
             
 <dt>
-    <h4 class="name" id="appObj.createSession"><span class="type-signature">&lt;static> </span>appObj.createSession<span class="signature">(sessionKey, callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="appObj.createSession"><span class="type-signature">&lt;static> </span>appObj.createSession<span class="signature">(easyrtcsid, callback)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -730,7 +730,7 @@
     
     
     <div class="description">
-        Creates a new session with a provided session key
+        Creates a new session with a provided easyrtcsid
     </div>
     
 
@@ -764,7 +764,7 @@
 	
         <tr>
             
-                <td class="name"><code>sessionKey</code></td>
+                <td class="name"><code>easyrtcsid</code></td>
             
             
             <td class="type">
@@ -780,7 +780,7 @@
             
             
             
-            <td class="description last">Session key. Must be formatted according to "sessionKeyRegExp" option.</td>
+            <td class="description last">EasyRTC Session Identifier. Must be formatted according to "easyrtcsidRegExp" option.</td>
         </tr>
 	
 	
@@ -803,7 +803,7 @@
             
             
             
-            <td class="description last">Callback with error and object containing EasyRTC session object (same as calling session(sessionKey))</td>
+            <td class="description last">Callback with error and object containing EasyRTC session object (same as calling session(easyrtcsid))</td>
         </tr>
 	
 	
@@ -834,7 +834,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line2088">line 2088</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line2207">line 2207</a>
     </li></ul></dd>
     
     
@@ -870,7 +870,7 @@
     
     
     <div class="description">
-        Returns the application name.
+        Returns the application name for the application. Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
     </div>
     
 
@@ -903,7 +903,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line961">line 961</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1017">line 1017</a>
     </li></ul></dd>
     
     
@@ -1042,7 +1042,124 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line972">line 972</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1028">line 1028</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="appObj.getEasyrtcsids"><span class="type-signature">&lt;static> </span>appObj.getEasyrtcsids<span class="signature">(callback)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Returns an array of all easyrtcsid's within the application
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Callback with error and array containing easyrtcsid's.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1123">line 1123</a>
     </li></ul></dd>
     
     
@@ -1182,7 +1299,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line988">line 988</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1044">line 1044</a>
     </li></ul></dd>
     
     
@@ -1322,7 +1439,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1005">line 1005</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1061">line 1061</a>
     </li></ul></dd>
     
     
@@ -1439,7 +1556,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1025">line 1025</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1081">line 1081</a>
     </li></ul></dd>
     
     
@@ -1556,7 +1673,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1041">line 1041</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1097">line 1097</a>
     </li></ul></dd>
     
     
@@ -1695,124 +1812,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1052">line 1052</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="appObj.getSessionKeys"><span class="type-signature">&lt;static> </span>appObj.getSessionKeys<span class="signature">(callback)</span><span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Returns an array of all session keys within the application
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">Callback with error and array containing session keys.</td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1067">line 1067</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1108">line 1108</a>
     </li></ul></dd>
     
     
@@ -1952,7 +1952,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line2145">line 2145</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line2264">line 2264</a>
     </li></ul></dd>
     
     
@@ -2092,7 +2092,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line2121">line 2121</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line2240">line 2240</a>
     </li></ul></dd>
     
     
@@ -2209,7 +2209,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line2132">line 2132</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line2251">line 2251</a>
     </li></ul></dd>
     
     
@@ -2349,7 +2349,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line2193">line 2193</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line2312">line 2312</a>
     </li></ul></dd>
     
     
@@ -2377,7 +2377,7 @@
         
             
 <dt>
-    <h4 class="name" id="appObj.session"><span class="type-signature">&lt;static> </span>appObj.session<span class="signature">(Session, callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="appObj.session"><span class="type-signature">&lt;static> </span>appObj.session<span class="signature">(easyrtcsid, callback)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -2385,7 +2385,7 @@
     
     
     <div class="description">
-        NOT YET IMPLEMENTED - Gets session object for a given session key. Returns null if session not found.The returned session object includes functions for managing session fields.
+        NOT YET IMPLEMENTED - Gets session object for a given easyrtcsid. Returns null if session not found.The returned session object includes functions for managing session fields.
     </div>
     
 
@@ -2419,7 +2419,7 @@
 	
         <tr>
             
-                <td class="name"><code>Session</code></td>
+                <td class="name"><code>easyrtcsid</code></td>
             
             
             <td class="type">
@@ -2435,7 +2435,7 @@
             
             
             
-            <td class="description last">key</td>
+            <td class="description last"></td>
         </tr>
 	
 	
@@ -2489,7 +2489,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line2455">line 2455</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line2585">line 2585</a>
     </li></ul></dd>
     
     
@@ -2713,7 +2713,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1113">line 1113</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1176">line 1176</a>
     </li></ul></dd>
     
     
@@ -2873,7 +2873,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1084">line 1084</a>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line1147">line 1147</a>
     </li></ul></dd>
     
     
@@ -2942,7 +2942,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Oct 28 2013 13:32:14 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Sun Nov 17 2013 20:03:36 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>

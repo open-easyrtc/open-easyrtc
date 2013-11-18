@@ -51,8 +51,8 @@ var eu          = require("./easyrtc_util");        // EasyRTC utility functions
 eventListener = module.exports;
 
 /**
- * Default listener for handling authentication. By default everyone gets in!
- *
+ * Default listener for event "authenticate". This event is called as part of the authentication process. To deny authentication, call the next() with an Error. By default everyone gets in!
+ * 
  * @param       {Object} socket         Socket.io socket object. References the individual connection socket. 
  * @param       {String} easyrtcid      Unique identifier for an EasyRTC connection.
  * @param       {string} appName        Application name which uniquely identifies it on the server.
@@ -67,7 +67,7 @@ eventListener.onAuthenticate = function(socket, easyrtcid, appName, username, cr
 
 
 /**
- * Listener which is called after a connection is authenticated and the connection object is generated and requested rooms are joined. Call next(err) to continue the connection procedure.
+ * Default listener for event "authenticated". This event is called after a connection is authenticated and the connection object is generated and requested rooms are joined. Call next(err) to continue the connection procedure.
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {nextCallback} next     A success callback of form next(err).
@@ -78,7 +78,7 @@ eventListener.onAuthenticated = function(connectionObj, next) {
 
 
 /**
- * Listener to be run upon a new socket connection
+ * Default listener for event "connection". This event is called when socket.io accepts a new connection.
  *
  * @param       {Object} socket         Socket.io socket object. References the individual connection socket. 
  * @param       {String} easyrtcid      Unique identifier for an EasyRTC connection.
@@ -105,7 +105,7 @@ eventListener.onConnection = function(socket, easyrtcid, next){
 
 
 /**
- * Default listener fired when socket.io reports a socket has disconnected.
+ * Default listener for event "disconnect". This event is called when socket.io detects a disconnection. Disconnections can occur due to either side purposefully dropping a connection, network disconnection, or time out. 
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {nextCallback} next     A success callback of form next(err).
@@ -120,17 +120,18 @@ eventListener.onDisconnect = function(connectionObj, next){
         },
         function(roomNames, asyncCallback) {
             // leave all rooms
-            for(var i = 0; i &lt; roomNames.length; i++) {
-                connectionObj.room(roomNames[i], function(err, roomObj){
-                    if (err) {return;}
-                    roomObj.leaveRoom();
-                });
-            }
-            asyncCallback(null);
+            async.each(roomNames,
+                function(currentRoomName, asyncEachCallback) {
+                    pub.events.emit("roomLeave", connectionObj, currentRoomName, function(err){asyncEachCallback(null);});
+                },
+                function(err){
+                    asyncCallback(null);
+                }
+            );
         },
         function(asyncCallback) {
             // log all connections as ended
-            pub.util.logDebug("[" + connectionObj.getEasyrtcid() + "] Disconnected");
+            pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Disconnected");
             connectionObj.removeConnection(asyncCallback);
         }
     ], function(err) {
@@ -142,7 +143,7 @@ eventListener.onDisconnect = function(connectionObj, next){
 
 
 /**
- * Listener to be run upon receiving an easyrtcAuth socket.io message
+ * Default listener for event "easyrtcAuth". This event is fired when an incoming 'easyrtcAuth' message is received from a client.
  *
  * @param       {Object} socket         Socket.io socket object. References the individual connection socket. 
  * @param       {String} easyrtcid      Unique identifier for an EasyRTC connection.
@@ -296,7 +297,7 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
                 return;
             }
             sessionObj = newSessionObj;
-            connectionObj.joinSession(sessionObj.getSessionKey(), asyncCallback);
+            connectionObj.joinSession(sessionObj.getEasyrtcsid(), asyncCallback);
         },
 
         function(asyncCallback) {
@@ -414,8 +415,10 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
 
         function(asyncCallback){
 
+            // TODO: Reinstate this emit function by setting flag for roomJoin event so it doesn't automatically emit delta's
             // Emit clientList delta to other clients in room
-            connectionObj.emitRoomDataDelta(false, function(err, roomDataObj){asyncCallback(err);});
+            // connectionObj.emitRoomDataDelta(false, function(err, roomDataObj){asyncCallback(err);});
+            asyncCallback(null);
         }
 
     ],
@@ -435,7 +438,7 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
 
 
 /**
- * Default listener fired when an incoming socket message has a type of "easyrtcCmd"
+ * Default listener for event "easyrtcCmd". This event is fired when an incoming 'easyrtcCmd' message is received from a client.
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {Object} msg            Message object which contains the full message from a client; this can include the standard msgType and msgData fields.
@@ -443,12 +446,13 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onEasyrtcCmd = function(connectionObj, msg, socketCallback, next){
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC command received with msgType [" + msg.msgType + "]");
     if (!_.isFunction(next)) {
-        next = function(err) {};
+        next = pub.util.nextToNowhere;
     }
 
     if(!_.isFunction(socketCallback)) {
-        pub.util.logWarning("[" + connectionObj.getEasyrtcid() + "] EasyRTC command message received with no callback. Ignoring.", msg);
+        pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC command message received with no callback. Ignoring.", msg);
         return;
     }
 
@@ -465,19 +469,17 @@ eventListener.onEasyrtcCmd = function(connectionObj, msg, socketCallback, next){
                 try{
                     socketCallback(pub.util.getErrorMsg(msgErrorCode));
                 }catch(e){}
-                pub.util.logWarning("[" + connectionObj.getEasyrtcid() + "] EasyRTC Auth message received with invalid message format [" + msgErrorCode + "]. Disconnecting socket.", msg);
-                asyncCallback(new pub.util.ConnectionError("["+ connectionObj.getEasyrtcid() +"] EasyRTC Auth message received with invalid message format [" + msgErrorCode + "]. Disconnecting socket."));
+                pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC Auth message received with invalid message format [" + msgErrorCode + "]. Disconnecting socket.", msg);
+                asyncCallback(new pub.util.ConnectionError("["+connectionObj.getAppName()+"]["+ connectionObj.getEasyrtcid() +"] EasyRTC Auth message received with invalid message format [" + msgErrorCode + "]. Disconnecting socket."));
                 return;
             }
             asyncCallback(null);
         },
         function(asyncCallback) {
-            pub.util.logDebug("[" + connectionObj.getEasyrtcid() + "] easyrtcCmd message received of type [" + msg.msgType + "]", msg);
-
             // The msgType controls how each message is handled
             switch(msg.msgType) {
                 case "setUserCfg":
-                    pub.util.logWarning("[" + connectionObj.getEasyrtcid() + "] WebRTC setUserCfg command received. This feature is not yet complete.");
+                    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] WebRTC setUserCfg command received. This feature is not yet complete.");
                     socketCallback({msgType:'ack'});
                     next(null);
                     break;
@@ -486,12 +488,20 @@ eventListener.onEasyrtcCmd = function(connectionObj, msg, socketCallback, next){
                     pub.events.emit("msgTypeSetPresence", connectionObj, msg.msgData.setPresence, socketCallback, next);
                     break;
 
+                case "setRoomApiField":
+                    pub.events.emit("msgTypeSetRoomApiField", connectionObj, msg.msgData.setRoomApiField, socketCallback, next);
+                    break;
+
                 case "roomJoin":
                     pub.events.emit("msgTypeRoomJoin", connectionObj, msg.msgData.roomJoin, socketCallback, next);
                     break;
 
                 case "roomLeave":
                     pub.events.emit("msgTypeRoomLeave", connectionObj, msg.msgData.roomLeave, socketCallback, next);
+                    break;
+
+                case "getIceConfig":
+                    pub.events.emit("msgTypeGetIceConfig", connectionObj, socketCallback, next);
                     break;
 
                 case "getRoomList":
@@ -509,7 +519,7 @@ eventListener.onEasyrtcCmd = function(connectionObj, msg, socketCallback, next){
                     connectionObj.getApp().connection(msg.targetEasyrtcid, function(err,targetConnectionObj){
                         if (err){
                             socketCallback(pub.util.getErrorMsg("MSG_REJECT_TARGET_EASYRTCID"));
-                            pub.util.logWarning("[" + connectionObj.getEasyrtcid() + "] Could not send WebRTC signal to client [" + msg.targetEasyrtcid + "]. They may no longer be online.");
+                            pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Could not send WebRTC signal to client [" + msg.targetEasyrtcid + "]. They may no longer be online.");
                             return;
                         }
                         pub.events.emit("emitEasyrtcCmd", targetConnectionObj, msg.msgType, outgoingMsg, null, next);
@@ -518,7 +528,8 @@ eventListener.onEasyrtcCmd = function(connectionObj, msg, socketCallback, next){
                     break;
 
                 default:
-                    pub.util.logWarning("[" + connectionObj.getEasyrtcid() + "] Received easyrtcCmd message with unhandled msgType.", msg);
+                    socketCallback(pub.util.getErrorMsg("MSG_REJECT_BAD_TYPE"));
+                    pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Received easyrtcCmd message with unhandled msgType.", msg);
                     next(null);
             }
 
@@ -533,7 +544,7 @@ eventListener.onEasyrtcCmd = function(connectionObj, msg, socketCallback, next){
 
 
 /**
- * Default listener fired when an incoming socket message has a Socket.IO type of "easyrtcMsg"
+ * Default listener for event "easyrtcMsg". This event is fired when an incoming 'easyrtcMsg' message is received from a client.
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {Object} msg            Message object which contains the full message from a client; this can include the standard msgType and msgData fields.
@@ -541,14 +552,14 @@ eventListener.onEasyrtcCmd = function(connectionObj, msg, socketCallback, next){
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
-    pub.util.logDebug("[" + connectionObj.getEasyrtcid() + "] EasyRTC message received of type [" + msg.msgType + "]", msg);
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC message received of type [" + msg.msgType + "]");
 
     if (!_.isFunction(next)) {
-        next = function(err) {};
+        next = pub.util.nextToNowhere;
     }
 
     if(!_.isFunction(socketCallback)) {
-        pub.util.logWarning("[" + connectionObj.getEasyrtcid() + "] EasyRTC message received with no callback. Ignoring message.", msg);
+        pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC message received with no callback. Ignoring message.", msg);
         return;
     }
 
@@ -565,7 +576,7 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
                 try{
                     socketCallback(pub.util.getErrorMsg(msgErrorCode));
                 }catch(e){}
-                pub.util.logWarning("[" + connectionObj.getEasyrtcid() + "] EasyRTC Auth message received with invalid message format [" + msgErrorCode + "]. Disconnecting socket.", msg);
+                pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC Auth message received with invalid message format [" + msgErrorCode + "]. Disconnecting socket.", msg);
                 asyncCallback(new pub.util.ConnectionError("["+ connectionObj.getEasyrtcid() +"] EasyRTC Auth message received with invalid message format [" + msgErrorCode + "]. Disconnecting socket."));
                 return;
             }
@@ -575,7 +586,7 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
 
             // test targetEasyrtcid (if defined). Will prevent client from sending to themselves
             if (msg.targetEasyrtcid  !== undefined && msg.targetEasyrtcid == connectionObj.getEasyrtcid()) {
-                pub.util.logWarning("[" + connectionObj.getEasyrtcid() + "] EasyRTC message received with improper targetEasyrtcid", msg);
+                pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC message received with improper targetEasyrtcid", msg);
                 socketCallback(pub.util.getErrorMsg("MSG_REJECT_TARGET_EASYRTCID"));
                 next(null); // TODO: set error
                 return;
@@ -588,6 +599,7 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
                 var outgoingMsg = {
                     senderEasyrtcid: connectionObj.getEasyrtcid(),
                     targetEasyrtcid: msg.targetEasyrtcid,
+                    msgType: msg.msgType,
                     msgData: msg.msgData
                 };
                 var targetConnectionObj = {};
@@ -658,6 +670,7 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
                 var outgoingMsg = {
                     senderEasyrtcid: connectionObj.getEasyrtcid(),
                     targetRoom: msg.targetRoom,
+                    msgType: msg.msgType,
                     msgData: msg.msgData
                 };
 
@@ -722,6 +735,7 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
                 var outgoingMsg = {
                     senderEasyrtcid: connectionObj.getEasyrtcid(),
                     targetGroup: msg.targetGroup,
+                    msgType: msg.msgType,
                     msgData: msg.msgData
                 };
 
@@ -766,7 +780,7 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
 
             }
             else {
-                pub.util.logWarning("[" + connectionObj.getEasyrtcid() + "] EasyRTC message received without targetEasyrtcid or targetRoom", msg);
+                pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC message received without targetEasyrtcid or targetRoom", msg);
                 next(null);
             }
         }
@@ -778,8 +792,9 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
 
 
 /**
- * Default listener for when server should emits an EasyRTC command to a socket.
- * The msgId and serverTime fields will be added to the msg automatically.
+ * Default listener for event "emitEasyrtcCmd". This event is fired when the server should emit an EasyRTC command to a client.
+ * 
+ * The easyrtcid and serverTime fields will be added to the msg automatically.
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {String} msgType        Message type of the message.
@@ -788,13 +803,13 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onEmitEasyrtcCmd = function(connectionObj, msgType, msg, socketCallback, next){
-    pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] Running func 'onEmitEasyrtcCmd'");
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onEmitEasyrtcCmd' with msgType ["+msgType+"]");
     if (!msg) {
         msg = {};
     }
     if(!_.isFunction(socketCallback)) {
         socketCallback = function(returnMsg) {
-            pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] EasyRTC command message: unhandled ACK return message.", returnMsg);
+            pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC command message: unhandled ACK return message.", returnMsg);
         };
     }
 
@@ -803,15 +818,15 @@ eventListener.onEmitEasyrtcCmd = function(connectionObj, msgType, msg, socketCal
     msg.serverTime  = Date.now();
 
     connectionObj.socket.emit( "easyrtcCmd", msg);
-    pub.util.logDebug("["+msg.easyrtcid+"] is sent easyrtcCmd", msg);
 
     next(null);
 };
 
 
 /**
- * Default listener for when server should emits an EasyRTC command to a socket.
- * The msgId and serverTime fields will be added to the msg automatically.
+ * Default listener for event "emitEasyrtcMsg". This event is fired when the server should emit an EasyRTC message to a client.
+ * 
+ * The easyrtcid and serverTime fields will be added to the msg automatically.
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {String} msgType        Message type of the message.
@@ -820,28 +835,28 @@ eventListener.onEmitEasyrtcCmd = function(connectionObj, msgType, msg, socketCal
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onEmitEasyrtcMsg = function(connectionObj, msgType, msg, socketCallback, next){
-    pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] Running func 'onEmitEasyrtcMsg'");
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onEmitEasyrtcMsg' with msgType ["+msgType+"]");
 
     if (!msg) {
         msg = {};
     }
     if(!_.isFunction(socketCallback)) {
         socketCallback = function(returnMsg) {
-            pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] EasyRTC message: unhandled ACK return message.", returnMsg);
+            pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC message: unhandled ACK return message.", returnMsg);
         };
     }
+    msg.easyrtcid   = connectionObj.getEasyrtcid();
     msg.msgType     = msgType;
     msg.serverTime  = Date.now();
 
     connectionObj.socket.emit( "easyrtcMsg", msg);
-    pub.util.logDebug("[" + connectionObj.getEasyrtcid() + "] is sent easyrtcMsg", msg);
 
     next(null);
 };
 
 
 /**
- * Emits an error to a connection as a new message.
+ * Default listener for event "emitError". This event is fired when the server should emit an EasyRTC error to a client.
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {String} errorCode      EasyRTC error code associated with an error.
@@ -849,14 +864,14 @@ eventListener.onEmitEasyrtcMsg = function(connectionObj, msgType, msg, socketCal
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onEmitError = function(connectionObj, errorCode, socketCallback, next){
-    pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] Running func 'onEmitError'");
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onEmitError'");
     if(!_.isFunction(socketCallback)) {
         socketCallback = function(returnMsg) {
-            pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] EasyRTC info: unhandled ACK return message.", returnMsg);
+            pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC info: unhandled ACK return message.", returnMsg);
         };
     }
     if(!_.isFunction(next)) {
-        next = function(err) {};
+        next = pub.util.nextToNowhere;
     }
 
     pub.events.emit("emitEasyrtcCmd", connectionObj, "error", pub.util.getErrorMsg(errorCode), socketCallback, next);
@@ -864,30 +879,26 @@ eventListener.onEmitError = function(connectionObj, errorCode, socketCallback, n
 
 
 /**
- * Emits an ack to a connection as a response to an incoming message.
+ * Default listener for event "emitReturnAck". This event is fired when the server should return an Ack to a client via an acknowledgment message.
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {Object} socketCallback Socket.io callback function which delivers a response to a socket. Expects a single parameter (msg).
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onEmitReturnAck = function(connectionObj, socketCallback, next){
-    pub.util.logDebug("Running func 'onEmitReturnAck'");
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onEmitReturnAck'");
     if(!_.isFunction(socketCallback)) {
-        pub.util.logWarning("EasyRTC: unable to return ack to socket.");
+        pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC: unable to return ack to socket.");
         return;
     }
     if(!_.isFunction(next)) {
-        next = function(err) {};
+        next = pub.util.nextToNowhere;
     }
 
     var msg = {
         msgType: "ack",
         msgData:{}
     };
-
-    if (!msg.msgData.errorText) {
-        msg.msgData.errorText="Error occured with error code: " + msg.errorCode;
-    }
 
     socketCallback(msg);
 
@@ -896,7 +907,7 @@ eventListener.onEmitReturnAck = function(connectionObj, socketCallback, next){
 
 
 /**
- * Emits an error to a connection as a response to an incoming message.
+ * Default listener for event "emitReturnError". This event is fired when the server should return an Error to a client via an acknowledgment message.
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {Object} socketCallback Socket.io callback function which delivers a response to a socket. Expects a single parameter (msg).
@@ -904,15 +915,15 @@ eventListener.onEmitReturnAck = function(connectionObj, socketCallback, next){
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onEmitReturnError = function(connectionObj, socketCallback, errorCode, next){
-    pub.util.logDebug("Running func 'onEmitReturnError'");
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onEmitReturnError'");
     if(!_.isFunction(socketCallback)) {
-        pub.util.logWarning("EasyRTC: unable to return error to socket. Error code was [" + errorCode + "]");
+        pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC: unable to return error to socket. Error code was [" + errorCode + "]");
 
-        next(new pub.util.ConnectionError("Unable to return error to socket. Error code was [" + errorCode + "]"));
+        next(new pub.util.ConnectionError("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Unable to return error to socket. Error code was [" + errorCode + "]"));
         return;
     }
     if(!_.isFunction(next)) {
-        next = function(err) {};
+        next = pub.util.nextToNowhere;
     }
 
     var msg = pub.util.getErrorMsg(errorCode);
@@ -924,14 +935,16 @@ eventListener.onEmitReturnError = function(connectionObj, socketCallback, errorC
 
 
 /**
- * Listener to be run when returning an EasyRTC token to a socket. This is done after a client has been authenticated and the connection has been established.
+ * Default listener for event "emitReturnToken". This event is fired when the server should return a token to a client via an acknowledgment message.
+ * 
+ * This is done after a client has been authenticated and the connection has been established.
  *
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {Object} socketCallback Socket.io callback function which delivers a response to a socket. Expects a single parameter (msg).
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onEmitReturnToken = function(connectionObj, socketCallback, next){
-    pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] Running func 'onSendToken'");
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onSendToken'");
     var easyrtcid = connectionObj.getEasyrtcid();
 
     var tokenMsg = {
@@ -944,7 +957,7 @@ eventListener.onEmitReturnToken = function(connectionObj, socketCallback, next){
 
     // Ensure socketCallback is present
     if(!_.isFunction(socketCallback)) {
-        pub.util.logWarning("["+easyrtcid+"] EasyRTC onSendToken called with no socketCallback.");
+        pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC onSendToken called with no socketCallback.");
         try{socket.disconnect();}catch(e){}
         return;
     }
@@ -958,12 +971,12 @@ eventListener.onEmitReturnToken = function(connectionObj, socketCallback, next){
             // Set roomData
             tokenMsg.msgData.roomData = roomData;
 
-            // Retrieve ice servers
-            asyncCallback(null, appObj.getOption("iceServers"));
+            // Retrieve ice config
+            connectionObj.events.emit("getIceConfig", connectionObj, asyncCallback);
         },
 
         function(iceServers, asyncCallback) {
-            tokenMsg.msgData.application        = {applicationName:connectionObj.getApp().getAppName()};
+            tokenMsg.msgData.application        = {applicationName:connectionObj.getAppName()};
             tokenMsg.msgData.easyrtcid          = connectionObj.getEasyrtcid();
             tokenMsg.msgData.iceConfig          = {iceServers: iceServers};
             tokenMsg.msgData.serverTime         = Date.now();
@@ -976,6 +989,7 @@ eventListener.onEmitReturnToken = function(connectionObj, socketCallback, next){
             if (!_.isEmpty(fieldObj)){
                 tokenMsg.msgData.application.field = fieldObj;
             }
+
             // Get Connection fields
             connectionObj.getFields(true, asyncCallback);
         },
@@ -984,13 +998,15 @@ eventListener.onEmitReturnToken = function(connectionObj, socketCallback, next){
             if (!_.isEmpty(fieldObj)){
                 tokenMsg.msgData.field = fieldObj;
             }
+
             // get session object
             connectionObj.getSessionObj(asyncCallback);
         },
 
         function(sessionObj, asyncCallback) {
             if (sessionObj) {
-                tokenMsg.msgData.sessionData = {"easyrtcsid":sessionObj.getSessionKey()};
+                tokenMsg.msgData.sessionData = {"easyrtcsid":sessionObj.getEasyrtcsid()};
+
                 // Get session fields
                 sessionObj.getFields(true, asyncCallback);
             }
@@ -1007,11 +1023,13 @@ eventListener.onEmitReturnToken = function(connectionObj, socketCallback, next){
 
             // Emit token back to socket (SUCCESS!)
             socketCallback(tokenMsg);
+
+            asyncCallback(null);
         }
 
     ],
     // This function is called upon completion of the async waterfall, or upon an error being thrown.
-    function (err, roomDataObj) {
+    function (err) {
         if (err){
             next(err);
         } else {
@@ -1022,13 +1040,18 @@ eventListener.onEmitReturnToken = function(connectionObj, socketCallback, next){
 
 
 /**
- * The primary log listener.
+ * Default listener for event "log". This event is fired when ever a loggable item is observed.
  * 
  * @param       {string} level          Log severity level. Can be ("debug"|"info"|"warning"|"error")
  * @param       {string} logText        Text for log.
  * @param       {?*} [logFields]        Simple JSON object which contains extra fields to be logged.
+ * @param       {?nextCallback} next    A success callback of form next(err).
  */
-eventListener.onLog = function(level, logText, logFields) {
+eventListener.onLog = function(level, logText, logFields, next) {
+    if(!_.isFunction(next)) {
+        next = pub.util.nextToNowhere;
+    }
+
     var consoleText = "";
 
     if (pub.getOption("logColorEnable")) {
@@ -1077,11 +1100,12 @@ eventListener.onLog = function(level, logText, logFields) {
     } else {
         console.log(consoleText);
     }
+    next(null);
 };
 
 
 /**
- * Meant to be run upon receiving a easyrtcCmd message with a msgType of 'roomJoin'
+ * Default listener for event "msgTypeRoomJoin". This event is fired when an easyrtcCmd message with msgType of "roomJoin" is received from a client. 
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {Object} rooms          A room object containing a map of room names.
@@ -1089,14 +1113,14 @@ eventListener.onLog = function(level, logText, logFields) {
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onMsgTypeRoomJoin = function(connectionObj, rooms, socketCallback, next){
-    pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeRoomJoin'");
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeRoomJoin'");
     if(!_.isFunction(socketCallback)) {
-        pub.util.logWarning("["+connectionObj.getEasyrtcid()+"] EasyRTC info: unhandled socket message callback.");
+        pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC info: unhandled socket message callback.");
         return;
     }
 
     if(!_.isFunction(next)) {
-        next = function(err) {};
+        next = pub.util.nextToNowhere;
     }
 
     if(!_.isObject(rooms) || _.isEmpty(rooms)) {
@@ -1173,7 +1197,7 @@ eventListener.onMsgTypeRoomJoin = function(connectionObj, rooms, socketCallback,
 
 
 /**
- * Meant to be run upon receiving a easyrtcCmd message with a msgType of 'roomLeave'
+ * Default listener for event "msgTypeRoomLeave". This event is fired when an easyrtcCmd message with msgType of "roomLeave" is received from a client. 
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {Object} rooms          A room object containing a map of room names.
@@ -1181,22 +1205,22 @@ eventListener.onMsgTypeRoomJoin = function(connectionObj, rooms, socketCallback,
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onMsgTypeRoomLeave = function(connectionObj, rooms, socketCallback, next){
-    pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeRoomLeave' with rooms: ",rooms);
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeRoomLeave' with rooms: ",rooms);
     if(!_.isFunction(socketCallback)) {
         socketCallback = function(returnMsg) {
-            pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] EasyRTC info: unhandled ACK return message.", returnMsg);
+            pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC info: unhandled ACK return message.", returnMsg);
         };
     }
 
     if(!_.isFunction(next)) {
-        next = function(err) {};
+        next = pub.util.nextToNowhere;
     }
 
     // Loop through each room in the rooms object. Emit the leaveRoom event for each one.
     async.each(Object.keys(rooms), function(currentRoomName, asyncCallback) {
         connectionObj.events.emit("roomLeave", connectionObj, currentRoomName, function(err){
             if (err) {
-                pub.util.logWarning("["+connectionObj.getEasyrtcid()+"] Error leaving room ["+currentRoomName+"].", err);
+                pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Error leaving room ["+currentRoomName+"].", err);
             }
             asyncCallback(null);
         });
@@ -1214,23 +1238,53 @@ eventListener.onMsgTypeRoomLeave = function(connectionObj, rooms, socketCallback
 
 
 /**
- * Meant to be run upon receiving a easyrtcCmd message with a msgType of 'roomLeave'
+ * Default listener for event "msgTypeGetIceConfig". This event is fired when an easyrtcCmd message with msgType of "getIceConfig" is received from a client. 
+ * 
+ * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
+ * @param       {Object} socketCallback Socket.io callback function which delivers a response to a socket. Expects a single parameter (msg).
+ * @param       {nextCallback} next     A success callback of form next(err).
+ */
+eventListener.onMsgTypeGetIceConfig = function(connectionObj, socketCallback, next){
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeGetIceConfig'");
+
+    if(!_.isFunction(socketCallback)) {
+        socketCallback = function(returnMsg) {
+            pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC info: unhandled ACK return message.", returnMsg);
+        };
+    }
+
+    if(!_.isFunction(next)) {
+        next = pub.util.nextToNowhere;
+    }
+
+    connectionObj.events.emit("getIceConfig", connectionObj, function(err, iceConfigObj){
+        if (err) {
+            socketCallback(pub.util.getErrorMsg("MSG_REJECT_GEN_FAIL"));
+            return;
+        }
+        socketCallback({"msgType":"iceConfig", "msgData":{"iceConfig":iceConfigObj}});
+    });
+};
+
+
+/**
+ * Default listener for event "msgTypeGetRoomList". This event is fired when an easyrtcCmd message with msgType of "getRoomList" is received from a client. 
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {Object} socketCallback Socket.io callback function which delivers a response to a socket. Expects a single parameter (msg).
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onMsgTypeGetRoomList = function(connectionObj, socketCallback, next){
-    pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeGetRoomList'");
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeGetRoomList'");
 
     if(!_.isFunction(socketCallback)) {
         socketCallback = function(returnMsg) {
-            pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] EasyRTC info: unhandled ACK return message.", returnMsg);
+            pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC info: unhandled ACK return message.", returnMsg);
         };
     }
 
     if(!_.isFunction(next)) {
-        next = function(err) {};
+        next = pub.util.nextToNowhere;
     }
 
     connectionObj.generateRoomList(
@@ -1247,7 +1301,7 @@ eventListener.onMsgTypeGetRoomList = function(connectionObj, socketCallback, nex
 
 
 /**
- * Meant to be run upon receiving a easyrtcCmd message with a msgType of 'setPresence'
+ * Default listener for event "msgTypeSetPresence". This event is fired when an easyrtcCmd message with msgType of "setPresence" is received from a client. 
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {Object} presenceObj    Presence object which contains all the fields for setting a presence for a connection.
@@ -1255,15 +1309,15 @@ eventListener.onMsgTypeGetRoomList = function(connectionObj, socketCallback, nex
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onMsgTypeSetPresence = function(connectionObj, presenceObj, socketCallback, next){
-    pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeSetPresence' with setPresence: ",presenceObj);
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeSetPresence' with setPresence: ",presenceObj);
     if(!_.isFunction(socketCallback)) {
         socketCallback = function(returnMsg) {
-            pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] EasyRTC info: unhandled ACK return message.", returnMsg);
+            pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC info: unhandled ACK return message.", returnMsg);
         };
     }
 
     if(!_.isFunction(next)) {
-        next = function(err) {};
+        next = pub.util.nextToNowhere;
     }
 
     connectionObj.setPresence(
@@ -1291,7 +1345,66 @@ eventListener.onMsgTypeSetPresence = function(connectionObj, presenceObj, socket
 
 
 /**
- * Creates a room attached to an application with a specified room name. The optional creatorConnectionObj is provided to provide context; joining the room is done separately. If successful, the callback returns a roomObj.
+ * Default listener for event "msgTypeSetRoomApiField". This event is fired when an easyrtcCmd message with msgType of "setRoomApiField" is received from a client. 
+ * 
+ * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
+ * @param       {Object} roomApiFieldObj Api Field object which contains all the fields for setting a presence for a connection.
+ * @param       {Object} socketCallback Socket.io callback function which delivers a response to a socket. Expects a single parameter (msg).
+ * @param       {nextCallback} next     A success callback of form next(err).
+ */
+eventListener.onMsgTypeSetRoomApiField = function(connectionObj, roomApiFieldObj, socketCallback, next){
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeSetRoomApiField' with apiFieldObj: ",roomApiFieldObj);
+    if(!_.isFunction(socketCallback)) {
+        socketCallback = function(returnMsg) {
+            pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC info: unhandled ACK return message.", returnMsg);
+        };
+    }
+
+    if(!_.isFunction(next)) {
+        next = pub.util.nextToNowhere;
+    }
+
+    connectionObj.room(roomApiFieldObj.roomName, function(err, connectionRoomObj){
+        if (err) {
+            socketCallback(pub.util.getErrorMsg("MSG_REJECT_BAD_ROOM"));
+            next(null);
+            return;
+        }
+        connectionRoomObj.setApiField(roomApiFieldObj.field, function(err){
+            if (err) {
+                socketCallback(pub.util.getErrorMsg("MSG_REJECT_BAD_FIELD"));
+                next(null);
+                return;
+            }
+            connectionRoomObj.emitRoomDataDelta(false, function(err, roomDataDelta){
+                if (err) {
+                    socketCallback(pub.util.getErrorMsg("MSG_REJECT_GEN_FAIL"));
+                    next(null);
+                    return;
+                }
+                socketCallback(roomDataDelta);
+            });
+        });
+    });
+};
+
+
+/**
+ * Default listener for event "getIceConfig". Returns an ICE configuration object to the callback.
+ * 
+ * The ICE configuration object will hold the array of STUN and TURN servers the connection should use when forming a peer connection. This default listener uses the "iceServer" configuration option at the application level.
+ * 
+ * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
+ * @param       {Function} callback     Callback of form (err, iceConfigObj)
+ */
+eventListener.onGetIceConfig = function(connectionObj, callback){
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onGetIceConfig'");
+    callback(null, {"iceServers": connectionObj.getApp().getOption("iceServers")});
+};
+
+
+/**
+ * Default listener for event "roomCreate". Creates a room attached to an application with a specified room name. The optional creatorConnectionObj is provided to provide context; joining the room is done separately. If successful, the callback returns a roomObj.
  * 
  * @param       {Object} appObj         EasyRTC application object. Contains methods used for identifying and managing an application.
  * @param       {?Object} creatorConnectionObj EasyRTC connection object belonging to the creator of the room. Contains methods used for identifying and managing a connection.
@@ -1299,55 +1412,62 @@ eventListener.onMsgTypeSetPresence = function(connectionObj, presenceObj, socket
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onRoomCreate = function(appObj, creatorConnectionObj, roomName, roomOptions, callback){
-    pub.util.logDebug("["+appObj.getAppName()+"] Running func 'onRoomCreate'");
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onRoomCreate'");
     appObj.createRoom(roomName, roomOptions, callback);
 };
 
 
 /**
- * Joins a connection to a callback. If successful, the callback will return a connectionRoomObj.
+ * Default listener for event "roomJoin". Joins a connection to a a specified room. If successful, the callback will return a connectionRoomObj.
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {string} roomName       Room name which uniquely identifies a room within an EasyRTC application.
+ * @param       {Function} callback     Callback of form (err, connectionRoomObj)
  */
 eventListener.onRoomJoin = function(connectionObj, roomName, callback){
-    pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] Running func 'onRoomJoin'");
-    connectionObj.joinRoom(roomName, callback);
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onRoomJoin'");
+    connectionObj.joinRoom(roomName, function(err, connectionRoomObj){
+        if (err) {
+            callback(err);
+            return;
+        }
+        connectionRoomObj.emitRoomDataDelta(false, function(err, roomDataDelta){
+            // Return connectionRoomObj regardless of if there was a problem sending out the deltas
+            callback(null, connectionRoomObj);
+        });
+    });
 };
 
 
-
-
-
 /**
- * Run upon a connection leaving a room.
+ * Default listener for event "roomLeave". Run upon a connection leaving a room.
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {string} roomName       Room name which uniquely identifies a room within an EasyRTC application.
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onRoomLeave = function(connectionObj, roomName, next){
-    pub.util.logDebug("["+connectionObj.getEasyrtcid()+"] Running func 'onRoomLeave' with rooms ["+roomName+"]");
+    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onRoomLeave' with rooms ["+roomName+"]");
 
     if(!_.isFunction(next)) {
-        next = function(err) {};
+        next = pub.util.nextToNowhere;
     }
 
     connectionObj.room(roomName, function(err, connectionRoomObj){
         if (err) {
-            pub.util.logWarning("[" + connectionObj.getEasyrtcid() + "] Couldn't leave room [" + roomName + "]");
+            pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Couldn't leave room [" + roomName + "]");
             roomCallback(null);
             return;
         }
 
-        pub.util.logDebug("[" + connectionObj.getEasyrtcid() + "] Leave room [" + roomName + "]");
+        pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Leave room [" + roomName + "]");
         connectionRoomObj.leaveRoom(next);
     });
 };
 
 
 /**
- * Default listener fired when the server is being shutdown.
+ * Default listener for event "shutdown". This event is fired when the server is being shutdown.
  * 
  * @param       {nextCallback} next     A success callback of form next(err).
  */
@@ -1358,13 +1478,13 @@ eventListener.onShutdown = function(next){
 
 
 /**
- * Initializes EasyRTC server so it is ready for connections. Depending on options this includes
+ * Default listener for event "startup". This event initializes EasyRTC server so it is ready for connections.
  *
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onStartup = function(next){
     if (!_.isFunction(next)) {
-        next = function(err) {};
+        next = pub.util.nextToNowhere;
     }
 
     pub.util.logDebug("Running func 'onStartup'");
@@ -1484,7 +1604,6 @@ eventListener.onStartup = function(next){
         next(err);
     });
 };
-
 </code></pre>
         </article>
     </section>
@@ -1501,7 +1620,7 @@ eventListener.onStartup = function(next){
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Oct 28 2013 13:32:13 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Sun Nov 17 2013 20:03:35 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>

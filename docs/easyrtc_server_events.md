@@ -4,22 +4,41 @@ EasyRTC: Server Events
 Customizing the server behavior of an EasyRTC application is done by creating listeners and associating them with EasyRTC events.
 
 
-## Setting Event Listeners
+## Event Methods
+
+The EasyRTC `events` object is directly accessible via the `easyrtc` object. As a convienience it is also a child of the `pub`, `appObj`, `connectionObj`, `sessionObj`, `roomObj`, and `connectionRoomObj`.
+
+
+### Setting Event Listeners
 
 Setting event listeners in EasyRTC is similar to the node.js events module method. Any differences are noted below.
 
-    easyrtc.on(event, listener);
+    easyrtc.events.on(eventName, listener);
 
  - All EasyRTC events are limited to a single listener.
  - Setting a listener removes any current listeners, including default EasyRTC listeners.
 
 
-## Removing Event Listeners
-Removing event listeners in EasyRTC is similar to the node.js events module method. Any differences are noted below.
+### Resetting Event To Default Listener
 
-    easyrtc.removeAllListeners(event);
+	easyrtc.events.setDefaultListener(eventName);
 
- - Removing a listener automatically re-adds the EasyRTC default listener.
+ - Removes a custom listener from an event and then restores the EasyRTC default Listener
+
+### Emit an Event
+
+    easyrtc.events.emit(event, [arg1], [arg2], [...], [callback|next]);
+
+ - See individual event documentation for parameter details.
+
+### Emit a Default Event
+
+Setting a listener overrides the default EasyRTC listener. Depending on your application you may wish to release control back to the default EasyRTC listener.
+
+    easyrtc.events.emitDefault(event, [arg1], [arg2], [...], [callback|next]);
+
+ - Default event names are the same as public event names.
+ - The parameter list is the same as the public listener. This includes the callback if present.
 
 
 ## EasyRTC Event Callback Convention
@@ -33,24 +52,11 @@ Many EasyRTC listeners include a callback as the last parameter. Conventions wil
 - **callback**
   - Informs EasyRTC that your listener is done processing and to move onto the next stage of the operation.
   - The first parameter is always an 'err' type which should be null unless there is an error which should stop the operation and be logged.
-  - The remaining parameter list will match that of the listener with the exception of the final callback parameter which is omitted.
-
-## Calling Default EasyRTC Listeners
-
-Setting a listener overrides the default EasyRTC listener. Depending on your application you may wish to release control back to the default EasyRTC listener.
-
-    easyrtc.defaultEvents.emit(event, [arg1], [arg2], [...]);
-
-- Default event names are the same as public event names.
-- The parameter list is the same as the public listener. This includes the callback if present.
+  - See individual event documentation for the remaining parameters.
 
 
-## List of EasyRTC Events
+## Event Documentation
 
-### 'startup' (httpApp, socketServer, options, next)
+The best spot (currently) to see all the available events is by reading the default event listeners documentation. This will give you an idea of the events, parameters, and default behavior.
 
-Runs during EasyRTC startup. It is preceeded by the http and socket server. Once 'next' is called, the 'startupCallback' is called if it was defined in easyrtc.listen().
-
-
-### 'connect'
-
+ - /docs/server_html_docs/module-easyrtc_default_event_listeners-eventListener.html

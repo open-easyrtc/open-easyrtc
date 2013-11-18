@@ -136,7 +136,7 @@
     
     
     <div class="description">
-        Default listener for handling authentication. By default everyone gets in!
+        Default listener for event "authenticate". This event is called as part of the authentication process. To deny authentication, call the next() with an Error. By default everyone gets in!
     </div>
     
 
@@ -453,7 +453,7 @@
     
     
     <div class="description">
-        Listener which is called after a connection is authenticated and the connection object is generated and requested rooms are joined. Call next(err) to continue the connection procedure.
+        Default listener for event "authenticated". This event is called after a connection is authenticated and the connection object is generated and requested rooms are joined. Call next(err) to continue the connection procedure.
     </div>
     
 
@@ -593,7 +593,7 @@
     
     
     <div class="description">
-        Listener to be run upon a new socket connection
+        Default listener for event "connection". This event is called when socket.io accepts a new connection.
     </div>
     
 
@@ -756,7 +756,7 @@
     
     
     <div class="description">
-        Default listener fired when socket.io reports a socket has disconnected.
+        Default listener for event "disconnect". This event is called when socket.io detects a disconnection. Disconnections can occur due to either side purposefully dropping a connection, network disconnection, or time out.
     </div>
     
 
@@ -896,7 +896,7 @@
     
     
     <div class="description">
-        Listener to be run upon receiving an easyrtcAuth socket.io message
+        Default listener for event "easyrtcAuth". This event is fired when an incoming 'easyrtcAuth' message is received from a client.
     </div>
     
 
@@ -1069,7 +1069,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line126">line 126</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line127">line 127</a>
     </li></ul></dd>
     
     
@@ -1105,7 +1105,7 @@
     
     
     <div class="description">
-        Default listener fired when an incoming socket message has a type of "easyrtcCmd"
+        Default listener for event "easyrtcCmd". This event is fired when an incoming 'easyrtcCmd' message is received from a client.
     </div>
     
 
@@ -1255,7 +1255,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line418">line 418</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line421">line 421</a>
     </li></ul></dd>
     
     
@@ -1291,7 +1291,7 @@
     
     
     <div class="description">
-        Default listener fired when an incoming socket message has a Socket.IO type of "easyrtcMsg"
+        Default listener for event "easyrtcMsg". This event is fired when an incoming 'easyrtcMsg' message is received from a client.
     </div>
     
 
@@ -1441,7 +1441,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line516">line 516</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line527">line 527</a>
     </li></ul></dd>
     
     
@@ -1477,7 +1477,7 @@
     
     
     <div class="description">
-        Default listener for when server should emits an EasyRTC command to a socket.The msgId and serverTime fields will be added to the msg automatically.
+        Default listener for event "emitEasyrtcCmd". This event is fired when the server should emit an EasyRTC command to a client.The easyrtcid and serverTime fields will be added to the msg automatically.
     </div>
     
 
@@ -1650,7 +1650,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line763">line 763</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line778">line 778</a>
     </li></ul></dd>
     
     
@@ -1686,7 +1686,7 @@
     
     
     <div class="description">
-        Default listener for when server should emits an EasyRTC command to a socket.The msgId and serverTime fields will be added to the msg automatically.
+        Default listener for event "emitEasyrtcMsg". This event is fired when the server should emit an EasyRTC message to a client.The easyrtcid and serverTime fields will be added to the msg automatically.
     </div>
     
 
@@ -1859,7 +1859,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line795">line 795</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line810">line 810</a>
     </li></ul></dd>
     
     
@@ -1895,7 +1895,7 @@
     
     
     <div class="description">
-        Emits an error to a connection as a new message.
+        Default listener for event "emitError". This event is fired when the server should emit an EasyRTC error to a client.
     </div>
     
 
@@ -2045,7 +2045,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line824">line 824</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line839">line 839</a>
     </li></ul></dd>
     
     
@@ -2081,7 +2081,7 @@
     
     
     <div class="description">
-        Emits an ack to a connection as a response to an incoming message.
+        Default listener for event "emitReturnAck". This event is fired when the server should return an Ack to a client via an acknowledgment message.
     </div>
     
 
@@ -2208,7 +2208,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line846">line 846</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line861">line 861</a>
     </li></ul></dd>
     
     
@@ -2244,7 +2244,7 @@
     
     
     <div class="description">
-        Emits an error to a connection as a response to an incoming message.
+        Default listener for event "emitReturnError". This event is fired when the server should return an Error to a client via an acknowledgment message.
     </div>
     
 
@@ -2394,7 +2394,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line879">line 879</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line890">line 890</a>
     </li></ul></dd>
     
     
@@ -2430,7 +2430,7 @@
     
     
     <div class="description">
-        Listener to be run when returning an EasyRTC token to a socket. This is done after a client has been authenticated and the connection has been established.
+        Default listener for event "emitReturnToken". This event is fired when the server should return a token to a client via an acknowledgment message.This is done after a client has been authenticated and the connection has been established.
     </div>
     
 
@@ -2557,7 +2557,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line906">line 906</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line919">line 919</a>
     </li></ul></dd>
     
     
@@ -2585,7 +2585,7 @@
         
             
 <dt>
-    <h4 class="name" id="onLog"><span class="type-signature">&lt;static> </span>onLog<span class="signature">(level, logText, <span class="optional">logFields</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="onGetIceConfig"><span class="type-signature">&lt;static> </span>onGetIceConfig<span class="signature">(connectionObj, callback)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -2593,7 +2593,147 @@
     
     
     <div class="description">
-        The primary log listener.
+        Default listener for event "getIceConfig". Returns an ICE configuration object to the callback.The ICE configuration object will hold the array of STUN and TURN servers the connection should use when forming a peer connection. This default listener uses the "iceServer" configuration option at the application level.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>connectionObj</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">EasyRTC connection object. Contains methods used for identifying and managing a connection.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Callback of form (err, iceConfigObj)</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1373">line 1373</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="onLog"><span class="type-signature">&lt;static> </span>onLog<span class="signature">(level, logText, <span class="optional">logFields</span>, next)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Default listener for event "log". This event is fired when ever a loggable item is observed.
     </div>
     
 
@@ -2723,6 +2863,39 @@
         </tr>
 	
 	
+	
+        <tr>
+            
+                <td class="name"><code>next</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#nextCallback">nextCallback</a></span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                    &lt;nullable><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last">A success callback of form next(err).</td>
+        </tr>
+	
+	
 	</tbody>
 </table>
     
@@ -2750,7 +2923,170 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1004">line 1004</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1023">line 1023</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="onMsgTypeGetIceConfig"><span class="type-signature">&lt;static> </span>onMsgTypeGetIceConfig<span class="signature">(connectionObj, socketCallback, next)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Default listener for event "msgTypeGetIceConfig". This event is fired when an easyrtcCmd message with msgType of "getIceConfig" is received from a client.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>connectionObj</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">EasyRTC connection object. Contains methods used for identifying and managing a connection.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>socketCallback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Socket.io callback function which delivers a response to a socket. Expects a single parameter (msg).</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>next</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#nextCallback">nextCallback</a></span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">A success callback of form next(err).</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1220">line 1220</a>
     </li></ul></dd>
     
     
@@ -2786,7 +3122,7 @@
     
     
     <div class="description">
-        Meant to be run upon receiving a easyrtcCmd message with a msgType of 'roomLeave'
+        Default listener for event "msgTypeGetRoomList". This event is fired when an easyrtcCmd message with msgType of "getRoomList" is received from a client.
     </div>
     
 
@@ -2913,7 +3249,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1196">line 1196</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1250">line 1250</a>
     </li></ul></dd>
     
     
@@ -2949,7 +3285,7 @@
     
     
     <div class="description">
-        Meant to be run upon receiving a easyrtcCmd message with a msgType of 'roomJoin'
+        Default listener for event "msgTypeRoomJoin". This event is fired when an easyrtcCmd message with msgType of "roomJoin" is received from a client.
     </div>
     
 
@@ -3099,7 +3435,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1064">line 1064</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1088">line 1088</a>
     </li></ul></dd>
     
     
@@ -3135,7 +3471,7 @@
     
     
     <div class="description">
-        Meant to be run upon receiving a easyrtcCmd message with a msgType of 'roomLeave'
+        Default listener for event "msgTypeRoomLeave". This event is fired when an easyrtcCmd message with msgType of "roomLeave" is received from a client.
     </div>
     
 
@@ -3285,7 +3621,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1156">line 1156</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1180">line 1180</a>
     </li></ul></dd>
     
     
@@ -3321,7 +3657,7 @@
     
     
     <div class="description">
-        Meant to be run upon receiving a easyrtcCmd message with a msgType of 'setPresence'
+        Default listener for event "msgTypeSetPresence". This event is fired when an easyrtcCmd message with msgType of "setPresence" is received from a client.
     </div>
     
 
@@ -3471,7 +3807,193 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1230">line 1230</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1284">line 1284</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="onMsgTypeSetRoomApiField"><span class="type-signature">&lt;static> </span>onMsgTypeSetRoomApiField<span class="signature">(connectionObj, roomApiFieldObj, socketCallback, next)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Default listener for event "msgTypeSetRoomApiField". This event is fired when an easyrtcCmd message with msgType of "setRoomApiField" is received from a client.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>connectionObj</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">EasyRTC connection object. Contains methods used for identifying and managing a connection.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>roomApiFieldObj</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Api Field object which contains all the fields for setting a presence for a connection.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>socketCallback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Socket.io callback function which delivers a response to a socket. Expects a single parameter (msg).</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>next</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#nextCallback">nextCallback</a></span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">A success callback of form next(err).</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1328">line 1328</a>
     </li></ul></dd>
     
     
@@ -3507,7 +4029,7 @@
     
     
     <div class="description">
-        Creates a room attached to an application with a specified room name. The optional creatorConnectionObj is provided to provide context; joining the room is done separately. If successful, the callback returns a roomObj.
+        Default listener for event "roomCreate". Creates a room attached to an application with a specified room name. The optional creatorConnectionObj is provided to provide context; joining the room is done separately. If successful, the callback returns a roomObj.
     </div>
     
 
@@ -3693,7 +4215,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1274">line 1274</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1387">line 1387</a>
     </li></ul></dd>
     
     
@@ -3721,7 +4243,7 @@
         
             
 <dt>
-    <h4 class="name" id="onRoomJoin"><span class="type-signature">&lt;static> </span>onRoomJoin<span class="signature">(connectionObj, roomName)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="onRoomJoin"><span class="type-signature">&lt;static> </span>onRoomJoin<span class="signature">(connectionObj, roomName, callback)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -3729,7 +4251,7 @@
     
     
     <div class="description">
-        Joins a connection to a callback. If successful, the callback will return a connectionRoomObj.
+        Default listener for event "roomJoin". Joins a connection to a a specified room. If successful, the callback will return a connectionRoomObj.
     </div>
     
 
@@ -3806,6 +4328,29 @@
         </tr>
 	
 	
+	
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Callback of form (err, connectionRoomObj)</td>
+        </tr>
+	
+	
 	</tbody>
 </table>
     
@@ -3833,7 +4378,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1286">line 1286</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1400">line 1400</a>
     </li></ul></dd>
     
     
@@ -3869,7 +4414,7 @@
     
     
     <div class="description">
-        Run upon a connection leaving a room.
+        Default listener for event "roomLeave". Run upon a connection leaving a room.
     </div>
     
 
@@ -3996,7 +4541,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1302">line 1302</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1422">line 1422</a>
     </li></ul></dd>
     
     
@@ -4032,7 +4577,7 @@
     
     
     <div class="description">
-        Default listener fired when the server is being shutdown.
+        Default listener for event "shutdown". This event is fired when the server is being shutdown.
     </div>
     
 
@@ -4113,7 +4658,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1327">line 1327</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1447">line 1447</a>
     </li></ul></dd>
     
     
@@ -4149,7 +4694,7 @@
     
     
     <div class="description">
-        Initializes EasyRTC server so it is ready for connections. Depending on options this includes
+        Default listener for event "startup". This event initializes EasyRTC server so it is ready for connections.
     </div>
     
 
@@ -4230,7 +4775,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1338">line 1338</a>
+        <a href="easyrtc_default_event_listeners.js.html">easyrtc_default_event_listeners.js</a>, <a href="easyrtc_default_event_listeners.js.html#line1458">line 1458</a>
     </li></ul></dd>
     
     
@@ -4277,7 +4822,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Oct 28 2013 13:32:14 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Sun Nov 17 2013 20:03:35 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>
