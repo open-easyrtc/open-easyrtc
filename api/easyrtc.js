@@ -1887,19 +1887,20 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 return;
             }
             var sendOffer = function() {
-                setTimeout(function() {
-                    sendSignalling(otherUser, "offer", sessionDescription, null, callFailureCB);
-                }, 100);
+                
+                sendSignalling(otherUser, "offer", sessionDescription, null, callFailureCB);
             };
             pc.setLocalDescription(sessionDescription, sendOffer,
                     function(errorText) {
                         callFailureCB(easyrtc.errCodes.CALL_ERR, errorText);
                     });
         };
-        pc.createOffer(setLocalAndSendMessage0, function(errorObj) {
-            callFailureCB(easyrtc.errCodes.CALL_ERR, JSON.stringify(errObj));
-        },
-                mediaConstraints);
+        setTimeout(function(){
+            pc.createOffer(setLocalAndSendMessage0, function(errorObj) {
+                callFailureCB(easyrtc.errCodes.CALL_ERR, JSON.stringify(errObj));
+               },
+               mediaConstraints);
+        }, 100);
     };
     function limitBandWidth(sd) {
         if (easyrtc.videoBandwidthString !== "") {
@@ -2260,7 +2261,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 delete mediaConstraints.mandatory.MozDontOfferDataChannel;
             }
         }
-        
+
         if (easyrtc.dataEnabled) {
             if (isInitiator || easyrtc.isMozilla) {
                 try {
@@ -2321,14 +2322,12 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 if (easyrtc.debugPrinter) {
                     easyrtc.debugPrinter("sending answer");
                 }
-                setTimeout(function() {
-                    sendSignalling(caller, "answer", sessionDescription,
-                            null,
-                            function(errorCode, errorText) {
-                                delete easyrtc.peerConns[caller];
-                                easyrtc.showError(errorCode, errorText);
-                            });
-                }, 100);
+                sendSignalling(caller, "answer", sessionDescription,
+                        null,
+                        function(errorCode, errorText) {
+                            delete easyrtc.peerConns[caller];
+                            easyrtc.showError(errorCode, errorText);
+                        });
                 easyrtc.peerConns[caller].startedAV = true;
                 if (pc.connectDataConnection) {
                     if (easyrtc.debugPrinter) {
