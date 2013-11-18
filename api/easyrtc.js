@@ -1,5 +1,5 @@
 /** @class
- *@version 0.10.2a
+ *@version 0.10.3-alpha
  *<p>
  * Provides client side support for the EasyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
@@ -54,7 +54,7 @@ easyrtc.errCodes = {
     PEER_GONE: "PEER_GONE", // peer doesn't exist
     ALREADY_CONNECTED: "ALREADY_CONNECTED"
 };
-easyrtc.apiVersion = "0.10.2a";
+easyrtc.apiVersion = "0.10.3-alpha";
 /** Most basic message acknowledgment object */
 easyrtc.ackMessage = {msgType: "ack", msgData: {}};
 /** Regular expression pattern for user ids. This will need modification to support non US character sets */

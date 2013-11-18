@@ -1,8 +1,8 @@
 EasyRTC: Change Log
 ===================
 
-v0.10.3a (note, alpha means alpha... please let us know of issues.)
---------
+0.10.3-alpha (note, alpha means alpha... please let us know of issues.)
+------------
 
 New Features:
  - API + Server - API fields. These are basically variables which are set by the client and shared to others in the room. Many possibilities!
@@ -10,6 +10,7 @@ New Features:
  
  - Server - isConnected() function added to connection object.
  - Server - Added convenience functions to several objects such as getAppName()
+ - Server - Added pub.events.emitDefault() method. The previous method of finding the default listener in an object was clunky.
 
 Changes:
   - API + Demos - Renaming initManaged() to easyApp(). Old name remains for the time being
@@ -18,8 +19,8 @@ Changes:
 Fixes:
  * Lots. But please let us know if there's any others which need doing.
 
-v0.10.2a
---------
+0.10.2-alpha
+------------
 
 New Features:
  - Server - Many changes to public object to ease development, including exposing events and util objects at every level.
