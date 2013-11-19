@@ -1,7 +1,12 @@
 EasyRTC: Change Log
 ===================
 
-v0.10.4-alpha (note, alpha means alpha... please let us know of issues.)
+v1.0.0- beta
+------------
+
+Moving alpha branch into beta.
+
+v0.10.4-alpha
 -------------
 Fixes:
  * Server - Fixed onRoomCreate event force close bug.
