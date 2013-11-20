@@ -1,6 +1,17 @@
 EasyRTC: Change Log
 ===================
 
+v1.0.1- beta
+------------
+
+Changes:
+ * Demos - Referenced Opera's WebRTC capabilities in the demo homepage
+ * Documentation - Updated 'Alpha' to 'Beta' in a few spots which were missed.
+
+Fixes:
+ * Server Example - Switched package.json to match modules with '*' due to npm problems
+
+Moving alpha branch into beta.
 v1.0.0- beta
 ------------
 
