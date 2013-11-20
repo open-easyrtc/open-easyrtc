@@ -11,8 +11,8 @@
   },
 
   "dependencies" : {
-    "easyrtc"   : ">=0.10",
-    "express"   : "3.4.*",
+    "easyrtc"   : "*",
+    "express"   : "*",
     "socket.io" : "*"
   },
 
