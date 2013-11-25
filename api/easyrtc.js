@@ -1,3 +1,5 @@
+
+
 /** @class
  *@version 0.10.4-alpha
  *<p>
@@ -36,8 +38,78 @@
  */
 
 
-
 var easyrtc = {};
+
+/** @private 
+ * @param {Object} destObject
+ * @param {Object} allowedEvents
+ */
+var easyrtcAddEventHandling = function(destObject, allowedEventsArray) {
+    //
+    // build a dictionary of allowed events for this object.
+    //
+    var allowedEvents = {};
+    for (var i = 0; i < allowedEventsArray.length; i++) {
+        allowedEvents[allowedEventsArray[i]] = true;
+    }
+    //
+    // verify that the eventName argument is a valid event type for the object.
+    //
+    function eventChecker(eventName, src) {
+        if (typeof eventName !== 'string') {
+            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, src + " called without a string as the first argument");
+            throw "developer error";
+        }
+        if (!allowedEvents[eventName]) {
+            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, src + " called with a bad event name = " + eventName);
+            throw "developer error";
+        }
+    }
+    var eventListeners = {};
+    destObject.addEventListener = function(eventName, eventListener) {
+        eventChecker(eventName, "addEventListener");
+        if (typeof eventListener !== 'function') {
+            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "addEventListener called with a nonfunction for second argument");
+            throw "developer error";
+        }
+        //
+        // remove the event listener if it's already present so we don't end up with two copies
+        //
+        destObject.removeEventListener(eventName, eventListener);
+        if (!eventListeners[eventName]) {
+            eventListeners[eventName] = [];
+        }
+        eventListeners[eventName][eventListeners[eventName].length] = eventListener;
+    };
+    destObject.removeEventListener = function(eventName, eventListener) {
+        eventChecker(eventName, "removeEventListener");
+        var listeners = eventListeners[eventName];
+        var i = 0;
+        if (listeners) {
+            for (i = 0; i < listeners.length; i++) {
+                if (listeners[i] === eventListener) {
+                    if (i < listeners.length - 1) {
+                        listeners[i] = listeners[listeners.length - 1];
+                    }
+                    listeners.length = listeners.length - 1;
+                }
+            }
+        }
+    };
+    destObject.emitEvent = function(eventName, eventData) {
+        eventChecker(eventName, "emitEvent");
+        var listeners = eventListeners[eventName];
+        var i = 0;
+        if (listeners) {
+            for (i = 0; i < listeners.length; i++) {
+                listeners[i](eventName, eventData);
+            }
+        }
+    };
+};
+
+easyrtcAddEventHandling(easyrtc, ["roomOccupant"]);
+
 /** Error codes that the EasyRTC will use in the errorCode field of error object passed
  *  to error handler set by easyrtc.setOnError. The error codes are short printable strings.
  * @type Dictionary
@@ -101,13 +173,14 @@ easyrtc.nativeVideoHeight = 0;
 easyrtc.nativeVideoWidth = 0;
 /** @private */
 easyrtc.credential = null;
-/* temporary hack */
-
 
 /** The rooms the user is in. This only applies to room oriented applications and is set at the same
  * time a token is received.
  */
 easyrtc.roomJoin = {};
+
+
+
 /** Checks if the supplied string is a valid user name (standard identifier rules)
  * @param {String} name
  * @return {Boolean} true for a valid user name
@@ -179,6 +252,7 @@ easyrtc.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
                 }
                 easyrtc.roomOccupantListener(roomName, easyrtc.lastLoggedInList[roomName]);
             }
+            easyrtc.emitEvent("roomOccupant", easyrtc.lastLoggedInList);
         }
         ;
         function failure(errorCode, errorText) {
@@ -1438,6 +1512,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 easyrtc.roomOccupantListener(key, {}, false);
             }
         }
+        easyrtc.emitEvent("roomOccupant", {});
         easyrtc.loggingOut = false;
         easyrtc.disconnecting = false;
         easyrtc.oldConfig = {};
@@ -1473,6 +1548,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             if (easyrtc.roomOccupantListener) {
                 easyrtc.roomOccupantListener(null, {}, false);
             }
+            easyrtc.emitEvent("roomOccupant", {});
             easyrtc.oldConfig = {};
         }, 250);
     };
@@ -1887,7 +1963,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 return;
             }
             var sendOffer = function() {
-                
+
                 sendSignalling(otherUser, "offer", sessionDescription, null, callFailureCB);
             };
             pc.setLocalDescription(sessionDescription, sendOffer,
@@ -1895,11 +1971,11 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                         callFailureCB(easyrtc.errCodes.CALL_ERR, errorText);
                     });
         };
-        setTimeout(function(){
+        setTimeout(function() {
             pc.createOffer(setLocalAndSendMessage0, function(errorObj) {
                 callFailureCB(easyrtc.errCodes.CALL_ERR, JSON.stringify(errObj));
-               },
-               mediaConstraints);
+            },
+                    mediaConstraints);
         }, 100);
     };
     function limitBandWidth(sd) {
@@ -2109,7 +2185,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     if (easyrtc.onStreamClosed) {
                         easyrtc.onStreamClosed(otherUser);
                     }
-                    delete easyrtc.peerConns[otherUser];
+//                  delete easyrtc.peerConns[otherUser];
                     easyrtc.updateConfigurationInfo();
                 }
 
@@ -2396,7 +2472,6 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 easyrtc.peerConns[caller].pc.close();
             } catch (anyErrors) {
             }
-            ;
             delete easyrtc.peerConns[caller];
             easyrtc.updateConfigurationInfo();
         }
@@ -2972,6 +3047,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             }
             processOccupantList(roomname, easyrtc.lastLoggedInList[roomname]);
         }
+        easyrtc.emitEvent("roomOccupant", easyrtc.lastLoggedInList);
     }
 
 

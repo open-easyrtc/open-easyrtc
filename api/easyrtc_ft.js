@@ -193,6 +193,22 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         };
     }
 
+    var roomOccupantListener = function(eventType, eventData) {
+        var roomName;
+        var foundUser = false;
+        for (roomName in eventData) {
+            if (eventData[roomName][destUser]) {
+                foundUser = true;
+            }
+        }
+        if (!foundUser) {
+            easyrtc.removeEventListener("roomOccupant", roomOccupantListener);
+            if (filesBeingSent.length > 0 || filesOffered.length > 0) {
+                progressListener({status: "cancelled"});
+            }
+        }
+    };
+    easyrtc.addEventListener("roomOccupant", roomOccupantListener);
     //
     // if a file offer is rejected, we delete references to it.
     //
@@ -200,7 +216,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         if (!msgData.seq)
             return;
         delete filesOffered[msgData.seq];
-         progressListener({status: "rejected"});
+        progressListener({status: "rejected"});
         filesOffered.length = 0;
         sendFilesWaiting();
     }
@@ -385,7 +401,30 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
     var ackThreshold = 10000; // receiver is allowed to be 10KB behind of sender
     var positionAcked = 0;
 
+    var roomOccupantListener = function(eventType, eventData) {
+        var user;
+        var foundUser;
+        var roomName;
+        for (destUser in userStreams) {
+            foundUser = false;
+            for (roomName in eventData) {
+                if (eventData[roomName][destUser]) {
+                    foundUser = true;
+                }
+            }
+            if (!foundUser) {
+                easyrtc.removeEventListener("roomOccupant", roomOccupantListener);
+                statusCB(destUser, {status: "done", reason: "cancelled"});
+                delete userStreams[destUser];
+            }
+        }
+    };
+    easyrtc.addEventListener("roomOccupant", roomOccupantListener);
+
     function fileOfferHandler(otherGuy, msgType, msgData) {
+        if (!userStreams[otherGuy]) {
+            userStreams[otherGuy] = {};
+        }
         acceptRejectCB(otherGuy, msgData.fileNameList, function(wasAccepted) {
             var ackHandler = function(ackMesg) {
 
