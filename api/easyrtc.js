@@ -509,6 +509,123 @@ easyrtc.onStreamClosed = function(easyrtcid) {
  */
 easyrtc.callCancelled = function(easyrtcid) {
 };
+
+/**
+ * This function gets the statistics for a particular peer connection. 
+ * @param {type} peerId
+ * @param {type} callback gets a map of { userDefinedKey: value}
+ * @param {type} filter has is a map of maps of the form {reportNum:{googleKey: userDefinedKey}}
+ */
+var count = 0;
+easyrtc.getPeerStatistics = function(peerId, callback, filter) {
+    count++;
+
+    if (!easyrtc.peerConns[peerId]) {
+        callback({"notConnected": peerId});
+    }
+    else if (easyrtc.peerConns[peerId].pc.getStats) {
+        easyrtc.peerConns[peerId].pc.getStats(function(stats) {
+            var localStats = {};
+            var part, parts = stats.result();
+            var i, j;
+            var itemKeys;
+            var itemKey;
+            if (!filter) {
+                for (i = 0; i < parts.length; i++) {
+                    var names = parts[i].names();
+                    for (var j = 0; j < names.length; j++) {
+                        itemKey = names[j];
+                        localStats[parts[i].id + "." + itemKey] = parts[i].local.stat(itemKey);
+                    }
+                }
+            }
+            else {
+                var partNames = [];
+                var partById = {};
+                var partList;
+                for (i = 0; i < parts.length; i++) {
+                    partById[parts[i].id] = parts[i];
+                    partNames[i] = {};
+                    //
+                    // convert the names into a dictionary
+                    //
+                    var names = parts[i].names();
+                    for (j = 0; j < names.length; j++) {
+                        partNames[i][names[j]] = true;
+                    }
+                }
+
+                for (i = 0; i < filter.length; i++) {
+                    var id = filter[i].id;
+                    itemKeys = filter[i].items;
+                    partList = [];
+                    if (id && id !== "*") {
+                        partList.push(partById[id]);
+                    }
+                    else {
+                        part = null;
+                        for (j = 0; j < parts.length; j++) {
+                            var fullMatch = true;
+                            for (itemKey in itemKeys) {
+                                if (!partNames[j][itemKey]) {
+                                    fullMatch = false;
+                                    break;
+                                }
+                            }
+                            if (fullMatch) {
+                                partList.push(parts[j]);
+                            }
+                        }
+                    }
+                    if( partList.length == 1) {
+                        for (j = 0; j < partList.length; j++) {
+                            part = partList[j];
+                            if (part.local) {
+                                for (itemKey in itemKeys) {
+                                    var userKey = itemKeys[itemKey];
+                                    localStats[userKey] = part.local.stat(itemKey);
+                                }
+                            }
+                        }
+                    }
+                    else if( partList.length > 1) {
+                        for( itemKey in itemKeys) {
+                            localStats[itemKeys[itemKey]] = [];
+                        }
+                        for (j = 0; j < partList.length; j++) {
+                            part = partList[j];
+                            if (part.local) {
+                                for (itemKey in itemKeys) {
+                                    var userKey = itemKeys[itemKey];
+                                    localStats[userKey].push(part.local.stat(itemKey));
+                                }
+                            }
+                        }
+                    }                    
+                }
+            }
+            callback(peerId, localStats);
+        });
+    }
+    else {
+        callback({"statistics": "not supported by this browser, try Chrome."});
+    }
+};
+
+easyrtc.standardStatsFilter = [
+    {id: "bweforvideo", items: {"googTransmitBitrate": "transmitBitRate",
+            "googActualEncBitrate": "encodeRate", "googAvailableSendBandwidth": "availableSendRate"}},
+    {id: "*", items: {"googCodecName": "audioCodec", "googTypingNoiseState": "typingNoise", "packetsSent":"audioPacketsSent"}},
+    {id: "*", items: {"googCodecName": "videoCodec", "googFrameRateSent": "outFrameRate", "packetsSent":"videoPacketsSent"}},
+    {id: "*", items: {"packetsLost": "videoPacketsLost", "packetsReceived": "videoPacketsReceived", 
+            "googFrameRateOutput": "frameRateOut" }},
+    {id: "*", items: {"packetsLost": "audioPacketsLost", "packetsReceived": "audioPacketsReceived", 
+            "audioOutputLevel": "audioOutputLevel" }},    
+    {id: "*", items: {"googRemoteAddress":"remoteAddress"}}
+];
+
+
+
 /** Provide a set of application defined fields that will be part of this instances
  * configuration information. This data will get sent to other peers via the websocket
  * path.
@@ -2829,17 +2946,6 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         });
     }
     connectToWSServer(successCallback, errorCallback);
-    function  getStatistics(pc, track, results) {
-        var successcb = function(stats) {
-            for (var i in stats) {
-                results[i] = stats[i];
-            }
-        };
-        var failurecb = function(event) {
-            results.error = event;
-        };
-        pc.getStats(track, successcb, failurecb);
-    }
 
 
     function DeltaRecord(added, deleted, modified) {
