@@ -560,7 +560,9 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
                     itemKeys = filter[i].items;
                     partList = [];
                     if (id && id !== "*") {
-                        partList.push(partById[id]);
+                        if( partById[id]) {
+                            partList.push(partById[id]);
+                        }
                     }
                     else {
                         part = null;
@@ -572,7 +574,7 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
                                     break;
                                 }
                             }
-                            if (fullMatch) {
+                            if (fullMatch && parts[j]) {
                                 partList.push(parts[j]);
                             }
                         }
@@ -3157,9 +3159,13 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     }
 
 
+    easyrtc.isTurnServer = function(ipaddress) {
+        return !!easyrtc._turnServers[ipaddress];
+    }
 
     function processIceConfig(iceConfig) {
         easyrtc.pc_config = {iceServers: []};
+        easyrtc._turnServers = {};
         for (var i = 0; i < iceConfig.iceServers.length; i++) {
             var item = iceConfig.iceServers[i];
             var fixedItem;
@@ -3183,6 +3189,9 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     var url = parts[1];
                     fixedItem = createIceServer(url, username, item.credential);
                 }
+                var ipaddress = item.url.split(/[@:&]/g)[0];
+                easyrtc._turnServers[ipaddress] = true;
+                
             }
             else { // is stun server entry
                 fixedItem = item;
