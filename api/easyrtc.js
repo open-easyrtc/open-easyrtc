@@ -1507,6 +1507,8 @@ easyrtc.idToName = function(easyrtcid) {
     }
     return "--" + easyrtcid + "--";
 };
+
+
 /* used in easyrtc.connect */
 /** @private */
 easyrtc.webSocket = null;
@@ -1561,6 +1563,16 @@ easyrtc.haveAudioTrack = function(easyrtcid) {
 easyrtc.haveVideoTrack = function(easyrtcid) {
     return easyrtc._haveTracks(easyrtcid, false);
 };
+
+easyrtc.supportsStatistics = function() {    
+    try {
+        var peer = new RTCPeerConnection({iceServers:[]}, {});
+        return !!peer.getStats;
+    }
+    catch(err) {
+        return false;
+    }
+}
 /**
  * Connects to the EasyRTC signaling server. You must connect before trying to
  * call other users.
