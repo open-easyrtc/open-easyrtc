@@ -3272,7 +3272,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 //
         var easyrtcsid = null;
         if (easyrtc.cookieId && document.cookie) {
-            var cookies = document.cookie.split("[; ]");
+            var cookies = document.cookie.split(/[; ]/g);
             var target = easyrtc.cookieId + "=";
             for (var i in cookies) {
                 if (cookies[i].indexOf(target) === 0) {
