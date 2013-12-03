@@ -3202,7 +3202,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     var url = parts[1];
                     fixedItem = createIceServer(url, username, item.credential);
                 }
-                var ipaddress = item.url.split(/[@:&]/g)[0];
+                var ipaddress = item.url.split(/[@:&]/g)[1];
                 easyrtc._turnServers[ipaddress] = true;
 
             }
