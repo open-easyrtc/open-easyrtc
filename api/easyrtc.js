@@ -541,10 +541,8 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
             }
             else {
                 var partNames = [];
-                var partById = {};
                 var partList;
                 for (i = 0; i < parts.length; i++) {
-                    partById[parts[i].id] = parts[i];
                     partNames[i] = {};
                     //
                     // convert the names into a dictionary
@@ -553,33 +551,35 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
                     for (j = 0; j < names.length; j++) {
                         partNames[i][names[j]] = true;
                     }
+
+                    //
+                    // discard info from any inactive connection.
+                    //
+                    if (partNames[i].googActiveConnection ) {
+                        var flag= parts[i].local.stat("googActiveConnection");
+                        if( !flag || flag === "false") {
+                            partNames[i] = {};
+                        }
+                    }
                 }
 
                 for (i = 0; i < filter.length; i++) {
-                    var id = filter[i].id;
-                    itemKeys = filter[i].items;
+                    itemKeys = filter[i];
                     partList = [];
-                    if (id && id !== "*") {
-                        if( partById[id]) {
-                            partList.push(partById[id]);
-                        }
-                    }
-                    else {
-                        part = null;
-                        for (j = 0; j < parts.length; j++) {
-                            var fullMatch = true;
-                            for (itemKey in itemKeys) {
-                                if (!partNames[j][itemKey]) {
-                                    fullMatch = false;
-                                    break;
-                                }
-                            }
-                            if (fullMatch && parts[j]) {
-                                partList.push(parts[j]);
+                    part = null;
+                    for (j = 0; j < parts.length; j++) {
+                        var fullMatch = true;
+                        for (itemKey in itemKeys) {
+                            if (!partNames[j][itemKey]) {
+                                fullMatch = false;
+                                break;
                             }
                         }
+                        if (fullMatch && parts[j]) {
+                            partList.push(parts[j]);
+                        }
                     }
-                    if( partList.length == 1) {
+                    if (partList.length == 1) {
                         for (j = 0; j < partList.length; j++) {
                             part = partList[j];
                             if (part.local) {
@@ -590,8 +590,8 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
                             }
                         }
                     }
-                    else if( partList.length > 1) {
-                        for( itemKey in itemKeys) {
+                    else if (partList.length > 1) {
+                        for (itemKey in itemKeys) {
                             localStats[itemKeys[itemKey]] = [];
                         }
                         for (j = 0; j < partList.length; j++) {
@@ -603,7 +603,7 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
                                 }
                             }
                         }
-                    }                    
+                    }
                 }
             }
             callback(peerId, localStats);
@@ -615,15 +615,16 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
 };
 
 easyrtc.standardStatsFilter = [
-    {id: "bweforvideo", items: {"googTransmitBitrate": "transmitBitRate",
-            "googActualEncBitrate": "encodeRate", "googAvailableSendBandwidth": "availableSendRate"}},
-    {id: "*", items: {"googCodecName": "audioCodec", "googTypingNoiseState": "typingNoise", "packetsSent":"audioPacketsSent"}},
-    {id: "*", items: {"googCodecName": "videoCodec", "googFrameRateSent": "outFrameRate", "packetsSent":"videoPacketsSent"}},
-    {id: "*", items: {"packetsLost": "videoPacketsLost", "packetsReceived": "videoPacketsReceived", 
-            "googFrameRateOutput": "frameRateOut" }},
-    {id: "*", items: {"packetsLost": "audioPacketsLost", "packetsReceived": "audioPacketsReceived", 
-            "audioOutputLevel": "audioOutputLevel" }},    
-    {id: "*", items: {"googRemoteAddress":"remoteAddress"}}
+    {"googTransmitBitrate": "transmitBitRate",
+        "googActualEncBitrate": "encodeRate", "googAvailableSendBandwidth": "availableSendRate"},
+    {"googCodecName": "audioCodec", "googTypingNoiseState": "typingNoise", "packetsSent": "audioPacketsSent"},
+    {"googCodecName": "videoCodec", "googFrameRateSent": "outFrameRate", "packetsSent": "videoPacketsSent"},
+    {"packetsLost": "videoPacketsLost", "packetsReceived": "videoPacketsReceived",
+        "googFrameRateOutput": "frameRateOut"},
+    {"packetsLost": "audioPacketsLost", "packetsReceived": "audioPacketsReceived",
+        "audioOutputLevel": "audioOutputLevel"},
+    {"googRemoteAddress": "remoteAddress", "googActiveConnection": "activeConnection"},
+    {"audioInputLevel": "audioInputLevel"}
 ];
 
 
@@ -1564,12 +1565,12 @@ easyrtc.haveVideoTrack = function(easyrtcid) {
     return easyrtc._haveTracks(easyrtcid, false);
 };
 
-easyrtc.supportsStatistics = function() {    
+easyrtc.supportsStatistics = function() {
     try {
-        var peer = new RTCPeerConnection({iceServers:[]}, {});
+        var peer = new RTCPeerConnection({iceServers: []}, {});
         return !!peer.getStats;
     }
-    catch(err) {
+    catch (err) {
         return false;
     }
 }
@@ -3203,7 +3204,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 }
                 var ipaddress = item.url.split(/[@:&]/g)[0];
                 easyrtc._turnServers[ipaddress] = true;
-                
+
             }
             else { // is stun server entry
                 fixedItem = item;
