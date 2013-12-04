@@ -3,7 +3,6 @@ EasyRTC: Change Log
 
 v1.0.5-beta
 -----------
-Note major version updated to 1.0!
 
 New Features:
  *
@@ -13,6 +12,20 @@ Changes:
 
 Fixes:
  *
+
+v1.0.0-beta to v1.0.4-beta
+--------------------------
+
+Due to merge issues, these versions weren't fully released. (But may have made it onto NPM)
+
+Changes:
+ * Moved alpha branch to beta branch
+ * Demos - Referenced Opera's WebRTC capabilities in the demo homepage
+ * Demos - Cleaned up simple video demo
+ * Documentation - Updated 'Alpha' to 'Beta' in a few spots which were missed.
+
+Fixes:
+ * Server Example - Switched package.json to match modules with '*' due to npm problems
 
 v0.10.4-alpha
 -------------
