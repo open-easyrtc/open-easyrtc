@@ -510,11 +510,12 @@ easyrtc.onStreamClosed = function(easyrtcid) {
 easyrtc.callCancelled = function(easyrtcid) {
 };
 
-/**
+/*
  * This function gets the statistics for a particular peer connection. 
  * @param {type} peerId
  * @param {type} callback gets a map of { userDefinedKey: value}
  * @param {type} filter has is a map of maps of the form {reportNum:{googleKey: userDefinedKey}}
+ * It is still experimental and hence isn't advertised in the documentation.
  */
 var count = 0;
 easyrtc.getPeerStatistics = function(peerId, callback, filter) {
