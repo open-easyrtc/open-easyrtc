@@ -1,5 +1,5 @@
 /** @class
- *@version 0.10.1a
+ *@version 1.0.5-beta
  *<p>
  * Provides support file and data transfer support to easyrtc.
  * </p>
