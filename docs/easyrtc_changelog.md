@@ -4,14 +4,14 @@ EasyRTC: Change Log
 v1.0.5-beta
 -----------
 
-New Features:
- *
-
 Changes:
- * 
+ * API - Additional improvements to file sharing API such as better handling of aborted transfers. 
+ * Server - Renamed server option to `appIceServers` to match other application level options.
 
 Fixes:
- *
+ * API - Fixed a string split issue when sending easyrtcsid value
+ * Server - Fixed bug which resulted in the iceServers message to be wrapped in another iceServers object. (Issue #20) 
+
 
 v1.0.0-beta to v1.0.4-beta
 --------------------------
