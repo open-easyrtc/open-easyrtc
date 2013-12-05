@@ -1,21 +1,31 @@
 EasyRTC: Change Log
 ===================
 
-v1.0.1- beta
-------------
+v1.0.5-beta
+-----------
 
 Changes:
+ * API - Additional improvements to file sharing API such as better handling of aborted transfers. 
+ * Server - Renamed server option to `appIceServers` to match other application level options.
+
+Fixes:
+ * API - Fixed a string split issue when sending easyrtcsid value
+ * Server - Fixed bug which resulted in the iceServers message to be wrapped in another iceServers object. (Issue #20) 
+
+
+v1.0.0-beta to v1.0.4-beta
+--------------------------
+
+Due to merge issues, these versions weren't fully released. (But may have made it onto NPM)
+
+Changes:
+ * Moved alpha branch to beta branch
  * Demos - Referenced Opera's WebRTC capabilities in the demo homepage
+ * Demos - Cleaned up simple video demo
  * Documentation - Updated 'Alpha' to 'Beta' in a few spots which were missed.
 
 Fixes:
  * Server Example - Switched package.json to match modules with '*' due to npm problems
-
-Moving alpha branch into beta.
-v1.0.0- beta
-------------
-
-Moving alpha branch into beta.
 
 v0.10.4-alpha
 -------------

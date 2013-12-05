@@ -254,7 +254,7 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
             if (msg.msgData.roomJoin) {
                 for (var currentRoomName in msg.msgData.roomJoin) {
                     if (!_.isString(currentRoomName) || !appObj.getOption("roomNameRegExp").test(currentRoomName)) {
-                        pub.events.emit("emitReturnError", socketCallback, "MSG_REJECT_TARGET_ROOM", function(err){});
+                        pub.events.emit("emitReturnError", socketCallback, "MSG_REJECT_TARGET_ROOM", pub.util.nextToNowhere);
                         pub.util.logWarning("[" + easyrtcid + "] Authentication failed. Requested room name not allowed [" + currentRoomName + "].");
                         return;
                     }
@@ -657,7 +657,7 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
                 function (err) {
                     if (err) {
                         // TODO: deal with errors!
-                        pub.events.emit("emitReturnError", connectionObj, "UNHANDLED", function(err){});
+                        pub.events.emit("emitReturnError", connectionObj, "UNHANDLED", pub.util.nextToNowhere);
                     } else {
                         socketCallback({msgType:'ack'});
                     }
@@ -705,12 +705,12 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
                                 if(msg.targetGroup) {
                                     targetConnectionObj.isInGroup(msg.targetGroup, function(err, isAllowed){
                                         if (isAllowed) {
-                                            pub.events.emit("emitEasyrtcMsg", targetConnectionObj, msg.msgType, outgoingMsg, null, function(err){});
+                                            pub.events.emit("emitEasyrtcMsg", targetConnectionObj, msg.msgType, outgoingMsg, null, pub.util.nextToNowhere);
                                         }
                                     });
                                 }
                                 else {
-                                    pub.events.emit("emitEasyrtcMsg", targetConnectionObj, msg.msgType, outgoingMsg, null, function(err){});
+                                    pub.events.emit("emitEasyrtcMsg", targetConnectionObj, msg.msgType, outgoingMsg, null, pub.util.nextToNowhere);
                                 }
                             });
                         }
@@ -763,7 +763,7 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
                                 if (err) {
                                     return;
                                 }
-                                pub.events.emit("emitEasyrtcMsg", targetConnectionObj, msg.msgType, outgoingMsg, null, function(err){});
+                                pub.events.emit("emitEasyrtcMsg", targetConnectionObj, msg.msgType, outgoingMsg, null, pub.util.nextToNowhere);
                             });
                         }
                         asyncCallback(null);
@@ -1124,13 +1124,13 @@ eventListener.onMsgTypeRoomJoin = function(connectionObj, rooms, socketCallback,
     }
 
     if(!_.isObject(rooms) || _.isEmpty(rooms)) {
-        pub.events.emit("emitReturnError", socketCallback, "MSG_REJECT_BAD_STRUCTURE", function(err){});
+        pub.events.emit("emitReturnError", socketCallback, "MSG_REJECT_BAD_STRUCTURE", pub.util.nextToNowhere);
         return;
     }
 
     for (var currentRoomName in rooms) {
         if (!_.isString(currentRoomName) || !connectionObj.getApp().getOption("roomNameRegExp").test(currentRoomName)) {
-            pub.events.emit("emitReturnError", socketCallback, "MSG_REJECT_TARGET_ROOM", function(err){});
+            pub.events.emit("emitReturnError", socketCallback, "MSG_REJECT_TARGET_ROOM", pub.util.nextToNowhere);
             return;
         }
     }
@@ -1395,11 +1395,11 @@ eventListener.onMsgTypeSetRoomApiField = function(connectionObj, roomApiFieldObj
  * The ICE configuration object will hold the array of STUN and TURN servers the connection should use when forming a peer connection. This default listener uses the "iceServer" configuration option at the application level.
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
- * @param       {Function} callback     Callback of form (err, iceConfigObj)
+ * @param       {Function} callback     Callback of form (err, iceConfigArray)
  */
 eventListener.onGetIceConfig = function(connectionObj, callback){
     pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onGetIceConfig'");
-    callback(null, {"iceServers": connectionObj.getApp().getOption("iceServers")});
+    callback(null, connectionObj.getApp().getOption("appIceServers"));
 };
 
 
@@ -1412,7 +1412,7 @@ eventListener.onGetIceConfig = function(connectionObj, callback){
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onRoomCreate = function(appObj, creatorConnectionObj, roomName, roomOptions, callback){
-    pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onRoomCreate'");
+    pub.util.logDebug("["+appObj.getAppName()+"]" + (creatorConnectionObj?"["+creatorConnectionObj.getEasyrtcid()+"]":"") +  " Running func 'onRoomCreate'");
     appObj.createRoom(roomName, roomOptions, callback);
 };
 
@@ -1493,20 +1493,6 @@ eventListener.onStartup = function(next){
             pub.util.logDebug("Configuring Http server");
 
             pub.httpApp.configure( function() {
-
-                // TODO: Remove this debug output (should disable itself after Sept 1, 2013)
-                if (Date.now() &lt; 1383267661000) {
-                    pub.httpApp.get(pub.getOption("apiPublicFolder") + "/debug_e",  function(req, res) {
-                        res.setHeader("Content-Type", "text/plain");
-                        res.end(Date.now() + "\n\n" + require("util").inspect(require("./easyrtc_private_obj").app, { showHidden: true, depth: 10 }));
-                    });
-                    pub.httpApp.get(pub.getOption("apiPublicFolder") + "/debug_o",  function(req, res) {
-                        res.setHeader("Content-Type", "text/plain");
-                        res.end(Date.now() + "\n\n" + require("util").inspect(require("./easyrtc_private_obj").option, { showHidden: true, depth: 10 }));
-                    });
-                }
-
-
                 // Set the EasyRTC demos
                 if (pub.getOption("demosEnable")) {
                     pub.util.logDebug("Setting up demos to be accessed from '" + pub.getOption("demosPublicFolder") + "/'");
@@ -1620,7 +1606,7 @@ eventListener.onStartup = function(next){
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Sun Nov 17 2013 20:03:35 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Wed Dec 04 2013 20:44:15 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>
