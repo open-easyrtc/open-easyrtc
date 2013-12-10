@@ -3512,11 +3512,17 @@ easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, o
         }
         return -1; // caller not connected
     };
+    
+    function hideVideo(video) {
+         easyrtc.setVideoObjectSrc(video, "");
+         video.style.visibility = "hidden";
+    }
+    
     easyrtc.setOnStreamClosed(function(caller) {
         for (var i = 0; i < numPEOPLE; i++) {
             var video = getIthVideo(i);
             if (video.caller === caller) {
-                easyrtc.setVideoObjectSrc(video, "");
+                hideVideo(video);
                 video.caller = "";
                 if (onHangup) {
                     onHangup(caller, i);
@@ -3538,13 +3544,22 @@ easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, o
         }
         helper(false);
     });
+    
+    
     easyrtc.setStreamAcceptor(function(caller, stream) {
         if (easyrtc.debugPrinter) {
             easyrtc.debugPrinter("stream acceptor called");
         }
+        function showVideo(video, stream) {
+            easyrtc.setVideoObjectSrc(video, stream);
+            if( video.style.visibility) {
+                video.style.visibility = 'visible';
+            }                
+        }
+        
         var i, video;
         if (refreshPane && videoIsFree(refreshPane)) {
-            easyrtc.setVideoObjectSrc(video, stream);
+            showVideo(video, stream);
             if (onCall) {
                 onCall(caller);
             }
@@ -3554,7 +3569,7 @@ easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, o
         for (i = 0; i < numPEOPLE; i++) {
             video = getIthVideo(i);
             if (video.caller === caller) {
-                easyrtc.setVideoObjectSrc(video, stream);
+                showVideo(video, stream);
                 if (onCall) {
                     onCall(caller, i);
                 }
@@ -3569,7 +3584,7 @@ easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, o
                 if (onCall) {
                     onCall(caller, i);
                 }
-                easyrtc.setVideoObjectSrc(video, stream);
+                showVideo(video, stream);
                 return;
             }
         }
@@ -3579,7 +3594,7 @@ easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, o
         video = getIthVideo(0);
         if (video) {
             easyrtc.hangup(video.caller);
-            easyrtc.setVideoObjectSrc(video, stream);
+            showVideo(video, stream);
             if (onCall) {
                 onCall(caller, 0);
             }
@@ -3595,7 +3610,7 @@ easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, o
             closeButton.onclick = function() {
                 if (video.caller) {
                     easyrtc.hangup(video.caller);
-                    easyrtc.setVideoObjectSrc(video, "");
+                    hideVideo(video);
                     video.caller = "";
                 }
             };
