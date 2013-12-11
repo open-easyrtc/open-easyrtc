@@ -7,10 +7,12 @@ EasyRTC: Server Configuration
 For the code setting the default configuration options see:
  - [../lib/easyrtc_default_options.js](../lib/easyrtc_default_options.js)
 
-Configuration levels - Server versus Application versus Room
-----
 
-In the near(ish) future, we will be exposing methods to manage configuration options at the application and room level. This will allow different rooms in the same application, or different applications in the same server to run with customized options.
+Configuration levels - Server versus Application versus Room
+------------------------------------------------------------
+
+EasyRTC allows management of configuration options at the server, application and room level. This will allow different rooms in the same application, or different applications in the same server to run with customized options.
+
 
 Setting Server Options
 ----------------------
@@ -27,6 +29,7 @@ Options can be set prior, during, or after the easyrtc.listen() function has bee
  - ei.setOption(optionName, optionValue)
 
 *note: Not all options will have an effect if changed after the server has started.*
+
 
 Setting Server Options Example
 ------------------------------
@@ -83,13 +86,6 @@ The following server.js code snippet includes three ways of setting EasyRTC opti
 Available Server Options
 ------------------------
 
-**WebRTC Options**
- - iceServers
-   - ICE Servers object which identifies all STUN and TURN servers.
-   - With new username field in TURN specification, this object may be updated soon.
-   - Defaults to: [{url: "stun:stun.l.google.com:19302"},{url: "stun:stun.sipgate.net"},{url: "stun:217.10.68.152"},{url: "stun:stun.sipgate.net:10000"},{url: "stun:217.10.68.152:10000"}]
-
-
 **Application Options**
  - appAutoCreateEnable
    - Enables the creation of application from the API. Occurs when client joins a nonexistent application.
@@ -101,6 +97,20 @@ Available Server Options
  - appDefaultName
    - The default application a connection belongs to if it is not initially specified.
    - Defaults to: "default"
+ - appIceServers
+   - ICE Servers object which identifies all STUN and TURN servers.
+   - With new username field in TURN specification, this object may be updated soon.
+   - Defaults to:
+
+    [{url: "stun:stun.l.google.com:19302"},
+    {url: "stun:stun.sipgate.net"},
+    {url: "stun:217.10.68.152"},
+    {url: "stun:stun.sipgate.net:10000"},
+    {url: "stun:217.10.68.152:10000"}]
+
+   - The format for a TURN server is:
+
+    {"url":"turn:[ADDRESS]:[PORT]","username":"[USERNAME]", "credential":"[CREDENTIAL]"}
 
 **Room Options**
  - roomAutoCreateEnable
@@ -120,7 +130,16 @@ Available Server Options
 **Connection Options**
  - connectionDefaultField
    - Default connection fields.
-   - Defaults to: {browserFamily:  {share:true, regex:null, data:null},browserMajor:   {share:true, regex:null, data:null},osFamily:       {share:true, regex:null, data:null},deviceFamily:   {share:true, regex:null, data:null}}
+   - Defaults to: null
+
+
+**Session Options**
+ - sessionEnable
+   - Enable sessions. If sessions are disabled, each socket connection from the same user will be the same. Relies on Express session handling also being enabled.
+   - Defaults to: true
+ -  sessionCookieEnable
+   - If enabled, the server will attempt to send a easyrtcsid cookie which matches the Express session id.
+   - Defaults to: true
 
 
 **API Hosting Options**
@@ -132,7 +151,7 @@ Available Server Options
    - Defaults to: "/easyrtc"
  - apiOldLocationEnable
    - [Depreciated] Listens for requests to core API files in old locations (in addition to the new standard locations)
-   - Defaults to: true
+   - Defaults to: false
 
 
 **Demo Options**
@@ -167,7 +186,7 @@ Available Server Options
 
 **Miscellaneous Server Options**
  - updateCheckEnable
-   - Checks for updates
+   - Checks for updates to EasyRTC
    - Defaults to: true
 
 
@@ -195,17 +214,17 @@ Available Server Options
    - Defaults to: /^[a-z0-9_. -]{1,32}$/i
  - presenceShowRegExp
    - Allowed presence "show" values (for setPresence command)
+   - Can be set at application level
    - Defaults to: /^(away|chat|dnd|xa)$/
  - presenceStatusRegExp
    - Allowed presence "status" value
+   - Can be set at application level
    - Defaults to: /^(.){0,255}$/
  - roomNameRegExp
    - Room name
-   - Defaults to: /^[a-z0-9_.-]{1,32}$/i
- - sessionKeyRegExp
-   - Session key (easyrtcsid)
+   - Can be set at application level
    - Defaults to: /^[a-z0-9_.-]{1,32}$/i
  - usernameRegExp
    - Username
+   - Can be set at application level
    - Defaults to: /^(.){1,64}$/i
-
