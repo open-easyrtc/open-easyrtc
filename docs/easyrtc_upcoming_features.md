@@ -6,11 +6,13 @@ There are many exciting features we are looking to add to EasyRTC in upcoming re
 General Features
 ----------------
 * TURN server support **HERE NOW!**
+* Assign connections to groups - (aka roles)
 
 API Specific Features
 ---------------------
 * Better cross browser support
 * More power for applications to influence webRTC connections
+* Send a message to a specific username (Can already target easyrtcid's and rooms)
 
 Server Specific Features
 ------------------------
