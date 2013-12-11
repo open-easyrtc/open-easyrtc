@@ -58,12 +58,6 @@ function genRoomOccupantName(roomName) {
     return "roomOccupant_" + roomName;
 }
 
-function setUserName(event, value) {
-    if (event.keyCode == 13) {
-        easyrtc.setUserName(value);
-    }
-}
-
 function setCredential(event, value) {
     if (event.keyCode == 13) {
         easyrtc.setCredential(value);
@@ -185,7 +179,7 @@ function connect() {
     var username = document.getElementById("userNameField").value;
     var password = document.getElementById("credentialField").value;
     if (username) {
-        easyrtc.setUserName(username);
+        easyrtc.setUsername(username);
     }
     if (password) {
         easyrtc.setCredential({password: password});

@@ -51,7 +51,7 @@ function connect() {
         easyrtc.showError("BAD-USER-NAME", "illegal user name");
         return;
     }
-    easyrtc.setUserName(tempName);
+    easyrtc.setUsername(tempName);
     if( window.localStorage && window.localStorage.easyrtcUserName ) {
         window.localStorage.easyrtcUserName = tempName;        
     }  

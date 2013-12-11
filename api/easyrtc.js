@@ -1,5 +1,3 @@
-
-
 /** @class
  *@version 1.0.5-beta
  *<p>
@@ -42,7 +40,7 @@ var easyrtc = {};
 
 /** @private 
  * @param {Object} destObject
- * @param {Object} allowedEvents
+ * @param {Object} allowedEventsArray
  */
 var easyrtcAddEventHandling = function(destObject, allowedEventsArray) {
     //
@@ -580,7 +578,7 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
                             partList.push(parts[j]);
                         }
                     }
-                    if (partList.length == 1) {
+                    if (partList.length === 1) {
                         for (j = 0; j < partList.length; j++) {
                             part = partList[j];
                             if (part.local) {
@@ -693,12 +691,12 @@ easyrtc._enqueueSendRoomApi = function(roomName) {
         easyrtc._sendRoomApiFields(roomName, easyrtc._roomApiFields[roomName]);
         easyrtc.roomApiFieldTimer = null;
     }, 10);
-}
+};
 
 /**
  *  @private 
  *  @param roomName
- * @param valuelist
+ * @param fields
  */
 easyrtc._sendRoomApiFields = function(roomName, fields) {
     var fieldAsString = JSON.stringify(fields);
@@ -1518,7 +1516,10 @@ easyrtc.webSocket = null;
 easyrtc.pc_config = {};
 /** @private  */
 easyrtc.closedChannel = null;
-/** @private */
+/** @private
+ * @param easyrtcid
+ * @param checkAudio
+ *  */
 easyrtc._haveTracks = function(easyrtcid, checkAudio) {
     var stream;
     if (!easyrtcid) {
@@ -1574,7 +1575,7 @@ easyrtc.supportsStatistics = function() {
     catch (err) {
         return false;
     }
-}
+};
 /**
  * Connects to the EasyRTC signaling server. You must connect before trying to
  * call other users.
@@ -1999,7 +2000,6 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     easyrtc.buildPeerConstraints = function() {
         var options = [];
         options.push({'DtlsSrtpKeyAgreement': 'true'}); // for interoperability
-        options.push
         return {optional: options};
     };
     /**
@@ -3175,7 +3175,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
     easyrtc.isTurnServer = function(ipaddress) {
         return !!easyrtc._turnServers[ipaddress];
-    }
+    };
 
     function processIceConfig(iceConfig) {
         easyrtc.pc_config = {iceServers: []};
@@ -3236,7 +3236,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     }
                 }
         );
-    }
+    };
 
     function processToken(msg) {
         if (easyrtc.debugPrinter) {
