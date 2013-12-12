@@ -968,6 +968,13 @@ easyRTC.initMediaSource = function(successCallback, errorCallback) {
         video: easyRTC.videoEnabled
     };
     if (easyRTC.videoEnabled || easyRTC.audioEnabled) {
+        //chrome throw a permission denied exception  if screen sharing + audio sharing 
+        if (mode.video
+            && mode.video.mandatory
+            && mode.video.mandatory.chromeMediaSource
+            && mode.video.mandatory.chromeMediaSource =='screen') {
+            mode.audio = false;
+        }
 //
 // getUserMedia usually fails the first time I call it. I suspect it's a page loading
 // issue. So I'm going to try adding a 1 second delay to allow things to settle down first.
@@ -1927,7 +1934,7 @@ easyRTC.connect = function(applicationName, successCallback, errorCallback) {
                 easyRTC.peerConns[otherUser].dataChannelR = dataChannel;
             }
 
-            if (!easyRTC.isMozillia) {
+            if (!easyRTC.isMozilla) {
                 dataChannel.onmessage = function(event) {
                     if (easyRTC.debugPrinter) {
                         easyRTC.debugPrinter("saw dataChannel.onmessage event");
