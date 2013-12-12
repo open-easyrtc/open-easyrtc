@@ -3185,6 +3185,9 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 var stuffToAdd = roomData[roomname].clientListDelta.updateClient;
                 if (stuffToAdd) {
                     for (var id in stuffToAdd) {
+                        if( !easyrtc.lastLoggedInList[roomname]) {
+                            easyrtc.lastLoggedInList[roomname] = [];
+                        }
                         easyrtc.lastLoggedInList[roomname][id] = stuffToAdd[id];
                     }
                 }
