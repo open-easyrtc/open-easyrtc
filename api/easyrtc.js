@@ -314,7 +314,7 @@ easyrtc.setVideoDims = function(width, height) {
  * rather than a webcam. If you have multiple screens, they are composited side by side.
  * @example
  *    easyrtc.setScreenCapture();
- */
+ */ 
 easyrtc.setScreenCapture = function() {
     easyrtc.videoFeatures = {
         mandatory: {
@@ -1135,6 +1135,15 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
 
     var mode = {'audio': (easyrtc.audioEnabled ? true : false),
         'video': ((easyrtc.videoEnabled) ? (easyrtc.videoFeatures) : false)};
+        
+    if( easyrtc.videoEnabled && easyrtc.videoFeatures && easyrtc.videoFeatures.mandatory &&
+        easyrtc.videoFeatures.mandatory.chromeMediaSource === "screen") {
+        if(mode.audio) {
+             mode.audio = false;
+             easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, 
+             "You can't have audio with a screen share. Masking your audio.");
+        }
+    }
     /** @private
      * @param {Stream} stream
      *  */
@@ -1462,6 +1471,28 @@ easyrtc.setUsername = function(username) {
         return false;
     }
 };
+
+/**
+ * Get an array of easyrtcids that are using a particular username
+ * @param {String} username - the username of interest.
+ * @param {String} room - an optional room name argument limiting results to a particular room.
+ * @returns an array of {easyrtcid:id, roomName: roomName}.
+ */
+easyrtc.usernameToIds = function(username, room) {
+    var results = [];
+    for (var roomname in easyrtc.lastLoggedInList) {
+        if( room && roomname !== room ) {
+            continue;
+        }
+        for( id in easyrtc.lastLoggedInList[roomname]) {           
+            if (easyrtc.lastLoggedInList[roomname][id].username === username) {
+                results.push({easyrtcid:id, roomName: roomname});
+            }
+        }
+    }
+    return results;
+};
+
 /**
  * Set the authentication credential if needed.
  * @param {Object} credential - a JSONifiable object.

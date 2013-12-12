@@ -408,3 +408,10 @@ function addApiField() {
     easyrtc.setRoomApiField(roomName, fieldname, fieldvalue);
     easyrtc.setRoomApiField(roomName, fieldname+"_copy", fieldvalue + "copy");
 }
+
+
+function getIdsOfName() {
+   var name = document.getElementById("targetName").value;
+   var ids = easyrtc.usernameToIds(name);
+   document.getElementById("foundIds").innerHTML = JSON.stringify(ids);
+}
