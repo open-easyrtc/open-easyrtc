@@ -39,7 +39,7 @@ section
 	background-color: #fff;
 	padding: 12px 24px;
     border-bottom: 1px solid #ccc;
-    margin-right: 240px;
+   /* margin-right: 240px; */
 }
 
 .variation {
@@ -144,7 +144,6 @@ h6
 
 .name, .signature {
 	font-family: Consolas, "Lucida Console", Monaco, monospace;
-    background-color:lightgray;
 }
 
 .name {
@@ -176,7 +175,7 @@ h6
 .prettyprint
 {
 	border: 1px solid #ddd;
-	width: 80%;
+	width: 100%;
     overflow: auto;
 }
 
