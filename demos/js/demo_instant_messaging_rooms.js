@@ -27,27 +27,27 @@ var selfEasyrtcid = "";
 var waitingForRoomList = true;
 var isConnected = false;
 
-function addToConversation(who, msgType, content, targetting) {
+function addToConversation(who, msgType, content, targeting) {
     // Escape html special characters, then add linefeeds.
     if( !content) {
         content = "**no body**";
     }
     content = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     content = content.replace(/\n/g, '<br />');
-    var targettingStr = "";
-    if (targetting) {
-        if (targetting.targetEasyrtcid) {
-            targettingStr += "user=" + targetting.targetEasyrtcid;
+    var targetingStr = "";
+    if (targeting) {
+        if (targeting.targetEasyrtcid) {
+            targetingStr += "user=" + targeting.targetEasyrtcid;
         }
-        if (targetting.targetRoom) {
-            targettingStr += " room=" + targetting.targetRoom;
+        if (targeting.targetRoom) {
+            targetingStr += " room=" + targeting.targetRoom;
         }
-        if (targetting.targetGroup) {
-            targettingStr += " group=" + targetting.targetGroup;
+        if (targeting.targetGroup) {
+            targetingStr += " group=" + targeting.targetGroup;
         }
     }
     document.getElementById('conversation').innerHTML +=
-            "<b>" + who + " sent " + targettingStr + ":</b>&nbsp;" + content + "<br />";
+            "<b>" + who + " sent " + targetingStr + ":</b>&nbsp;" + content + "<br />";
 }
 
 function genRoomDivName(roomName) {
@@ -164,8 +164,8 @@ function refreshRoomList() {
 }
 
 
-function peerListener(who, msgType, content, targetting) {
-    addToConversation(who, msgType, content, targetting);
+function peerListener(who, msgType, content, targeting) {
+    addToConversation(who, msgType, content, targeting);
 }
 
 function connect() {
