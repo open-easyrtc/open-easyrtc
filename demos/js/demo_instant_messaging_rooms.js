@@ -27,7 +27,7 @@ var selfEasyrtcid = "";
 var waitingForRoomList = true;
 var isConnected = false;
 
-function addToConversation(who, msgType, content, targeting) {
+function addToConversation(who, msgType, cocdntent, targeting) {
     // Escape html special characters, then add linefeeds.
     if( !content) {
         content = "**no body**";
@@ -116,10 +116,9 @@ function addRoom(roomName, parmString, userAdded) {
     }
     if (userAdded) {
         console.log("calling joinRoom(" + roomName + ") because it was a user action ");
-        
+
         easyrtc.joinRoom(roomName, roomParms, 
                 function() {
-                   
                     if( isConnected) {
                         addRoomButton();
                     }
