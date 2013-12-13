@@ -1,7 +1,31 @@
 EasyRTC: Change Log
 ===================
 
-v1.0.5-beta
+v1.0.6-beta
+-----------
+
+New Features::
+ * API - New convenience function to return an array of easyrtcid's which match a username. easyrtc.usernameToIds()
+ * Server - New application level function for determining if an easyrtcid is currently connected. appObj.isConnected()
+ * Documentation - New guide for installing EasyRTC alongside another server
+ * Documentation - New guide for running EasyRTC with SSL
+ * Documentation - New guide for using rooms (still in progress)
+
+Changes:
+ * API - easyrtc_closeicon uses an inline svg in the easyrtc.css file instead of an external svg.
+ * API - easyrtc.easyApp now renders remote video object invisible on stream close
+ * API - Fixed some handling in joinRoom and leaveRoom (which now optionally allows success and failure callbacks)
+ * Server - Code cleanup. Error handling improvements. Removal of debug code.
+ * Documentation - Updates to server configuration, upcoming features, and client tutorial.
+
+Fixes:
+ * API - Handle a possibility of the lastLoggedInList not having a room entry before adding an easyrtcid to it (Related to issue #14)
+ * Demos - Screen share and rooms demo now properly use easyrtc.setUsername()
+ * Server - Now disconnects client if an easyrtcAuth message is received when they are already logged in.
+ * Server - Message verification fixes for easyrtcsid, and application names
+
+
+ v1.0.5-beta
 -----------
 
 Changes:
