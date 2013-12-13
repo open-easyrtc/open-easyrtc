@@ -6,11 +6,11 @@ EasyRTC Framework Tutorial
 Overview
 ---------
 
-EasyRTC is a framework built on top of WebRTC an emerging W3C/IETF standard for real time communication of audio, video, and data directly between web browsers.  WebRTC supports the transfer of audio, video and data on a peer-to-peer basis putting very little load on supporting servers.
+EasyRTC is a framework built on top of WebRTC, an emerging W3C/IETF standard for real time communication of audio, video, and data directly between web browsers.  WebRTC supports the transfer of audio, video and data on a peer-to-peer basis putting very little load on supporting servers.
 
 The EasyRTC framework consists of a client or browser-side Javascript library and a backend Javascript server built on top of a node.js.  Because the WebRTC libraries is built into each browser there is no need for a browser plug-in.
 
-Google's Chrome browser version 23 or higher has the broadest support for the WebRTC API and other browsers are making great strides in incorporating WebRTC, including: Mozilla's Firefox and Opera.
+Google's Chrome browser has the broadest support for the WebRTC API. Opera is now using the same engine as Chrome and hence mimics it's behavior. Firefox provides decent support for video chats and data communications.
 
 
 WebRTC has the potential once it is fully standardized to support audio and video chats and conferencing, multiplayer games and many other audio, video and data-based applications.
@@ -28,7 +28,7 @@ Using the EasyRTC framework, several of these steps can be collapsed into a sing
 vastly simplifying the developers job, particularly if the web developer is
 trying to support multiple platforms.
 
-This document is a tutorial for writing applications with the EasyRTC framework.
+This document is a tutorial for writing applications with the EasyRTC framework. It does not cover the entire EasyRTC API.
 
 Terminology
 -----------
@@ -40,7 +40,7 @@ Terminology
 Installing EasyRTC and Getting Help
 --------------
 
-The EasyRTC framework can be easily installed on most platforms in 10 minutes.  We have install  instructions for Windows, Mac and Linux available. The files that make up EasyRTC at [the github repository for EasyRTC](https://github.com/priologic/easyrtc) . Start with the README.md file.
+The EasyRTC framework can be easily installed on most platforms in 10 minutes.  We have install  instructions for Windows, Mac and Linux available. The files that make up EasyRTC at the [https://github.com/priologic/easyrtc](github repository for EasyRTC) start with the README.md file. The docs directory of EasyRTC distribution has documentation in HTML for both server and client side components.
 
 If you find yourself running into problems installing check out the various sources for connecting with us and the community also listed in the README.md file.
 
@@ -67,12 +67,14 @@ The second video tag should be in a &lt;div> block with a CSS _position_ value o
 
     <body>
        ...
-       <video  style="float:left" id="self" width="300" height="200"></video>
+       <video  style="float:left" id="self" width="300" height="200" muted="muted"></video>
        <div style="position:relative;float:left;width:300px">
            <video id="caller" width="300" height="200"></video>
        </div>
        ...
     </body>
+
+If you don't have the muted flag in the self video tag, you'll get a feedback look from your speakers to your microphone.
 
 Now we have to start writing some application logic for the application.js file,
 starting with an initialization function that will be called when the page gets loaded.
@@ -89,7 +91,7 @@ find out who else is hooked up to the server. The callback is registered using E
 Here is an example initialization function:
 
      function my_init() {
-         easyrtc.setRoomOccupantListener( loggedInListener);
+         easyrtc.setRoomOccupantListener( roomListener);
          easyrtc.easyApp("Company Chat Line", "self", ["caller"],
              function(myId) {
                 console.log("My easyrtcid is " + myId);
@@ -100,7 +102,11 @@ Here is an example initialization function:
 The callback will be called whenever somebody else connects to
 or disconnects from the "Company Chat Line", and immediately after the call to easyrtc.easyApp.
 
-The callback is passed a map whose keys are the ids (easyrtcids) of the other people connected to the server using the same application name.
+The callback is passed two arguments:
+
++ a room name 
++ a map whose keys are the ids (easyrtcids) of the other people connected to the server using the same application name.
+
 In our example, the callback will maintain a list of buttons
 to call the other people connected to the "Company Chat Line".
 We'll add a &lt;div> to the &lt;body> to hold these buttons.
@@ -111,9 +117,9 @@ We'll add a &lt;div> to the &lt;body> to hold these buttons.
         ...
      </body>
 
-The text for the loggedInListener is below:
+The text for the roomListener is below:
 
-    function loggedInListener(roomName, otherPeers) {
+    function roomListener(roomName, otherPeers) {
         var otherClientDiv = document.getElementById('otherClients');
         while (otherClientDiv.hasChildNodes()) {
             otherClientDiv.removeChild(otherClientDiv.lastChild);
@@ -142,6 +148,7 @@ To actually initiate a call to a person, all we need to do is call the easyrtc.c
 passing it the easyrtcid of the person, and three callbacks:
 
 + function successCallback(easyrtcid) - called when the initiated succeeded.
++ 
 + function errorCallback(errorCode, errorText) - called on error.
 + function accepted(wasAccepted,easyrtcid) - called to indicate whether the call was accepted or not.
 
@@ -231,7 +238,7 @@ Video Conferencing - Trading Ease For Flexibility
 In the previous section, we outlined the approach that maximized the ease of getting a video conference page up and running.
 In this section, we trade off some the ease for greater flexibility and control.
 
-Instead of calling easyrtc.easyApp, you can call  easyrtc.initMediaSource
+Instead of calling easyrtc.easyApp, you can call easyrtc.initMediaSource
 to get access to the local media stream,
 followed by a call to easyrtc.connect once the call to
 easyrtc.initMediaSource finished. This (and a bit more) is what easyrtc.easyApp does internally.
@@ -308,7 +315,7 @@ The entire "involved" version of the Javascript looks like the below:
 
 
         function my_init() {
-            easyrtc.setRoomOccupantListener( loggedInListener);
+            easyrtc.setRoomOccupantListener( roomListener);
             var connectSuccess = function(myId) {
                 console.log("My easyrtcid is " + myId);
             }
@@ -326,7 +333,7 @@ The entire "involved" version of the Javascript looks like the below:
          }
 
 
-        function loggedInListener(roomName, otherPeers) {
+        function roomListener(roomName, otherPeers) {
             var otherClientDiv = document.getElementById('otherClients');
             while (otherClientDiv.hasChildNodes()) {
                 otherClientDiv.removeChild(otherClientDiv.lastChild);
@@ -378,8 +385,8 @@ calling easyrtc.setVideoBandwidth. The function takes a single integer argument,
 
     easyrtc.setVideoBandwidth(45);
 
-The method should be called before initiating or accepting connections as it operates by modifing records used to establish peer connections.
-It will have no effect on media streams passed to a peer connection before it was invoked. Currently, this is only respected by Chrome.
+The method should be called before initiating or accepting connections as it operates by modifying records used to establish peer connections.
+It will have no effect on media streams passed to a peer connection before it was invoked. Currently, this is only respected by Chrome, and we're told by Mozilla that Firefox won't like it.
 
 
 ### Ignoring Calls ###
@@ -428,12 +435,58 @@ In your javascript, add the below:
 While the above callback is fine for handling a single check, a real implementation would need to handle the case
 of a second check coming in before the first has been responded to.
 
+### Joining and Leaving Rooms ###
+
+Rooms are a compartmentalizing feature of EasyRTC that are useful for setting up "chat rooms".  
+Their behavior is controlled by application logic you install in the EasyRTC server (see the server documentation for details of this). By default, this behavior is:
+
++ Unless a client specifies a room (or set of rooms) before it connects, it will be a member of the room named "default".
++ A client can be a member of multiple rooms simultaneously.
++ A client's roomOccupantListener callback gets called whenever there are reported changes to a room that they are a member of.
++ Joining a nonexistent room creates it.
+
+A client becomes a member of a room by calling
+ 
+>   easyrtc.joinRoom(roomName, roomParameters, successCallback, failureCallback);
+
+The roomParameters argument is application specific.
+
+For example:
+
+	easyrtc.joinRoom("ballroom", null,
+          function(roomName) {
+               console.log("I'm now in room " + roomName);
+          },
+          function(errorCode, errorText, roomName) {
+			  console.log("had problems joining " + roomName);
+          });
+
+A client leaves a room by calling
+
+>   easyrtc.leaveRoom(roomName, successCallback, failureCallback);
+   
+For example: 
+
+	easyrtc.leaveRoom("ballroom", 
+          function(roomName) {
+               console.log("No longer in room " + roomName);
+          },
+          function(errorCode, errorText, roomName) {
+			  console.log("had problems leaving " + roomName);
+          });
+
+Both easyrtc.joinRoom and easyrtc.leaveRoom can be called before a connect, or after.
+If they are called before the connect, their successCallback and failureCallback functions
+won't be invoked.
+
+For more information about rooms, see the [easyrtc_rooms.md](easyrtc_rooms.md) file.
+
 ### Listening For Errors ###
 
-You can register an error callback to find out about errors using easyrtc.setOnError. The callback gets passed two arguments, an error cde and an error message.
+You can register an error callback to find out about errors using easyrtc.setOnError. The callback gets passed an object of the form {"errorCode:errorCode", "errorText":errorText}.
 Example usage:
 
-    easyrtc.setOnError( function(errorCode, errorMessage) { console.log(errorMessage);}
+    easyrtc.setOnError( function(errEvent) { console.log(errEvent.errorText);}
 
 The errorCode parameter is a short string that is more intended for programmatic use than human consumption.
 
@@ -451,15 +504,17 @@ The destination is either a peers easyrtcId or an object that may specify one or
 The messageType is a short string you chose. The ackHandler gets called when the server receives your message, and does not
 constitute a reply from the other peer.
 
-The other peer must be connected to the server and it must have registered a data listener (callback) as below:
+The other peer must be connected to the server and it must have registered a peer listener (callback) as below:
 
-    easyrtc.setPeerListener( function(sendersEasyrtcid, msgType, msgData, targetting) {
+    easyrtc.setPeerListener( function(sendersEasyrtcid, msgType, msgData, targeting) {
           if( msgType === 'contactInfo' ) {
               console.log( sendersEasyrtcid  + ' is named ' + msgData.firstName + ' ' + msgData.lastName);
           }
     });
 
-The targetting parameter is present if the destination was specified as an object by the sender.
+The targeting parameter is present if the destination was specified as an object by the sender.
+
+You can also have a peer listener that is specific to a particular message type, or a particular message type and sender. Only one peer listener will be called per message and the most specific peer listener takes priority.
 
 ### Using Data Channels ###
 To use data channels, each peer must enable data channels before calling (or accepting a call):
@@ -482,8 +537,7 @@ easyrtc.sendDataP2P:
 
 Listening is done with the same peerListener as used when sending message using websockets.
 
-Caveat emptor: At this point in time, the production releases of Firefox and Chrome can't talk to each other using data channels because
-Chrome only supports udp-like data channels and Firefox only supports tcp-like data channels.
+Caveat emptor: At this point in time, the production releases of Firefox and Chrome can't talk to each other using data channels.
 
 ### Are You Connected ###
 
