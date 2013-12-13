@@ -195,7 +195,7 @@
     
     
     
-        <dt class="important tag-deprecated">Deprecated:</dt><dd class="yes-def tag-deprecated"><ul class="dummy"><li>Yes</li></ul></dd>
+        <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>now called easyrtc.easyApp.</li><ul></dd>
     
     
     
@@ -923,7 +923,7 @@
             <td class="type">
             
                 
-<span class="param-type">type</span>
+<span class="param-type">DomElement</span>
 
 
             
@@ -1773,7 +1773,7 @@
             <td class="type">
             
                 
-<span class="param-type">type</span>
+<span class="param-type">Boolean</span>
 
 
             
@@ -2059,7 +2059,7 @@
         
             
 <dt>
-    <h3 class="name" id="enableMicrophone"><span class="type-signature">&lt;static> </span>enableMicrophone<span class="signature">(enable)</span><span class="type-signature"> &rarr; {undefined}</span></h3>
+    <h3 class="name" id="enableMicrophone"><span class="type-signature">&lt;static> </span>enableMicrophone<span class="signature">(enable)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -2107,7 +2107,7 @@
             <td class="type">
             
                 
-<span class="param-type">type</span>
+<span class="param-type">Boolean</span>
 
 
             
@@ -2160,24 +2160,6 @@
     
     
     
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">undefined</span>
-
-
-	</dd>
-</dl>
-
-        
     
     
 </dd>
@@ -4327,7 +4309,7 @@
             <td class="type">
             
                 
-<span class="param-type">type</span>
+<span class="param-type">String</span>
 
 
             
@@ -4350,7 +4332,7 @@
             <td class="type">
             
                 
-<span class="param-type">type</span>
+<span class="param-type">String</span>
 
 
             
@@ -4383,7 +4365,7 @@
             
             
             
-            <td class="description last">called once the room is joined.</td>
+            <td class="description last">called once, with a roomname as it's argument, once the room is joined.</td>
         </tr>
 	
 	
@@ -4456,7 +4438,7 @@
         
             
 <dt>
-    <h3 class="name" id="leaveRoom"><span class="type-signature">&lt;static> </span>leaveRoom<span class="signature">(roomName)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="leaveRoom"><span class="type-signature">&lt;static> </span>leaveRoom<span class="signature">(roomName, successCallback, failureCallback)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -4464,7 +4446,7 @@
     
     
     <div class="description">
-        This function allows you to leave a single room.
+        This function allows you to leave a single room. Note: the successCB and failureDB arguments are optional and will only be called if you are already connected to the server.
     </div>
     
 
@@ -4504,7 +4486,7 @@
             <td class="type">
             
                 
-<span class="param-type">type</span>
+<span class="param-type">String</span>
 
 
             
@@ -4515,6 +4497,52 @@
             
             
             <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>successCallback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">A function which expects a roomName.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>failureCallback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">A function which expects the following arguments: errorCode, errorText, roomName.</td>
         </tr>
 	
 	
@@ -4561,7 +4589,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.leaveRoom("freds_room");</code></pre>
+    <pre class="prettyprint"><code>   easyrtc.leaveRoom("freds_room");   easyrtc.leaveRoom("freds_room", function() { console.log("left the room")},                      function(errorCode, errroText) { console.log("left the room")});           </code></pre>
 
     
 </dd>
@@ -4617,7 +4645,7 @@
             <td class="type">
             
                 
-<span class="param-type">type</span>
+<span class="param-type">String</span>
 
 
             
@@ -4640,7 +4668,7 @@
             <td class="type">
             
                 
-<span class="param-type">type</span>
+<span class="param-type">Boolean</span>
 
 
             
@@ -4781,7 +4809,7 @@
             
             
             
-            <td class="description last"></td>
+            <td class="description last">the type of message being sent (application specific).</td>
         </tr>
 	
 	
@@ -4794,7 +4822,7 @@
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">Object</span>
 
 
             
@@ -4874,7 +4902,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.sendData(someEasyrtcid, {room:499, bldgNum:'asd'});</code></pre>
+    <pre class="prettyprint"><code>   easyrtc.sendData(someEasyrtcid, "roomData",  {room:499, bldgNum:'asd'},      function ackHandler(msgType, msgData);   );</code></pre>
 
     
 </dd>
@@ -4882,7 +4910,166 @@
         
             
 <dt>
-    <h3 class="name" id="sendDataWS"><span class="type-signature">&lt;static> </span>sendDataWS<span class="signature">(destination, {String, msgData, ackhandler)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="sendDataP2P"><span class="type-signature">&lt;static> </span>sendDataP2P<span class="signature">(destUser, msgType, msgData)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sends data to another user using previously established data channel. This method willfail if no data channel has been established yet. Unlike the easyrtc.sendWS method,you can't send a dictionary, convert dictionaries to strings using JSON.stringify first.What datatypes you can send, and how large a datatype depends on your browser.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>destUser</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">(an easyrtcid)</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>msgType</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">the type of message being sent (application specific).</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>msgData</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">an object which can be JSON'ed.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>    easyrtc.sendDataP2P(someEasyrtcid, "roomdata", {room:499, bldgNum:'asd'});</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="sendDataWS"><span class="type-signature">&lt;static> </span>sendDataWS<span class="signature">(destination, msgType, msgData, ackhandler)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -4947,10 +5134,15 @@
 	
         <tr>
             
-                <td class="name"><code>{String</code></td>
+                <td class="name"><code>msgType</code></td>
             
             
             <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
             
             </td>
             
@@ -4958,7 +5150,7 @@
             
             
             
-            <td class="description last">msgType</td>
+            <td class="description last">the type of message being sent (application specific).</td>
         </tr>
 	
 	
@@ -4971,7 +5163,7 @@
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">Object</span>
 
 
             
@@ -5833,7 +6025,7 @@
             <td class="type">
             
                 
-<span class="param-type">type</span>
+<span class="param-type">String</span>
 
 
             
@@ -6398,7 +6590,7 @@
             
             
             
-            <td class="description last">has the signature (gotConnection, why)</td>
+            <td class="description last">has the signature (gotConnection, errorText)</td>
         </tr>
 	
 	
@@ -6445,7 +6637,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.setGotConnection( function(gotConnection, why) {       if( gotConnection ){           console.log("Successfully connected to signaling server");       }       else {           console.log("Failed to connect to signaling server because: " + why);       }   });</code></pre>
+    <pre class="prettyprint"><code>   easyrtc.setGotConnection( function(gotConnection, errorText) {       if( gotConnection ){           console.log("Successfully connected to signaling server");       }       else {           console.log("Failed to connect to signaling server because: " + errorText);       }   });</code></pre>
 
     
 </dd>
@@ -6511,7 +6703,7 @@
             
             
             
-            <td class="description last">has the signature function(gotMedia, why)</td>
+            <td class="description last">has the signature function(gotMedia, errorText)</td>
         </tr>
 	
 	
@@ -6558,7 +6750,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.setGotMedia( function(gotMediaCB, why) {        if( gotMedia ){            console.log("Got the requested user media");        }        else {            console.log("Failed to get media because: " +  why);        }    });</code></pre>
+    <pre class="prettyprint"><code>    easyrtc.setGotMedia( function(gotMediaCB, errorText) {        if( gotMedia ){            console.log("Got the requested user media");        }        else {            console.log("Failed to get media because: " +  errorText);        }    });</code></pre>
 
     
 </dd>
@@ -7262,7 +7454,7 @@
             <td class="type">
             
                 
-<span class="param-type">type</span>
+<span class="param-type">Object</span>
 
 
             
@@ -8990,6 +9182,147 @@
     
 </dd>
 
+        
+            
+<dt>
+    <h3 class="name" id="usernameToIds"><span class="type-signature">&lt;static> </span>usernameToIds<span class="signature">(username, room)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Get an array of easyrtcids that are using a particular username
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>username</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">the username of interest.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>room</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">an optional room name argument limiting results to a particular room.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    an array of {easyrtcid:id, roomName: roomName}.
+</div>
+
+
+
+        
+    
+    
+</dd>
+
         </dl>
     
     
@@ -9009,7 +9342,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Wed Dec 04 2013 09:34:10 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Dec 13 2013 12:36:13 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>
