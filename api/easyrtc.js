@@ -243,7 +243,7 @@ easyrtc.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
             if (successCB) {
                 successCB(roomName);
             }
-            processRoomData(roomData);
+            easyrtc._processRoomData(roomData);
 
             /*
             easyrtc.lastLoggedInList[roomName] = {};
@@ -293,7 +293,7 @@ easyrtc.leaveRoom = function(roomName, successCallback, failureCallback) {
             easyrtc.sendSignalling(null, "roomLeave", {roomLeave: roomItem},
             function(msgType, msgData) {
                 var roomData = msgData.roomData;
-                processRoomData(roomData);
+                easyrtc._processRoomData(roomData);
                 if (successCallback) {
                     successCallback(roomName);
                 }
@@ -2707,22 +2707,22 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
     var onChannelMsg = function(msg) {
 
-        var targetting = {};
+        var targeting = {};
         if (msg.targetEasyrtcId) {
-            targetting.targetEasyrtcId = msg.targetEasyrtcId;
+            targeting.targetEasyrtcId = msg.targetEasyrtcId;
         }
         if (msg.targetRoom) {
-            targetting.targetRoom = msg.targetRoom;
+            targeting.targetRoom = msg.targetRoom;
         }
         if (msg.targetGroup) {
-            targetting.targetGroup = msg.targetGroup;
+            targeting.targetGroup = msg.targetGroup;
         }
         if (msg.senderEasyrtcid) {
-            easyrtc.receivePeerDistribute(msg.senderEasyrtcid, msg, targetting);
+            easyrtc.receivePeerDistribute(msg.senderEasyrtcid, msg, targeting);
         }
         else {
             if (easyrtc.receiveServerCB) {
-                easyrtc.receiveServerCB(msg.msgType, msg.msgData, targetting);
+                easyrtc.receiveServerCB(msg.msgType, msg.msgData, targeting);
             }
             else {
                 console.log("Unhandled server message " + JSON.stringify(msg));
@@ -3182,7 +3182,6 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         }
     }
 
-
     function processRoomData(roomData) {
         easyrtc.roomData = roomData;
         for (var roomname in easyrtc.roomData) {
@@ -3230,6 +3229,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         easyrtc.emitEvent("roomOccupant", easyrtc.lastLoggedInList);
     }
 
+    easyrtc._processRoomData = processRoomData;
 
     easyrtc.isTurnServer = function(ipaddress) {
         return !!easyrtc._turnServers[ipaddress];
