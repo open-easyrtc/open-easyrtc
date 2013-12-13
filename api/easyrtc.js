@@ -279,8 +279,8 @@ easyrtc.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
  * @param {Function} failureCallback - A function which expects the following arguments: errorCode, errorText, roomName.
  * @example
  *    easyrtc.leaveRoom("freds_room");
- *    easyrtc.leaveRoom("freds_room", function() { console.log("left the room")},
- *                       function(errorCode, errroText) { console.log("left the room")});           
+ *    easyrtc.leaveRoom("freds_room", function(roomname) { console.log("left the room")},
+ *                       function(errorCode, errroText, roomname) { console.log("left the room")});           
  */
 easyrtc.leaveRoom = function(roomName, successCallback, failureCallback) {
     if (easyrtc.roomJoin[roomName]) {
