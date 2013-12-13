@@ -14,6 +14,11 @@ Features
  * easyRTC is completely free and open source under a BSD 2 license. No usage costs or other hidden fees.
 
 
+Update Alert!
+-------------
+In the next version of EasyRTC (v1.0), we will be moving to a new modular system. It is recommended that any new development be done using the new modular version (currently in the beta branch).
+
+
 Documentation
 -------------
  * [Install instructions for Ubuntu, Windows, and Mac](./docs/easyrtc_installing.md)
