@@ -1,4 +1,5 @@
-# EasyRTC API to/from Server Messages
+EasyRTC: API to/from Server Messages
+====================================
 
 EasyRTC socket messages are sent via socket.io using three custom emit types:
 
