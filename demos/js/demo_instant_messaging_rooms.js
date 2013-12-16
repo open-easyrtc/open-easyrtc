@@ -27,7 +27,7 @@ var selfEasyrtcid = "";
 var waitingForRoomList = true;
 var isConnected = false;
 
-function addToConversation(who, msgType, cocdntent, targeting) {
+function addToConversation(who, msgType, content, targeting) {
     // Escape html special characters, then add linefeeds.
     if( !content) {
         content = "**no body**";
@@ -59,7 +59,7 @@ function genRoomOccupantName(roomName) {
 }
 
 function setCredential(event, value) {
-    if (event.keyCode == 13) {
+    if (event.keyCode === 13) {
         easyrtc.setCredential(value);
     }
 }
@@ -147,7 +147,7 @@ function roomEntryListener(entered, roomName) {
         addRoom(roomName, null, false);
     }
     else {
-        var roomNode = document.getElementById(roomId);
+        var roomNode = document.getElementById(genRoomDivName(roomName));
         if (roomNode) {
             document.getElementById('#rooms').removeChildNode(roomNode);
         }
@@ -269,21 +269,13 @@ function occupantListener(roomName, data, isPrimary) {
         button.appendChild(label);
         roomDiv.appendChild(button);
     }
+    refreshRoomList();
 }
 
 
 
-function getGroupId() {
-    var id = document.getElementById('groupName').value;
-    if (id) {
-        id = id.trim();
-    }
-    if (id && id !== "") {
-        return id;
-    }
-    else {
+function getGroupId() {   
         return null;
-    }
 }
 
 
