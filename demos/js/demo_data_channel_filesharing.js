@@ -26,16 +26,16 @@
 var selfEasyrtcid = "";
 var peers = {};
 
-function buildPeerBlockName(peerid) {
-    return "peerzone_" + peerid;
+function buildPeerBlockName(easyrtcid) {
+    return "peerzone_" + easyrtcid;
 }
 
-function buildDragNDropName(peerid) {
-    return "dragndrop_" + peerid;
+function buildDragNDropName(easyrtcid) {
+    return "dragndrop_" + easyrtcid;
 }
 
-function buildReceiveAreaName(peerid) {
-    return "receivearea_" + peerid;
+function buildReceiveAreaName(easyrtcid) {
+    return "receivearea_" + easyrtcid;
 }
 
 
@@ -49,6 +49,7 @@ function connect() {
 
     easyrtc.setAcceptChecker(function(easyrtcid, responsefn) {
         responsefn(true);
+        document.getElementById("connectbutton_" + easyrtcid).style.visibility = "hidden";
     });
 
     easyrtc.setDataChannelOpenListener(function(easyrtcid, usesPeer) {
@@ -91,15 +92,38 @@ function convertListToButtons(roomName, data, isPrimary) {
     }
 
 
-    function buildDropDiv(peerid) {
+    function buildDropDiv(easyrtcid) {
         var statusDiv = document.createElement("div");
         statusDiv.className = "dragndropStatus";
+        
+        var dropArea = document.createElement("div");
+        var connectButton = document.createElement("button");
+        connectButton.appendChild(document.createTextNode("Connect"));
+        connectButton.className = "connectButton";
+        connectButton.id = "connectbutton_" + easyrtcid;
+        connectButton.onclick = function() {
+            statusDiv.innerHTML = "Waiting for connection to be established";
+            easyrtc.call(easyrtcid,
+                    function(caller, mediatype) {
+                        statusDiv.innerHTML = "Connection established";
+                        dropArea.className = "dragndrop connected";
+                        connectButton.style.visibility = "hidden";
+                    },
+                    function(errorCode, errorText) {
+                        dropArea.className = "dragndrop connected";
+                        statusDiv.innerHTML = "Connection failed";
+                        connectButton.style.visibility = "hidden";
+                        noDCs[easyrtcid] = true;
+                    },
+                    function wasAccepted(yup) {
+                    }
+            );
+        }
 
-        var div = document.createElement("div");
-        div.id = buildDragNDropName(peerid);
-        div.className = "dragndrop notConnected";
-        div.innerHTML = "File drop area";
-        div.appendChild(statusDiv);
+        dropArea.id = buildDragNDropName(easyrtcid);
+        dropArea.className = "dragndrop notConnected";
+        dropArea.innerHTML = "File drop area";
+
 
         function updateStatusDiv(state) {
             switch (state.status) {
@@ -107,7 +131,7 @@ function convertListToButtons(roomName, data, isPrimary) {
                     statusDiv.innerHTML = "waiting for other party<br\>to accept transmission";
                     break;
                 case "started_file":
-                    statusDiv.innerHTML = "started file: " +state.name;
+                    statusDiv.innerHTML = "started file: " + state.name;
                 case "working":
                     statusDiv.innerHTML = state.name + ":" + state.position + "/" + state.size + "(" + state.numFiles + " files)";
                     break;
@@ -135,36 +159,16 @@ function convertListToButtons(roomName, data, isPrimary) {
             // if we haven't eastablished a connection to the other party yet, do so now,
             // and on completion, send the files. Otherwise send the files now.
             var timer = null;
-            if (easyrtc.getConnectStatus(peerid) === easyrtc.NOT_CONNECTED && noDCs[peerid] === undefined) {
+            if (easyrtc.getConnectStatus(easyrtcid) === easyrtc.NOT_CONNECTED && noDCs[easyrtcid] === undefined) {
                 //
                 // calls between firefrox and chrome ( version 30) have problems one way if you 
                 // use data channels.
                 //
-                try {
-                    easyrtc.call(peerid,
-                            function(caller, mediatype) {
-                                if (noDCs[peerid] === undefined) {
-                                    filesHandler(files);
-                                }
-                            },
-                            function(errorCode, errorText) {
-                                easyrtc.showError(errorCode, errorText)
-                            },
-                            function wasAccepted(yup) {
-                            }
-                    );
-                    timer = setTimeout(function() {
-                        noDCs[peerid] = true;
-                        filesHandler(files);
-                    }, 4000);
-                } catch (callError) {
-                    noDCs[peerid] = true;
-                    filesHandler(files);
-                }
+
             }
-            else if (easyrtc.getConnectStatus(peerid) === easyrtc.IS_CONNECTED || noDCs[peerid]) {
+            else if (easyrtc.getConnectStatus(easyrtcid) === easyrtc.IS_CONNECTED || noDCs[easyrtcid]) {
                 if (!fileSender) {
-                    fileSender = easyrtc_ft.buildFileSender(peerid, updateStatusDiv);
+                    fileSender = easyrtc_ft.buildFileSender(easyrtcid, updateStatusDiv);
                 }
                 fileSender(files, true /* assume binary */);
             }
@@ -172,8 +176,12 @@ function convertListToButtons(roomName, data, isPrimary) {
                 easyrtc.showError("user-error", "Wait for the connection to complete before adding more files!");
             }
         }
-        easyrtc_ft.buildDragNDropRegion(div, filesHandler);
-        return div;
+        easyrtc_ft.buildDragNDropRegion(dropArea, filesHandler);
+        var container = document.createElement("div");
+        container.appendChild(connectButton);
+        container.appendChild(dropArea);
+        container.appendChild(statusDiv);
+        return container;
     }
 
 
@@ -186,17 +194,17 @@ function convertListToButtons(roomName, data, isPrimary) {
     }
 
 
-    for (var i in data) {
-        if (!peers[i]) {
+    for (var easyrtcid in data) {
+        if (!peers[easyrtcid]) {
             var peerBlock = document.createElement("div");
-            peerBlock.id = buildPeerBlockName(i);
+            peerBlock.id = buildPeerBlockName(easyrtcid);
             peerBlock.className = "peerblock";
-            peerBlock.appendChild(document.createTextNode(" For peer " + i));
+            peerBlock.appendChild(document.createTextNode(" For peer " + easyrtcid));
             peerBlock.appendChild(document.createElement("br"));
-            peerBlock.appendChild(buildDropDiv(i));
-            peerBlock.appendChild(buildReceiveDiv(i));
+            peerBlock.appendChild(buildDropDiv(easyrtcid));
+            peerBlock.appendChild(buildReceiveDiv(easyrtcid));
             peerZone.appendChild(peerBlock);
-            peers[i] = true;
+            peers[easyrtcid] = true;
         }
     }
 }
@@ -216,7 +224,7 @@ function acceptRejectCB(otherGuy, fileNameList, wasAccepted) {
     receiveBlock.appendChild(document.createElement("br"));
     for (var i = 0; i < fileNameList.length; i++) {
         receiveBlock.appendChild(
-                document.createTextNode("  " + fileNameList[i].name + "(" + fileNameList[i].size +  " bytes)"));
+                document.createTextNode("  " + fileNameList[i].name + "(" + fileNameList[i].size + " bytes)"));
         receiveBlock.appendChild(document.createElement("br"));
     }
     //
@@ -243,6 +251,8 @@ function acceptRejectCB(otherGuy, fileNameList, wasAccepted) {
 function receiveStatusCB(otherGuy, msg) {
     var receiveBlock = document.getElementById(buildReceiveAreaName(otherGuy));
     switch (msg.status) {
+        case "started":
+            break;
         case "eof":
             receiveBlock.innerHTML = "Finished file";
             break;
@@ -259,7 +269,7 @@ function receiveStatusCB(otherGuy, msg) {
             receiveBlock.innerHTML = msg.name + " " + msg.received + "/" + msg.size;
             break;
         default:
-            console.log("strange file receive cb message = " + msg);
+            console.log("strange file receive cb message = ", JSON.stringify(msg));
     }
     return true;
 }

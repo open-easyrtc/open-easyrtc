@@ -48,9 +48,7 @@
                 border-radius: 5px;
             }            
             .dragndropStatus {
-                color: #ffffff;
-                background-color: transparent;
-                text-shadow: 0px 0px 5px rgba(0, 0, 0, 1)
+                display: inline-block;
             }
             .connecting {
                 background-color: yellow;
@@ -59,7 +57,7 @@
                 background-color: pink;
             }
             .notConnected {
-                background-color: #e0e0e0;
+                visibility:hidden;
             }
             .connected {
                 background-color: #e0ffe0;
@@ -71,6 +69,9 @@
             .connected:hover {
                 margin: 1px;
                 border-width:3px;
+            }
+            .connectButton {
+                padding:2em;
             }
 
         </style>

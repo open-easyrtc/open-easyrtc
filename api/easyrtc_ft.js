@@ -87,14 +87,12 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
 
     function dragEnterHandler(e) {
         addClass(droptarget, dropCueClass);
-        console.log("entered file drop area");
         return drageventcancel(e);
     }
 
 
     function dragLeaveHandler(e) {
         removeClass(droptarget, dropCueClass);
-        console.log("left file drop area");
         return drageventcancel(e);
     }
 
@@ -142,8 +140,6 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
             target.className = classname;
         }
         target.className = target.className.replace("  ", " ");
-        console.log("target is " + target.id);
-        console.log("class name is now " + target.className);
     }
 
     function removeClass(target, classname) {
@@ -151,8 +147,6 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
             return;
         }
         target.className = target.className.replace(classname, "").replace("  ", " ");
-
-        console.log("class name is now " + target.className);
     }
 };
 
@@ -349,6 +343,8 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
             }, 240);
         }
     }
+    
+    
     function sendFilesOffer(files, areBinary) {
         if (haveFilesWaiting) {
             filesWaiting.push({files: files, areBinary: areBinary});
