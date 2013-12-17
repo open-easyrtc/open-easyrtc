@@ -82,10 +82,10 @@ function removeIfPresent(parent, childname) {
 
 
 
-function convertListToButtons(roomName, data, isPrimary) {
+function convertListToButtons(roomName, occupants, isPrimary) {
     var peerZone = document.getElementById('peerZone');
     for (var oldPeer in  peers) {
-        if (!data[oldPeer]) {
+        if (!occupants[oldPeer]) {
             removeIfPresent(peerZone, buildPeerBlockName(oldPeer));
             delete peers[oldPeer];
         }
@@ -194,7 +194,7 @@ function convertListToButtons(roomName, data, isPrimary) {
     }
 
 
-    for (var easyrtcid in data) {
+    for (var easyrtcid in occupants) {
         if (!peers[easyrtcid]) {
             var peerBlock = document.createElement("div");
             peerBlock.id = buildPeerBlockName(easyrtcid);
