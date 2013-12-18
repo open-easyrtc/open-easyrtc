@@ -32,13 +32,13 @@ function initApp() {
     }    
 }
 
-function disable(id) {
-    document.getElementById(id).disabled = "disabled";
+function disable(domId) {
+    document.getElementById(domId).disabled = "disabled";
 }
 
 
-function enable(id) {
-    document.getElementById(id).disabled = "";
+function enable(domId) {
+    document.getElementById(domId).disabled = "";
 }
 
 
@@ -124,17 +124,17 @@ function requestFullScreen() {
 }
 
 
-easyrtc.setPeerListener(function(peer, msgType, data){
+easyrtc.setPeerListener(function(easyrtcid, msgType, data){
     var otherClientDiv = document.getElementById('otherClients');
     var button = document.createElement('button');
     button.onclick = function(easyrtcid) {
         return function() {
-            performCall(peer);
+            performCall(easyrtcid);
         };
-    }(peer);
-    button.id = "callbutton_" +peer;
-    console.log("adding button for id =" + peer);
-    var label = document.createTextNode("Get screen of " + easyrtc.idToName(peer));
+    }(easyrtcid);
+    button.id = "callbutton_" +easyrtcid;
+    console.log("adding button for id =" + easyrtcid);
+    var label = document.createTextNode("Get screen of " + easyrtc.idToName(easyrtcid));
     button.appendChild(label);
     otherClientDiv.appendChild(button);
 });
@@ -142,9 +142,9 @@ easyrtc.setPeerListener(function(peer, msgType, data){
 
 function performCall(otherEasyrtcid) {
     easyrtc.hangupAll();
-    var acceptedCB = function(accepted, caller) {
+    var acceptedCB = function(accepted, easyrtcid) {
         if( !accepted ) {
-            easyrtc.showError("CALL-REJECTED", "Sorry, your call to " + easyrtc.idToName(caller) + " was rejected");
+            easyrtc.showError("CALL-REJECTED", "Sorry, your call to " + easyrtc.idToName(easyrtcid) + " was rejected");
             enable('otherClients');
         }
     };
@@ -192,7 +192,7 @@ easyrtc.setStreamAcceptor( function(caller, stream) {
 
 
 
-easyrtc.setOnStreamClosed( function (caller) {
+easyrtc.setOnStreamClosed( function (easyrtcid) {
     easyrtc.setVideoObjectSrc(document.getElementById('callerVideo'), "");
     document.cancelFullScreen();
     disable("hangupButton");
@@ -201,8 +201,8 @@ easyrtc.setOnStreamClosed( function (caller) {
 
 var callerPending = null;
 
-easyrtc.setCallCancelled( function(caller){
-    if( caller === callerPending) {
+easyrtc.setCallCancelled( function(easyrtcid){
+    if( easyrtcid === callerPending) {
         document.getElementById('acceptCallBox').style.display = "none";
         callerPending = false;
     }

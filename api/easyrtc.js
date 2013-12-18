@@ -2016,14 +2016,14 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 }
         );
     };
-    /** Value returned by easyrtc.getConnectStatus if the other user isn't connected. */
+    /** Value returned by easyrtc.getConnectStatus if the other user isn't connected to us. */
     easyrtc.NOT_CONNECTED = "not connected";
     /** Value returned by easyrtc.getConnectStatus if the other user is in the process of getting connected */
-    easyrtc.BECOMING_CONNECTED = "connection in progress";
-    /** Value returned by easyrtc.getConnectStatus if the other user is connected. */
+    easyrtc.BECOMING_CONNECTED = "connection in progress to us.";
+    /** Value returned by easyrtc.getConnectStatus if the other user is connected to us. */
     easyrtc.IS_CONNECTED = "is connected";
     /**
-     * Return true if the client has a peer-2-peer connection to another user.
+     * Check if the client has a peer-2-peer connection to another user.
      * The return values are text strings so you can use them in debugging output.
      *  @param {String} otherUser - the easyrtcid of the other user.
      *  @return {String} one of the following values: easyrtc.NOT_CONNECTED, easyrtc.BECOMING_CONNECTED, easyrtc.IS_CONNECTED
@@ -3319,7 +3319,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             processRoomData(msgData.roomData);
         }
 
-        if (msgData.application) {
+        if (msgData.application.field) {
             easyrtc.fields.application = msgData.application.field;
         }
 

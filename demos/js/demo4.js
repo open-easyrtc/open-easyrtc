@@ -42,18 +42,18 @@ function clearConnectList() {
 }
 
 
-function convertListToButtons (roomName, data, isPrimary) {
+function convertListToButtons (roomName, occupants, isPrimary) {
     clearConnectList();
-    otherClientDiv = document.getElementById('otherClients');
-    for(var i in data) {
+    var otherClientDiv = document.getElementById('otherClients');
+    for(var easyrtcid in occupants) {
         var button = document.createElement('button');
         button.onclick = function(easyrtcid) {
             return function() {
                 performCall(easyrtcid);
             };
-        }(i);
+        }(easyrtcid);
 
-        label = document.createTextNode(i);
+        var label = document.createTextNode(easyrtcid);
         button.appendChild(label);
         otherClientDiv.appendChild(button);
     }
@@ -61,9 +61,9 @@ function convertListToButtons (roomName, data, isPrimary) {
 
 
 function performCall(otherEasyrtcid) {
-    var acceptedCB = function(accepted, caller) {
+    var acceptedCB = function(accepted, easyrtcid) {
         if( !accepted ) {
-            alert("Sorry, your call to " + caller + " was rejected");
+            alert("Sorry, your call to " + easyrtcid + " was rejected");
         }
     };
     var successCB = function() {};
@@ -84,6 +84,6 @@ function loginFailure(errorCode, message) {
 
 
 // Sets calls so they are automatically accepted (this is default behaviour)
-easyrtc.setAcceptChecker(function(caller, cb) {
-    cb(true);
+easyrtc.setAcceptChecker(function(easyrtcid, callback) {
+    callback(true);
 } );

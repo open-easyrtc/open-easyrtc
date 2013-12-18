@@ -29,14 +29,13 @@ var selfEasyrtcid = "";
 function connect() {
     easyrtc.setVideoDims(1280,720);
     easyrtc.enableDebug(false);
-    console.log("Initializing.");
     easyrtc.setRoomOccupantListener(convertListToButtons);
     easyrtc.easyApp("easyrtc.videoChatHd", "selfVideo", ["callerVideo"], loginSuccess, loginFailure);
 }
 
 
 function clearConnectList() {
-    otherClientDiv = document.getElementById('otherClients');
+    var otherClientDiv = document.getElementById('otherClients');
     while (otherClientDiv.hasChildNodes()) {
         otherClientDiv.removeChild(otherClientDiv.lastChild);
     }
@@ -45,16 +44,16 @@ function clearConnectList() {
 
 function convertListToButtons (roomName, data, isPrimary) {
     clearConnectList();
-    otherClientDiv = document.getElementById('otherClients');
-    for(var i in data) {
+    var otherClientDiv = document.getElementById('otherClients');
+    for(var easyrtcid in data) {
         var button = document.createElement('button');
         button.onclick = function(easyrtcid) {
             return function() {
                 performCall(easyrtcid);
             };
-        }(i);
+        }(easyrtcid);
 
-        label = document.createTextNode(easyrtc.idToName(i));
+        var label = document.createTextNode(easyrtc.idToName(easyrtcid));
         button.appendChild(label);
         button.className = "callbutton";
         otherClientDiv.appendChild(button);

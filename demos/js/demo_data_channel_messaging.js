@@ -64,40 +64,40 @@ function closeListener(otherParty) {
 function convertListToButtons(roomName, occupantList, isPrimary) {
     connectList = occupantList;
 
-    otherClientDiv = document.getElementById('otherClients');
+    var otherClientDiv = document.getElementById('otherClients');
     while (otherClientDiv.hasChildNodes()) {
         otherClientDiv.removeChild(otherClientDiv.lastChild);
     }
 
     var label, button;
-    for (var i in connectList) {
+    for (var easyrtcid in connectList) {
         var rowGroup = document.createElement("span");
-        var rowLabel = document.createTextNode(easyrtc.idToName(i));
+        var rowLabel = document.createTextNode(easyrtc.idToName(easyrtcid));
         rowGroup.appendChild(rowLabel);
 
         button = document.createElement('button');
-        button.id = "connect_" + i;
+        button.id = "connect_" + easyrtcid;
         button.onclick = function(easyrtcid) {
             return function() {
                 startCall(easyrtcid);
             };
-        }(i);
+        }(easyrtcid);
         label = document.createTextNode("Connect");
         button.appendChild(label);
         rowGroup.appendChild(button);
 
         button = document.createElement('button');
-        button.id = "send_" + i;
+        button.id = "send_" + easyrtcid;
         button.onclick = function(easyrtcid) {
             return function() {
                 sendStuffP2P(easyrtcid);
             };
-        }(i);
+        }(easyrtcid);
         label = document.createTextNode("Send Message");
         button.appendChild(label);
         rowGroup.appendChild(button);
         otherClientDiv.appendChild(rowGroup);
-        updateButtonState(i);
+        updateButtonState(easyrtcid);
     }
     if (!otherClientDiv.hasChildNodes()) {
         otherClientDiv.innerHTML = "<em>Nobody else logged in to talk to...</em>";
@@ -143,14 +143,13 @@ function sendStuffP2P(otherEasyrtcid) {
     if (text.replace(/\s/g, "").length === 0) { // Don't send just whitespace
         return;
     }
-    console.log("++text was ", text)
     if (easyrtc.getConnectStatus(otherEasyrtcid) === easyrtc.IS_CONNECTED) {
         easyrtc.sendDataP2P(otherEasyrtcid, 'msg', text);
     }
     else {
         easyrtc.showError("NOT-CONNECTED", "not connected to " + easyrtc.idToName(otherEasyrtcid) + " yet.");
     }
-    console.log("--text was ", text)
+
     addToConversation("Me", "msgtype", text);
     document.getElementById('sendMessageText').value = "";
 }

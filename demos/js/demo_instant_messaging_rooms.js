@@ -231,7 +231,7 @@ function addQuickJoinButtons(roomList) {
 
 
 
-function occupantListener(roomName, data, isPrimary) {
+function occupantListener(roomName, occupants, isPrimary) {
     if (roomName === null) {
         return;
     }
@@ -244,7 +244,7 @@ function occupantListener(roomName, data, isPrimary) {
     else {
         jQuery(roomDiv).empty();
     }
-    for (var easyrtcid in data) {
+    for (var easyrtcid in occupants) {
         var button = document.createElement("button");
         button.onclick = (function(roomname, easyrtcid) {
             return function() {
@@ -252,13 +252,13 @@ function occupantListener(roomName, data, isPrimary) {
             };
         })(roomName, easyrtcid);
         var presenceText = "";
-        if (data[easyrtcid].presence) {
+        if (occupants[easyrtcid].presence) {
             presenceText += "(";
-            if (data[easyrtcid].presence.show) {
-                presenceText += "show=" + data[easyrtcid].presence.show + " ";
+            if (occupants[easyrtcid].presence.show) {
+                presenceText += "show=" + occupants[easyrtcid].presence.show + " ";
             }
-            if (data[easyrtcid].presence.status) {
-                presenceText += "status=" + data[easyrtcid].presence.status;
+            if (occupants[easyrtcid].presence.status) {
+                presenceText += "status=" + occupants[easyrtcid].presence.status;
             }
             presenceText += ")";
         }

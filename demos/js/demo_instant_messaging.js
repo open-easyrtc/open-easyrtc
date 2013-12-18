@@ -40,20 +40,20 @@ function connect() {
 }
 
 
-function convertListToButtons (roomName, data, isPrimary) {
-    otherClientDiv = document.getElementById('otherClients');
+function convertListToButtons (roomName, occupants, isPrimary) {
+    var otherClientDiv = document.getElementById('otherClients');
     while (otherClientDiv.hasChildNodes()) {
         otherClientDiv.removeChild(otherClientDiv.lastChild);
     }
     
-    for(var i in data) {        
+    for(var easyrtcid in occupants) {        
         var button = document.createElement('button');
         button.onclick = function(easyrtcid) {        
             return function() {
                 sendStuffWS(easyrtcid);
             };
-        }(i);        
-        var label = document.createTextNode("Send to " + easyrtc.idToName(i));
+        }(easyrtcid);        
+        var label = document.createTextNode("Send to " + easyrtc.idToName(easyrtcid));
         button.appendChild(label);
                 
         otherClientDiv.appendChild(button);        

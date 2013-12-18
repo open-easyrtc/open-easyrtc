@@ -508,10 +508,10 @@ function prepVideoBox(whichBox) {
 
 function killActiveBox() {
     if( activeBox > 0) {
-        var caller = easyrtc.getIthCaller(activeBox-1);
+        var easyrtcid = easyrtc.getIthCaller(activeBox-1);
         collapseToThumb();
         setTimeout( function() {
-            easyrtc.hangup(caller);
+            easyrtc.hangup(easyrtcid);
         }, 400);
     }  
 }
@@ -531,8 +531,8 @@ function callEverybodyElse(roomName, otherPeople) {
     var list = [];
     var connectCount = 0;
     
-    for(var i in otherPeople ) {
-        list.push(i);
+    for(var easyrtcid in otherPeople ) {
+        list.push(easyrtcid);
     }
     //
     // Connect in reverse order. Latter arriving people are more likely to have
@@ -578,9 +578,9 @@ function sendText(e) {
     var stringToSend = document.getElementById('textentryField').value;
     if( stringToSend && stringToSend != "") {
         for(var i = 0; i < maxCALLERS; i++ ) {
-            var caller = easyrtc.getIthCaller(i);
-            if( caller && caller != "") {
-                easyrtc.sendPeerMessage(caller, "im",  stringToSend);
+            var easyrtcid = easyrtc.getIthCaller(i);
+            if( easyrtcid && easyrtcid != "") {
+                easyrtc.sendPeerMessage(easyrtcid, "im",  stringToSend);
             }        
         }
     } 
@@ -654,9 +654,9 @@ function showMessage(startX, startY, content) {
     }
 }
 
-function messageListener(who, msgType, content) {
+function messageListener(easyrtcid, msgType, content) {
     for(var i = 0; i < maxCALLERS; i++) {
-        if( easyrtc.getIthCaller(i) == who) {
+        if( easyrtc.getIthCaller(i) == easyrtcid) {
             var startArea = document.getElementById(getIdOfBox(i+1));
             var startX = parseInt(startArea.offsetLeft) + parseInt(startArea.offsetWidth)/2;
             var startY = parseInt(startArea.offsetTop) + parseInt(startArea.offsetHeight)/2;
@@ -690,7 +690,7 @@ function appInit() {
     easyrtc.setDisconnectListener( function() {
         easyrtc.showError("LOST-CONNECTION", "Lost connection to signaling server");
     });   
-    easyrtc.setOnCall( function(caller, slot) {
+    easyrtc.setOnCall( function(easyrtcid, slot) {
         boxUsed[slot+1] = true;
         if(activeBox == 0 &&  easyrtc.getConnectionCount() == 1) { // first connection
             collapseToThumb();
@@ -701,9 +701,9 @@ function appInit() {
     });
 
 
-    easyrtc.setOnHangup(function(caller, slot) {
+    easyrtc.setOnHangup(function(easyrtcid, slot) {
         boxUsed[slot+1] = false;
-        console.log("hanging up on " + caller);
+        console.log("hanging up on " + easyrtcid);
         if(activeBox > 0 && slot+1 == activeBox) {
             collapseToThumb(); 
         }

@@ -32,13 +32,13 @@ function initApp() {
 }
 
 
-function disable(id) {
-    document.getElementById(id).disabled = "disabled";
+function disable(domId) {
+    document.getElementById(domId).disabled = "disabled";
 }
 
 
-function enable(id) {
-    document.getElementById(id).disabled = "";
+function enable(domId) {
+    document.getElementById(domId).disabled = "";
 }
 
 var contactedListeners = {};
@@ -59,10 +59,10 @@ function connect() {
     easyrtc.setScreenCapture();
     easyrtc.enableAudio(document.getElementById("shareAudio").checked);
     easyrtc.setRoomOccupantListener(function (roomName, otherPeers){
-        var peer;
-        for(peer in otherPeers ) {
-            if( !contactedListeners[peer]) {
-                easyrtc.sendPeerMessage(peer, "available", {
+        var easyrtcid;
+        for(easyrtcid in otherPeers ) {
+            if( !contactedListeners[easyrtcid]) {
+                easyrtc.sendPeerMessage(easyrtcid, "available", {
                     sender:true
                 }, function(){}, function(errCode, errorText) {
                     console.log("messaging error" + errorText);
@@ -72,7 +72,7 @@ function connect() {
         contactedListeners = otherPeers;
     });
     
-    easyrtc.setPeerListener(function(peer, msgType, data){});
+    easyrtc.setPeerListener(function(easyrtcid, msgType, data){});
     
     easyrtc.connect("easyrtc.videoScreen", loginSuccess, loginFailure);
 }
@@ -109,16 +109,16 @@ function disconnect() {
 }
 
 
-easyrtc.setStreamAcceptor( function(caller, stream) {
+easyrtc.setStreamAcceptor( function(easyrtcid, stream) {
     var audio = document.getElementById('callerAudio');
     easyrtc.setVideoObjectSrc(audio,stream);
-    console.log("got audio from " + easyrtc.idToName(caller));
+    console.log("got audio from " + easyrtc.idToName(easyrtcid));
     enable("hangupButton");
 });
 
 
 
-easyrtc.setOnStreamClosed( function (caller) {
+easyrtc.setOnStreamClosed( function (easyrtcid) {
     easyrtc.setVideoObjectSrc(document.getElementById('callerAudio'), "");
     disable("hangupButton");
 });
@@ -126,19 +126,19 @@ easyrtc.setOnStreamClosed( function (caller) {
 
 var callerPending = null;
 
-easyrtc.setCallCancelled( function(caller){
-    if( caller === callerPending) {
+easyrtc.setCallCancelled( function(easyrtcid){
+    if( easyrtcid === callerPending) {
         document.getElementById('acceptCallBox').style.display = "none";
         callerPending = false;
     }
 });
 
 
-easyrtc.setAcceptChecker(function(caller, cb) {
+easyrtc.setAcceptChecker(function(easyrtcid, cb) {
     document.getElementById('acceptCallBox').style.display = "block";
-    callerPending = caller;
+    callerPending = easyrtcid;
 
-   document.getElementById('acceptCallLabel').innerHTML = "Accept incoming call from " + easyrtc.idToName(caller) + " ?";
+   document.getElementById('acceptCallLabel').innerHTML = "Accept incoming call from " + easyrtc.idToName(easyrtcid) + " ?";
 
     var acceptTheCall = function(wasAccepted) {
         document.getElementById('acceptCallBox').style.display = "none";
