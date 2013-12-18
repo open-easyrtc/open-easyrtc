@@ -128,7 +128,7 @@ easyrtc.apiVersion = "1.0.6-beta";
 /** Most basic message acknowledgment object */
 easyrtc.ackMessage = {msgType: "ack", msgData: {}};
 /** Regular expression pattern for user ids. This will need modification to support non US character sets */
-easyrtc.usernamePattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,30}[a-zA-Z0-9]$/;
+easyrtc.usernameRegExp = /^(.){1,64}$/;
 /** @private */
 easyrtc.cookieId = "easyrtcsid";
 /** @private */
@@ -189,7 +189,7 @@ easyrtc.roomJoin = {};
  *    }
  */
 easyrtc.isNameValid = function(name) {
-    return easyrtc.usernamePattern.test(name);
+    return easyrtc.usernameRegExp.test(name);
 };
 /**
  * This function sets the name of the cookie that client side library will look for
