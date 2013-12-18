@@ -20,7 +20,7 @@ As is often the case with software, with power comes complexity. WebRTC has a le
 A WebRTC application usually needs to do most of the following steps.
 
 + Get access to the local camera and microphone in the form of a "media stream".
-+ Establish a connection to a signalling server.
++ Establish a connection to a signaling server.
 + Initiate a call to a person on another browser.
 + Connect media streams to video tags.
 

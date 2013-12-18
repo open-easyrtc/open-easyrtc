@@ -1,13 +1,13 @@
 EasyRTC: Using SSL
 ==================
 
-Being a signalling server, EasyRTC sends many message in plain text between the client and server. It is a good idea to connect to EasyRTC via SSL.
+Being a signaling server, EasyRTC sends many message in plain text between the client and server. It is a good idea to connect to EasyRTC via SSL.
 
 Benefits of using SSL:
 ----------------------
 
  - Increase end user confidence
- - Secure signalling traffic from eavesdroppers
+ - Secure signaling traffic from eavesdroppers
  - In Chrome: Browser remembers camera and microphone sharing preference for site. Does not re-ask at each  - visit.
  - In Chrome: Enables screen sharing API
 

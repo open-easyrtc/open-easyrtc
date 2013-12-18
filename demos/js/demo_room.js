@@ -691,7 +691,7 @@ function appInit() {
     easyrtc.easyApp("easyrtc.room", "box0", ["box1", "box2", "box3"], loginSuccess, loginFailure);
     easyrtc.setPeerListener(messageListener);
     easyrtc.setDisconnectListener( function() {
-        easyrtc.showError("LOST-CONNECTION", "Lost connection to signalling server");
+        easyrtc.showError("LOST-CONNECTION", "Lost connection to signaling server");
     });   
     easyrtc.setOnCall( function(caller, slot) {
         boxUsed[slot+1] = true;
