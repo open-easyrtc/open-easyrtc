@@ -107,7 +107,7 @@ function addRoom(roomName, parmString, userAdded) {
             roomParms = JSON.parse(parmString);
         } catch (error) {
             roomParms = null;
-            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "non-jsonable parameter to easyrtc.joinRoom");
+            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "Room Parameters must be an object containing key/value pairs. eg: {\"fruit\":\"banana\",\"color\":\"yellow\"}");
             return;
         }
     }

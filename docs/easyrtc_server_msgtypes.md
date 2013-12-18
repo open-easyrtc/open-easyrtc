@@ -128,7 +128,7 @@ Enters a room. If room doesn't exist, a new room may be created.
 
  - **roomJoin** (required) Map of room names
    - **roomName** (required) Room name (matches map key)
-   - **roomParameter** (optional) May be any JSONable object. This field is not looked at by EasyRTC, however it is available for custom server applications. May be used for room options or authentication needs.
+   - **roomParameter** (optional) A map(dictionary) object with key/value pairs. The values can be any JSONable object. This field is not currently looked at by EasyRTC, however it is available for custom server applications. May be used for room options or authentication needs.
 
 **Returns:**
  - **roomData** (with roomStatus of `join`)
