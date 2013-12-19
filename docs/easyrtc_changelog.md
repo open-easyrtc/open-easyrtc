@@ -1,10 +1,29 @@
 EasyRTC: Change Log
 ===================
 
+v1.0.7
+------
+
+New Features:
+ * Server - New function connectionObj.getUsername() to return the username of the specified connection.
+ * Documentation - New guide for handling ICE configuration, including STUN and TURN
+ * Documentation - New guide for handling authentication.
+
+Changes:
+ * API - Renamed easyrtc.usernamePattern to easyrtc.usernameRegExp to align with server option name. Set the default value to align with default server option value.
+ * Server - Cleanup of logging and error handling
+ * Server - connectionObj.roomJoin() will no longer create a room if a room doesn't already exist. This logic is handled by the roomJoin event.
+ * Demos - General cleanup including variable renaming (Why shoeldn't "signaling" have two L's?)
+
+Fixes:
+ * Server - Fixed issue when joining rooms when roomAutoCreateEnable option is disabled. When joining room fails, an error message is now returned rather than an empty roomData object. Related to issue #17 
+ * Demos - Fixes and improvements for rooms demo.
+
+
 v1.0.6-beta
 -----------
 
-New Features::
+New Features:
  * API - New convenience function to return an array of easyrtcid's which match a username. easyrtc.usernameToIds()
  * Server - New application level function for determining if an easyrtcid is currently connected. appObj.isConnected()
  * Documentation - New guide for installing EasyRTC alongside another server
