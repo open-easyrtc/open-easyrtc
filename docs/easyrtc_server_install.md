@@ -20,6 +20,7 @@ Ubuntu EasyRTC Install Steps:
     * ensure the node is run as that user.
 	
 4. Download files from the [server_example folder](../server_example/) into your EasyRTC application folder.
+    * OR [download and extract this .zip](http://easyrtc.com/files/easyrtc_server_example.zip)
 
 5. Change to the easyrtc folder and then install node modules locally
     * `cd /var/nodes/easyrtc`
