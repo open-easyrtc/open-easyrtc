@@ -93,3 +93,10 @@ Even with TURN, a WebRTC peer connections can fail.
  - High latency
  - Packet loss
  - Poor client processing power
+
+
+If You Run Into Problems
+------------------------
+Please feel free to post on our discussion forum:
+
+ * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)

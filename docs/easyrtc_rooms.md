@@ -105,3 +105,9 @@ When a client has requested to leave a room, the "roomLeave" event is fired. By 
  - Control which other clients receive an update that a client left the room
  - Perform application logic, where rooms may be matched to a database entry
 
+
+If You Run Into Problems
+------------------------
+Please feel free to post on our discussion forum:
+
+ * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)

@@ -228,3 +228,10 @@ Available Server Options
    - Username
    - Can be set at application level
    - Defaults to: /^(.){1,64}$/i
+
+
+If You Run Into Problems
+------------------------
+Please feel free to post on our discussion forum:
+
+ * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)

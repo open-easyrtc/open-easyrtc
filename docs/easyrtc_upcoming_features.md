@@ -27,3 +27,10 @@ Demos
 Other
 -----
 * As the specifications and browsers are improved, we'll follow.
+
+
+Any Features You Would Like?
+----------------------------
+Please feel free to post on our discussion forum:
+
+ * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)

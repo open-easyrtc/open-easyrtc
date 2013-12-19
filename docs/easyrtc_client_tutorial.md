@@ -1,8 +1,6 @@
 EasyRTC Framework Tutorial
 =======================
 
-   Last updated September 16, 2013.
-
 Overview
 ---------
 
@@ -563,3 +561,9 @@ You can disconnect from the server by calling easyrtc.disconnect. Example use:
 
      easyrtc.disconnect();
 
+
+If You Run Into Problems
+------------------------
+Please feel free to post on our discussion forum:
+
+ * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)

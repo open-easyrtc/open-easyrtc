@@ -96,3 +96,10 @@ In this simplistic example, any clients connecting to the adminSite application 
      - `next(new easyrtc.util.ConnectionError("Failed our private auth."));`    
 
 For more information about EasyRTC server events, see [easyrtc_server_events.md](easyrtc_server_events.md)
+
+
+If You Run Into Problems
+------------------------
+Please feel free to post on our discussion forum:
+
+ * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)

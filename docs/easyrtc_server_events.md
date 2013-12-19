@@ -60,3 +60,10 @@ Many EasyRTC listeners include a callback as the last parameter. Conventions wil
 The best spot (currently) to see all the available events is by reading the default event listeners documentation. This will give you an idea of the events, parameters, and default behavior.
 
  - /docs/server_html_docs/module-easyrtc_default_event_listeners-eventListener.html
+
+
+If You Run Into Problems
+------------------------
+Please feel free to post on our discussion forum:
+
+ * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)

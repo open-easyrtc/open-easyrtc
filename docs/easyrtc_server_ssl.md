@@ -61,3 +61,9 @@ Using an SSL Gateway or Load Balancing server:
 ----------------------------------------------
 
 For performance, load balancing, or firewall reasons you may wish to use an SSL gateway or load balancer. These often entail the gateway handling SSL, then routing requests to an EasyRTC server in a virtual private network. The gateway should be set to include the X-Forwarded-For http header. There are many solutions for doing this, each with their own instructions.
+
+If You Run Into Problems
+------------------------
+Please feel free to post on our discussion forum:
+
+ * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
