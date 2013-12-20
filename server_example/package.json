@@ -1,0 +1,24 @@
+{
+  "name"        : "easyrtc_server_example",
+  "version"     : "0.1.4",
+  "author"      : "Priologic Software Inc. <info@priologic.com> (http://priologic.com/)",
+  "description" : "Simple EasyRTC server example which includes EasyRTC, Express, and Socket.io",
+
+  "private"     : true,
+
+  "scripts": {
+    "start"     : "node server.js"
+  },
+
+  "dependencies" : {
+    "easyrtc"   : "*",
+    "express"   : "*",
+    "socket.io" : "*"
+  },
+
+  "license"     : "BSD2",
+
+  "engines": {
+    "node"      : ">=0.8"
+  }
+}

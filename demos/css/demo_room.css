@@ -16,7 +16,7 @@
 }
 
 .closeButton {
-    display: none; /* hide the initManaged's close button because we have our own */
+    display: none; /* hide the easyApp's close button because we have our own */
 }
 
 .thumbCommon {

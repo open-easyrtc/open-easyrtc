@@ -6,6 +6,9 @@ var maxCALLERS = 3;
 var numVideoOBJS = maxCALLERS+1;
 var layout;
 
+
+easyrtc.dontAddCloseButtons(true);
+
 function getIdOfBox(boxNum) {
     return "box" + boxNum;
 }
@@ -394,7 +397,7 @@ function handleWindowResize() {
     var fullpage = document.getElementById('fullpage');
     fullpage.style.width = window.innerWidth + "px";
     fullpage.style.height = window.innerHeight + "px";
-    connectCount = easyRTC.getConnectionCount();
+    connectCount = easyrtc.getConnectionCount();
             
     function applyReshape(obj,  parentw, parenth) {
         var myReshape = obj.reshapeMe(parentw, parenth);
@@ -505,11 +508,10 @@ function prepVideoBox(whichBox) {
 
 function killActiveBox() {
     if( activeBox > 0) {
-        var caller = easyRTC.getIthCaller(activeBox-1);
+        var easyrtcid = easyrtc.getIthCaller(activeBox-1);
         collapseToThumb();
         setTimeout( function() {
-            easyRTC.hangup(caller);
-            easyRTC.sendDataWS(null, {hangupEasyrtcid:caller});
+            easyrtc.hangup(easyrtcid);
         }, 400);
     }  
 }
@@ -522,17 +524,16 @@ function muteActiveBox() {
 
 
 
-function callEverybodyElse(otherPeople) {
+function callEverybodyElse(roomName, otherPeople) {
     
-    easyRTC.setLoggedInListener(null); // so we're only called once.
+    easyrtc.setRoomOccupantListener(null); // so we're only called once.
 
     var list = [];
     var connectCount = 0;
     
-    for(var i in otherPeople ) {
-        list.push(i);
+    for(var easyrtcid in otherPeople ) {
+        list.push(easyrtcid);
     }
-    
     //
     // Connect in reverse order. Latter arriving people are more likely to have
     // empty slots.
@@ -545,12 +546,12 @@ function callEverybodyElse(otherPeople) {
             }
         }
         function callFailure() {
-            easyRTC.showError("CALL-REJECTED", "Rejected by other party");
+            easyrtc.showError("CALL-REJECTED", "Rejected by other party");
             if( connectCount < maxCALLERS && position > 0) {
                 establishConnection(position-1);
             }            
         }
-        easyRTC.call(list[position], callSuccess, callFailure);    
+        easyrtc.call(list[position], callSuccess, callFailure);    
         
     }
     if( list.length > 0) {
@@ -577,9 +578,9 @@ function sendText(e) {
     var stringToSend = document.getElementById('textentryField').value;
     if( stringToSend && stringToSend != "") {
         for(var i = 0; i < maxCALLERS; i++ ) {
-            var caller = easyRTC.getIthCaller(i);
-            if( caller && caller != "") {
-                easyRTC.sendData(caller, stringToSend);
+            var easyrtcid = easyrtc.getIthCaller(i);
+            if( easyrtcid && easyrtcid != "") {
+                easyrtc.sendPeerMessage(easyrtcid, "im",  stringToSend);
             }        
         }
     } 
@@ -653,9 +654,9 @@ function showMessage(startX, startY, content) {
     }
 }
 
-function messageListener(who, content) {
+function messageListener(easyrtcid, msgType, content) {
     for(var i = 0; i < maxCALLERS; i++) {
-        if( easyRTC.getIthCaller(i) == who) {
+        if( easyrtc.getIthCaller(i) == easyrtcid) {
             var startArea = document.getElementById(getIdOfBox(i+1));
             var startX = parseInt(startArea.offsetLeft) + parseInt(startArea.offsetWidth)/2;
             var startY = parseInt(startArea.offsetTop) + parseInt(startArea.offsetHeight)/2;
@@ -682,17 +683,16 @@ function appInit() {
     window.onresize = handleWindowResize;
     handleWindowResize(); //initial call of the top-down layout manager
     
-    // easyRTC.setVideoBandwidth(20);
-    easyRTC.setLoggedInListener(callEverybodyElse);
-    easyRTC.initManaged("roomDemo", "box0", ["box1", "box2", "box3"], loginSuccess);
-    easyRTC.setDataListener(messageListener);
-    easyRTC.setDisconnectListener( function() {
-        easyRTC.showError("LOST-CONNECTION", "Lost connection to signalling server");
-        easyRTC.initM
+
+    easyrtc.setRoomOccupantListener(callEverybodyElse);
+    easyrtc.easyApp("roomDemo", "box0", ["box1", "box2", "box3"], loginSuccess);
+    easyrtc.setPeerListener(messageListener);
+    easyrtc.setDisconnectListener( function() {
+        easyrtc.showError("LOST-CONNECTION", "Lost connection to signaling server");
     });   
-    easyRTC.setOnCall( function(caller, slot) {
+    easyrtc.setOnCall( function(easyrtcid, slot) {
         boxUsed[slot+1] = true;
-        if(activeBox == 0 &&  easyRTC.getConnectionCount() == 1) { // first connection
+        if(activeBox == 0 &&  easyrtc.getConnectionCount() == 1) { // first connection
             collapseToThumb();
             document.getElementById('textEntryButton').style.display = 'block';
         }
@@ -701,16 +701,16 @@ function appInit() {
     });
 
 
-    easyRTC.setOnHangup(function(caller, slot) {
+    easyrtc.setOnHangup(function(easyrtcid, slot) {
         boxUsed[slot+1] = false;
-        console.log("hanging up on " + caller);
+        console.log("hanging up on " + easyrtcid);
         if(activeBox > 0 && slot+1 == activeBox) {
             collapseToThumb(); 
         }
         setTimeout(function() {
             document.getElementById(getIdOfBox(slot+1)).style.visibility = "hidden";
 
-            if( easyRTC.getConnectionCount() == 0 ) { // no more connections
+            if( easyrtc.getConnectionCount() == 0 ) { // no more connections
                 expandThumb(0);
                 document.getElementById('textEntryButton').style.display = 'none';
                 document.getElementById('textentryBox').style.display = 'none';

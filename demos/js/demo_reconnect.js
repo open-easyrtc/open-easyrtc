@@ -29,26 +29,26 @@ var selfEasyrtcid = "";
 
 function initApp() {
     console.log("Initializing.");
-    easyRTC.enableVideo(false);
-    easyRTC.enableAudio(false);
-    easyRTC.connect("reconnect", loginSuccess, loginFailure);
+    easyrtc.enableVideo(false);
+    easyrtc.enableAudio(false);
+    easyrtc.connect("easyrtc.instantMessaging", loginSuccess, loginFailure);
 }
 
-easyRTC.enableDebug(false);
-easyRTC.setDisconnectListener(initApp);
+easyrtc.enableDebug(false);
+easyrtc.setDisconnectListener(initApp);
 
 
 function sendDummy() {
-    easyRTC.sendDataWS(null, {msgType: "xxx", burp: "burp"});
+    easyrtc.sendDataWS(null, {msgType: "xxx", burp: "burp"});
 }
 
-function loginSuccess(easyRTCId) {
-    document.getElementById("stateLabel").innerHTML = " connected as " + easyRTCId;
+function loginSuccess(easyrtcId) {
+    document.getElementById("stateLabel").innerHTML = " connected as " + easyrtcId;
     console.log("logged in");
 }
 
 
-function loginFailure(message) {
+function loginFailure(errorCode, message) {
     document.getElementById("stateLabel").innerHTML = "disconnected";
 }
 
