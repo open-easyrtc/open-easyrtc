@@ -1058,7 +1058,7 @@ easyrtc.setVideoObjectSrc = function(videoObject, stream) {
 /* @private*/
 /** Load Easyrtc Stylesheet.
  *   Easyrtc Stylesheet define easyrtcMirror class and some basic css class for using easyrtc.js.
- *   That way, developers can overide it or use it's own css file minified css apckage.
+ *   That way, developers can overide it or use it's own css file minified css or package.
  * @example
  *       easyrtc.loadStylesheet();
  *
