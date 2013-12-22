@@ -1059,8 +1059,6 @@ easyrtc.setVideoObjectSrc = function(videoObject, stream) {
 /** Load Easyrtc Stylesheet.
  *   Easyrtc Stylesheet define easyrtcMirror class and some basic css class for using easyrtc.js.
  *   That way, developers can overide it or use it's own css file minified css apckage.
- * @param {Function} successCallback - will be called when the media source is ready.
- * @param {Function} errorCallback - is called with a message string if the attempt to get media failed.
  * @example
  *       easyrtc.loadStylesheet();
  *
