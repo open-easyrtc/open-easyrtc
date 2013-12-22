@@ -790,33 +790,7 @@ easyrtc.onError = function(errorObject) {
     errorBody.appendChild(messageNode);
     errorDiv.style.display = "block";
 };
-//
-// add the style sheet to the head of the document. That way, developers
-// can overide it.
-//
-(function() {
-    //
-    // check to see if we already have an easyrtc.css file loaded
-    // if we do, we can exit immediately.
-    //
-    var links = document.getElementsByTagName("link");
-    for (var cssindex in links) {
-        var css = links[cssindex];
-        if (css.href && (css.href.match("\/easyrtc.css") || css.href.match("\/easyrtc.css\?"))) {
-            return;
-        }
-    }
-    //
-    // add the easyrtc.css file since it isn't present
-    //
-    var easySheet = document.createElement("link");
-    easySheet.setAttribute("rel", "stylesheet");
-    easySheet.setAttribute("type", "text/css");
-    easySheet.setAttribute("href", "/easyrtc/easyrtc.css");
-    var headSection = document.getElementsByTagName("head")[0];
-    var firstHead = headSection.childNodes[0];
-    headSection.insertBefore(easySheet, firstHead);
-})();
+
 /** @private */
 easyrtc.videoBandwidthString = "b=AS:50"; // default video band width is 50kbps
 
@@ -1062,8 +1036,8 @@ easyrtc.clearMediaStream = function(element) {
  *  that from you.
  *  If the media stream is from a local webcam, you may want to add the
  *  easyrtcMirror class to the video object so it looks like a proper mirror.
- *  The easyrtcMirror class is defined in easyrtc.css, which is automatically added
- *  when you add the easyrtc.js file to an HTML file.
+ *  The easyrtcMirror class is defined in easyrtc.css.
+ *  Which is could be added using the same path of easyrtc.js file to an HTML file
  *  @param {DOMObject} videoObject an HTML5 video object
  *  @param {MediaStream} stream a media stream as returned by easyrtc.getLocalStream or your stream acceptor.
  * @example
@@ -1080,6 +1054,42 @@ easyrtc.setVideoObjectSrc = function(videoObject, stream) {
         easyrtc.clearMediaStream(videoObject);
     }
 };
+
+/* @private*/
+/** Load Easyrtc Stylesheet.
+ *   Easyrtc Stylesheet define easyrtcMirror class and some basic css class for using easyrtc.js.
+ *   That way, developers can overide it or use it's own css file minified css apckage.
+ * @param {Function} successCallback - will be called when the media source is ready.
+ * @param {Function} errorCallback - is called with a message string if the attempt to get media failed.
+ * @example
+ *       easyrtc.loadStylesheet();
+ *
+ */
+easyrtc.loadStylesheet = function () {
+
+    //
+    // check to see if we already have an easyrtc.css file loaded
+    // if we do, we can exit immediately.
+    //
+    var links = document.getElementsByTagName("link");
+    for (var cssindex in links) {
+        var css = links[cssindex];
+        if (css.href && (css.href.match("\/easyrtc.css") || css.href.match("\/easyrtc.css\?"))) {
+            return;
+        }
+    }
+    //
+    // add the easyrtc.css file since it isn't present
+    //
+    var easySheet = document.createElement("link");
+    easySheet.setAttribute("rel", "stylesheet");
+    easySheet.setAttribute("type", "text/css");
+    easySheet.setAttribute("href", "/easyrtc/easyrtc.css");
+    var headSection = document.getElementsByTagName("head")[0];
+    var firstHead = headSection.childNodes[0];
+    headSection.insertBefore(easySheet, firstHead);
+};
+
 /** @private
  * @param {String} x */
 easyrtc.formatError = function(x) {
