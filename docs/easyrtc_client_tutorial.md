@@ -8,7 +8,7 @@ EasyRTC is a framework built on top of WebRTC, an emerging W3C/IETF standard for
 
 The EasyRTC framework consists of a client or browser-side Javascript library and a backend Javascript server built on top of a node.js.  Because the WebRTC libraries is built into each browser there is no need for a browser plug-in.
 
-Google's Chrome browser has the broadest support for the WebRTC API. Opera is now using the same engine as Chrome and hence mimics it's behavior. Firefox provides decent support for video chats and data communications.
+Google's Chrome browser has the broadest support for the WebRTC API. Opera is now using the same engine as Chrome and hence mimics it's behavior. Firefox provides excellent support for data communications but only basic support for video chats (it lacks the ability to set the camera resolution, programmatically allow screen sharing, or do statistics gathering).
 
 
 WebRTC has the potential once it is fully standardized to support audio and video chats and conferencing, multiplayer games and many other audio, video and data-based applications.
@@ -72,7 +72,7 @@ The second video tag should be in a &lt;div> block with a CSS _position_ value o
        ...
     </body>
 
-If you don't have the muted flag in the self video tag, you'll get a feedback look from your speakers to your microphone.
+If you don't have the muted flag in the self video tag, you'll get a feedback loop from your speakers to your microphone.
 
 Now we have to start writing some application logic for the application.js file,
 starting with an initialization function that will be called when the page gets loaded.
@@ -145,8 +145,7 @@ to more permanent identifiers like name, job title, and profile picture.
 To actually initiate a call to a person, all we need to do is call the easyrtc.call method,
 passing it the easyrtcid of the person, and three callbacks:
 
-+ function successCallback(easyrtcid) - called when the initiated succeeded.
-+ 
++ function successCallback(easyrtcid) - called when the initiation succeeds.
 + function errorCallback(errorCode, errorText) - called on error.
 + function accepted(wasAccepted,easyrtcid) - called to indicate whether the call was accepted or not.
 
@@ -163,7 +162,7 @@ Here is some code for the actual call initiation:
         );
     }
 
-Now we just have to modify the &lt;body tag of our html file to actually call the my_init function.
+Now we just have to modify the body tag of our html file to actually call the my_init function.
 
      <body onload="my_init()">
 
@@ -299,7 +298,7 @@ We'll need two more calls for the involved version:
             });
 
 
-The entire "involved" version of the Javascript looks like the below:
+The entire Javascript looks like the below code:
 
     The mylogic2.js file:
          easyrtc.setStreamAcceptor( function(callerEasyrtcid, stream) {
@@ -498,7 +497,7 @@ You can send data (via websockets) to someone by calling easyrtc.sendDataWS as b
              console.log(ackMesg.msgData.errorText);
          }
     });
-The destination is either a peers easyrtcId or an object that may specify one or more of targetEasyrtcid, targetGroup, and targetRoom.
+The destination is either a peer's easyrtcId or an object that may specify one or more of targetEasyrtcid, targetGroup, and targetRoom.
 The messageType is a short string you chose. The ackHandler gets called when the server receives your message, and does not
 constitute a reply from the other peer.
 

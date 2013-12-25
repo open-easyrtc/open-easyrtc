@@ -3,7 +3,7 @@ EasyRTC: ICE Configuration
 
 WebRTC utilizes a technique called [ICE, Interactive Connectivity Establishment](http://en.wikipedia.org/wiki/Interactive_Connectivity_Establishment), to traverse NAT's and firewalls. As part of the ICE process, the browser may utilize [STUN](http://en.wikipedia.org/wiki/STUN) and [TURN](http://en.wikipedia.org/wiki/Traversal_Using_Relays_around_NAT) servers. The addresses to STUN and TURN servers are sent to the browser via an ICE configuration.
 
-STUN generally require very little bandwidth, thus there are many free servers available. On the other hand, TURN does incur significant processing and bandwidth costs. There are some free TURN services for development, but for production you will need a commercial or self-hosted solution.
+STUN servers generally require very little bandwidth, thus there are many free servers available. On the other hand, TURN does incur significant processing and bandwidth costs. There are some free TURN services for development, but for production you will need a commercial or self-hosted solution.
 
 It is estimated that 85-90% of connections do not require TURN, however that still leaves a significant percentage which does require it.
 
