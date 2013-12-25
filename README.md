@@ -28,6 +28,7 @@ Installation In A Nutshell
 
 Step by step instructions including additional setup options can be found in `/docs/easyrtc_server_install.md`
 
+Note: there is no corresponding need to install the client files specifically; they were installed as part of EasyRTC in step 3.
 
 Documentation
 -------------
