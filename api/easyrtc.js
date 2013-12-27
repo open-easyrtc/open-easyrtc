@@ -246,17 +246,17 @@ easyrtc.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
             easyrtc._processRoomData(roomData);
 
             /*
-            easyrtc.lastLoggedInList[roomName] = {};
-            for (var key in roomData[roomName].clientList) {
-                if (key !== easyrtc.myEasyrtcid) {
-                    easyrtc.lastLoggedInList[roomName][key] = roomData[roomName].clientList[key];
-                }
-            }
-            easyrtc.roomOccupantListener(roomName, easyrtc.lastLoggedInList[roomName]);
-            easyrtc.emitEvent("roomOccupant", easyrtc.lastLoggedInList);
-            */
+             easyrtc.lastLoggedInList[roomName] = {};
+             for (var key in roomData[roomName].clientList) {
+             if (key !== easyrtc.myEasyrtcid) {
+             easyrtc.lastLoggedInList[roomName][key] = roomData[roomName].clientList[key];
+             }
+             }
+             easyrtc.roomOccupantListener(roomName, easyrtc.lastLoggedInList[roomName]);
+             easyrtc.emitEvent("roomOccupant", easyrtc.lastLoggedInList);
+             */
         }
-        
+
         function failure(errorCode, errorText) {
             if (failureCB) {
                 failureCB(errorCode, errorText, roomName);
@@ -298,11 +298,11 @@ easyrtc.leaveRoom = function(roomName, successCallback, failureCallback) {
                     successCallback(roomName);
                 }
             },
-            function(errorCode, errorText) {
-                if (failureCallback) {
-                    failureCallback(errorCode, errorText, roomName);
-                }
-            });
+                    function(errorCode, errorText) {
+                        if (failureCallback) {
+                            failureCallback(errorCode, errorText, roomName);
+                        }
+                    });
         }
     }
 };
@@ -563,6 +563,9 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
             else {
                 var partNames = [];
                 var partList;
+                var bestBytesReceived = 0;
+                var bestI;
+                
                 for (i = 0; i < parts.length; i++) {
                     partNames[i] = {};
                     //
@@ -574,13 +577,27 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
                     }
 
                     //
+                    // a chrome-firefox connection results in several activeConnections. 
+                    // we only want one, so we look for the one with the most data being received on it.
+                    //
+                    if( partNames[i].googRemoteAddress  && partNames[i].googActiveConnection) {
+                        var hasActive = parts[i].local.stat("googActiveConnection");
+                        if( hasActive === true || hasActive === "true" ) {
+                            var curReceived =  parseInt(parts[i].local.stat("bytesReceived"));
+                            if( curReceived > bestBytesReceived) {
+                                bestI = i;
+                                bestBytesReceived = curReceived;
+                            }
+                        }
+                    }
+                }
+                
+                for (i = 0; i < parts.length; i++) {
+                    //
                     // discard info from any inactive connection.
                     //
-                    if (partNames[i].googActiveConnection) {
-                        var flag = parts[i].local.stat("googActiveConnection");
-                        if (!flag || flag === "false") {
+                    if (partNames[i].googActiveConnection && i != bestI) {
                             partNames[i] = {};
-                        }
                     }
                 }
 
@@ -1792,8 +1809,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
     easyrtc.sendSignalling = sendSignalling;
     var totalLengthSent = 0;
-    
-     /**
+
+    /**
      *Sends data to another user using previously established data channel. This method will
      * fail if no data channel has been established yet. Unlike the easyrtc.sendWS method,
      * you can't send a dictionary, convert dictionaries to strings using JSON.stringify first.
@@ -2329,8 +2346,19 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                         id: event.candidate.sdpMid,
                         candidate: event.candidate.candidate
                     };
-                    if (easyrtc.peerConns[otherUser].startedAV) {
 
+                    //
+                    // some candidates include ip addresses of turn servers. we'll want those 
+                    // later so we can see if our actual connection uses a turnsever.
+                    // The keyword "relay" in the candidate identifies it as referencing a 
+                    // turn server. The \d symbol in the regular expression matches a number.
+                    // 
+                    if (event.candidate.candidate.indexOf("typ relay") > 0) {
+                        var ipaddress = event.candidate.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/)[2];
+                        easyrtc._turnServers[ipaddress] = true;
+                    }
+
+                    if (easyrtc.peerConns[otherUser].startedAV) {
                         sendSignalling(otherUser, "candidate", candidateData, null, function() {
                             failureCB(easyrtc.errCodes.PEER_GONE, "Candidate disappeared");
                         });
@@ -2764,6 +2792,11 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             }
             pc = easyrtc.peerConns[caller].pc;
             pc.addIceCandidate(candidate);
+
+            if (msgData.candidate.indexOf("typ relay") > 0) {
+                var ipaddress = msgData.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/)[1];
+                easyrtc._turnServers[ipaddress] = true;
+            }
         };
         var flushCachedCandidates = function(caller) {
             if (queuedMessages[caller]) {

@@ -33,6 +33,14 @@
                 <!-- Main Content -->
                 <!--show-->
                 <div id="demoContainer">
+                Note: your own image will show up postage stamp sized, while the other party's video will be shown in high-definition (1280x720). Note: not all webcams are seen by WebRTC as providing high-definition video; the fallback is to use standard definition (640x480).
+                   <div id="connectControls">
+                        <div id="iam">Not yet connected...</div>
+                        <br />
+                        <strong>Connected users:</strong>
+                        <div id="otherClients"></div>
+                    </div>
+ 
                     <div id="videos"> 
 
                         <div style="position:relative;float:left;" width="1282" height="722">
@@ -40,12 +48,6 @@
                             <video  class="easyrtcMirror" autoplay="autoplay" id="selfVideo" muted="true" volume="0" ></video>
                         </div>
                         <!-- each caller video needs to be in it's own div so it's close button can be positioned correctly -->
-                    </div>
-                    <div id="connectControls">
-                        <div id="iam">Not yet connected...</div>
-                        <br />
-                        <strong>Connected users:</strong>
-                        <div id="otherClients"></div>
                     </div>
                 </div>
                 <!--hide-->
