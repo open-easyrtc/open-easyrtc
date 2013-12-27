@@ -2954,7 +2954,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
         if (!easyrtc.webSocket) {
             easyrtc.webSocket = io.connect(easyrtc.serverPath, {
-                'connect timeout': 10000
+                'connect timeout': 10000,
+                'force new connection': true
             });
             if (!easyrtc.webSocket) {
                 throw "io.connect failed";
