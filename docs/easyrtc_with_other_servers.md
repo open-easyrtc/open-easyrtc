@@ -39,3 +39,9 @@ Here are some steps to running the simple audio video demo from your web server.
     http://localhost/demos/demo_audio_video_simple.html
  
 Your own WebRTC app can then be developed in a similar fashion.
+
+If You Run Into Problems
+------------------------
+Please feel free to post on our discussion forum:
+
+ * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
