@@ -2942,7 +2942,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         function processCandidateQueue(caller, msgData) {
 
             if (easyrtc.peerConns[caller] && easyrtc.peerConns[caller].startedAV) {
-                processCandidate(msgData);
+                processCandidate(caller, msgData);
             }
             else {
                 if (!easyrtc.peerConns[caller]) {
