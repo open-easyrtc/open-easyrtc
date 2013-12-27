@@ -2905,7 +2905,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     "candidate",
                     easyrtc.peerConns[caller].candidatesToSend[i],
                     onSignalSuccess,
-                    nSignalFailure
+                    onSignalFailure
                 );
             }
 
