@@ -1387,7 +1387,7 @@ easyrtc.setVideoBandwidth = function(kbitsPerSecond) {
  * @returns {boolean}
  */
 easyrtc.supportsDataChannels = function() {
-    if( navigator.useragent.match(/android/i) && webrtcDetectedVersion >= 33) {
+    if( navigator.userAgent.match(/android/i) && webrtcDetectedVersion >= 33) {
         return true;
     }
     else {
