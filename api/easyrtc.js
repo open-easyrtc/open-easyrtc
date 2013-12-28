@@ -1387,7 +1387,12 @@ easyrtc.setVideoBandwidth = function(kbitsPerSecond) {
  * @returns {boolean}
  */
 easyrtc.supportsDataChannels = function() {
-    return (webrtcDetectedBrowser === "firefox" || webrtcDetectedVersion >= 31);
+    if( navigator.useragent.match(/android/i) && webrtcDetectedVersion >= 33) {
+        return true;
+    }
+    else {
+        return (webrtcDetectedBrowser === "firefox" || webrtcDetectedVersion >= 31);
+    }
 };
 /**
  * Sets a listener for data sent from another client (either peer to peer or via websockets).
