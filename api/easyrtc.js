@@ -603,8 +603,8 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
                             partNames[i] = {};
                          }
                          else {
-                            var localAddress =  parts[i].local.stat("googLocalAddress");
-                            var remoteAddress =  parts[i].local.stat("googRemoteAddress");
+                            var localAddress =  parts[i].local.stat("googLocalAddress").split(":")[0];
+                            var remoteAddress =  parts[i].local.stat("googRemoteAddress").split(":")[0];
                             if(easyrtc.isTurnServer(localAddress)){
                                 turnAddress = localAddress;
                             }
@@ -658,7 +658,7 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
                     }
                 }
             }
-            if( localStats.remoteAddress) {
+            if( localStats.remoteAddress && turnAddress) {
                 localStats.remoteAddress = turnAddress;
             }
             callback(peerId, localStats);
