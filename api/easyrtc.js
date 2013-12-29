@@ -563,8 +563,9 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
             else {
                 var partNames = [];
                 var partList;
-                var bestBytesReceived = 0;
+                var bestBytes = 0;
                 var bestI;
+                var turnAddress = null;
                 
                 for (i = 0; i < parts.length; i++) {
                     partNames[i] = {};
@@ -583,10 +584,11 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
                     if( partNames[i].googRemoteAddress  && partNames[i].googActiveConnection) {
                         var hasActive = parts[i].local.stat("googActiveConnection");
                         if( hasActive === true || hasActive === "true" ) {
-                            var curReceived =  parseInt(parts[i].local.stat("bytesReceived"));
-                            if( curReceived > bestBytesReceived) {
+                            var curReceived =  parseInt(parts[i].local.stat("bytesReceived")) + 
+                                               parseInt(parts[i].local.stat("bytesSent"));
+                            if( curReceived > bestBytes) {
                                 bestI = i;
-                                bestBytesReceived = curReceived;
+                                bestBytes = curReceived;
                             }
                         }
                     }
@@ -596,8 +598,20 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
                     //
                     // discard info from any inactive connection.
                     //
-                    if (partNames[i].googActiveConnection && i != bestI) {
+                    if (partNames[i].googActiveConnection ) {
+                         if(i != bestI) {
                             partNames[i] = {};
+                         }
+                         else {
+                            var localAddress =  parts[i].local.stat("googLocalAddress");
+                            var remoteAddress =  parts[i].local.stat("googRemoteAddress");
+                            if(easyrtc.isTurnServer(localAddress)){
+                                turnAddress = localAddress;
+                            }
+                            else if( easyrtc.isTurnServer(remoteAddress)) {
+                                turnAddress = remoteAddress;
+                            }
+                         }
                     }
                 }
 
@@ -643,6 +657,9 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
                         }
                     }
                 }
+            }
+            if( localStats.remoteAddress) {
+                localStats.remoteAddress = turnAddress;
             }
             callback(peerId, localStats);
         });
