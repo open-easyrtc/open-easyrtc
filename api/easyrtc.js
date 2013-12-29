@@ -1,5 +1,5 @@
 /** @class
- *@version 1.0.7
+ *@version 1.0.8
  *<p>
  * Provides client side support for the EasyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md

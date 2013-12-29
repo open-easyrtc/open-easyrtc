@@ -34,7 +34,7 @@
  */
 
 
-easyrtc_ft = {};
+var easyrtc_ft = {};
 
 /**
  * Establish an area as a drag-n-drop drop site for files.
