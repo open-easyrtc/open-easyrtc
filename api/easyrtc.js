@@ -43,11 +43,12 @@ var easyrtc = {};
  * @param {Object} allowedEventsArray
  */
 var easyrtcAddEventHandling = function(destObject, allowedEventsArray) {
+    var i;
     //
     // build a dictionary of allowed events for this object.
     //
     var allowedEvents = {};
-    for (var i = 0; i < allowedEventsArray.length; i++) {
+    for (i = 0; i < allowedEventsArray.length; i++) {
         allowedEvents[allowedEventsArray[i]] = true;
     }
     //
