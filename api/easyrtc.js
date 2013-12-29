@@ -2433,7 +2433,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             if (easyrtc.debugPrinter) {
                 easyrtc.debugPrinter(JSON.stringify(e));
             }
-            failureCB(easyrtc.errCodes.SYSTEM_ERROR, e.message);
+            failureCB(easyrtc.errCodes.SYSTEM_ERR, e.message);
             return null;
         }
 
@@ -2583,7 +2583,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     initOutGoingChannel(otherUser);
                 } catch (channelErrorEvent) {
                     console.log("failed to init outgoing channel");
-                    failureCB(easyrtc.errCodes.SYSTEM_ERROR,
+                    failureCB(easyrtc.errCodes.SYSTEM_ERR,
                             easyrtc.formatError(channelErrorEvent));
                 }
             }
