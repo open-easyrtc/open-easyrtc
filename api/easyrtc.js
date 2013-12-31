@@ -1016,7 +1016,7 @@ easyrtc.enableMediaTracks = function(enable, tracks){
  */
 easyrtc.enableCamera = function(enable){
     if(easyrtc.localStream && easyrtc.localStream.getVideoTracks){
-        enableMediaTracks(enable, easyrtc.localStream.getVideoTracks());
+        easyrtc.enableMediaTracks(enable, easyrtc.localStream.getVideoTracks());
     }
 };
 /**
@@ -1027,7 +1027,7 @@ easyrtc.enableCamera = function(enable){
  */
 easyrtc.enableMicrophone = function(enable){
     if(easyrtc.localStream && easyrtc.localStream.getAudioTracks){
-        enableMediaTracks(enable, easyrtc.localStream.getAudioTracks());
+        easyrtc.enableMediaTracks(enable, easyrtc.localStream.getAudioTracks());
     }
 };
 /**
