@@ -175,6 +175,8 @@ function connect() {
     easyrtc.setRoomEntryListener(roomEntryListener);
     easyrtc.setDisconnectListener(function() {
         jQuery('#rooms').empty();
+        document.getElementById("main").className = "notconnected";
+        console.log("disconnect listener fired");
     });
     updatePresence();
     var username = document.getElementById("userNameField").value;
@@ -188,6 +190,9 @@ function connect() {
     easyrtc.connect("easyrtc.instantMessaging", loginSuccess, loginFailure);
 }
 
+function disconnect() {
+    easyrtc.disconnect();
+}
 
 function addQuickJoinButtons(roomList) {
     var quickJoinBlock = document.getElementById("quickJoinBlock");
@@ -322,7 +327,6 @@ function loginSuccess(easyrtcId) {
     selfEasyrtcid = easyrtcId;
     document.getElementById("iam").innerHTML = "I am " + easyrtcId;
     refreshRoomList();
-    document.getElementById('connectButton').disabled = true;
     isConnected = true;
     displayFields();
     document.getElementById("main").className = "connected";
