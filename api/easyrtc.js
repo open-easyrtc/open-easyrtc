@@ -3395,7 +3395,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback){
                 else {
                     parts = item.url.substring("turn:".length).split("@");
                     if(parts.length !== 2){
-                        easyrtc.showError("badparam", "turn server url looked like " + item.url);
+                        easyrtc.showError("badparam", "Iceserver entry doesn't have a username: " + JSON.stringify(item));
                     }
                     username = parts[0];
                     url = parts[1];
