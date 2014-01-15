@@ -90,7 +90,7 @@ Here is an example initialization function:
 
      function my_init() {
          easyrtc.setRoomOccupantListener( roomListener);
-         easyrtc.easyApp("Company Chat Line", "self", ["caller"],
+         easyrtc.easyApp("Company_Chat_Line", "self", ["caller"],
              function(myId) {
                 console.log("My easyrtcid is " + myId);
              }
@@ -190,7 +190,7 @@ Here is the complete HTML and Javascript for this solution.
     The mylogic.js file:
         function my_init() {
              easyrtc.setRoomOccupantListener( loggedInListener);
-             easyrtc.easyApp("Company Chat Line", "self", ["caller"],
+             easyrtc.easyApp("Company_Chat_Line", "self", ["caller"],
                  function(myId) {
                     console.log("My easyrtcid is " + myId);
                  }
