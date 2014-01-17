@@ -1732,7 +1732,8 @@ easyrtc.supportsStatistics = function(){
  * Connects to the EasyRTC signaling server. You must connect before trying to
  * call other users.
  * @param {String} applicationName is a string that identifies the application so that different applications can have different
- *        lists of users.
+ *        lists of users. Note that the server configuration specifies a regular expression that is used to check application names 
+ *        for validity. The default pattern is that of an identifier, spaces are not allowed.
  * @param {Function} successCallback (easyrtcId, roomOwner) - is called on successful connect. easyrtcId is the
  *   unique name that the client is known to the server by. A client usually only needs it's own easyrtcId for debugging purposes.
  *       roomOwner is true if the user is the owner of a room. It's value is random if the user is in multiple rooms.
@@ -3786,7 +3787,7 @@ easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, o
         if(refreshPane && videoIsFree(refreshPane)){
             showVideo(video, stream);
             if(onCall){
-                onCall(caller);
+                onCall(caller, refreshPane);
             }
             refreshPane = null;
             return;
