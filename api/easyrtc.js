@@ -3787,7 +3787,7 @@ easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, o
         if(refreshPane && videoIsFree(refreshPane)){
             showVideo(video, stream);
             if(onCall){
-                onCall(caller);
+                onCall(caller, refreshPane);
             }
             refreshPane = null;
             return;
