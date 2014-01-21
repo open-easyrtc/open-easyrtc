@@ -30,7 +30,7 @@
  *
  * @module      easyrtc_public_obj
  * @author      Priologic Software, info@easyrtc.com
- * @copyright   Copyright 2013 Priologic Software. All rights reserved.
+ * @copyright   Copyright 2014 Priologic Software. All rights reserved.
  * @license     BSD v2, see LICENSE file in module root folder.
  */
 
@@ -675,6 +675,12 @@ pub.util.isValidIncomingMessage = function(type, msg, appObj, callback) {
                                 isCallbackRun = true;
                                 return;
                             }
+                            // if roomParameter field is defined, it must be an object
+                            if (msg.msgData.roomJoin[currentRoomName].roomParameter !== undefined && !_.isObject(msg.msgData.roomJoin[currentRoomName].roomParameter)){
+                                callback(null, false, "MSG_REJECT_BAD_STRUCTURE");
+                                isCallbackRun = true;
+                                return;
+                            }
                         };
                     }
 
@@ -1066,7 +1072,7 @@ pub.app = function(appName, callback) {
         callback = function(err, appObj) {};
     }
     if (!e.app[appName]) {
-        pub.util.logWarning("Attempt to request non-existent application name: '" + appName +"'");
+        pub.util.logDebug("Attempt to request non-existent application name: '" + appName +"'");
         callback(new pub.util.ApplicationWarning("Attempt to request non-existent application name: '" + appName +"'"));
         return;
     }
@@ -1342,8 +1348,8 @@ pub.app = function(appName, callback) {
         connectionObj.util = pub.util;
 
 
-        /*
-         * Reference to connection's socket.io object.
+        /**
+         * Reference to connection's socket.io object. See http://socket.io/ for more information.
          *
          * @memberof    pub.appObj.connectionObj
          */
@@ -1370,16 +1376,6 @@ pub.app = function(appName, callback) {
             return appName;
         };
 
-
-        /**
-         * Returns the session object to which the connection belongs (if one exists). Returns a null if connection is not attached to a session (such as when sessions are disabled). Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
-         *
-         * @memberof    pub.appObj.connectionObj
-         * @return      {Object}    The session object. May be null if connection has not been joined to a session.
-         */
-        connectionObj.getSession = function() {
-            return _sessionObj;
-        };
 
         /**
          * Returns the easyrtcid for the connection.  Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
@@ -1446,6 +1442,17 @@ pub.app = function(appName, callback) {
 
 
         /**
+         * Returns the session object to which the connection belongs (if one exists). Returns a null if connection is not attached to a session (such as when sessions are disabled). Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
+         *
+         * @memberof    pub.appObj.connectionObj
+         * @return      {Object}    The session object. May be null if connection has not been joined to a session.
+         */
+        connectionObj.getSession = function() {
+            return _sessionObj;
+        };
+
+
+        /**
          * TO BE REMOVED - Use getSession() instead.
          * Returns the session object which the connection belongs to. Will return null if connection is not in a session (such as if session handling is disabled).
          * 
@@ -1460,6 +1467,18 @@ pub.app = function(appName, callback) {
             else {
                 callback(null,null);
             }
+        };
+
+
+        /**
+         * Returns the username associated with the connection. Returns NULL if no username has been set.
+         * Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
+         *
+         * @memberof    pub.appObj.connectionObj
+         * @return      {String}    The username associated with the connection.
+         */
+        connectionObj.getUsername = function() {
+            return e.app[appName].connection[easyrtcid].username;
         };
 
 
@@ -1856,7 +1875,7 @@ pub.app = function(appName, callback) {
 
 
         /**
-         * Joins an existing room, returning a room object. Returns null if room can not be joined.
+         * Joins an existing room, returning a connectionRoom object.
          *
          * @memberof    pub.appObj.connectionObj
          * @param       {string} roomName       Room name which uniquely identifies a room within an EasyRTC application.
@@ -1869,12 +1888,18 @@ pub.app = function(appName, callback) {
                 return;
             }
 
+            // Check if room doesn't exist
+            if (!e.app[appName].room[roomName]) {
+                pub.util.logWarning("["+appName+"]["+easyrtcid+"] Can not enter room which doesn't exist: '" + roomName +"'");
+                callback(new pub.util.ConnectionWarning("Can not enter room which doesn't exist: '" + roomName +"'"));
+                return;
+            }
+
             // Check if client already in room
             if (e.app[appName].connection[easyrtcid].room[roomName]) {
                 connectionObj.room(roomName, callback);
                 return;
             }
-
 
             // Local private function to create the default connection-room object in the private variable
             var createConnectionRoom = function(roomName, appRoomObj, callback) {
@@ -1899,23 +1924,6 @@ pub.app = function(appName, callback) {
                 connectionObj.room(roomName, callback);
             };
 
-            // Check if room doesn't exist
-            if (!e.app[appName].room[roomName]) {
-                if (appObj.getOption("roomAutoCreateEnable")) {
-                        appObj.createRoom(roomName, null, function(err, roomObj){
-                            if (err) {
-                                callback(err);
-                                return;
-                            }
-                            createConnectionRoom(roomName, roomObj, callback);
-                        });
-                } else {
-                    pub.util.logWarning("["+appName+"]["+easyrtcid+"] Can not enter room which doesn't exist: '" + roomName +"'");
-                    callback(new pub.util.ConnectionWarning("Can not enter room which doesn't exist: '" + roomName +"'"));
-                    return;
-                }
-            }
-
             appObj.room(roomName, function(err, appRoomObj){
                 if(err) {
                     callback(err);
@@ -1923,7 +1931,6 @@ pub.app = function(appName, callback) {
                 }
                 createConnectionRoom(roomName, appRoomObj, callback);
             });
-
         };
 
 
@@ -2880,7 +2887,7 @@ pub.events.setDefaultListeners();
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Dec 13 2013 14:56:48 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Jan 20 2014 16:04:48 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>
