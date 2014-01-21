@@ -26,8 +26,9 @@ Installation In A Nutshell
  4. Start EasyRTC by running `node server.js`
  5. Browse the examples using a WebRTC enabled browser. *(defaults to port `8080`)*
 
-Step by step instructions including additional setup options can be found in `/docs/easyrtc_installing.md`
+Step by step instructions including additional setup options can be found in `/docs/easyrtc_server_install.md`
 
+Note: there is no corresponding need to install the client files specifically; they were installed as part of EasyRTC in step 3.
 
 Documentation
 -------------
