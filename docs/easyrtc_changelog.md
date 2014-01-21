@@ -1,6 +1,29 @@
 EasyRTC: Change Log
 ===================
 
+v1.0.8
+------
+New Features:
+ * API - Added easyrtc.getRoomApiField() convenience method to get a peers API fields.
+ * Documentation - New install directions for Git users. (issue #29)
+
+Changes:
+ * API - Better TURN detection for Firefox and Chrome
+ * API - Enabled 'force new connection' flag in socket.io.
+ * Documentation - Various updates (inc. issue #41)
+ * Demos - Added disconnect button to Instant Messaging Rooms demo
+
+Fixes:
+ * API - A couple type-o fixes in easyrtc.supportsDataChannels()
+ * API - Fixed type-o in easyrtc.connect() causing bad reference to listener for signal failure. See issue #32 
+ * API - Fixed reference to error code in easyrtc.connect()
+ * API - Made data channel checks more strict (to cover lack of support on mobile)
+ * API - Fixed missing parameter when handing candidates.
+ * API - Fixed bug in easyrtc.sendServerMessage when debug was enabled.
+ * Server - Allowing '+' symbol in client version string. This is allowed by http://semver.org
+ * Server - Removed duplicate emit of room delta list when another client joins via explicit join room command. (issue #37)
+
+
 v1.0.7
 ------
 

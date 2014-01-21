@@ -1,10 +1,10 @@
 /** @class
- *@version 1.0.7
+ *@version 1.0.8
  *<p>
  * Provides support file and data transfer support to easyrtc.
  * </p>
  *<p>
- *copyright Copyright (c) 2013, Priologic Software Inc.
+ *copyright Copyright (c) 2014, Priologic Software Inc.
  *All rights reserved.</p>
  *
  *<p>
@@ -34,7 +34,7 @@
  */
 
 
-easyrtc_ft = {};
+var easyrtc_ft = {};
 
 /**
  * Establish an area as a drag-n-drop drop site for files.

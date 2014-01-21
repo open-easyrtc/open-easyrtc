@@ -30,7 +30,7 @@
  * 
  * @module      easyrtc_default_event_listeners
  * @author      Priologic Software, info@easyrtc.com
- * @copyright   Copyright 2013 Priologic Software. All rights reserved.
+ * @copyright   Copyright 2014 Priologic Software. All rights reserved.
  * @license     BSD v2, see LICENSE file in module root folder.
  */
 
@@ -217,7 +217,18 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
             var credential  = (msg.msgData.credential   ? msg.msgData.credential: null);
 
             // Authenticate is responsible for authenticating the connection
-            pub.events.emit("authenticate", socket, easyrtcid, appName, username, credential, msg, asyncCallback);
+            pub.events.emit("authenticate", socket, easyrtcid, appName, username, credential, msg, function(err){
+                if (err) {
+                    try{
+                        socketCallback(pub.util.getErrorMsg("LOGIN_BAD_AUTH"));
+                        socket.disconnect();
+                        pub.util.logInfo("["+appName+"]["+easyrtcid+"] Authentication denied. Socket disconnected.", err);
+                    }catch(e){}
+                    return;
+                } else {
+                    asyncCallback(null);
+                }
+            });
         },
 
         function(asyncCallback) {
@@ -265,7 +276,7 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
                 for (var currentRoomName in msg.msgData.roomJoin) {
                     if (!_.isString(currentRoomName) || !appObj.getOption("roomNameRegExp").test(currentRoomName)) {
                         pub.events.emit("emitReturnError", socketCallback, "MSG_REJECT_TARGET_ROOM", pub.util.nextToNowhere);
-                        pub.util.logWarning("[" + easyrtcid + "] Authentication failed. Requested room name not allowed [" + currentRoomName + "].");
+                        pub.util.logInfo("[" + easyrtcid + "] Authentication failed. Requested room name not allowed [" + currentRoomName + "].");
                         return;
                     }
                 }
@@ -373,7 +384,7 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
                                 socketCallback(pub.util.getErrorMsg("LOGIN_BAD_ROOM"));
                                 socket.disconnect();
                             }catch(e){}
-                            pub.util.logWarning("[" + easyrtcid + "] Authentication failed. Requested room name does not exist [" + currentRoomName + "].");
+                            pub.util.logInfo("[" + easyrtcid + "] Authentication failed. Requested room name does not exist [" + currentRoomName + "].");
                             return;
                         }
                     });
@@ -664,7 +675,7 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
                 function (err) {
                     if (err) {
                         socketCallback(pub.util.getErrorMsg("MSG_REJECT_GEN_FAIL"));
-                        pub.util.logError("["+easyrtcid+"] General message error. Message ignored.", err);
+                        pub.util.logError("["+connectionObj.getEasyrtcid()+"] General message error. Message ignored.", err);
                     } else {
                         socketCallback({msgType:'ack'});
                     }
@@ -795,7 +806,7 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
     function(err) {
         if (err) {
             socketCallback(pub.util.getErrorMsg("MSG_REJECT_GEN_FAIL"));
-            pub.util.logError("["+easyrtcid+"] General message error. Message ignored.", err);
+            pub.util.logError("["+connectionObj.getEasyrtcid()+"] General message error. Message ignored.", err);
         }
     });
 };
@@ -828,7 +839,6 @@ eventListener.onEmitEasyrtcCmd = function(connectionObj, msgType, msg, socketCal
     msg.serverTime  = Date.now();
 
     connectionObj.socket.emit( "easyrtcCmd", msg);
-
     next(null);
 };
 
@@ -1145,29 +1155,6 @@ eventListener.onMsgTypeRoomJoin = function(connectionObj, rooms, socketCallback,
         }
     }
 
-    // TODO: Here's some pseudo code for how this function should work... It should check for possible errors before actually joining.
-    // Loop through all rooms
-        // Does room exist?
-            // YES
-            // Are we already in it?
-                // Error
-            // NO
-            // Are we NOT allowed to create it?
-                // Error
-    // If ERROR
-        // Send Error in SocketCallback then return
-    // If NO Error
-    // Loop through all rooms
-        // Does room exist?
-            // YES
-                // Join Room
-            // NO
-                // Create Room
-                    // Join Room
-    // Send socketCallback with room data
-    // Emit room data delta to other connections in room
-    // Send Callback
-
     var appObj = connectionObj.getApp();
 
     async.each(Object.keys(rooms), function(currentRoomName, roomCallback) {
@@ -1185,21 +1172,24 @@ eventListener.onMsgTypeRoomJoin = function(connectionObj, rooms, socketCallback,
                 });
             }
             else {
-                // TODO: Don't fail silently if connection tries joining non existent room and they aren't allowed to create it.
-                roomCallback(null);
+                pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"]["+currentRoomName+"] Unable to join non-existant room.");
+                roomCallback(new pub.util.ConnectionError("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"]["+currentRoomName+"] Unable to join room."));
             }
         });
     }, function(err, newRoomObj) {
+        if (err) {
+            socketCallback(pub.util.getErrorMsg("MSG_REJECT_BAD_ROOM"));
+            next(null); // Error has been handled
+            return;
+        }
+
         connectionObj.generateRoomClientList("join", rooms, function(err, roomData){
             if (err) {
-                // TODO: Deal with possible errors
-                next(err);
+                socketCallback(pub.util.getErrorMsg("MSG_REJECT_BAD_ROOM"));
+                next(null); // Error has been handled
             }
             else {
                 socketCallback({"msgType":"roomData", "msgData":{"roomData":roomData}});
-                connectionObj.emitRoomDataDelta(false, function(err, roomDataObj){
-                    next(err);
-                });
             }
         });
     });
@@ -1402,7 +1392,7 @@ eventListener.onMsgTypeSetRoomApiField = function(connectionObj, roomApiFieldObj
 /**
  * Default listener for event "getIceConfig". Returns an ICE configuration object to the callback.
  * 
- * The ICE configuration object will hold the array of STUN and TURN servers the connection should use when forming a peer connection. This default listener uses the "iceServer" configuration option at the application level.
+ * The ICE configuration object will hold the array of STUN and TURN servers the connection should use when forming a peer connection. This default listener uses the "appIceServers" configuration option at the application level.
  * 
  * @param       {Object} connectionObj  EasyRTC connection object. Contains methods used for identifying and managing a connection.
  * @param       {Function} callback     Callback of form (err, iceConfigArray)
@@ -1419,6 +1409,7 @@ eventListener.onGetIceConfig = function(connectionObj, callback){
  * @param       {Object} appObj         EasyRTC application object. Contains methods used for identifying and managing an application.
  * @param       {?Object} creatorConnectionObj EasyRTC connection object belonging to the creator of the room. Contains methods used for identifying and managing a connection.
  * @param       {string} roomName       Room name which uniquely identifies a room within an EasyRTC application.
+ * @param       {?Object} roomOptions   Room options. May be null.
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onRoomCreate = function(appObj, creatorConnectionObj, roomName, roomOptions, callback){
@@ -1466,7 +1457,7 @@ eventListener.onRoomLeave = function(connectionObj, roomName, next){
     connectionObj.room(roomName, function(err, connectionRoomObj){
         if (err) {
             pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Couldn't leave room [" + roomName + "]");
-            roomCallback(null);
+            next(err);
             return;
         }
 
@@ -1527,7 +1518,6 @@ eventListener.onStartup = function(next){
 
                 if (pub.getOption("apiEnable")) {
                     // Set the EasyRTC API files
-                    // TODO: Minified version
                     pub.util.logDebug("Setting up API files to be accessed from '" + pub.getOption("apiPublicFolder") + "/'");
                     pub.httpApp.get(pub.getOption("apiPublicFolder") + "/easyrtc.js",                  function(req, res) {pub.util.sendSessionCookie(req, res); res.sendfile("api/easyrtc.js",                   {root:__dirname + "/../"});});
                     pub.httpApp.get(pub.getOption("apiPublicFolder") + "/easyrtc_ft.js",               function(req, res) {pub.util.sendSessionCookie(req, res); res.sendfile("api/easyrtc_ft.js",                {root:__dirname + "/../"});});
@@ -1572,7 +1562,6 @@ eventListener.onStartup = function(next){
                 pub.util.logDebug("["+easyrtcid+"] Socket connected");
                 pub.util.logDebug("Emitting event 'connection'");
                 pub.events.emit("connection", socket, easyrtcid, function(err){
-                    // TODO: Use EasyRTC disconnect procedure
                     if(err){
                         socket.disconnect();
                         pub.util.logError("["+easyrtcid+"] Connect error", err);
@@ -1616,7 +1605,7 @@ eventListener.onStartup = function(next){
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Dec 13 2013 14:56:48 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Jan 20 2014 16:04:48 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>
