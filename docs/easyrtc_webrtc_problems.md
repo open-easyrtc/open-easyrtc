@@ -3,6 +3,7 @@ WebRTC Problems and Possible Fixes:
 
 Many of these issues are general WebRTC or browser issues and not specific to EasyRTC. Given time, many of these will become less frequent as the specification browsers are updated.
 
+
 No Self Video
 -------------
 
@@ -12,6 +13,7 @@ No Self Video
  - Shutdown / reset camera and computer. Some cameras seem to freeze up (even Apple ones).
  - No hardware / driver support. WebRTC in Android isn't enabled for all devices.
  - HOPE: Browsers will do a better job of detecting and handling camera problems in the future.
+
 
 No Video Sent To Peer
 ---------------------
@@ -23,6 +25,7 @@ No Video Sent To Peer
  - We've seen some Android devices unable to display remote video reliably. The Nexus devices seem to be the best tested.
  - HOPE: Network admins and firewall manufacturers recognize the upcoming importance of WebRTC and provide QOS and whitelist rules.
 
+
 Lag and slow connections
 ------------------------
 
@@ -32,28 +35,31 @@ Lag and slow connections
  - Adjust resolution and bandwidth settings (see Picture Quality section)
  - HOPE: The whole world gets fiber to the home :)
 
+
 Delays in Video or Audio
 ------------------------
 
  - Often hardware related, not connection.
    - Frames get held up in buffer waiting to be displayed / transported.
-   - Faster video / cpu processor are recommended.
+   - Faster video / CPU processor are recommended.
    - Reduced resolution and fewer streams will often reduce effect.
  - Using TURN server does introduce a slight delay.
    - Best if TURN server is geographically nearer to callers.
    - Load balancing and beefier servers may be needed.
  - HOPE: Support for hardware encoding / decoding will greatly reduce processor usage and video delay.
-   
+
+
 Picture Quality
 ---------------
 
  - Video resolution can be in set using:
-   -  easyrtc.setVideoDims(width,height);
+   -  easyrtc.setVideoDims(width, height);
  - In Chrome the bandwidth can be set using:
-   -  easyrtc.setVideoBandwidth(kbitspersecond);
+   -  easyrtc.setVideoBandwidth(kbits-per-second);
  - Video camera hardware makes a big difference. When we upgraded from a 5yr old 720p camera to a new 1080p camera, the differences were remarkable. Even when just sending 640x480.
- - HOPE: Support for hardware encoding / decoding will allow higher resolution pictures.
+ - HOPE: Support for hardware encoding / decoding will allow higher resolution video.
  - HOPE: Support for adjusting bandwidth from within the JavaScript API.
+
 
 Sound Quality
 -------------
@@ -63,6 +69,5 @@ Sound Quality
    - Especially common with laptops and tablets.
    - Reduce the speaker volume.
    - Use a headset.
-   - Use a conference microphone/speaker with built-in noise canceling.
- - HOPE: Browsers implement (and expose) their own noise canceling and feedback protection options.
- 
+   - Use a conference microphone/speaker with built-in noise cancelling.
+ - HOPE: Browsers implement (and expose) their own noise cancelling and feedback protection options.
