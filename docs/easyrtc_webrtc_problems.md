@@ -1,5 +1,5 @@
-WebRTC Problems and Possible Fixes:
-===================================
+WebRTC Problems and Possible Fixes
+==================================
 
 Many of these issues are general WebRTC or browser issues and not specific to EasyRTC. Given time, many of these will become less frequent as the specification browsers are updated.
 
