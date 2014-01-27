@@ -1444,11 +1444,11 @@ easyrtc.setVideoBandwidth = function(kbitsPerSecond) {
  * @returns {boolean}
  */
 easyrtc.supportsDataChannels = function() {
-    if (navigator.userAgent.match(/android/i) && webrtcDetectedVersion >= 33) {
-        return true;
+    if (navigator.userAgent.match(/android/i)) {
+        return webrtcDetectedVersion >= 34;
     }
     else {
-        return (webrtcDetectedBrowser === "firefox" || webrtcDetectedVersion >= 31);
+        return (webrtcDetectedBrowser === "firefox" || webrtcDetectedVersion >= 32);
     }
 };
 /**
@@ -1606,10 +1606,10 @@ easyrtc.usernameToIds = function(username, room) {
  */
 easyrtc.getRoomApiField = function(roomname, easyrtcid, fieldname) {
     if (easyrtc.lastLoggedInList[roomname] &&
-        easyrtc.lastLoggedInList[roomname][easyrtcid] &&
-        easyrtc.lastLoggedInList[roomname][easyrtcid].apiField &&
-        easyrtc.lastLoggedInList[roomname][easyrtcid].apiField[fieldname]){
-       return easyrtc.lastLoggedInList[roomname][easyrtcid].apiField[fieldname].fieldValue;
+            easyrtc.lastLoggedInList[roomname][easyrtcid] &&
+            easyrtc.lastLoggedInList[roomname][easyrtcid].apiField &&
+            easyrtc.lastLoggedInList[roomname][easyrtcid].apiField[fieldname]) {
+        return easyrtc.lastLoggedInList[roomname][easyrtcid].apiField[fieldname].fieldValue;
     }
     else {
         return undefined;
@@ -2567,9 +2567,15 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             if (easyrtc.debugPrinter) {
                 easyrtc.debugPrinter("saw dataChannel.onmessage event: " + JSON.stringify(event.data));
             }
-            var msg = JSON.parse(event.data);
-            if (msg) {
-                easyrtc.receivePeerDistribute(otherUser, msg, null);
+
+            if (event.data === "dataChannelPrimed") {
+                easyrtc.sendDataWS(otherUser, "dataChannelPrimed", "");
+            }
+            else {
+                var msg = JSON.parse(event.data);
+                if (msg) {
+                    easyrtc.receivePeerDistribute(otherUser, msg, null);
+                }
             }
         }
 
@@ -2579,13 +2585,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             }
             var dataChannel = pc.createDataChannel(easyrtc.datachannelName, easyrtc.getDatachannelConstraints());
             easyrtc.peerConns[otherUser].dataChannelS = dataChannel;
-            if (!easyrtc.isMozilla) {
-                easyrtc.peerConns[otherUser].dataChannelR = dataChannel;
-            }
-
-            if (!easyrtc.isMozilla) {
-                dataChannel.onmessage = dataChannelMessageHandler;
-            }
+            easyrtc.peerConns[otherUser].dataChannelR = dataChannel;
+            dataChannel.onmessage = dataChannelMessageHandler;
 
 
             dataChannel.onopen = function(event) {
@@ -2593,16 +2594,12 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     easyrtc.debugPrinter("saw dataChannel.onopen event");
                 }
                 if (easyrtc.peerConns[otherUser]) {
-                    easyrtc.peerConns[otherUser].dataChannelReady = true;
-                    if (easyrtc.peerConns[otherUser].callSuccessCB) {
-                        easyrtc.peerConns[otherUser].callSuccessCB(otherUser, "datachannel");
-                    }
-                    if (easyrtc.onDataChannelOpen) {
-                        easyrtc.onDataChannelOpen(otherUser, true);
-                    }
-                    easyrtc.updateConfigurationInfo();
+                    dataChannel.send("dataChannelPrimed");
                 }
             };
+
+
+
             dataChannel.onclose = function(event) {
                 if (easyrtc.debugPrinter) {
                     easyrtc.debugPrinter("saw dataChannelS.onclose event");
@@ -2623,6 +2620,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             if (easyrtc.debugPrinter) {
                 easyrtc.debugPrinter("initializing incoming channel handler for " + otherUser);
             }
+
             easyrtc.peerConns[otherUser].pc.ondatachannel = function(event) {
 
                 if (easyrtc.debugPrinter) {
@@ -2631,10 +2629,9 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
                 var dataChannel = event.channel;
                 easyrtc.peerConns[otherUser].dataChannelR = dataChannel;
-                if (!easyrtc.isMozilla) {
-                    easyrtc.peerConns[otherUser].dataChannelS = dataChannel;
-                    easyrtc.peerConns[otherUser].dataChannelReady = true;
-                }
+
+                easyrtc.peerConns[otherUser].dataChannelS = dataChannel;
+                easyrtc.peerConns[otherUser].dataChannelReady = true;
                 dataChannel.onmessage = dataChannelMessageHandler;
                 dataChannel.onclose = function(event) {
                     if (easyrtc.debugPrinter) {
@@ -2651,10 +2648,14 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     easyrtc.updateConfigurationInfo();
                 };
 
-                // the data channel is open implicitly because it was incoming
-                if (easyrtc.onDataChannelOpen) {
-                    easyrtc.onDataChannelOpen(otherUser, true);
-                }
+                dataChannel.onopen = function(event) {
+                    if (easyrtc.debugPrinter) {
+                        easyrtc.debugPrinter("saw dataChannel.onopen event");
+                    }
+                    if (easyrtc.peerConns[otherUser]) {
+                        dataChannel.send("dataChannelPrimed");
+                    }
+                };
 
             };
         }
@@ -2664,19 +2665,24 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         //
         var doDataChannels = easyrtc.dataEnabled;
         if (doDataChannels) {
+
             // check if both sides have the same browser and versions 
-        }
-        if (easyrtc.isMozilla) {
-            if (!doDataChannels) {
-                mediaConstraints.mandatory.MozDontOfferDataChannel = true;
-            }
-            else {
-                delete mediaConstraints.mandatory.MozDontOfferDataChannel;
-            }
         }
 
         if (doDataChannels) {
-            if (isInitiator || easyrtc.isMozilla) {
+            easyrtc.setPeerListener(function() {
+                easyrtc.peerConns[otherUser].dataChannelReady = true;
+                if (easyrtc.peerConns[otherUser].callSuccessCB) {
+                    easyrtc.peerConns[otherUser].callSuccessCB(otherUser, "datachannel");
+                }
+                if (easyrtc.onDataChannelOpen) {
+                    easyrtc.onDataChannelOpen(otherUser, true);
+                }
+                easyrtc.updateConfigurationInfo();
+
+            }, "dataChannelPrimed", otherUser);
+
+            if (isInitiator) {
                 try {
 
                     initOutGoingChannel(otherUser);
@@ -2686,7 +2692,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                             easyrtc.formatError(channelErrorEvent));
                 }
             }
-            if (!isInitiator || easyrtc.isMozilla) {
+            if (!isInitiator) {
                 initIncomingChannel(otherUser);
             }
         }
@@ -4072,7 +4078,3 @@ if (navigator.mozGetUserMedia) {
 
 /** @private */
 easyrtc.isMozilla = (webrtcDetectedBrowser === "firefox");
-//
-// This is the end of the polyfill adapter.js
-//
-
