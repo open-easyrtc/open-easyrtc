@@ -49,16 +49,16 @@ There is a lot of work still to go in providing additional features which produc
 When will WebRTC be ready for production?
 -----------------------------------------
 
-Currently the WebRTC W3C specification is still being finalized. The original posted date for reaching recommendation status was overly optimistic (Q1 2013). With implementation methods still being debated, be prepared for it to take until Q4 2013 (or longer).
+Currently the WebRTC W3C specification is still being finalized. The original posted date for reaching recommendation status was overly optimistic (Q1 2013). With implementation methods still being debated, be prepared for it to take until Q4 2014 (or longer).
 
-As the specification gets closer to recommendation status, we expect those browsers which are currently working on WebRTC to better communicate with each other.
+As the specification gets closer to recommendation status, we expect those browsers which are currently working on WebRTC to better communicate with each other. Currently the biggest contended issues surround video codec requirements.
 
 Some browsers may wait until after the standard reaches recommendation status to implement WebRTC.
 
 
 How about Multi-way Conversations?
 ----------------------------------
-WebRTC doesn't support multicast or broadcast packets (currently), so the only way to do multi-way conversations is a star configuration: each peer establishes a connection to every other peer. The EasyRTC API will support this and we provide a demo.
+WebRTC doesn't support multicast or broadcast packets (currently), so the only way to do multi-way conversations is a star configuration: each peer establishes a connection to every other peer. The EasyRTC API does support this and we provide a demo.
 
 Check out [tawk.com](http://tawk.com) for an in-production example.
 
@@ -80,6 +80,12 @@ Are there plans to integrating with SIP?
 SIP is an extensive protocol, and developing a WebRTC platform which supports it in a way casual developers could use it would be difficult. Unless we can come up with a way to make this "easy", it won't happen. This does allow for SIP and VOIP gateways to implement WebRTC using EasyRTC.
 
 Priologic Software has been working on SIP integration methods commercially (shameless plug).
+
+
+What are the common connection, audio, and video problems?
+----------------------------------------------------------
+
+See our separate document: WebRTC Problems and Possible Fixes
 
 
 How do I report bugs or ask for features?
