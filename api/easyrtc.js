@@ -1326,14 +1326,36 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
         audio: easyrtc.audioEnabled,
         video: easyrtc.videoEnabled
     };
+    
+    function getCurrentTime() {
+        return (new Date()).getTime();
+    }
+    
+    var firstCallTime;
     if (easyrtc.videoEnabled || easyrtc.audioEnabled) {
-//
-// getUserMedia usually fails the first time I call it. I suspect it's a page loading
-// issue. So I'm going to try adding a 1 second delay to allow things to settle down first.
-//
+        //
+        // getUserMedia sopm fails the first time I call it. I suspect it's a page loading
+        // issue. So I'm going to try adding a 3 second delay to allow things to settle down first.
+        // In addition, I'm going to try again after 3 seconds.
+        //
+    
+        function tryAgain(error) {
+            var currentTime = getCurrentTime();
+            if( currentTime < firstCallTime + 1000) {
+                console.log("Trying getUserMedia a second time");
+                setTimeout(function(){
+                    getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
+                }, 3000);
+            }
+            else {
+                onUserMediaError(error);
+            }
+        }
+        
         setTimeout(function() {
-            try {
-                getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
+            try {                
+                firstCallTime = getCurrentTime();
+                getUserMedia(mode, onUserMediaSuccess, tryAgain);
             } catch (e) {
                 errorCallback(easyrtc.errCodes.MEDIA_ERR, "getUserMedia failed with exception: " + e.message);
             }
@@ -3632,28 +3654,40 @@ easyrtc.autoAddCloseButtons = true;
 easyrtc.dontAddCloseButtons = function() {
     easyrtc.autoAddCloseButtons = false;
 };
+
 /**
- * Provides a layer on top of the easyrtc.initMediaSource and easyrtc.connect, assign the local media stream to
- * the video object identified by monitorVideoId, assign remote video streams to
- * the video objects identified by videoIds, and then call onReady. One of it's
- * side effects is to add hangup buttons to the remote video objects, buttons
- * that only appear when you hover over them with the mouse cursor. This method will also add the
- * easyrtcMirror class to the monitor video object so that it behaves like a mirror.
- *  @param {String} applicationName - name of the application.
- *  @param {String} monitorVideoId - the id of the video object used for monitoring the local stream.
- *  @param {Array} videoIds - an array of video object ids (strings)
- *  @param {Function} onReady - a callback function used on success. It is called with the easyrtcId this peer is knopwn to the server as.
- *  @param {Function} onFailure - a callbackfunction used on failure (failed to get local media or a connection of the signaling server).
- *  @example
- *     easyrtc.easyApp('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],
- *              function(easyrtcId){
- *                  console.log("successfully connected, I am " + easyrtcId);
- *              },
- *              function(errorCode, errorText){
- *                  console.log(errorText);
- *              );
+ * Validates that the video ids correspond to dom objects.
+ * @param {type} monitorVideoId
+ * @param {type} videoIds
+ * @returns {undefined}
+ * @private
  */
-easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, onFailure) {
+easyrtc._validateVideoIds = function(monitorVideoId, videoIds) {
+    var i;
+    // verify that video ids were not typos.
+    if (monitorVideoId && !document.getElementById(monitorVideoId)) {
+        easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "The monitor video id passed to easyApp was bad, saw " + monitorVideoId);
+        return false;
+    }
+
+    for (i in videoIds) {
+        var name = videoIds[i];
+        if (!document.getElementById(name)) {
+            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "The caller video id '" + name + "' passed to easyApp was bad.");
+            return false;
+        }
+    }
+    return true;
+};
+
+/**
+ * This is a helper function for the easyApp method. It manages the assignment of video streams
+ * to video objects. It assumes
+ * @param {type} monitorVideoId
+ * @param {type} videoIds
+ * @returns {void}
+ */
+easyrtc.easyAppBody = function(monitorVideoId, videoIds) {
     var numPEOPLE = videoIds.length;
     var refreshPane = 0;
     var onCall = null, onHangup = null, gotMediaCallback = null, gotConnectionCallback = null;
@@ -3665,55 +3699,14 @@ easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, o
         return (obj.caller === "" || obj.caller === null || obj.caller === undefined);
     }
 
-// verify that video ids were not typos.
-    if (monitorVideoId && !document.getElementById(monitorVideoId)) {
-        easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "The monitor video id passed to easyApp was bad, saw " + monitorVideoId);
-        return;
+    if( !easyrtc._validateVideoIds(monitorVideoId, videoIds)) {
+        throw "bad video element id";
     }
 
     if (monitorVideoId) {
         document.getElementById(monitorVideoId).muted = "muted";
     }
-    var i;
-    for (i in videoIds) {
-        var name = videoIds[i];
-        if (!document.getElementById(name)) {
-            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "The caller video id '" + name + "' passed to easyApp was bad.");
-            return;
-        }
-    }
-    /** Sets an event handler that gets called when the local media stream is
-     *  created or not. Can only be called after calling easyrtc.easyApp.
-     *  @param {Function} gotMediaCB has the signature function(gotMedia, errorText)
-     *  @example
-     *     easyrtc.setGotMedia( function(gotMediaCB, errorText){
-     *         if( gotMedia ){
-     *             console.log("Got the requested user media");
-     *         }
-     *         else{
-     *             console.log("Failed to get media because: " +  errorText);
-     *         }
-     *     });
-     */
-    easyrtc.setGotMedia = function(gotMediaCB) {
-        gotMediaCallback = gotMediaCB;
-    };
-    /** Sets an event handler that gets called when a connection to the signaling
-     * server has or has not been made. Can only be called after calling easyrtc.easyApp.
-     * @param {Function} gotConnectionCB has the signature (gotConnection, errorText)
-     * @example
-     *    easyrtc.setGotConnection( function(gotConnection, errorText){
-     *        if( gotConnection ){
-     *            console.log("Successfully connected to signaling server");
-     *        }
-     *        else{
-     *            console.log("Failed to connect to signaling server because: " + errorText);
-     *        }
-     *    });
-     */
-    easyrtc.setGotConnection = function(gotConnectionCB) {
-        gotConnectionCallback = gotConnectionCB;
-    };
+
     /** Sets an event handler that gets called when a call is established.
      * It's only purpose (so far) is to support transitions on video elements.
      * This function is only defined after easyrtc.easyApp is called.
@@ -3891,6 +3884,61 @@ easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, o
         monitorVideo.muted = "muted";
         monitorVideo.defaultMuted = true;
     }
+    
+   
+};
+
+/**
+ * Provides a layer on top of the easyrtc.initMediaSource and easyrtc.connect, assign the local media stream to
+ * the video object identified by monitorVideoId, assign remote video streams to
+ * the video objects identified by videoIds, and then call onReady. One of it's
+ * side effects is to add hangup buttons to the remote video objects, buttons
+ * that only appear when you hover over them with the mouse cursor. This method will also add the
+ * easyrtcMirror class to the monitor video object so that it behaves like a mirror.
+ *  @param {String} applicationName - name of the application.
+ *  @param {String} monitorVideoId - the id of the video object used for monitoring the local stream.
+ *  @param {Array} videoIds - an array of video object ids (strings)
+ *  @param {Function} onReady - a callback function used on success. It is called with the easyrtcId this peer is knopwn to the server as.
+ *  @param {Function} onFailure - a callbackfunction used on failure (failed to get local media or a connection of the signaling server).
+ *  @example
+ *     easyrtc.easyApp('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],
+ *              function(easyrtcId){
+ *                  console.log("successfully connected, I am " + easyrtcId);
+ *              },
+ *              function(errorCode, errorText){
+ *                  console.log(errorText);
+ *              );
+ */
+easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, onFailure) {
+     gotMediaCallback = null, gotConnectionCallback = null;
+
+    if( !easyrtc._validateVideoIds(monitorVideoId, videoIds)) {
+        throw "bad video id";
+    }
+
+    easyrtc.easyAppBody(monitorVideoId, videoIds);
+   
+    easyrtc.setGotMedia = function(gotMediaCB) {
+        gotMediaCallback = gotMediaCB;
+    };
+    /** Sets an event handler that gets called when a connection to the signaling
+     * server has or has not been made. Can only be called after calling easyrtc.easyApp.
+     * @param {Function} gotConnectionCB has the signature (gotConnection, errorText)
+     * @example
+     *    easyrtc.setGotConnection( function(gotConnection, errorText){
+     *        if( gotConnection ){
+     *            console.log("Successfully connected to signaling server");
+     *        }
+     *        else{
+     *            console.log("Failed to connect to signaling server because: " + errorText);
+     *        }
+     *    });
+     */
+    easyrtc.setGotConnection = function(gotConnectionCB) {
+        gotConnectionCallback = gotConnectionCB;
+    };
+  
+  
 
 
     var nextInitializationStep;
@@ -3905,8 +3953,8 @@ easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, o
                 if (gotMediaCallback) {
                     gotMediaCallback(true, null);
                 }
-                if (monitorVideo !== null) {
-                    easyrtc.setVideoObjectSrc(monitorVideo, easyrtc.getLocalStream());
+                if (monitorVideoId !== null) {
+                    easyrtc.setVideoObjectSrc(document.getElementById(monitorVideoId), easyrtc.getLocalStream());
                 }
                 function connectError(errorCode, errorText) {
                     if (gotConnectionCallback) {
