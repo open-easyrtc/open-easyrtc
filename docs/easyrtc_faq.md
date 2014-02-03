@@ -8,7 +8,7 @@ WebRTC allows real-time communications within the browser without the need for p
 
  * Standardized methods of connecting to web cameras and microphones.
  * Peer to peer connections. Improves latency and reduces bottlenecks on the servers.
- * Standardized negotiation for steaming audio, video and data.
+ * Standardized negotiation for streaming audio, video and data.
 
 
 What is EasyRTC?
@@ -41,26 +41,37 @@ For the most part, if you can run Node.JS, you can run EasyRTC.
 Is EasyRTC production ready?
 ----------------------------
 
-Yes and no... The biggest barrier to EasyRTC being considered production ready is the current state of WebRTC, both in terms of the specification and browser support, is not complete. As for EasyRTC itself, it along with its sibling EasyRTC Enterprise have been in production use since May of 2013.
+We have used EasyRTC in production since May of 2013 (see [https://tawk.com](https://tawk.com "tawk.com")). The included demos include notes about what browsers the various features work in, or how experimental the feature is.
 
 There is a lot of work still to go in providing additional features which production code will need. We invite all users to give us feedback as to what features you desire.
 
 
-When will WebRTC be ready for production?
------------------------------------------
+Is WebRTC production ready?
+---------------------------
 
-Currently the WebRTC W3C specification is still being finalized. The original posted date for reaching recommendation status was overly optimistic (Q1 2013). With implementation methods still being debated, be prepared for it to take until Q4 2014 (or longer).
+Many products and services utilizing WebRTC have already been released despite the specification not yet being finalized. The original posted date for reaching recommendation status was overly optimistic (Q1 2013). With implementation methods still being debated, be prepared for it to take until Q4 2014 (or longer).
 
 As the specification gets closer to recommendation status, we expect those browsers which are currently working on WebRTC to better communicate with each other. Currently the biggest contended issues surround video codec requirements.
 
 Some browsers may wait until after the standard reaches recommendation status to implement WebRTC.
 
 
+How About Data Channels?
+------------------------
+
+The data channel portion of the specification is close to being finalized. Browser support is getting better, with inter-optibility among desktop Chrome and Firefox now possible.
+
+EasyRTC supports automatic fail-over to websockets in those cases where data channel support is spotty.
+
+
 How about Multi-way Conversations?
 ----------------------------------
-WebRTC doesn't support multicast or broadcast packets (currently), so the only way to do multi-way conversations is a star configuration: each peer establishes a connection to every other peer. The EasyRTC API does support this and we provide a demo.
+
+EasyRTC includes a demo showing up to four connections in a star configuration. Each peer establishes a connection to every other peer.
 
 Check out [tawk.com](http://tawk.com) for an in-production example.
+
+More advanced conference and multicast requirements would require a dedicated WebRTC capable conference server or [MCU](http://en.wikipedia.org/wiki/Multipoint_control_unit "MCU"). EasyRTC does not yet include direct support for these. We are working with various vendors to gain this support.
 
 
 Why use Node.js?
