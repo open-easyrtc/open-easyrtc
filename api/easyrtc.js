@@ -1351,13 +1351,23 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
                 onUserMediaError(error);
             }
         }
+
+        function tryAgain2(e) {
+            console.log("Trying getUserMedia a second time");
+            try {
+                getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
+            }
+            catch(e) {
+               onUserMediaError(e);
+            }
+        }
         
         setTimeout(function() {
             try {                
                 firstCallTime = getCurrentTime();
                 getUserMedia(mode, onUserMediaSuccess, tryAgain);
             } catch (e) {
-                errorCallback(easyrtc.errCodes.MEDIA_ERR, "getUserMedia failed with exception: " + e.message);
+                setTimeout( tryAgain2, 2500);
             }
         }, 1000);
     }
