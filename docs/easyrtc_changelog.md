@@ -7,15 +7,17 @@ New Features:
   - Documentation - New document entitled "WebRTC Common Problems and Solutions"
 
 Changes:
-  - Updated the FAQ file.
-  - Bumped Underscore module to v1.5.x.
-  - Removed support for TURN urls of the form "turn:name@domain:port" in favour of the newer form that separates the username field. Attempts to use the older form will result in an meaningful error message.
+  - API - Removed support for TURN urls of the form "turn:name@domain:port" in favour of the newer form that separates the username field. Attempts to use the older form will result in an meaningful error message.
   - API - If the first attempt to call to getUserMedia fails or throws an exception, wait two seconds and try again.
-     
+  - Server - Bumped Underscore module to v1.5.x.
+  - Documentation - FAQ has both new and updated questions.
+  - Documentation - New documentation for upgrading EasyRTC using NPM. (issue #43)
+
 Fixes:
   - API - Updated data channel support for Firefox so that it interops with Chrome again. 
   - API - Fixed the easyrtc.supportsDataChannel methods check for Android browsers. Data channels aren't currently supported for Android by EasyRTC.
   - API - When data channels are opened, an initial message is sent each way to verify that data channels work.
+  - Server - Fixed bug where a getIceConfig request didn't return the proper format. (issue #46)
   - Documentation - Minor changes for greater consistency.
 
 v1.0.8
@@ -84,7 +86,7 @@ Fixes:
  - Server - Message verification fixes for easyrtcsid, and application names
 
 
- v1.0.5-beta
+v1.0.5-beta
 -----------
 
 Changes:
@@ -110,10 +112,12 @@ Changes:
 Fixes:
  - Server Example - Switched package.json to match modules with '-' due to npm problems
 
+
 v0.10.4-alpha
 -------------
 Fixes:
  - Server - Fixed onRoomCreate event force close bug.
+
 
 0.10.3-alpha
 ------------
@@ -121,7 +125,6 @@ Fixes:
 New Features:
  - API + Server - API fields. These are basically variables which are set by the client and shared to others in the room. Many possibilities!
  - API + Server - ICE Config improvements. Client can now request an updated ICE configuration from the server, or server can force new one on client.
- 
  - Server - isConnected() function added to connection object.
  - Server - Added convenience functions to several objects such as getAppName()
  - Server - Added pub.events.emitDefault() method. The previous method of finding the default listener in an object was clunky.
@@ -132,6 +135,7 @@ Changes:
 
 Fixes:
  - Lots. But please let us know if there's any others which need doing.
+
 
 0.10.2-alpha
 ------------
@@ -230,7 +234,6 @@ v0.8.0
 ------
 
 New Features:
-
  - API - Added support for grabbing the screen as the local media source. Currently this only works in Canary, and causes the browser to crash if you try to use it in a peer connection.
  - API - Added support for grabbing video at high-definition instead of the default standard definition. Warning: the browser may cheat and give you a lower resolution than you asked for that has the desired aspect ratio.
  - API - Added a number of callbacks to the initManaged method to support richer interactions with the client.
@@ -259,7 +262,6 @@ v0.7.0
 ------
 
 New Features:
-
  - API - Added initial support for Data Channels.
  - API - Added more debugging output and provided a means to control it through the easyrtc.debugPrinter variable and easyrtc.enableDebug function.
  - API - Added code to log application state (WRT webrtc) to the server.
@@ -274,7 +276,6 @@ New Features:
  - Documentation - This changelog :)
 
 Changes:
-
  - API - The callSuccessCB argument to easyrtc.call now has a second argument, which can be either 'audiovideo' or 'datachannel'. The callSuccessCB function may be get called twice if the peer connection is using data channels as well as audio or video.
  - API - Fixed easyrtc.connect so that you can reconnect after calling disconnect.
  - Server - Websocket 'onMessage' section moved to external function for easier editing.
@@ -283,7 +284,6 @@ Changes:
  - Demos - Removed unneeded CSS for selfVideo tag from demo_audio_only.html, changed callerVideo id to callerAudio id, removed selfVideo tag and javascript which referenced it, changed a variable name from 'video' to 'audio'.
 
 Fixes:
-
  - Server - Bad link to a stun server.
 
 
@@ -291,13 +291,11 @@ v0.6.0
 ------
 
 New Features:
-
  - Demos - Demo landing page which includes links and compatibility chart.
  - Server - Option to disable demos in config.js.
  - API - powered_by_easyrtc.png image. Please use it to promote the project.
 
 Changes:
-
  - Demos - Change Split live demos to their own folder.
  - Demos - Change Major graphical upgrade for demos and landing page.
 
