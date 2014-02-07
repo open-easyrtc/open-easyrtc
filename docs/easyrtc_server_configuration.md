@@ -1,13 +1,6 @@
 EasyRTC: Server Configuration
 =============================
 
-**Alpha Version**
-*This page will be updated before we leave alpha, and certainly before we get to production. If not, feel free to attack us with wet noodles.*
-
-For the code setting the default configuration options see:
- - [../lib/easyrtc_default_options.js](../lib/easyrtc_default_options.js)
-
-
 Configuration levels - Server versus Application versus Room
 ------------------------------------------------------------
 
@@ -35,69 +28,70 @@ Setting Server Options Example
 ------------------------------
 The following server.js code snippet includes three ways of setting EasyRTC options.
 
-	var http    = require("http");              // http server core module
-	var express = require("express");           // web framework external module
-	var io      = require("socket.io");         // web socket external module
-	var easyrtc = require("easyrtc");           // EasyRTC external module
-	
-	// Setup and configure Express http server. Expect a subfolder called "static" to be the web root.
-	var httpApp = express();
-	httpApp.configure(function() {
-	    httpApp.use(express.static(__dirname + "/static/"));
-	});
-	
-	var webServer = http.createServer(httpApp).listen(8080);
-	var socketServer = io.listen(webServer);
-	var easyrtcListener;
-	
-	
-	// Configure EasyRTC to load demos from /easyrtcdemos/
-	easyrtc.setOption("demosPublicFolder", "/easyrtcdemos");
-	
-	// Start EasyRTC server with options to change the log level and add dates to the log.
-	var easyrtcServer = easyrtc.listen(
-	        httpApp,
-	        socketServer,
-	        {logLevel:"debug", logDateEnable:true},
-	        function(err, rtc) {
+    var http    = require("http");              // http server core module
+    var express = require("express");           // web framework external module
+    var io      = require("socket.io");         // web socket external module
+    var easyrtc = require("easyrtc");           // EasyRTC external module
 
-	            // After the server has started, we can still change the default room name
-	            rtc.setOption("roomDefaultName", "SectorZero");
-	
-	            // Creates a new application called MyApp with a default room named "SectorOne".
-	            rtc.createApp(
-	                "easyrtc.instantMessaging",
-	                {"roomDefaultName":"SectorOne"},
-	                myEasyrtcApp
-	            );
-	        }
-	);
-	
-	// Setting option for specific application
-	var myEasyrtcApp = function(err, appObj) {
-	    // All newly created rooms get a field called roomColor.
-	    // Note this does not affect the room "SectorOne" as it was created already.
-	    appObj.setOption("roomDefaultFieldObj",
-	         {"roomColor":{fieldValue:"orange", fieldOption:{isShared:true}}}
-	    );
-	};
+    // Setup and configure Express http server. Expect a subfolder called "static" to be the web root.
+    var httpApp = express();
+    httpApp.configure(function() {
+        httpApp.use(express.static(__dirname + "/static/"));
+    });
+
+    var webServer = http.createServer(httpApp).listen(8080);
+    var socketServer = io.listen(webServer);
+    var easyrtcListener;
+
+
+    // Configure EasyRTC to load demos from /easyrtcdemos/
+    easyrtc.setOption("demosPublicFolder", "/easyrtcdemos");
+    
+    // Start EasyRTC server with options to change the log level and add dates to the log.
+    var easyrtcServer = easyrtc.listen(
+            httpApp,
+            socketServer,
+            {logLevel:"debug", logDateEnable:true},
+            function(err, rtc) {
+
+                // After the server has started, we can still change the default room name
+                rtc.setOption("roomDefaultName", "SectorZero");
+    
+                // Creates a new application called MyApp with a default room named "SectorOne".
+                rtc.createApp(
+                    "easyrtc.instantMessaging",
+                    {"roomDefaultName":"SectorOne"},
+                    myEasyrtcApp
+                );
+            }
+    );
+
+    // Setting option for specific application
+    var myEasyrtcApp = function(err, appObj) {
+        // All newly created rooms get a field called roomColor.
+        // Note this does not affect the room "SectorOne" as it was created already.
+        appObj.setOption("roomDefaultFieldObj",
+             {"roomColor":{fieldValue:"orange", fieldOption:{isShared:true}}}
+        );
+    };
 
 
 Available Server Options
 ------------------------
 
-**Application Options**
- - appAutoCreateEnable
+### Application Options
+
+ - **appAutoCreateEnable**
    - Enables the creation of application from the API. Occurs when client joins a nonexistent application.
    - This should be set to false for production use.
    - Defaults to: true
- - appDefaultFieldObj
+ - **appDefaultFieldObj**
    - Default fields which are set when an application is created. In form of {"fieldName":{fieldValue:<JsonObj>, fieldOption:{isShared:<boolean>}}[, ...]}
    - Defaults to: null
- - appDefaultName
+ - **appDefaultName**
    - The default application a connection belongs to if it is not initially specified.
    - Defaults to: "default"
- - appIceServers
+ - **appIceServers**
    - ICE Servers object which identifies all STUN and TURN servers.
    - With new username field in TURN specification, this object may be updated soon.
    - Defaults to:
@@ -112,119 +106,128 @@ Available Server Options
 
     {"url":"turn:[ADDRESS]:[PORT]","username":"[USERNAME]", "credential":"[CREDENTIAL]"}
 
-**Room Options**
- - roomAutoCreateEnable
+
+### Room Options
+
+ - **roomAutoCreateEnable**
    - Enables the creation of rooms from the API. Occurs when client joins a nonexistent room.
    - Defaults to: true
- - roomDefaultEnable
+ - **roomDefaultEnable**
    -  Enables connections joining a default room if it is not initially specified. If false, than a connection initially may be in no room.
    - Defaults to: true
- - roomDefaultFieldObj
+ - **roomDefaultFieldObj**
    - Default fields which are set when a room is created. In form of {"fieldName":{fieldValue:<JsonObj>, fieldOption:{isShared:<boolean>}}[, ...]}
    - Defaults to: null
- - roomDefaultName
+ - **roomDefaultName**
    - The default room a connection joins if it is not initially specified.
    - Defaults to: "default"
 
 
-**Connection Options**
- - connectionDefaultField
+### Connection Options
+
+ - **connectionDefaultField**
    - Default connection fields.
    - Defaults to: null
 
 
-**Session Options**
- - sessionEnable
+### Session Options
+
+ - **sessionEnable**
    - Enable sessions. If sessions are disabled, each socket connection from the same user will be the same. Relies on Express session handling also being enabled.
    - Defaults to: true
- -  sessionCookieEnable
+ - **sessionCookieEnable**
    - If enabled, the server will attempt to send a easyrtcsid cookie which matches the Express session id.
    - Defaults to: true
 
 
-**API Hosting Options**
- - apiEnable
+### API Hosting Options
+
+ - **apiEnable**
    - Enables hosting of the EasyRTC API files.
    - Defaults to: true
- - apiPublicFolder
+ - **apiPublicFolder**
    - Api public folder without trailing slash. Note that the demos expect this to be '/easyrtc'
    - Defaults to: "/easyrtc"
- - apiOldLocationEnable
+ - **apiOldLocationEnable**
    - [Depreciated] Listens for requests to core API files in old locations (in addition to the new standard locations)
    - Defaults to: false
 
 
-**Demo Options**
- - demosEnable
+### Demo Options
+
+ - **demosEnable**
    - Enables the various EasyRTC demos. For a production system, this should be disabled.
    - Defaults to: true
- - demosPublicFolder
+ - **demosPublicFolder**
    - Demos public folder without trailing slash.
    - Defaults to: "/demos"
 
 
-**Log options** - Only apply if internal 'log' event is used
- - logLevel
+### Log options
+
+Log options only apply if internal 'log' event is used
+
+ - **logLevel**
    - The minimum log level to show. (debug|info|warning|error|none)
    - Defaults to: "info"
- - logDateEnable
+ - **logDateEnable**
    -  Display timestamp in each entry
    - Defaults to: false
- - logErrorStackEnable
+ - **logErrorStackEnable**
    - print the stack trace in logged errors when available
    - Defaults to: true
- - logWarningStackEnable
+ - **logWarningStackEnable**
    - print the stack trace in logged warnings when available
    - Defaults to: true
- - logColorEnable
+ - **logColorEnable**
    - include console colors. Disable if forwarding logs to files or databases
    - Defaults to: true
- - logObjectDepth
+ - **logObjectDepth**
    - When objects are included in the log, this is the max depth the log will display
    - Defaults to: 7
 
 
-**Miscellaneous Server Options**
- - updateCheckEnable
+### Miscellaneous Server Options
+ - **updateCheckEnable**
    - Checks for updates to EasyRTC
    - Defaults to: true
 
 
-**Regular expressions for validating names and other input**
- - apiVersionRegExp
+### Regular expressions for validating names and other input
+ - **apiVersionRegExp**
    - API Version
    - Defaults to: /^[a-z0-9_.-]{1,32}$/i
- - appNameRegExp
+ - **appNameRegExp**
    - Application name
    - Defaults to: /^[a-z0-9_.-]{1,32}$/i
- - easyrtcidRegExp
+ - **easyrtcidRegExp**
    - EasyRTC socket id (easyrtcid)
    - Defaults to: /^[a-z0-9_.-]{1,32}$/i
- - easyrtcsidRegExp
+ - **easyrtcsidRegExp**
    - EasyRTC session id (easyrtcsid)
    - Defaults to: /^[a-z0-9_.-]{1,64}$/i
- - groupNameRegExp
+ - **groupNameRegExp**
    - Group name
    - Defaults to: /^[a-z0-9_.-]{1,32}$/i
- - fieldNameRegExp
+ - **fieldNameRegExp**
    - Field names (for defining app and room custom fields)
    - Defaults to: /^[a-z0-9_. -]{1,32}$/i
- - optionNameRegExp
+ - **optionNameRegExp**
    - Option names (for defining server options)
    - Defaults to: /^[a-z0-9_. -]{1,32}$/i
- - presenceShowRegExp
+ - **presenceShowRegExp**
    - Allowed presence "show" values (for setPresence command)
    - Can be set at application level
    - Defaults to: /^(away|chat|dnd|xa)$/
- - presenceStatusRegExp
+ - **presenceStatusRegExp**
    - Allowed presence "status" value
    - Can be set at application level
    - Defaults to: /^(.){0,255}$/
- - roomNameRegExp
+ - **roomNameRegExp**
    - Room name
    - Can be set at application level
    - Defaults to: /^[a-z0-9_.-]{1,32}$/i
- - usernameRegExp
+ - **usernameRegExp**
    - Username
    - Can be set at application level
    - Defaults to: /^(.){1,64}$/i
@@ -234,4 +237,4 @@ If You Run Into Problems
 ------------------------
 Please feel free to post on our discussion forum:
 
- * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
+ - [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)

@@ -71,3 +71,10 @@ Sound Quality
    - Use a headset.
    - Use a conference microphone/speaker with built-in noise cancelling.
  - HOPE: Browsers implement (and expose) their own noise cancelling and feedback protection options.
+
+
+If You Run Into Problems
+------------------------
+Please feel free to post on our discussion forum:
+
+ - [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)

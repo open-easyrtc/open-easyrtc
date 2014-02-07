@@ -5,7 +5,7 @@ EasyRTC
 
 **A bundle of Open Source WebRTC joy!**
 
-Priologic's EasyRTC, a bundle of Open Source WebRTC joy, incorporates an EasyRTC server install and client API, and working, HTML5 and Javascript, application source code under a BSD 2 license.
+Priologic's EasyRTC, a bundle of Open Source WebRTC joy, incorporates an EasyRTC server install and client API, and working, HTML5 and JavaScript, application source code under a BSD 2 license.
 
 
 Features

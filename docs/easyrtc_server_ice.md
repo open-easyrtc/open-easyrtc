@@ -41,7 +41,6 @@ The appIceConfig option accepts an array containing zero or more URL's to STUN a
     ];
 
 
-
 **Setting appIceConfig Across Server**
 
     easyrtc.setOption("appIceConfig", myIceConfig);
@@ -99,4 +98,4 @@ If You Run Into Problems
 ------------------------
 Please feel free to post on our discussion forum:
 
- * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
+ - [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)

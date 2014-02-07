@@ -6,9 +6,9 @@ What is WebRTC?
 
 WebRTC allows real-time communications within the browser without the need for plugins. A few of its greatest benefits include:
 
- * Standardized methods of connecting to web cameras and microphones.
- * Peer to peer connections. Improves latency and reduces bottlenecks on the servers.
- * Standardized negotiation for streaming audio, video and data.
+ - Standardized methods of connecting to web cameras and microphones.
+ - Peer to peer connections. Improves latency and reduces bottlenecks on the servers.
+ - Standardized negotiation for streaming audio, video and data.
 
 
 What is EasyRTC?
@@ -16,12 +16,12 @@ What is EasyRTC?
 
 EasyRTC removes the pain associated with getting started with WebRTC with the following cool features:
 
- * Cross browser support.
- * Working source code.
- * Easy server install.
- * WebSocket server.
- * Single language for server and clients (Javascript).
- * Open Source and free!
+ - Cross browser support.
+ - Working source code.
+ - Easy server install.
+ - WebSocket server.
+ - Single language for server and clients (JavaScript).
+ - Open Source and free!
 
 Why is WebRTC Hard?
 -------------------
@@ -33,6 +33,7 @@ The EasyRTC framework provides that message passing scheme so that the developer
 
 EasyRTC Requirements:
 --------------------
+
 So far we have tested EasyRTC on Windows 7, 8, OS-X, Raspberry Pi, and Ubuntu 12.04 LTS where users have administrator or sudo access.
 
 For the most part, if you can run Node.JS, you can run EasyRTC.
@@ -79,10 +80,10 @@ Why use Node.js?
 
 Node.JS is a powerful asynchronous server platform which has several qualities we find enduring:
 
- * Performs exceptionally well as a HTML5 socket server.
- * Easy to program for with a thriving open source community to back it up.
- * Multi-platform! Allows installs on Linux, Windows, and Macs.
- * The Node Package Manager provides an easy way to distribute and install EasyRTC.
+ - Performs exceptionally well as a HTML5 socket server.
+ - Easy to program for with a thriving open source community to back it up.
+ - Multi-platform! Allows installs on Linux, Windows, and Macs.
+ - The Node Package Manager provides an easy way to distribute and install EasyRTC.
 
 
 Are there plans to integrating with SIP?
@@ -104,12 +105,12 @@ How do I report bugs or ask for features?
 
 We monitor both the Github issue tracker and the Google Groups discussion forum.
 
- * [https://github.com/priologic/easyrtc/issues](https://github.com/priologic/easyrtc/issues)
- * [https://groups.google.com/forum/?forum/#!forum/easyrtc](https://groups.google.com/forum/?forum/#!forum/easyrtc)
+ - [https://github.com/priologic/easyrtc/issues](https://github.com/priologic/easyrtc/issues)
+ - [https://groups.google.com/forum/?forum/#!forum/easyrtc](https://groups.google.com/forum/?forum/#!forum/easyrtc)
 
 
 You Didn't Answer My Question!
 ------------------------------
  Ask away on our forum. We do monitor it!
 
- * [https://groups.google.com/forum/?forum/#!forum/easyrtc](https://groups.google.com/forum/?forum/#!forum/easyrtc)
+ - [https://groups.google.com/forum/?forum/#!forum/easyrtc](https://groups.google.com/forum/?forum/#!forum/easyrtc)
