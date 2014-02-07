@@ -9,8 +9,10 @@ EasyRTC Room Features
  - Server can restrict who gains access to rooms
  - Server can define room fields (variables) which are shared to all clients in a room
 
+
 Default Room Behavior
 ---------------------
+
  - If no room is specified the client will join a default room named "default"
  - Requested rooms will automatically be created if they don't currently exist
  - Clients see all other authenticated clients within the same room
@@ -37,7 +39,7 @@ Server Options which Effect Rooms
 JavaScript Client API - Joining a room
 --------------------------------------
 
-**easyrtc.joinRoom()**
+### easyrtc.joinRoom()
 
 Joining a room is handled using the joinRoom function. This can be run before or after `easyrtc.connect()` or `easyrtc.easyApp()`. It may be called multiple times to be in multiple rooms simultaneously. It may be called before or after connecting to the server.
 
@@ -57,7 +59,7 @@ Note: the successCB and failureDB will only be called if you are already connect
 JavaScript Client API - Leaving a room
 --------------------------------------
 
-**easyrtc.leaveRoom()**
+### easyrtc.leaveRoom()
 
 Leaving a room is handled using the leaveRoom function, or through disconnecting.
 
@@ -73,11 +75,12 @@ Leaving a room is handled using the leaveRoom function, or through disconnecting
 
 Server - "roomCreate" Event
 ---------------------------
+
 When a client has requested to create a room, the "roomCreate" event is fired. By setting a new listener for the "roomCreate" event, the default behavior can be overruled.
 
 Note: The roomCreate event will be fired when a client requests to join a room which doesn't exist and the "roomAutoCreateEnable" option is set to true. Upon successful callback.
 
-**Common Uses:**
+### Common Uses:
  - Authenticate who is permitted to create rooms
  - Set roomField's
  - Perform application logic, where rooms may be matched to a database entry
@@ -88,7 +91,7 @@ Server - "roomJoin" Event
 
 Controlling who can join an existing room, and what occurs when joining is controlled by a listener for the "roomJoin" event. By setting a new listener for the "roomJoin" event, the default behavior can be overruled.
 
-**Common Uses:**
+### Common Uses:
  - Authenticate who is permitted to join rooms
  - Set roomField's
  - Control which other clients receive an update that a client joined the room
@@ -97,9 +100,10 @@ Controlling who can join an existing room, and what occurs when joining is contr
 
 Server - "roomLeave" Event
 ---------------------------
+
 When a client has requested to leave a room, the "roomLeave" event is fired. By setting a new listener for the "roomLeave" event, the default behavior can be overruled.
 
-**Common Uses:**
+### Common Uses:
  - Prevent a client from leaving a room
  - Set roomField's
  - Control which other clients receive an update that a client left the room
@@ -110,4 +114,4 @@ If You Run Into Problems
 ------------------------
 Please feel free to post on our discussion forum:
 
- * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
+ - [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)

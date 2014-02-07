@@ -121,7 +121,7 @@ function addRoom(roomName, parmString, userAdded) {
     if (userAdded) {
         console.log("calling joinRoom(" + roomName + ") because it was a user action ");
 
-        easyrtc.joinRoom(roomName, roomParms, 
+        easyrtc.joinRoom(roomName, roomParms,
                 function() {
                    /* we'll geta room entry event for the room we were actually added to */
                 },
@@ -144,7 +144,7 @@ function leaveRoom(roomName) {
 
 
 function roomEntryListener(entered, roomName) {
-    if (entered) { // entered a room 
+    if (entered) { // entered a room
         console.log("saw add of room " + roomName);
         addRoom(roomName, null, false);
     }
@@ -276,7 +276,7 @@ function occupantListener(roomName, occupants, isPrimary) {
 
 
 
-function getGroupId() {   
+function getGroupId() {
         return null;
 }
 
@@ -323,9 +323,9 @@ function sendMessage(destTargetId, destRoom) {
 }
 
 
-function loginSuccess(easyrtcId) {
-    selfEasyrtcid = easyrtcId;
-    document.getElementById("iam").innerHTML = "I am " + easyrtcId;
+function loginSuccess(easyrtcid) {
+    selfEasyrtcid = easyrtcid;
+    document.getElementById("iam").innerHTML = "I am " + easyrtcid;
     refreshRoomList();
     isConnected = true;
     displayFields();

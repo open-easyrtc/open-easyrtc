@@ -22,7 +22,7 @@ Setting Username and Credential in Client
  - Value is sent to the server "authenticate" event listener  
 
 
-	easyrtc.setUsername("handsomeJack");
+    easyrtc.setUsername("handsomeJack");
 
 
 **easyrtc.setCredential()**
@@ -32,12 +32,12 @@ Setting Username and Credential in Client
  - Value is sent to the server "authenticate" event listener  
 
 
-	easyrtc.setCredential({
+    easyrtc.setCredential({
       "password":"345RTC!",
       "realm":"easyrtc.com",
       "apikey":"d834kds81vs189s10kkd4"
     });
- 
+
 
 Checking Authentication On Server
 ---------------------------------
@@ -102,4 +102,4 @@ If You Run Into Problems
 ------------------------
 Please feel free to post on our discussion forum:
 
- * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
+ - [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)

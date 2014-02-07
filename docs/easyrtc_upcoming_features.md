@@ -3,31 +3,36 @@ EasyRTC: Upcoming Features
 
 There are many exciting features we are looking to add to EasyRTC in upcoming releases.
 
+
 General Features
 ----------------
-* TURN server support **HERE NOW!**
-* Assign connections to groups - (aka roles)
+
+ - Assign connections to groups - (aka roles)
+
 
 API Specific Features
 ---------------------
-* Better cross browser support
-* More power for applications to influence webRTC connections
-* Send a message to a specific username (Can already target easyrtcid's and rooms)
+
+ - Better cross browser support
+ - More power for applications to influence webRTC connections
+ - Send a message to a specific username (Can already target easyrtcid's and rooms)
+
 
 Server Specific Features
 ------------------------
-* Option to minimize easyrtc.js
-* Switch to become a proper Node.js module **HERE NOW!**
-* Events for creating your own listeners easily **HERE NOW!**
+
+ - Option to minimize easyrtc.js
+
 
 Demos
 -----
-* More demos!
+ - More demos!
+
 
 Other
 -----
-* As the specifications and browsers are improved, we'll follow.
 
+ - As the specifications and browsers are improved, we'll follow.
 
 Any Features You Would Like?
 ----------------------------

@@ -86,7 +86,7 @@ function setUpMirror() {
         easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
         selfVideo.muted = true;
         haveSelfVideo = true;
-    }    
+    }
 }
 
 function performCall(otherEasyrtcid) {
@@ -97,7 +97,7 @@ function performCall(otherEasyrtcid) {
             enable('otherClients');
         }
     };
-    
+
     var successCB = function() {
         setUpMirror();
         enable('hangupButton');
@@ -110,12 +110,12 @@ function performCall(otherEasyrtcid) {
 }
 
 
-function loginSuccess(easyrtcId) {
+function loginSuccess(easyrtcid) {
     disable("connectButton");
   //  enable("disconnectButton");
     enable('otherClients');
-    selfEasyrtcid = easyrtcId;
-    document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyrtcId);
+    selfEasyrtcid = easyrtcid;
+    document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyrtcid);
 }
 
 

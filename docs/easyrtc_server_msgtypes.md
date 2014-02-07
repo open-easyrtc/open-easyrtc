@@ -11,11 +11,14 @@ EasyRTC socket messages are sent via socket.io using three custom emit types:
 ----------
 
 
-# easyrtcAuth
+easyrtcAuth
+===========
 
 "easyrtcAuth" is the socket.io emit type which EasyRTC expects to initialize (or re-initialize) a connection. No other messages are handled by EasyRTC until a connection is authenticated.
 
-## Incoming (to server)
+
+Incoming (to server)
+--------------------
 
 ### msgType - 'authenticate'
 Includes fields needed for authentication. Sender and target must be online, authenticated, and in same application. Returns a message with msgType='token' upon success.
@@ -42,15 +45,19 @@ Includes fields needed for authentication. Sender and target must be online, aut
 
 ----------
 
-# easyrtcCmd
+easyrtcCmd
+==========
 
 The easyrtcCmd is the core socket.io emit type which EasyRTC uses to send and receive commands.
 
-## Incoming (to server)
+
+Incoming (to server)
+--------------------
 
 Unless specified, messages sent to the server will be returned with an **ack** or an **error**.
 
 ### msgType - 'candidate'
+
 WebRTC signal. Transfer of WebRTC ICE candidate(s) for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
@@ -62,6 +69,7 @@ WebRTC signal. Transfer of WebRTC ICE candidate(s) for establishing peer-connect
 
 
 ### msgType - 'offer'
+
 WebRTC signal. Sends WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
@@ -72,6 +80,7 @@ WebRTC signal. Sends WebRTC offer for establishing peer-connection. Sender and t
 
 
 ### msgType - 'answer'
+
 WebRTC signal. Accepts WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
@@ -82,6 +91,7 @@ WebRTC signal. Accepts WebRTC offer for establishing peer-connection. Sender and
 
 
 ### msgType - 'reject'
+
 WebRTC signal. Rejects WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
@@ -90,6 +100,7 @@ WebRTC signal. Rejects WebRTC offer for establishing peer-connection. Sender and
 
 
 ### msgType - 'hangup'
+
 WebRTC signal. Instructs target to hangup WebRTC peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
@@ -98,6 +109,7 @@ WebRTC signal. Instructs target to hangup WebRTC peer-connection. Sender and tar
 
 
 ### msgType - 'getIceConfig'
+
 Requests a refreshed ICE configuration. This gives the ability to update STUN and TURN servers listing on a periodic basis for longer running connections.
 
 **Fields:**
@@ -108,6 +120,7 @@ Requests a refreshed ICE configuration. This gives the ability to update STUN an
 
 
 ### msgType - 'getRoomList'
+
 Requests a list of all rooms which the client has access to. It has no fields. The server should return a message to the callback with msgType of 'roomList'.
 
 **Fields:**
@@ -118,6 +131,7 @@ Requests a list of all rooms which the client has access to. It has no fields. T
 
 
 ### msgType - 'roomJoin'
+
 Enters a room. If room doesn't exist, a new room may be created.
 
 **Fields:**
@@ -136,6 +150,7 @@ Enters a room. If room doesn't exist, a new room may be created.
 
 
 ### msgType - 'roomLeave'
+
 Leaves a room. Upon leaving a room, the API should remove all room info (incl. connection list) from memory.
 
 **Fields:**
@@ -153,6 +168,7 @@ Leaves a room. Upon leaving a room, the API should remove all room info (incl. c
 
 
 ### msgType - 'setRoomApiField'
+
 Sets the apiField value for a connection. This apiField is sent to all other connections in the roomData. It is important to realize that this field is not unique to a room. Upon receiving 
 
 **Fields:**
@@ -172,6 +188,7 @@ Sets the apiField value for a connection. This apiField is sent to all other con
 
 
 ### msgType - 'setPresence'
+
 Sets user online presence which is re-broadcast as part of the list. User must be authenticated.
 
 **Fields:**
@@ -190,6 +207,7 @@ Sets user online presence which is re-broadcast as part of the list. User must b
 
 
 ### msgType - 'setUserCfg'
+
 Sets user configurable options. User must be authenticated.
 
 **Fields:**
@@ -204,9 +222,11 @@ Sets user configurable options. User must be authenticated.
    - **apiField** (optional) Map of fields for the special appDefinedFields value which gets transferred in the broadcast list. Any fields not mentioned will be left as-is. To remove a field, give it a value of `null`.
 
 
-## Outgoing (from server)
+Outgoing (from server)
+----------------------
 
 ### msgType - 'candidate'
+
 Transfer of WebRTC ICE candidate(s) for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
@@ -219,6 +239,7 @@ Transfer of WebRTC ICE candidate(s) for establishing peer-connection. Sender and
 
 
 ### msgType - 'offer'
+
 Sends WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
@@ -230,6 +251,7 @@ Sends WebRTC offer for establishing peer-connection. Sender and target must be o
 
 
 ### msgType - 'answer'
+
 Accepts WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
@@ -241,6 +263,7 @@ Accepts WebRTC offer for establishing peer-connection. Sender and target must be
 
 
 ### msgType - 'reject'
+
 Rejects WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
@@ -250,6 +273,7 @@ Rejects WebRTC offer for establishing peer-connection. Sender and target must be
 
 
 ### msgType - 'hangup'
+
 Instructs target to hangup WebRTC peer-connection. Sender and target must be online, authenticated, and in same application.
 
 **Fields:**
@@ -259,6 +283,7 @@ Instructs target to hangup WebRTC peer-connection. Sender and target must be onl
 
 
 ### msgType - 'iceConfig'
+
 ICE configuration object. This gives the ability to update the STUN and TURN server listing on a periodic basis for longer running connections. Upon reception, the client should refresh 
 
 **Fields:**
@@ -274,10 +299,8 @@ ICE configuration object. This gives the ability to update the STUN and TURN ser
   - **error**
 
 
-
-
-
 ### msgType - 'token'
+
 Initiates an authenticated EasyRTC application. Note this may be sent multiple times in a session upon configuration changes. The API should reset application, room, and list data.
 
 **Fields:**
@@ -305,6 +328,7 @@ Initiates an authenticated EasyRTC application. Note this may be sent multiple t
 
 
 ### msgType - 'roomData'
+
 Provides room information for all rooms the user is currently in. This includes a list of online users who the user is permitted to see. By default authenticated users can see all other users in the same application and room.
 
 **Fields:**
@@ -338,6 +362,7 @@ Provides room information for all rooms the user is currently in. This includes 
 
 
 ### msgType - 'roomList'
+
 Provides rooms which the client has access to. By default authenticated users can see all other rooms in the same application.
 
 **Fields:**
@@ -352,6 +377,7 @@ Provides rooms which the client has access to. By default authenticated users ca
 
 
 ### msgType - 'sessionData'
+
 Provides session information for the user. This includes any session fields.
 
 **Fields:**
@@ -368,6 +394,7 @@ Provides session information for the user. This includes any session fields.
 
 
 ### msgType - 'forwardToUrl'
+
 Instructs API to forward user to specified URL. Useful for server handled error handling and user support techniques.
 
 **Fields:**
@@ -382,6 +409,7 @@ Instructs API to forward user to specified URL. Useful for server handled error 
 
 
 ### msgType - 'error'
+
 Provides an error code to the API when an error occurs.
 
 **Fields:**
@@ -397,11 +425,13 @@ Provides an error code to the API when an error occurs.
 ----------
 
 
-# easyrtcMsg
+easyrtcMsg
+==========
 
 "easyrtcMsg" is the socket.io emit type which EasyRTC uses for custom application level messages.
 
-## Incoming (to server)
+Incoming (to server)
+--------------------
 
 ### General Message Format
 
@@ -419,7 +449,8 @@ Provides an error code to the API when an error occurs.
  - **error**
 
 
-## Outgoing (to client)
+Outgoing (to client)
+--------------------
 
 ### General Message Format
 
@@ -435,3 +466,10 @@ Provides an error code to the API when an error occurs.
 **Returns:**
 
  - **ack**
+
+
+If You Run Into Problems
+------------------------
+Please feel free to post on our discussion forum:
+
+ - [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)

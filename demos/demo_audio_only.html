@@ -14,7 +14,7 @@
         <script type="text/javascript" src="js/prettify/jquery.min.js"></script>
         <link rel="stylesheet" type="text/css" href="js/prettify/prettify.css" />
 
-        <!--show-->    
+        <!--show-->
         <!-- Assumes global locations for socket.io.js and easyrtc.js -->
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
@@ -29,7 +29,7 @@
                 float:left;
                 width:250px;
                 text-align:center;
-                border: 2px solid black;            
+                border: 2px solid black;
             }
             #otherClients {
                 height:200px;
@@ -65,7 +65,7 @@
                 <!-- Main Content -->
                 <h1>EasyRTC Demo: Audio Only Chat</h1>
 
-                <p>The application provides an audio only chat by disabling video 
+                <p>The application provides an audio only chat by disabling video
                     before initializing the local media stream.</p>
 
                 <p>To use it, press the Connect button.
@@ -87,7 +87,7 @@
                     </div>
 
                     <!-- Note... this demo should be updated to remove video references -->
-                    <div id="videos"> 
+                    <div id="videos">
                         <video id="callerAudio"></video>
                         <div id="acceptCallBox"> <!-- Should be initially hidden using CSS -->
                             <div id="acceptCallLabel"></div>
@@ -103,7 +103,7 @@
                 <h3>HTML</h3>
                 <pre  id="prettyHtml" class="prettyprint linenums:1">
                 </pre>
-                <h3>Javascript</h3>
+                <h3>JavaScript</h3>
                 <p>The contents of demo_audio_only.js:</p>
                 <pre id="prettyJS" class="prettyprint linenums:1">
                 </pre>
@@ -113,7 +113,7 @@
                     loadAndFilter(window.location.href, "prettyHtml",2 );
                     loadAndFilter(getHelperPath("js"), "prettyJS", 2);
                 </script>
-                <!-- End Main Content -->   
+                <!-- End Main Content -->
             </div>
 
             <div id="footer">

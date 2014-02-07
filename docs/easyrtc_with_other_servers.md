@@ -3,6 +3,7 @@ EasyRTC: Using Alongside Other Servers
 
 EasyRTC supports working alongside of Apache, IIS, and other web servers. In these cases, your web application would use EasyRTC to just handle signaling. All html and other files would continue to be hosted on the current web server. 
 
+
 Configuration Notes:
 --------------------
  - EasyRTC can be set to use a different port to avoid conflicts (such as 8080)
@@ -40,8 +41,9 @@ Here are some steps to running the simple audio video demo from your web server.
  
 Your own WebRTC app can then be developed in a similar fashion.
 
+
 If You Run Into Problems
 ------------------------
 Please feel free to post on our discussion forum:
 
- * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
+ - [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)

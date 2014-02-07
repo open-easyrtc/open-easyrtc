@@ -28,7 +28,7 @@ var selfEasyrtcid = "";
 function initApp() {
     if( window.localStorage && window.localStorage.easyrtcUserName ) {
         document.getElementById('userName').value = window.localStorage.easyrtcUserName;
-    }    
+    }
 }
 
 
@@ -53,8 +53,8 @@ function connect() {
     }
     easyrtc.setUsername(tempName);
     if( window.localStorage && window.localStorage.easyrtcUserName ) {
-        window.localStorage.easyrtcUserName = tempName;        
-    }  
+        window.localStorage.easyrtcUserName = tempName;
+    }
     console.log("Initializing with username " + tempName);
     easyrtc.setScreenCapture();
     easyrtc.enableAudio(document.getElementById("shareAudio").checked);
@@ -67,13 +67,13 @@ function connect() {
                 }, function(){}, function(errCode, errorText) {
                     console.log("messaging error" + errorText);
                 });
-            }        
+            }
         }
         contactedListeners = otherPeers;
     });
-    
+
     easyrtc.setPeerListener(function(easyrtcid, msgType, data){});
-    
+
     easyrtc.connect("easyrtc.videoScreen", loginSuccess, loginFailure);
 }
 
@@ -84,11 +84,11 @@ function hangup() {
 }
 
 
-function loginSuccess(easyrtcId) {
+function loginSuccess(easyrtcid) {
     disable("connectButton");
     disable("shareAudio");
     enable("disconnectButton");
-    selfEasyrtcid = easyrtcId;
+    selfEasyrtcid = easyrtcid;
     document.getElementById("iam").innerHTML = "Connected";
 }
 

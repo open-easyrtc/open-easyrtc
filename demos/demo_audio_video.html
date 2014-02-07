@@ -14,13 +14,13 @@
         <script type="text/javascript" src="js/prettify/jquery.min.js"></script>
         <link rel="stylesheet" type="text/css" href="js/prettify/prettify.css" />
 
-        <!--show-->    
+        <!--show-->
         <!-- Assumes global locations for socket.io.js and easyrtc.js -->
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
         <script type="text/javascript" src="js/demo_audio_video.js"></script>
 
-        <!--hide-->    
+        <!--hide-->
         <!-- Styles used within the demo -->
         <style type="text/css">
             #demoContainer {
@@ -30,7 +30,7 @@
                 float:left;
                 width:250px;
                 text-align:center;
-                border: 2px solid black;            
+                border: 2px solid black;
             }
             #otherClients {
                 height:200px;
@@ -90,14 +90,14 @@
                         <input type="checkbox" checked="checked" id="shareAudio" />Share audio
                         <input type="checkbox" checked="checked" id="shareVideo" />Share video <br />
                         <button id="connectButton" onclick="connect()">Connect</button>
-                        <button id="hangupButton" disabled="disabled" onclick="hangup()">Hangup</button>                       
+                        <button id="hangupButton" disabled="disabled" onclick="hangup()">Hangup</button>
                         <div id="iam">Not yet connected...</div>
                         <br />
                         <strong>Connected users:</strong>
                         <div id="otherClients"></div>
                     </div>
 
-                    <div id="videos"> 
+                    <div id="videos">
                         <video autoplay="autoplay" id="selfVideo"  class="easyrtcMirror" muted="muted" volume="0"></video>
                         <video autoplay="autoplay" id="callerVideo"></video>
                         <div id="acceptCallBox"> <!-- Should be initially hidden using CSS -->
@@ -114,7 +114,7 @@
                 <h3>HTML</h3>
                 <pre  id="prettyHTML" class="prettyprint linenums:1">
                 </pre>
-                <h3>Javascript</h3>
+                <h3>JavaScript</h3>
                 <p>The contents of demo_audio_video.js:</p>
                 <pre  id="prettyJS" class="prettyprint linenums:1">
                 </pre>

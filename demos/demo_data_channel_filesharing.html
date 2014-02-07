@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
         <title>EasyRTC Demo: Data Channel File-sharing</title>
-        <link rel="stylesheet" type="text/css" href="css/landing.css" />  
+        <link rel="stylesheet" type="text/css" href="css/landing.css" />
         <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
         <!--hide-->
 
@@ -12,14 +12,14 @@
         <link rel="stylesheet" type="text/css" href="js/prettify/prettify.css" />
                 <script type="text/javascript" src="js/prettify/loadAndFilter.js"></script>
         <script type="text/javascript" src="js/prettify/jquery-1.9.1.min.js"></script>
-        
+
         <!--show-->
         <!-- Assumes global locations for socket.io.js and easyrtc.js -->
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
         <script type="text/javascript" src="/easyrtc/easyrtc_ft.js"></script>
         <script type="text/javascript" src="js/demo_data_channel_filesharing.js"></script>
-        
+
         <!--hide-->
         <!-- Styles used within the demo -->
         <style type="text/css">
@@ -29,16 +29,15 @@
             }
 
             .peerblock {
-                width: 800px;  
+                width: 800px;
                 border-radius:2px;
                 border:1px solid gray;
-            }            
-            
+            }
+
             .receiveBlock {
                 width: 500px;
                 margin:10px;
                 display: inline-block;
-                
             }
             .dragndrop {
                 display: inline-block;
@@ -46,7 +45,7 @@
                 margin: 2px;
                 border:2px solid black;
                 border-radius: 5px;
-            }            
+            }
             .dragndropStatus {
                 display: inline-block;
             }
@@ -90,13 +89,13 @@
                 <p>This application demonstrates file sharing using the easyrtc.sendData method.
                     It should connect to the server upon start up, and display drag-and-drop areas for other peers.</p>
 
-                <p>To use it, drop a file into the drag-and-drop area for a peer. The peer should receive it.
+                <p>To use it, connect to a peer then drop a file into the drag-and-drop area for that peer. The peer should receive it.
                 </p>
 
                 <p class="alert"><img alt="Warn" height="32" width="32" src="images/br_status_warn.png" />
-                    This demo requires reliable data channels which means it needs Firefox or Chrome (version 32+). 
+                    This demo requires reliable data channels which means it needs Firefox or Chrome (version 32+).
                     In the absence of reliable data channels it will fallback to using websockets to transfer a file.
-                    Notice that it uses easyrtc_ft.js as well as easyrtc.js. 
+                    Notice that it uses easyrtc_ft.js as well as easyrtc.js.
                 </p>
                 <hr />
                 <h2>The Demo</h2>
@@ -113,9 +112,9 @@
                 <pre  id="prettyHtml" class="prettyprint linenums:1">
 
                 </pre>
-                <h3>Javascript</h3>
+                <h3>JavaScript</h3>
                 <p>The contents of demo_instant_messaging.js:</p>
-                
+
                 <pre  id="prettyJS" class="prettyprint linenums:1">
                 </pre>
 

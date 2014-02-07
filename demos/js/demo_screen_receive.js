@@ -29,7 +29,7 @@ var selfEasyrtcid = "";
 function initApp() {
     if( window.localStorage && window.localStorage.easyrtcUserName ) {
         document.getElementById('userName').value = window.localStorage.easyrtcUserName;
-    }    
+    }
 }
 
 function disable(domId) {
@@ -44,19 +44,19 @@ function enable(domId) {
 
 function connect() {
     console.log("Initializing.");
-    
+
     var userName = document.getElementById('userName').value;
     if( !easyrtc.isNameValid(userName)) {
         easyrtc.showError("BAD-USER-NAME", "illegal user name");
         return;
     }
-    
+
     easyrtc.setUsername(userName);
     if( window.localStorage ) {
         window.localStorage.easyrtcUserName = document.getElementById('userName').value;
-    }   
-    
-    
+    }
+
+
     easyrtc.enableAudio(document.getElementById('shareAudio').checked);
     easyrtc.enableVideo(false);
     easyrtc.setRoomOccupantListener(convertListToButtons);
@@ -76,11 +76,11 @@ function hangup() {
 // this method actually just removes old buttons.
 // The adding of buttons is done with the data listener.
 //
-function convertListToButtons(roomName, data, isPrimary){    
+function convertListToButtons(roomName, data, isPrimary){
     console.log("saw data list of " + JSON.stringify(data));
     var otherClientDiv = document.getElementById('otherClients');
     var i, nextChild;
-    
+
     for( i = otherClientDiv.childNodes[0]; i; i = nextChild ){
         nextChild = i.nextSibling;
         var buttonId = i.id;
@@ -104,7 +104,7 @@ function requestFullScreen() {
         elem.mozRequestFullScreen();
     } else if (elem.webkitRequestFullscreen) {
         elem.webkitRequestFullscreen();
-    }  
+    }
     var hideBox = document.getElementById('shrinkBox');
     hideBox.className = 'yesShrink';
     hideBox.onclick = function() {
@@ -120,7 +120,7 @@ function requestFullScreen() {
         }
         elem.className = 'smallBox';
     };
-    
+
 }
 
 
@@ -148,7 +148,7 @@ function performCall(otherEasyrtcid) {
             enable('otherClients');
         }
     };
-    
+
     var successCB = function() {
         enable('hangupButton');
     };
@@ -160,12 +160,12 @@ function performCall(otherEasyrtcid) {
 }
 
 
-function loginSuccess(easyrtcId) {
+function loginSuccess(easyrtcid) {
     disable("connectButton");
     enable("disconnectButton");
     enable('otherClients');
     document.getElementById("iam").innerHTML = "Connected";
-    selfEasyrtcid = easyrtcId;
+    selfEasyrtcid = easyrtcid;
 }
 
 
