@@ -143,6 +143,16 @@ This will start EasyRTC at boot and allow you to start and stop the service in t
 There are improvements which can be made such as increasing the open file limit, running the service as a non-root user, and adding notification commands to let administrators know of problems.
 
 
+Upgrading EasyRTC
+-----------------
+
+If you are using the packaged version of EasyRTC, upgrading is easy. In the console change to your application directory then enter:
+
+    npm upgrade
+
+Note that you should first check the changelog to see if there are any breaking changes.
+
+
 Your First EasyRTC Server Program
 =================================
 
