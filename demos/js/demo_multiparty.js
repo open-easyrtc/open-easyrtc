@@ -603,8 +603,15 @@ function showMessage(startX, startY, content) {
     var centerEndX = .2*startX + .8*fullW/2;
     var centerEndY = .2*startY + .8*fullH/2;
 
-    var cloudObject = document.createElement('image');
+
+    var cloudObject = document.createElement("img");
     cloudObject.src = "images/cloud.png";
+    cloudObject.style.width = "1px";
+    cloudObject.style.height = "1px";
+    cloudObject.style.left = startX + "px";
+    cloudObject.style.top = startY + "px";
+    fullPage.appendChild(cloudObject);
+
     cloudObject.onload = function() {
         cloudObject.style.left = startX + "px";
         cloudObject.style.top = startY + "px";
@@ -613,7 +620,6 @@ function showMessage(startX, startY, content) {
         cloudObject.style.opacity = 0.7;
         cloudObject.style.zIndex = 5;
         cloudObject.className = "transit boxCommon";
-        fullPage.appendChild(cloudObject);
         var textObject;
         function removeCloud() {
             if( textObject) {
