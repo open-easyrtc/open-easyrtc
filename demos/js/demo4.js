@@ -29,7 +29,7 @@ var selfEasyrtcid = "";
 function connect() {
     easyrtc.enableDebug(false);
     easyrtc.setRoomOccupantListener(convertListToButtons);
-    easyrtc.easyApp("easyrtc.audioVideo", "selfVideo", 
+    easyrtc.easyApp("easyrtc.audioVideo", "selfVideo",
        ["callerVideo", "callerVideo2", "callerVideo3"], loginSuccess, loginFailure);
 }
 
@@ -72,9 +72,9 @@ function performCall(otherEasyrtcid) {
 }
 
 
-function loginSuccess(easyrtcId) {
-    selfEasyrtcid = easyrtcId;
-    document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyrtcId);
+function loginSuccess(easyrtcid) {
+    selfEasyrtcid = easyrtcid;
+    document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyrtcid);
 }
 
 

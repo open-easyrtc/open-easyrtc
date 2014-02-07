@@ -80,7 +80,7 @@ function convertListToButtons (roomName, occupants, isPrimary) {
                 performCall(easyrtcid);
             };
         }(easyrtcid);
-            
+
         var label = document.createElement('text');
         label.innerHTML = easyrtc.idToName(easyrtcid);
         button.appendChild(label);
@@ -107,12 +107,12 @@ function performCall(otherEasyrtcid) {
 }
 
 
-function loginSuccess(easyrtcId) {
+function loginSuccess(easyrtcid) {
     disable("connectButton");
     // enable("disconnectButton");
     enable('otherClients');
-    selfEasyrtcid = easyrtcId;
-    document.getElementById("iam").innerHTML = "I am " + easyrtcId;
+    selfEasyrtcid = easyrtcid;
+    document.getElementById("iam").innerHTML = "I am " + easyrtcid;
 }
 
 
@@ -155,7 +155,7 @@ easyrtc.setAcceptChecker(function(easyrtcid, callback) {
     var acceptTheCall = function(wasAccepted) {
         document.getElementById('acceptCallBox').style.display = "none";
         if( wasAccepted && easyrtc.getConnectionCount() > 0 ) {
-            easyrtc.hangupAll();    
+            easyrtc.hangupAll();
         }
         callback(wasAccepted);
     };
@@ -164,5 +164,5 @@ easyrtc.setAcceptChecker(function(easyrtcid, callback) {
     };
     document.getElementById("callRejectButton").onclick =function() {
         acceptTheCall(false);
-    };    
+    };
 } );

@@ -12,7 +12,7 @@ body {
 #container {
     width:960px;
     margin-left: auto;
-    margin-right:auto;			
+    margin-right:auto;
 
     background-image:url("../images/bg_dark.png");
     background-color:black;
@@ -20,7 +20,7 @@ body {
     border-color: #FF6600;
     border-width: 1px;
     border-style: solid;
-    border-radius:10px; 
+    border-radius:10px;
 }
 
 #logo_easyrtc {
@@ -72,7 +72,7 @@ body {
     font-size: small;
     padding: 5px;
     color:white;
-    min-height:60px;    
+    min-height:60px;
 }
 #footer p {
     margin: 0px;

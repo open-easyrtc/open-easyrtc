@@ -44,7 +44,7 @@ function connect() {
 function addToConversation(who, msgType, content) {
     // Escape html special characters, then add linefeeds.
     content = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    content = content.replace(/\n/g, '<br />');    
+    content = content.replace(/\n/g, '<br />');
     document.getElementById('conversation').innerHTML +=
             "<b>" + who + ":</b>&nbsp;" + content + "<br />";
 }
@@ -155,9 +155,9 @@ function sendStuffP2P(otherEasyrtcid) {
 }
 
 
-function loginSuccess(easyrtcId) {
-    selfEasyrtcid = easyrtcId;
-    document.getElementById("iam").innerHTML = "I am " + easyrtcId;
+function loginSuccess(easyrtcid) {
+    selfEasyrtcid = easyrtcid;
+    document.getElementById("iam").innerHTML = "I am " + easyrtcid;
 }
 
 

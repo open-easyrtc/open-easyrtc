@@ -5,7 +5,7 @@
             float:left;
             width:250px;
             text-align:center;
-            border: 2px solid black;            
+            border: 2px solid black;
         }
         #otherClients {
             height:200px;
@@ -30,8 +30,8 @@
         .easyrtc_closeButton {
             position:absolute;
             right:2px;
-            background-color: transparent;      
-            background-image: url('../images/button_close.png');  
+            background-color: transparent;
+            background-image: url('../images/button_close.png');
             border:none;
             margin:0px;
             padding:0px;

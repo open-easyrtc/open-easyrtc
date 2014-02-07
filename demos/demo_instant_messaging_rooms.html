@@ -70,8 +70,8 @@
 
                 <!-- Main Content -->
                 <h1>EasyRTC Demo: Instant Messaging + Rooms </h1>
-                <p><strong>Note:</strong> This is primarily an application 
-                    developed to test new features going into EasyRTC Modular (v1.0.x). It's currently not written to be a tutorial, 
+                <p><strong>Note:</strong> This is primarily an application
+                    developed to test new features going into EasyRTC Modular (v1.0.x). It's currently not written to be a tutorial,
                     but it does demonstrate how to use various features like presence and room targeted messaging.</p>
                 <hr />
                 <h2>The Demo</h2>
@@ -80,7 +80,7 @@
                     Username: <input type="text" id="userNameField" />
                     Password: <input type="text" id="credentialField" />
                     <div >
-                        <button id="connectButton" onclick="connect();">Connect</button>                   
+                        <button id="connectButton" onclick="connect();">Connect</button>
                     </div>
                     <hr>
                 </div>
@@ -100,9 +100,9 @@
                     Quick Join -
 
                     <div id="quickJoinBlock"></div> <button onclick="refreshRoomList();"> Refresh</button>
-                    <button onclick="addRoom(null, null, true);">or join </button> 
+                    <button onclick="addRoom(null, null, true);">or join </button>
                     <input id="roomToAdd" type="text" size="20" />
-                    <br>                  
+                    <br>
                     Optional room parameters<input id="optRoomParms" type="text" size="20"/>
 
                 </div>
@@ -117,9 +117,9 @@
                         Rooms:
                         <div id="rooms"></div>
                     </div>
-                    <div id="receiveMessageArea" >
+                    <div id="receiveMessageArea">
                         Received Messages:
-                        <div id="conversation"></div>	  
+                        <div id="conversation"></div>
                     </div>
                 </div>
 
@@ -136,7 +136,7 @@
                 <div class="postconnection">
                     <hr>
                     <h3>Fields from server</h3>
-                    <div id="fields">                    
+                    <div id="fields">
                     </div>
                     <hr>
                     <button onclick="easyrtc.getFreshIceConfig();" class="postconnection"> Get Fresh ICE configuration</button>
@@ -147,7 +147,7 @@
                     <div >
                         <input id="targetName" type="text" />
                         <button onclick="getIdsOfName();">Fetch ids</button>
-                        <div id="foundIds"></div>                    
+                        <div id="foundIds"></div>
                     </div>
                 </div>
 
@@ -163,7 +163,7 @@
                     <li><strong>Presence</strong> - Your presence gets sent to all clients in rooms you share. DND=Do not disturb. XE=Extended Away. The status field can be any string.</li>
                     <li><strong>Delta Lists</strong> - After initial login, the client should only receive changes to who is online.</li>
                 </ul>
-            
+
                 <!-- End Main Content -->
             </div>
             <!--hide-->
@@ -172,7 +172,7 @@
                 <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="/easyrtc/img/powered_by_easyrtc.png" height="60" width="200" alt="Powered By EasyRTC" /></a>
                 <p><em>&copy; 2014 - Priologic Software Inc., All Rights Reserved.</em></p>
                 <p id="license">EasyRTC source code released under a BSD2 License. <a href="https://github.com/priologic/easyrtc/blob/master/LICENSE">See LICENSE file in project folder</a> for details.</p>
-            </div>   
+            </div>
         </div>
         <script type="text/javascript">
 

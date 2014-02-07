@@ -28,7 +28,7 @@
                 float:left;
                 width:360px;
                 text-align:center;
-                border: 2px solid black;            
+                border: 2px solid black;
             }
             #otherClients {
                 height:200px;
@@ -44,15 +44,13 @@
                 background-color:pink;
                 padding:15px;
             }
-	    
-
            .smallBox{
                 width:500px;
                 height:400px;
                 overflow:scroll;
                 float:left;
             }
-            
+
             .bigBox{
                 position:fixed;
                 width: 100%;
@@ -60,13 +58,13 @@
                 left: 0px;
                 top:0px;
                 z-index:2;
-                overflow:scroll;                
+                overflow:scroll;
             }
-            
+
             .noShrink {
                 display:none;
             }
-            
+
             .yesShrink {
                 position:fixed;
                 right: 20px;
@@ -77,10 +75,10 @@
                 border-color: red;
                 border-style: solid;
                 background-color: black;
-                color: white; 
+                color: white;
                 opacity: 0.70;
             }
-            
+
             .yesShrink:hover {
                 opacity: 1.0;
             }
@@ -106,32 +104,32 @@
                     Click one of those buttons to see (with their permission) their live screen.</p>
                 <hr />
                 <h2>The Demo</h2>
-	         <!--show-->
+             <!--show-->
                 <div id="demoContainer">
                     <div id="connectControls">
 
                         <span style="float:left">
-                            Your name: <input type="text" id="userName" /> 
+                            Your name: <input type="text" id="userName" />
                             <input type="checkbox" id="shareAudio" /><label for="shareAudio"> Share audio</label><br>
                         </span>
                         <span style="float:left;clear:both">
-                        <button id="connectButton" onclick="connect()">Connect to server</button>        
+                        <button id="connectButton" onclick="connect()">Connect to server</button>
                         <button id="disconnectButton" disabled="disabled" onclick="disconnect()">Disconnect</button>
                         </span>
-                        <div style="float:left;clear:both" id="iam">Not yet connected...</div>                        
+                        <div style="float:left;clear:both" id="iam">Not yet connected...</div>
                         <div style="float:left;clear:both" id="otherClients"></div>
                         <button style="float:left;clear:both" id="hangupButton" disabled="disabled" onclick="hangup()">Hangup</button>
-                        <button style="float:right" onclick="requestFullScreen()">Use full screen</button>                        
+                        <button style="float:right" onclick="requestFullScreen()">Use full screen</button>
 
                     </div>
-                    <div id="videos" class="smallBox"> 
+                    <div id="videos" class="smallBox">
                         <div id ="shrinkBox" class="noShrink">
                             <p>
                              Click here to exit<br>
                              full screen.
                             </p>
                         </div>
-                        <video autoplay="autoplay" id="callerVideo" ></video>                        
+                        <video autoplay="autoplay" id="callerVideo" ></video>
                     </div><br>
                 </div>
                 <!--hide-->
@@ -144,7 +142,7 @@
                 <pre id="prettyHTML" class="prettyprint linenums:1">
 
                 </pre>
-                <h3>Javascript</h3>
+                <h3>JavaScript</h3>
                 <p>The contents of demo_audio_video.js:</p>
                 <pre id="prettyJS" class="prettyprint linenums:1">
                 </pre>

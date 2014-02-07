@@ -95,7 +95,7 @@ function convertListToButtons(roomName, occupants, isPrimary) {
     function buildDropDiv(easyrtcid) {
         var statusDiv = document.createElement("div");
         statusDiv.className = "dragndropStatus";
-        
+
         var dropArea = document.createElement("div");
         var connectButton = document.createElement("button");
         connectButton.appendChild(document.createTextNode("Connect"));
@@ -161,7 +161,7 @@ function convertListToButtons(roomName, occupants, isPrimary) {
             var timer = null;
             if (easyrtc.getConnectStatus(easyrtcid) === easyrtc.NOT_CONNECTED && noDCs[easyrtcid] === undefined) {
                 //
-                // calls between firefrox and chrome ( version 30) have problems one way if you 
+                // calls between firefrox and chrome ( version 30) have problems one way if you
                 // use data channels.
                 //
 
@@ -278,9 +278,9 @@ function blobAcceptor(otherGuy, blob, filename) {
     easyrtc_ft.saveAs(blob, filename);
 }
 
-function loginSuccess(easyrtcId) {
-    selfEasyrtcid = easyrtcId;
-    document.getElementById("iam").innerHTML = "I am " + easyrtcId;
+function loginSuccess(easyrtcid) {
+    selfEasyrtcid = easyrtcid;
+    document.getElementById("iam").innerHTML = "I am " + easyrtcid;
     easyrtc_ft.buildFileReceiver(acceptRejectCB, blobAcceptor, receiveStatusCB);
 }
 
