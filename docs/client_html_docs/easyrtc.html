@@ -1069,7 +1069,7 @@
             
             
             
-            <td class="description last">(easyrtcId, roomOwner) - is called on successful connect. easyrtcId is the  unique name that the client is known to the server by. A client usually only needs it's own easyrtcId for debugging purposes.      roomOwner is true if the user is the owner of a room. It's value is random if the user is in multiple rooms.</td>
+            <td class="description last">(easyrtcid, roomOwner) - is called on successful connect. easyrtcid is the  unique name that the client is known to the server by. A client usually only needs it's own easyrtcid for debugging purposes.      roomOwner is true if the user is the owner of a room. It's value is random if the user is in multiple rooms.</td>
         </tr>
 	
 	
@@ -1534,7 +1534,7 @@
             
             
             
-            <td class="description last">a callback function used on success. It is called with the easyrtcId this peer is knopwn to the server as.</td>
+            <td class="description last">a callback function used on success. It is called with the easyrtcid this peer is knopwn to the server as.</td>
         </tr>
 	
 	
@@ -1604,8 +1604,157 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.easyApp('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],             function(easyrtcId){                 console.log("successfully connected, I am " + easyrtcId);             },             function(errorCode, errorText){                 console.log(errorText);             );</code></pre>
+    <pre class="prettyprint"><code>    easyrtc.easyApp('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],             function(easyrtcid){                 console.log("successfully connected, I am " + easyrtcid);             },             function(errorCode, errorText){                 console.log(errorText);             );</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="easyAppBody"><span class="type-signature">&lt;static> </span>easyAppBody<span class="signature">(monitorVideoId, videoIds)</span><span class="type-signature"> &rarr; {void}</span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        This is a helper function for the easyApp method. It manages the assignment of video streamsto video objects. It assumes
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>monitorVideoId</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">type</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>videoIds</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">type</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">void</span>
+
+
+	</dd>
+</dl>
+
+        
+    
     
 </dd>
 
@@ -5180,7 +5329,7 @@
             
             
             
-            <td class="description last">a string containing the easyrtcId of the other user.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
+            <td class="description last">a string containing the easyrtcid of the other user.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
         </tr>
 	
 	
@@ -5521,7 +5670,7 @@
             
             
             
-            <td class="description last">either a string containing the easyrtcId of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
+            <td class="description last">either a string containing the easyrtcid of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
         </tr>
 	
 	
@@ -5703,7 +5852,7 @@
             
             
             
-            <td class="description last">either a string containing the easyrtcId of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
+            <td class="description last">either a string containing the easyrtcid of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
         </tr>
 	
 	
@@ -7032,119 +7181,6 @@
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>   easyrtc.setGotConnection( function(gotConnection, errorText){       if( gotConnection ){           console.log("Successfully connected to signaling server");       }       else{           console.log("Failed to connect to signaling server because: " + errorText);       }   });</code></pre>
-
-    
-</dd>
-
-        
-            
-<dt>
-    <h3 class="name" id="setGotMedia"><span class="type-signature">&lt;static> </span>setGotMedia<span class="signature">(gotMediaCB)</span><span class="type-signature"></span></h3>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Sets an event handler that gets called when the local media stream is created or not. Can only be called after calling easyrtc.easyApp.
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>gotMediaCB</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Function</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">has the signature function(gotMedia, errorText)</td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-    
-    
-    
-    
-    
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>    easyrtc.setGotMedia( function(gotMediaCB, errorText){        if( gotMedia ){            console.log("Got the requested user media");        }        else{            console.log("Failed to get media because: " +  errorText);        }    });</code></pre>
 
     
 </dd>
@@ -9736,7 +9772,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Jan 20 2014 10:54:06 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Feb 07 2014 14:19:24 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>

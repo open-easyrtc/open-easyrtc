@@ -2604,9 +2604,18 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 easyrtc.sendDataWS(otherUser, "dataChannelPrimed", "");
             }
             else {
-                var msg = JSON.parse(event.data);
-                if (msg) {
-                    easyrtc.receivePeerDistribute(otherUser, msg, null);
+                //
+                // Chrome and Firefox Interop is passing a event with a strange data="", perhaps
+                // as it's own form of priming message. Comparing the data against "" doesn't
+                // work, so I'm going with parsing and trapping the parse error.
+                // 
+                try {
+                   var msg = JSON.parse(event.data);
+                   if (msg) {
+                       easyrtc.receivePeerDistribute(otherUser, msg, null);
+                   }
+                }
+                catch(oops) {
                 }
             }
         }
