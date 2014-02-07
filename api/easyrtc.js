@@ -2898,7 +2898,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
         var targeting = {};
         if (msg.targetEasyrtcid) {
-            targeting.targetEasyrtcid = msg.targetEasyrtcId;
+            targeting.targetEasyrtcid = msg.targetEasyrtcid;
         }
         if (msg.targetRoom) {
             targeting.targetRoom = msg.targetRoom;
