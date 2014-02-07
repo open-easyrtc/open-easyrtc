@@ -1786,8 +1786,8 @@ easyrtc.supportsStatistics = function() {
  * @param {String} applicationName is a string that identifies the application so that different applications can have different
  *        lists of users. Note that the server configuration specifies a regular expression that is used to check application names 
  *        for validity. The default pattern is that of an identifier, spaces are not allowed.
- * @param {Function} successCallback (easyrtcId, roomOwner) - is called on successful connect. easyrtcId is the
- *   unique name that the client is known to the server by. A client usually only needs it's own easyrtcId for debugging purposes.
+ * @param {Function} successCallback (easyrtcid, roomOwner) - is called on successful connect. easyrtcid is the
+ *   unique name that the client is known to the server by. A client usually only needs it's own easyrtcid for debugging purposes.
  *       roomOwner is true if the user is the owner of a room. It's value is random if the user is in multiple rooms.
  * @param {Function} errorCallback (errorCode, errorText) - is called on unsuccessful connect. if null, an alert is called instead.
  *  The errorCode takes it's value from easyrtc.errCodes.
@@ -1989,7 +1989,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     };
     /** Sends data to another user using websockets. The easyrtc.sendServerMessage or easyrtc.sendPeerMessage methods
      * are wrappers for this method; application code should use them instead.
-     * @param {String} destination - either a string containing the easyrtcId of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.
+     * @param {String} destination - either a string containing the easyrtcid of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.
      * Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).
      * @param {String} msgType -the type of message being sent (application specific).
      * @param {Object} msgData - an object which can be JSON'ed.
@@ -2050,7 +2050,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         }
     };
     /** Sends data to another user. This method uses datachannels if one has been set up, or websockets otherwise.
-     * @param {String} destUser - a string containing the easyrtcId of the other user.
+     * @param {String} destUser - a string containing the easyrtcid of the other user.
      * Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).
      * @param {String} msgType -the type of message being sent (application specific).
      * @param {Object} msgData - an object which can be JSON'ed.
@@ -2071,7 +2071,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     };
     /**
      * Sends a message to another peer on the easyrtcMsg channel.
-     * @param {String} destination - either a string containing the easyrtcId of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.
+     * @param {String} destination - either a string containing the easyrtcid of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.
      * Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).
      * @param {String} msgType - the type of message being sent (application specific).
      * @param {Object} msgData - a JSONable object with the message contents.
@@ -2897,8 +2897,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     var onChannelMsg = function(msg) {
 
         var targeting = {};
-        if (msg.targetEasyrtcId) {
-            targeting.targetEasyrtcId = msg.targetEasyrtcId;
+        if (msg.targetEasyrtcid) {
+            targeting.targetEasyrtcid = msg.targetEasyrtcId;
         }
         if (msg.targetRoom) {
             targeting.targetRoom = msg.targetRoom;
@@ -3894,12 +3894,12 @@ easyrtc.easyAppBody = function(monitorVideoId, videoIds) {
  *  @param {String} applicationName - name of the application.
  *  @param {String} monitorVideoId - the id of the video object used for monitoring the local stream.
  *  @param {Array} videoIds - an array of video object ids (strings)
- *  @param {Function} onReady - a callback function used on success. It is called with the easyrtcId this peer is knopwn to the server as.
+ *  @param {Function} onReady - a callback function used on success. It is called with the easyrtcid this peer is knopwn to the server as.
  *  @param {Function} onFailure - a callbackfunction used on failure (failed to get local media or a connection of the signaling server).
  *  @example
  *     easyrtc.easyApp('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],
- *              function(easyrtcId){
- *                  console.log("successfully connected, I am " + easyrtcId);
+ *              function(easyrtcid){
+ *                  console.log("successfully connected, I am " + easyrtcid);
  *              },
  *              function(errorCode, errorText){
  *                  console.log(errorText);

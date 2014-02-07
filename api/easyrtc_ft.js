@@ -152,7 +152,7 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
 
 /**
  * Builds a function that can be used to send a group of files to a peer.
- * @param {String} destUser easyrtcId of the person being sent to.
+ * @param {String} destUser easyrtcid of the person being sent to.
  * @param {Function} progressListener - if provided, is called with the following objects:
  *    {status:"waiting"}  // once a file offer has been sent but not accepted or rejected yet
  *    {status:"started_file", name: filename}
