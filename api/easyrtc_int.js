@@ -349,8 +349,11 @@ easyrtc.setVideoDims = function(width, height) {
 easyrtc.setScreenCapture = function() {
     easyrtc.videoFeatures = {
         mandatory: {
-            chromeMediaSource: "screen"
-        },
+            chromeMediaSource: 'screen',
+            maxWidth: screen.width,
+            maxHeight: screen.height,
+            minFrameRate: 1,
+            maxFrameRate: 5        },
         optional: []
     };
 };
@@ -1384,7 +1387,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
         }
         
         setTimeout(function() {
-            try {                
+            try {
                 firstCallTime = getCurrentTime();
                 getUserMedia(mode, onUserMediaSuccess, tryAgain);
             } catch (e) {
@@ -1713,7 +1716,7 @@ easyrtc.idToName = function(easyrtcid) {
             }
         }
     }
-    return "--" + easyrtcid + "--";
+    return easyrtcid;
 };
 
 
@@ -3220,7 +3223,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     }
                 }
                 else {
-                    errorCallback(easyrtc.errCodes.CONNECT_ERR,easyrtc.constantStrings.noServer);
+                    errorCallback(easyrtc.errCodes.CONNECT_ERR, easyrtc.constantStrings.noServer);
                 }
             }
 

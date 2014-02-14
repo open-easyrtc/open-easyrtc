@@ -349,8 +349,11 @@ easyrtc.setVideoDims = function(width, height) {
 easyrtc.setScreenCapture = function() {
     easyrtc.videoFeatures = {
         mandatory: {
-            chromeMediaSource: "screen"
-        },
+            chromeMediaSource: 'screen',
+            maxWidth: screen.width,
+            maxHeight: screen.height,
+            minFrameRate: 1,
+            maxFrameRate: 5        },
         optional: []
     };
 };
@@ -1384,7 +1387,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
         }
         
         setTimeout(function() {
-            try {                
+            try {
                 firstCallTime = getCurrentTime();
                 getUserMedia(mode, onUserMediaSuccess, tryAgain);
             } catch (e) {
@@ -1713,7 +1716,7 @@ easyrtc.idToName = function(easyrtcid) {
             }
         }
     }
-    return "--" + easyrtcid + "--";
+    return easyrtcid;
 };
 
 
@@ -3220,7 +3223,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     }
                 }
                 else {
-                    errorCallback(easyrtc.errCodes.CONNECT_ERR,easyrtc.constantStrings.noServer);
+                    errorCallback(easyrtc.errCodes.CONNECT_ERR, easyrtc.constantStrings.noServer);
                 }
             }
 
@@ -4154,12 +4157,12 @@ if (navigator.mozGetUserMedia) {
 easyrtc.isMozilla = (webrtcDetectedBrowser === "firefox");
 
 easyrtc.constantStrings = {
-  "unableToEnterRoom":"Unable to enter room {0} because {1}" , 
+  "unableToEnterRoom":"Unable to enter room {0} because {1}" ,
   "resolutionWarning": "Requested video size of {0}x{1} but got size of {2}x{3}",
   "badUserName": "Illegal username {0}",
   "localMediaError": "Error getting local media stream: {0}",
   "miscSignalError": "Miscellaneous error from signalling server. It may be ignorable.",
-  "noServer":  "Unable to reach the EasyRTC signalling server.",
+  "noServer": "Unable to reach the EasyRTC signalling server.",
   "badsocket": "Socket.io connect event fired with bad websocket.",
   "icf": "Internal communications failure"
-}
+};
