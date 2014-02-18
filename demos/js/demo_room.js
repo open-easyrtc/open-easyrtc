@@ -606,7 +606,7 @@ function showMessage(startX, startY, content) {
     var centerEndX = .2*startX + .8*fullW/2;
     var centerEndY = .2*startY + .8*fullH/2;
 
-    var cloudObject = document.createElement('image');
+    var cloudObject = document.createElement("img");
     cloudObject.src = "images/cloud.png";
     cloudObject.onload = function() {
         cloudObject.style.left = startX + "px";
