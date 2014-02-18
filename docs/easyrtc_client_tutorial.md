@@ -80,7 +80,7 @@ Now we have to start writing some application logic for the application.js file,
 starting with an initialization function that will be called when the page gets loaded.
 The primary responsibility of the initialization function is to call the EasyRTC.easyApp method. It takes the following arguments:
 
- - applicationName - some literal string like "Company Chat Line".
+ - applicationName - some literal string like "Company_Chat_Line".
  - self-video-id - a string containing the id of the first video tag.
  - array-of-caller-video-ids - an array containing the id of the second video tag.
  - successCallback - a function to call on successful connection.
@@ -100,7 +100,7 @@ Here is an example initialization function:
      }
 
 The callback will be called whenever somebody else connects to
-or disconnects from the "Company Chat Line", and immediately after the call to easyrtc.easyApp.
+or disconnects from the "Company_Chat_Line", and immediately after the call to easyrtc.easyApp.
 
 The callback is passed two arguments:
 
@@ -108,7 +108,7 @@ The callback is passed two arguments:
  - a map whose keys are the ids (easyrtcids) of the other people connected to the server using the same application name.
 
 In our example, the callback will maintain a list of buttons
-to call the other people connected to the "Company Chat Line".
+to call the other people connected to the "Company_Chat_Line".
 We'll add a &lt;div> to the &lt;body> to hold these buttons.
 
      <body>
@@ -274,7 +274,7 @@ The new initialization looks like:
               function(){       // success callback
                   var selfVideo = document.getElementById("self");
                   easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
-                  easyrtc.connect("Company Chat Line", connectSuccess, connectFailure);
+                  easyrtc.connect("Company_Chat_Line", connectSuccess, connectFailure);
               },
               connectFailure
         );
@@ -325,7 +325,7 @@ The entire JavaScript looks like the below code:
                   function(){        // success callback
                       var selfVideo = document.getElementById("self");
                       easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
-                      easyrtc.connect("Company Chat Line", connectSuccess, connectFailure);
+                      easyrtc.connect("Company_Chat_Line", connectSuccess, connectFailure);
                   },
                   connectFailure
             );
