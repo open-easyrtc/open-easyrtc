@@ -9,7 +9,7 @@ Configuration Notes:
  - EasyRTC can be set to use a different port to avoid conflicts (such as 8080)
  - In client code, you must tell EasyRTC the socket.io URL prior to running `easyrtc.easyApp()` or `easyrtc.connect()`
    - `easyrtc.setSocketUrl("<URL>");`
-     - eg: `easyrtc.setSocketUrl("\\mydomain.com:8080");`
+     - eg: `easyrtc.setSocketUrl("//mydomain.com:8080");`
    - If the EasyRTC server is simply on a different port you can use:
      - `easyrtc.setSocketUrl(":<PORT>");`
      - eg: `easyrtc.setSocketUrl(":8080");`
