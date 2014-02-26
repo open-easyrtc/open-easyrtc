@@ -33,6 +33,8 @@ function connect() {
     easyrtc.enableDataChannels(true);
     easyrtc.enableVideo(false);
     easyrtc.enableAudio(false);
+    easyrtc.enableVideoReceive(false);
+    easyrtc.enableAudioReceive(false);
     easyrtc.setDataChannelOpenListener(openListener);
     easyrtc.setDataChannelCloseListener(closeListener);
     easyrtc.setPeerListener(addToConversation);
