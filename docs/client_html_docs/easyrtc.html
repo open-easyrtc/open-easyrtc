@@ -1069,7 +1069,7 @@
             
             
             
-            <td class="description last">(easyrtcid, roomOwner) - is called on successful connect. easyrtcid is the  unique name that the client is known to the server by. A client usually only needs it's own easyrtcid for debugging purposes.      roomOwner is true if the user is the owner of a room. It's value is random if the user is in multiple rooms.</td>
+            <td class="description last">(easyrtcId, roomOwner) - is called on successful connect. easyrtcId is the  unique name that the client is known to the server by. A client usually only needs it's own easyrtcId for debugging purposes.      roomOwner is true if the user is the owner of a room. It's value is random if the user is in multiple rooms.</td>
         </tr>
 	
 	
@@ -1534,7 +1534,7 @@
             
             
             
-            <td class="description last">a callback function used on success. It is called with the easyrtcid this peer is knopwn to the server as.</td>
+            <td class="description last">a callback function used on success. It is called with the easyrtcId this peer is knopwn to the server as.</td>
         </tr>
 	
 	
@@ -1604,7 +1604,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.easyApp('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],             function(easyrtcid){                 console.log("successfully connected, I am " + easyrtcid);             },             function(errorCode, errorText){                 console.log(errorText);             );</code></pre>
+    <pre class="prettyprint"><code>    easyrtc.easyApp('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],             function(easyrtcId){                 console.log("successfully connected, I am " + easyrtcId);             },             function(errorCode, errorText){                 console.log(errorText);             );</code></pre>
 
     
 </dd>
@@ -1868,6 +1868,109 @@
         
     <pre class="prettyprint"><code>     easyrtc.enableAudio(false);</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="enableAudioReceive"><span class="type-signature">&lt;static> </span>enableAudioReceive<span class="signature">(value)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Control whether the client requests audio from a peer during a call.Must be called before the call to have an effect.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+            
+            <td class="type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">true to receive audio, false otherwise. The default is true.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
     
 </dd>
 
@@ -2423,6 +2526,109 @@
         
     <pre class="prettyprint"><code>     easyrtc.enableVideo(false);</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="enableVideoReceive"><span class="type-signature">&lt;static> </span>enableVideoReceive<span class="signature">(value)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Control whether the client requests audio from a peer during a call.Must be called before the call to have an effect.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+            
+            <td class="type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">true to receive video, false otherwise. The default is true.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
     
 </dd>
 
@@ -5329,7 +5535,7 @@
             
             
             
-            <td class="description last">a string containing the easyrtcid of the other user.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
+            <td class="description last">a string containing the easyrtcId of the other user.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
         </tr>
 	
 	
@@ -5670,7 +5876,7 @@
             
             
             
-            <td class="description last">either a string containing the easyrtcid of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
+            <td class="description last">either a string containing the easyrtcId of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
         </tr>
 	
 	
@@ -5852,7 +6058,7 @@
             
             
             
-            <td class="description last">either a string containing the easyrtcid of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
+            <td class="description last">either a string containing the easyrtcId of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
         </tr>
 	
 	
@@ -9772,7 +9978,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Feb 07 2014 14:19:24 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Wed Mar 05 2014 13:15:37 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>

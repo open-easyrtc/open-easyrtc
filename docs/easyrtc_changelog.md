@@ -1,6 +1,20 @@
 EasyRTC: Change Log
 ===================
 
+v1.0.10
+-------
+New Features:
+  - API - Beginnings of internationalization support. This will be expanded upon in future versions.
+  - API - New media constraint function enableAudioReceive(). Control if client requests audio from peer.
+  - API - New media constraint function enableVideoReceive(). Control if client requests video from peer.
+
+Changes:
+ - API: - Updates to getPeerStatistics() to better support Firefox
+
+Fixes:
+  - Server - Removed reference to Express's configure() which they removed in v4.0.0 (issue #49)
+
+
 v1.0.9
 ------
 New Features:
@@ -19,6 +33,7 @@ Fixes:
   - API - When data channels are opened, an initial message is sent each way to verify that data channels work.
   - Server - Fixed bug where a getIceConfig request didn't return the proper format. (issue #46)
   - Documentation - Minor changes for greater consistency.
+
 
 v1.0.8
 ------
