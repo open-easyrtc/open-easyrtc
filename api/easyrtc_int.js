@@ -156,6 +156,12 @@ easyrtc.localStream = null;
 easyrtc.videoFeatures = true; // default video
 easyrtc.audioFeatures = true; // default audio
 
+easyrtc.mediaConstraints = {
+    'mandatory': {
+        'OfferToReceiveAudio': true,
+        'OfferToReceiveVideo': true
+    }
+};
 /**
  * Control whether the client requests audio from a peer during a call.
  * Must be called before the call to have an effect.
@@ -372,7 +378,7 @@ easyrtc.setScreenCapture = function() {
             maxWidth: screen.width,
             maxHeight: screen.height,
             minFrameRate: 1,
-            maxFrameRate: 5        },
+            maxFrameRate: 5},
         optional: []
     };
 };
@@ -1269,7 +1275,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
     }
 
 
-    var mode = {'audio': (easyrtc.audioEnabled ? easyrtc.audioFeatures: false),
+    var mode = {'audio': (easyrtc.audioEnabled ? easyrtc.audioFeatures : false),
         'video': ((easyrtc.videoEnabled) ? (easyrtc.videoFeatures) : false)};
 
     if (easyrtc.videoEnabled && easyrtc.videoFeatures && easyrtc.videoFeatures.mandatory &&
@@ -1400,17 +1406,17 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
             try {
                 getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
             }
-            catch(e) {
-               onUserMediaError(e);
+            catch (e) {
+                onUserMediaError(e);
             }
         }
-        
+
         setTimeout(function() {
             try {
                 firstCallTime = getCurrentTime();
                 getUserMedia(mode, onUserMediaSuccess, tryAgain);
             } catch (e) {
-                setTimeout( tryAgain2, 2500);
+                setTimeout(tryAgain2, 2500);
             }
         }, 1000);
     }
@@ -1861,13 +1867,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     if (easyrtc.debugPrinter) {
         easyrtc.debugPrinter("attempt to connect to WebRTC signalling server with application name=" + applicationName);
     }
-    var mediaConstraints = {
-        'mandatory': {
-            'OfferToReceiveAudio': true,
-            'OfferToReceiveVideo': true
-        }
 
-    };
     function isEmptyObj(obj) {
         if (obj === null || obj === undefined) {
             return true;
@@ -2363,7 +2363,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             pc.createOffer(setLocalAndSendMessage0, function(errorObj) {
                 callFailureCB(easyrtc.errCodes.CALL_ERR, JSON.stringify(errObj));
             },
-                    mediaConstraints);
+                    easyrtc.mediaConstraints);
         }, 100);
     };
     function limitBandWidth(sd) {
@@ -2653,12 +2653,12 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 // work, so I'm going with parsing and trapping the parse error.
                 // 
                 try {
-                   var msg = JSON.parse(event.data);
-                   if (msg) {
-                       easyrtc.receivePeerDistribute(otherUser, msg, null);
-                   }
+                    var msg = JSON.parse(event.data);
+                    if (msg) {
+                        easyrtc.receivePeerDistribute(otherUser, msg, null);
+                    }
                 }
-                catch(oops) {
+                catch (oops) {
                 }
             }
         }
@@ -2859,7 +2859,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     function(message) {
                         easyrtc.showError(easyrtc.errCodes.INTERNAL_ERR, "create-answer: " + message);
                     },
-                    mediaConstraints);
+                    easyrtc.mediaConstraints);
         };
         if (easyrtc.debugPrinter) {
             easyrtc.debugPrinter("about to call setRemoteDescription in doAnswer");

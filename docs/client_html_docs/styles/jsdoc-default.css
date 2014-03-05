@@ -144,6 +144,7 @@ h6
 
 .name, .signature {
 	font-family: Consolas, "Lucida Console", Monaco, monospace;
+    background-color:lightgray;
 }
 
 .name {
@@ -191,7 +192,7 @@ h6
 	display: block;
 	padding: 4px 12px;
 	margin: 0;
-	background-color: #fff;
+	background-color: lightblue;
 	color: #000;
 	border-left: 3px #ddd solid;
 }
