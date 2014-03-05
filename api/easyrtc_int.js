@@ -154,10 +154,29 @@ easyrtc.disconnecting = false;
 easyrtc.localStream = null;
 /** @private */
 easyrtc.videoFeatures = true; // default video
+easyrtc.audioFeatures = true; // default audio
 
+/**
+ * Control whether the client requests audio from a peer during a call.
+ * Must be called before the call to have an effect.
+ * @param value - true to receive audio, false otherwise. The default is true.
+ */
+easyrtc.enableAudioReceive = function(value) {
+    easyrtc.mediaConstraints.mandatory.OfferToReceiveAudio = value;
+};
+
+/**
+ * Control whether the client requests audio from a peer during a call.
+ * Must be called before the call to have an effect.
+ * @param value - true to receive video, false otherwise. The default is true.
+ */
+easyrtc.enableVideoReceive = function(value) {
+    easyrtc.mediaConstraints.mandatory.OfferToReceiveVideo = value;
+};
 
 /** @private */
 easyrtc.audioEnabled = true;
+
 /** @private */
 easyrtc.videoEnabled = true;
 /** @private */
@@ -1250,7 +1269,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
     }
 
 
-    var mode = {'audio': (easyrtc.audioEnabled ? true : false),
+    var mode = {'audio': (easyrtc.audioEnabled ? easyrtc.audioFeatures: false),
         'video': ((easyrtc.videoEnabled) ? (easyrtc.videoFeatures) : false)};
 
     if (easyrtc.videoEnabled && easyrtc.videoFeatures && easyrtc.videoFeatures.mandatory &&

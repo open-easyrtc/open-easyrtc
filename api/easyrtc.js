@@ -154,11 +154,11 @@ easyrtc.disconnecting = false;
 easyrtc.localStream = null;
 /** @private */
 easyrtc.videoFeatures = true; // default video
-
-
+easyrtc.audioFeatures = true; // default audio
 
 /**
- * Control whether the peer receives audio.
+ * Control whether the client requests audio from a peer during a call.
+ * Must be called before the call to have an effect.
  * @param value - true to receive audio, false otherwise. The default is true.
  */
 easyrtc.enableAudioReceive = function(value) {
@@ -166,24 +166,17 @@ easyrtc.enableAudioReceive = function(value) {
 };
 
 /**
- * Control whether the peer receives video.
- * @param value - true to  receive video, false otherwise. The default is true.
+ * Control whether the client requests audio from a peer during a call.
+ * Must be called before the call to have an effect.
+ * @param value - true to receive video, false otherwise. The default is true.
  */
 easyrtc.enableVideoReceive = function(value) {
     easyrtc.mediaConstraints.mandatory.OfferToReceiveVideo = value;
 };
 
-
-/** @private */
-easyrtc.mediaConstraints = {
-    'mandatory': {
-        'OfferToReceiveAudio': true,
-        'OfferToReceiveVideo': true
-    }
-
-};
 /** @private */
 easyrtc.audioEnabled = true;
+
 /** @private */
 easyrtc.videoEnabled = true;
 /** @private */
@@ -379,7 +372,7 @@ easyrtc.setScreenCapture = function() {
             maxWidth: screen.width,
             maxHeight: screen.height,
             minFrameRate: 1,
-            maxFrameRate: 5},
+            maxFrameRate: 5        },
         optional: []
     };
 };
@@ -586,186 +579,137 @@ easyrtc.callCancelled = function(easyrtcid) {
 var count = 0;
 easyrtc.getPeerStatistics = function(peerId, callback, filter) {
     count++;
-    
-    function firefoxStatsHandler(stats) {
-        var audioSent = 0, audioReceived = 0, audioLost = 0, audioJitter;
-        var videoSent = 0, videoReceived = 0, videoLost = 0, videoJitter;
-        var i;
-        
-        for( i in stats) {
-            var blk = stats[i];
-            if( blk.type === "inboundrtp" ) {
-                if( blk.id.indexOf("_audio_") > 0) {
-                    audioLost += blk.packetsLost;
-                    audioReceived += blk.packetsReceived;
-                    audioJitter = blk.jitter;
-                }
-                else if( blk.id.indexOf("_video_") > 0 ) {
-                    videoLost += blk.packetsLost;
-                    videoReceived += blk.packetsReceived;
-                    videoJitter = blk.jitter;
-                }
-            }
-            else if( blk.type === "outboundrtp") {
-                if( blk.id.indexOf("_audio_") > 0) {
-                    audioSent += blk.packetsSent;
-                }
-                else if( blk.id.indexOf("_video_") > 0 ) {
-                    videoSent += blk.packetsSent;
-                }     
-            }
-        }
-        var localStats ={};
-        localStats.audioPacketsSent = audioSent;
-        localStats.audioPacketsLost = audioLost;
-        localStats.audioPacketsReceived = audioReceived;
-        localStats.audioJitter = audioJitter;
-        localStats.videoPacketsSent = videoSent;
-        localStats.videoPacketsLost = videoLost;
-        localStats.videoPacketsReceived = videoReceived;
-        localStats.videoJitter = videoJitter;
-        callback(peerId, localStats);
-    }
-    
-    function chromeStatsHandler(stats) {
-
-        var localStats = {};
-        var part, parts = stats.result();
-        var i, j;
-        var itemKeys;
-        var itemKey;
-        var names;
-        var userKey;
-
-        var partNames = [];
-        var partList;
-        var bestBytes = 0;
-        var bestI;
-        var turnAddress = null;
-        var hasActive, curReceived;
-        var localAddress, remoteAddress;
-
-        if (!filter) {
-            for (i = 0; i < parts.length; i++) {
-                names = parts[i].names();
-                for (j = 0; j < names.length; j++) {
-                    itemKey = names[j];
-                    localStats[parts[i].id + "." + itemKey] = parts[i].local.stat(itemKey);
-                }
-            }
-        }
-        else {
-            for (i = 0; i < parts.length; i++) {
-                partNames[i] = {};
-                //
-                // convert the names into a dictionary
-                //
-                names = parts[i].names();
-                for (j = 0; j < names.length; j++) {
-                    partNames[i][names[j]] = true;
-                }
-
-                //
-                // a chrome-firefox connection results in several activeConnections. 
-                // we only want one, so we look for the one with the most data being received on it.
-                //
-                if (partNames[i].googRemoteAddress && partNames[i].googActiveConnection) {
-                    hasActive = parts[i].local.stat("googActiveConnection");
-                    if (hasActive === true || hasActive === "true") {
-                        curReceived = parseInt(parts[i].local.stat("bytesReceived")) +
-                                parseInt(parts[i].local.stat("bytesSent"));
-                        if (curReceived > bestBytes) {
-                            bestI = i;
-                            bestBytes = curReceived;
-                        }
-                    }
-                }
-            }
-
-            for (i = 0; i < parts.length; i++) {
-                //
-                // discard info from any inactive connection.
-                //
-                if (partNames[i].googActiveConnection) {
-                    if (i !== bestI) {
-                        partNames[i] = {};
-                    }
-                    else {
-                        localAddress = parts[i].local.stat("googLocalAddress").split(":")[0];
-                        remoteAddress = parts[i].local.stat("googRemoteAddress").split(":")[0];
-                        if (easyrtc.isTurnServer(localAddress)) {
-                            turnAddress = localAddress;
-                        }
-                        else if (easyrtc.isTurnServer(remoteAddress)) {
-                            turnAddress = remoteAddress;
-                        }
-                    }
-                }
-            }
-
-            for (i = 0; i < filter.length; i++) {
-                itemKeys = filter[i];
-                partList = [];
-                part = null;
-                for (j = 0; j < parts.length; j++) {
-                    var fullMatch = true;
-                    for (itemKey in itemKeys) {
-                        if (!partNames[j][itemKey]) {
-                            fullMatch = false;
-                            break;
-                        }
-                    }
-                    if (fullMatch && parts[j]) {
-                        partList.push(parts[j]);
-                    }
-                }
-                if (partList.length === 1) {
-                    for (j = 0; j < partList.length; j++) {
-                        part = partList[j];
-                        if (part.local) {
-                            for (itemKey in itemKeys) {
-                                userKey = itemKeys[itemKey];
-                                localStats[userKey] = part.local.stat(itemKey);
-                            }
-                        }
-                    }
-                }
-                else if (partList.length > 1) {
-                    for (itemKey in itemKeys) {
-                        localStats[itemKeys[itemKey]] = [];
-                    }
-                    for (j = 0; j < partList.length; j++) {
-                        part = partList[j];
-                        if (part.local) {
-                            for (itemKey in itemKeys) {
-                                userKey = itemKeys[itemKey];
-                                localStats[userKey].push(part.local.stat(itemKey));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (localStats.remoteAddress && turnAddress) {
-            localStats.remoteAddress = turnAddress;
-        }
-        callback(peerId, localStats);
-    }
 
     if (!easyrtc.peerConns[peerId]) {
         callback({"notConnected": peerId});
     }
     else if (easyrtc.peerConns[peerId].pc.getStats) {
-        if (easyrtc.isMozilla) {
-            easyrtc.peerConns[peerId].pc.getStats(null, firefoxStatsHandler,
-                    function(err) {
-                        console.log("stats failure ", err);
-                    });
-        }
-        else {
-            easyrtc.peerConns[peerId].pc.getStats(chromeStatsHandler);
-        }
+
+        easyrtc.peerConns[peerId].pc.getStats(function(stats) {
+
+            var localStats = {};
+            var part, parts = stats.result();
+            var i, j;
+            var itemKeys;
+            var itemKey;
+            var names;
+            var userKey;
+
+            var partNames = [];
+            var partList;
+            var bestBytes = 0;
+            var bestI;
+            var turnAddress = null;
+            var hasActive, curReceived;
+            var localAddress, remoteAddress;
+
+            if (!filter) {
+                for (i = 0; i < parts.length; i++) {
+                    names = parts[i].names();
+                    for (j = 0; j < names.length; j++) {
+                        itemKey = names[j];
+                        localStats[parts[i].id + "." + itemKey] = parts[i].local.stat(itemKey);
+                    }
+                }
+            }
+            else {
+                for (i = 0; i < parts.length; i++) {
+                    partNames[i] = {};
+                    //
+                    // convert the names into a dictionary
+                    //
+                    names = parts[i].names();
+                    for (j = 0; j < names.length; j++) {
+                        partNames[i][names[j]] = true;
+                    }
+
+                    //
+                    // a chrome-firefox connection results in several activeConnections. 
+                    // we only want one, so we look for the one with the most data being received on it.
+                    //
+                    if (partNames[i].googRemoteAddress && partNames[i].googActiveConnection) {
+                        hasActive = parts[i].local.stat("googActiveConnection");
+                        if (hasActive === true || hasActive === "true") {
+                            curReceived = parseInt(parts[i].local.stat("bytesReceived")) +
+                                    parseInt(parts[i].local.stat("bytesSent"));
+                            if (curReceived > bestBytes) {
+                                bestI = i;
+                                bestBytes = curReceived;
+                            }
+                        }
+                    }
+                }
+
+                for (i = 0; i < parts.length; i++) {
+                    //
+                    // discard info from any inactive connection.
+                    //
+                    if (partNames[i].googActiveConnection) {
+                        if (i !== bestI) {
+                            partNames[i] = {};
+                        }
+                        else {
+                            localAddress = parts[i].local.stat("googLocalAddress").split(":")[0];
+                            remoteAddress = parts[i].local.stat("googRemoteAddress").split(":")[0];
+                            if (easyrtc.isTurnServer(localAddress)) {
+                                turnAddress = localAddress;
+                            }
+                            else if (easyrtc.isTurnServer(remoteAddress)) {
+                                turnAddress = remoteAddress;
+                            }
+                        }
+                    }
+                }
+
+                for (i = 0; i < filter.length; i++) {
+                    itemKeys = filter[i];
+                    partList = [];
+                    part = null;
+                    for (j = 0; j < parts.length; j++) {
+                        var fullMatch = true;
+                        for (itemKey in itemKeys) {
+                            if (!partNames[j][itemKey]) {
+                                fullMatch = false;
+                                break;
+                            }
+                        }
+                        if (fullMatch && parts[j]) {
+                            partList.push(parts[j]);
+                        }
+                    }
+                    if (partList.length === 1) {
+                        for (j = 0; j < partList.length; j++) {
+                            part = partList[j];
+                            if (part.local) {
+                                for (itemKey in itemKeys) {
+                                    userKey = itemKeys[itemKey];
+                                    localStats[userKey] = part.local.stat(itemKey);
+                                }
+                            }
+                        }
+                    }
+                    else if (partList.length > 1) {
+                        for (itemKey in itemKeys) {
+                            localStats[itemKeys[itemKey]] = [];
+                        }
+                        for (j = 0; j < partList.length; j++) {
+                            part = partList[j];
+                            if (part.local) {
+                                for (itemKey in itemKeys) {
+                                    userKey = itemKeys[itemKey];
+                                    localStats[userKey].push(part.local.stat(itemKey));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (localStats.remoteAddress && turnAddress) {
+                localStats.remoteAddress = turnAddress;
+            }
+            callback(peerId, localStats);
+        });
     }
     else {
         callback({"statistics": "not supported by this browser, try Chrome."});
@@ -1325,7 +1269,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
     }
 
 
-    var mode = {'audio': (easyrtc.audioEnabled ? true : false),
+    var mode = {'audio': (easyrtc.audioEnabled ? easyrtc.audioFeatures: false),
         'video': ((easyrtc.videoEnabled) ? (easyrtc.videoFeatures) : false)};
 
     if (easyrtc.videoEnabled && easyrtc.videoFeatures && easyrtc.videoFeatures.mandatory &&
@@ -1456,17 +1400,17 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
             try {
                 getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
             }
-            catch (e) {
-                onUserMediaError(e);
+            catch(e) {
+               onUserMediaError(e);
             }
         }
-
+        
         setTimeout(function() {
             try {
                 firstCallTime = getCurrentTime();
                 getUserMedia(mode, onUserMediaSuccess, tryAgain);
             } catch (e) {
-                setTimeout(tryAgain2, 2500);
+                setTimeout( tryAgain2, 2500);
             }
         }, 1000);
     }
@@ -1917,10 +1861,13 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     if (easyrtc.debugPrinter) {
         easyrtc.debugPrinter("attempt to connect to WebRTC signalling server with application name=" + applicationName);
     }
+    var mediaConstraints = {
+        'mandatory': {
+            'OfferToReceiveAudio': true,
+            'OfferToReceiveVideo': true
+        }
 
-
-
-
+    };
     function isEmptyObj(obj) {
         if (obj === null || obj === undefined) {
             return true;
@@ -2005,7 +1952,6 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     //   errorCallback: a function with signature function(errorCode, errorText)
     //
     function sendSignalling(destUser, msgType, msgData, successCallback, errorCallback) {
-
         if (!easyrtc.webSocket) {
             throw "Attempt to send message without a valid connection to the server.";
         }
@@ -2417,7 +2363,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             pc.createOffer(setLocalAndSendMessage0, function(errorObj) {
                 callFailureCB(easyrtc.errCodes.CALL_ERR, JSON.stringify(errObj));
             },
-                    easyrtc.mediaConstraints);
+                    mediaConstraints);
         }, 100);
     };
     function limitBandWidth(sd) {
@@ -2481,15 +2427,6 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     easyrtc.hangup = function(otherUser) {
         hangupBody(otherUser);
         easyrtc.updateConfigurationInfo();
-    };
-    /** @private
-     * @param {String} candidateString
-     */
-    easyrtc.detectTurnServerInCandidate = function(candidateString) {
-        if (candidateString.indexOf("typ relay") > 0) {
-            var ipaddress = candidateString.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/i)[2];
-            easyrtc._turnServers[ipaddress] = true;
-        }
     };
     /**
      * Hangs up on all current connections.
@@ -2611,8 +2548,10 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     // The keyword "relay" in the candidate identifies it as referencing a 
                     // turn server. The \d symbol in the regular expression matches a number.
                     // 
-                    easyrtc.detectTurnServerInCandidate(event.candidate.candidate);
-
+                    if (event.candidate.candidate.indexOf("typ relay") > 0) {
+                        var ipaddress = event.candidate.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/)[2];
+                        easyrtc._turnServers[ipaddress] = true;
+                    }
 
                     if (easyrtc.peerConns[otherUser].startedAV) {
                         sendSignalling(otherUser, "candidate", candidateData, null, function() {
@@ -2714,12 +2653,12 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 // work, so I'm going with parsing and trapping the parse error.
                 // 
                 try {
-                    var msg = JSON.parse(event.data);
-                    if (msg) {
-                        easyrtc.receivePeerDistribute(otherUser, msg, null);
-                    }
+                   var msg = JSON.parse(event.data);
+                   if (msg) {
+                       easyrtc.receivePeerDistribute(otherUser, msg, null);
+                   }
                 }
-                catch (oops) {
+                catch(oops) {
                 }
             }
         }
@@ -2920,12 +2859,13 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     function(message) {
                         easyrtc.showError(easyrtc.errCodes.INTERNAL_ERR, "create-answer: " + message);
                     },
-                    easyrtc.mediaConstraints);
+                    mediaConstraints);
         };
         if (easyrtc.debugPrinter) {
             easyrtc.debugPrinter("about to call setRemoteDescription in doAnswer");
         }
         try {
+
             pc.setRemoteDescription(sd, invokeCreateAnswer, function(message) {
                 easyrtc.showError(easyrtc.errCodes.INTERNAL_ERR, "set-remote-description: " + message);
             });
@@ -3067,7 +3007,10 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             pc = easyrtc.peerConns[caller].pc;
             pc.addIceCandidate(candidate);
 
-            easyrtc.detectTurnServerInCandidate(msgData.candidate);
+            if (msgData.candidate.indexOf("typ relay") > 0) {
+                var ipaddress = msgData.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/)[1];
+                easyrtc._turnServers[ipaddress] = true;
+            }
         };
 
         var flushCachedCandidates = function(caller) {
@@ -4233,12 +4176,12 @@ if (navigator.mozGetUserMedia) {
 easyrtc.isMozilla = (webrtcDetectedBrowser === "firefox");
 
 easyrtc.constantStrings = {
-    "unableToEnterRoom": "Unable to enter room {0} because {1}",
-    "resolutionWarning": "Requested video size of {0}x{1} but got size of {2}x{3}",
-    "badUserName": "Illegal username {0}",
-    "localMediaError": "Error getting local media stream: {0}",
-    "miscSignalError": "Miscellaneous error from signalling server. It may be ignorable.",
-    "noServer": "Unable to reach the EasyRTC signalling server.",
-    "badsocket": "Socket.io connect event fired with bad websocket.",
-    "icf": "Internal communications failure"
+  "unableToEnterRoom":"Unable to enter room {0} because {1}" ,
+  "resolutionWarning": "Requested video size of {0}x{1} but got size of {2}x{3}",
+  "badUserName": "Illegal username {0}",
+  "localMediaError": "Error getting local media stream: {0}",
+  "miscSignalError": "Miscellaneous error from signalling server. It may be ignorable.",
+  "noServer": "Unable to reach the EasyRTC signalling server.",
+  "badsocket": "Socket.io connect event fired with bad websocket.",
+  "icf": "Internal communications failure"
 };
