@@ -1545,15 +1545,15 @@ easyrtc.supportsDataChannels = function() {
  * @param {String} source - the sender's easyrtcid, optional.
  * @example
  *     easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting){
- *         ("From " + easyrtc.idToName(easyrtcid) +
+ *         console.log("From " + easyrtc.idToName(easyrtcid) +
  *             " sent the following data " + JSON.stringify(msgData));
  *     });
  *     easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting){
- *         ("From " + easyrtc.idToName(easyrtcid) +
+ *         console.log("From " + easyrtc.idToName(easyrtcid) +
  *             " sent the following data " + JSON.stringify(msgData));
  *     }, 'food', 'dkdjdekj44--');
  *     easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting){
- *         ("From " + easyrtcid +
+ *         console.log("From " + easyrtcid +
  *             " sent the following data " + JSON.stringify(msgData));
  *     }, 'drink');
  *
