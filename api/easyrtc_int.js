@@ -55,14 +55,22 @@ easyrtc.format = function(format, arg1, arg2, arg3) {
     }
     return formatted;
 };
+
 //
-// for supporting internationalization
+// Maps a key to a language specific string using the easyrtc.constantStrings map.
+// Defaults to the key if the key can not be found, but outputs a warning in that case.
+// This function is only used internally by easyrtc.js 
 //
+/**
+ * @private
+ * @param {String} key
+ */
 easyrtc.getConstantString = function(key) {
     if (easyrtc.constantStrings[key]) {
         return easyrtc.constantStrings[key];
     }
     else {
+        console.warning("Could not find key='" + key + "' in easyrtc.constantStrings");
         return key;
     }
 };
