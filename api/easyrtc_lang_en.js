@@ -7,5 +7,9 @@ easyrtc.constantStrings = {
   "miscSignalError": "Miscellaneous error from signalling server. It may be ignorable.",
   "noServer": "Unable to reach the EasyRTC signalling server.",
   "badsocket": "Socket.io connect event fired with bad websocket.",
-  "icf": "Internal communications failure"
+  "icf": "Internal communications failure",
+  "statsNotSupported":"call statistics not supported by this browser, try Chrome.",
+   "noWebrtcSupport":"Your browser doesn't appear to support WebRTC.",
+   "gumFailed":"Failed to get access to local media. Error code was {0}.",
+   "requireAudioOrVideo":"At least one of audio and video must be provided"   
 };

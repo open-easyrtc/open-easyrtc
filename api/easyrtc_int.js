@@ -37,11 +37,17 @@
 
 
 var easyrtc = {};
-
-//
-// for supporting internationalization
-//
-easyrtc.format = function() {
+/**
+ * This function performs a printf like formatting. It actually takes an unlimited
+ * number of arguments, the declared arguments arg1, arg2, arg3 are present just for
+ * documentation purposes. 
+ * @param {String} format A string like "abcd{1}efg{2}hij{1}."
+ * @param {String} arg1 The value that replaces {1}
+ * @param {String} arg2 The value that replaces {2}
+ * @param {String} arg3 The value that replaces {3}
+ * @returns {String} the formatted string.
+ */
+easyrtc.format = function(format, arg1, arg2, arg3) {
     var formatted = arguments[0];
     for (var i = 1; i < arguments.length; i++) {
         var regexp = new RegExp('\\{' + (i - 1) + '\\}', 'gi');
@@ -49,7 +55,17 @@ easyrtc.format = function() {
     }
     return formatted;
 };
-
+//
+// for supporting internationalization
+//
+easyrtc.getConstantString = function(key) {
+    if (easyrtc.constantStrings[key]) {
+        return easyrtc.constantStrings[key];
+    }
+    else {
+        return key;
+    }
+};
 /** @private
  * @param {Object} destObject
  * @param {Object} allowedEventsArray
@@ -248,7 +264,7 @@ easyrtc.setCookieId = function(cookieId) {
  */
 easyrtc.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
     if (easyrtc.roomJoin[roomName]) {
-        console.error("Programmer error: attempt to join room " + roomName + " which you are already in.");
+        console.error("Developer error: attempt to join room " + roomName + " which you are already in.");
         return;
     }
     var newRoomData = {roomName: roomName};
@@ -294,7 +310,7 @@ easyrtc.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
                 failureCB(errorCode, errorText, roomName);
             }
             else {
-                easyrtc.showError(errorCode, easyrtc.format(easyrtc.constantStrings.unableToEnterRoom, roomName, errorText));
+                easyrtc.showError(errorCode, easyrtc.format(easyrtc.getConstantString("unableToEnterRoom"), roomName, errorText));
             }
         };
 
@@ -718,7 +734,7 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
         });
     }
     else {
-        callback({"statistics": "not supported by this browser, try Chrome."});
+        callback({"statistics": easyrtc.getConstantString("statsNotSupported") });
     }
 };
 
@@ -1255,11 +1271,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
         easyrtc.debugPrinter("about to request local media");
     }
 
-    if (!window.getUserMedia) {
-        errorCallback("Your browser doesn't appear to support WebRTC.");
-    }
-
-    if (errorCallback === null) {
+    if (!errorCallback) {
         errorCallback = function(errorCode, errorText) {
             var message = "easyrtc.initMediaSource: " + easyrtc.formatError(errorText);
             if (easyrtc.debugPrinter) {
@@ -1268,9 +1280,16 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
             easyrtc.showError(easyrtc.errCodes.MEDIA_ERR, message);
         };
     }
+    
+    if (!window.getUserMedia) {
+        errorCallback(easyrtc.getConstantString("noWebrtcSupport"));
+    }
+
+
 
     if (!successCallback) {
-        console.error("easyrtc.initMediaSource not supplied a successCallback");
+        easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, 
+            "easyrtc.initMediaSource not supplied a successCallback");
         return;
     }
 
@@ -1282,7 +1301,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
             easyrtc.videoFeatures.mandatory.chromeMediaSource === "screen") {
         if (mode.audio) {
             mode.audio = false;
-            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR,
+            console.warning(easyrtc.errCodes.DEVELOPER_ERR,
                     "You can't have audio with a screen share. Masking your audio.");
         }
     }
@@ -1313,7 +1332,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
                             (easyrtc.nativeVideoHeight !== easyrtc.videoFeatures.mandatory.minHeight ||
                                     easyrtc.nativeVideoWidth !== easyrtc.videoFeatures.mandatory.minWidth)) {
                         easyrtc.showError(easyrtc.errCodes.MEDIA_WARNING,
-                                easyrtc.format(easyrtc.constantStrings.resolutionWarning,
+                                easyrtc.format(easyrtc.getConstantString("resolutionWarning"),
                                 easyrtc.videoFeatures.mandatory.minWidth, easyrtc.videoFeatures.mandatory.minHeight,
                                 easyrtc.nativeVideoWidth, easyrtc.nativeVideoHeight));
                     }
@@ -1355,8 +1374,19 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
         if (easyrtc.debugPrinter) {
             easyrtc.debugPrinter("failed to get local media");
         }
+        var errText;
+        if( typeof error == 'string') {
+            errText = error;
+        }
+        else if( error.name) {
+            errText = error.name;
+        }
+        else {
+            errText = "Unknown";
+        }
         if (errorCallback) {
-            errorCallback(easyrtc.errCodes.MEDIA_ERR, "Failed to get access to local media. Error code was " + error.code + ".");
+            console.log("invoking error callback", errText);
+            errorCallback(easyrtc.errCodes.MEDIA_ERR, easyrtc.format(easyrtc.getConstantString("gumFailed"), errText));
         }
         easyrtc.localStream = null;
         easyrtc.haveAudioVideo = {
@@ -1366,7 +1396,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
         easyrtc.updateConfigurationInfo();
     };
     if (!easyrtc.audioEnabled && !easyrtc.videoEnabled) {
-        onUserMediaError("At least one of audio and video must be provided");
+        onUserMediaError(easyrtc.getConstantString("requireAudioOrVideo"));
         return;
     }
 
@@ -1401,22 +1431,12 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
             }
         }
 
-        function tryAgain2(e) {
-            console.log("Trying getUserMedia a second time");
-            try {
-                getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
-            }
-            catch (e) {
-                onUserMediaError(e);
-            }
-        }
-
         setTimeout(function() {
             try {
                 firstCallTime = getCurrentTime();
                 getUserMedia(mode, onUserMediaSuccess, tryAgain);
             } catch (e) {
-                setTimeout(tryAgain2, 2500);
+                tryAgain(e);
             }
         }, 1000);
     }
@@ -1648,7 +1668,7 @@ easyrtc.setUsername = function(username) {
         return true;
     }
     else {
-        easyrtc.showError(easyrtc.errCodes.BAD_NAME, easyrtc.format(easyrtc.constantStrings.badUserName, username));
+        easyrtc.showError(easyrtc.errCodes.BAD_NAME, easyrtc.format(easyrtc.getConstantString("badUserName"), username));
         return false;
     }
 };
@@ -1764,7 +1784,7 @@ easyrtc._haveTracks = function(easyrtcid, checkAudio) {
     else {
         peerConnObj = easyrtc.peerConns[easyrtcid];
         if (!peerConnObj) {
-            console.error("Programmer error: haveTracks called about a peer you don't have a connection to");
+            console.error("Developer error: haveTracks called about a peer you don't have a connection to");
             return false;
         }
         stream = peerConnObj.stream;
@@ -2620,7 +2640,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         }
         else if (easyrtc.videoEnabled || easyrtc.audioEnabled) {
             if (easyrtc.localStream === null) {
-                message = "Application program error: attempt to share audio or video before calling easyrtc.initMediaSource.";
+                message = "Developer error: attempt to share audio or video before calling easyrtc.initMediaSource.";
                 if (easyrtc.debugPrinter) {
                     easyrtc.debugPrinter(message);
                 }
@@ -2802,7 +2822,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                         doAnswer(caller, msgData);
                     },
                     function(err) {
-                        easyrtc.showError(easyrtc.errCodes.MEDIA_ERR, easyrtc.format(easyrtc.constantStrings.localMediaError, err));
+                        easyrtc.showError(easyrtc.errCodes.MEDIA_ERR, easyrtc.format(easyrtc.getConstantString("localMediaError"), err));
                     });
             return;
         }
@@ -3202,7 +3222,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
     };
 
     if (!window.io) {
-        easyrtc.onError("Your HTML has not included the socket.io.js library");
+        easyrtc.showError("Developer error", "Your HTML has not included the socket.io.js library");
     }
 
     function connectToWSServer(successCallback, errorCallback) {
@@ -3234,7 +3254,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             function handleErrorEvent() {
                 if (easyrtc.myEasyrtcid) {
                     if (easyrtc.webSocket.socket.connected) {
-                        easyrtc.showError(easyrtc.errCodes.SIGNAL_ERROR, easyrtc.constantStrings.miscSignalError);
+                        easyrtc.showError(easyrtc.errCodes.SIGNAL_ERROR, easyrtc.getConstantString("miscSignalError"));
                     }
                     else {
                         /* socket server went down. this will generate a 'disconnect' event as well, so skip this event */
@@ -3242,7 +3262,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     }
                 }
                 else {
-                    errorCallback(easyrtc.errCodes.CONNECT_ERR, easyrtc.constantStrings.noServer);
+                    errorCallback(easyrtc.errCodes.CONNECT_ERR, easyrtc.getConstantString("noServer"));
                 }
             }
 
@@ -3252,7 +3272,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
             easyrtc.webSocketConnected = true;
             if (!easyrtc.webSocket || !easyrtc.webSocket.socket || !easyrtc.webSocket.socket.sessionid) {
-                easyrtc.showError(easyrtc.errCodes.CONNECT_ERR, easyrtc.constantStrings.badsocket);
+                easyrtc.showError(easyrtc.errCodes.CONNECT_ERR, easyrtc.getConstantString("badsocket"));
             }
 
             if (easyrtc.debugPrinter) {
@@ -3262,7 +3282,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 sendAuthenticate(successCallback, errorCallback);
             }
             else {
-                errorCallback(easyrtc.errCodes.SIGNAL_ERROR, easyrtc.constantStrings.icf);
+                errorCallback(easyrtc.errCodes.SIGNAL_ERROR, easyrtc.getConstantString("icf"));
             }
         }
         );
@@ -3520,7 +3540,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     fixedItem = createIceServer(item.url, item.username, item.credential);
                 }
                 else {
-                    easyrtc.showError("badparam", "Iceserver entry doesn't have a username: " + JSON.stringify(item));
+                    easyrtc.showError("Developer error", "Iceserver entry doesn't have a username: " + JSON.stringify(item));
                 }
                 ipaddress = item.url.split(/[@:&]/g)[1];
                 easyrtc._turnServers[ipaddress] = true;
@@ -4008,11 +4028,11 @@ easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, o
                     if (gotConnectionCallback) {
                         gotConnectionCallback(false, errorText);
                     }
+                    else if (onFailure) {
+                        onFailure(easyrtc.errCodes.CONNECT_ERR, errorText);
+                    }
                     else {
                         easyrtc.showError(easyrtc.errCodes.CONNECT_ERR, errorText);
-                    }
-                    if (onFailure) {
-                        onFailure(easyrtc.errCodes.CONNECT_ERR, errorText);
                     }
                 }
                 easyrtc.connect(applicationName, nextInitializationStep, connectError);
@@ -4021,11 +4041,11 @@ easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, o
                 if (gotMediaCallback) {
                     gotMediaCallback(false, errorText);
                 }
+                else if (onFailure) {
+                    onFailure(easyrtc.errCodes.MEDIA_ERR, errorText);
+                }
                 else {
                     easyrtc.showError(easyrtc.errCodes.MEDIA_ERR, errorText);
-                }
-                if (onFailure) {
-                    onFailure(easyrtc.errCodes.MEDIA_ERR, errorText);
                 }
             }
     );
