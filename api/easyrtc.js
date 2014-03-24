@@ -55,14 +55,22 @@ easyrtc.format = function(format, arg1, arg2, arg3) {
     }
     return formatted;
 };
+
 //
-// for supporting internationalization
+// Maps a key to a language specific string using the easyrtc.constantStrings map.
+// Defaults to the key if the key can not be found, but outputs a warning in that case.
+// This function is only used internally by easyrtc.js 
 //
+/**
+ * @private
+ * @param {String} key
+ */
 easyrtc.getConstantString = function(key) {
     if (easyrtc.constantStrings[key]) {
         return easyrtc.constantStrings[key];
     }
     else {
+        console.warning("Could not find key='" + key + "' in easyrtc.constantStrings");
         return key;
     }
 };
@@ -1413,7 +1421,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
     var firstCallTime;
     if (easyrtc.videoEnabled || easyrtc.audioEnabled) {
         //
-        // getUserMedia sopm fails the first time I call it. I suspect it's a page loading
+        // getUserMedia fails the first time I call it. I suspect it's a page loading
         // issue. So I'm going to try adding a 3 second delay to allow things to settle down first.
         // In addition, I'm going to try again after 3 seconds.
         //
@@ -3209,7 +3217,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 clearQueuedMessages(caller);
                 break;
             case "error":
-                easyrtc.showError(msg.errorCode, msg.errorText);
+                easyrtc.showError(msg.errCode, msg.errText);
                 break;
             default:
                 console.error("received unknown message type from server, msgType is " + msgType);
@@ -3570,7 +3578,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                         processIceConfig(ackmsg.msgData.iceConfig);
                     }
                     else {
-                        easyrtc.showError(ackmsg.msgData.errorCode, ackmsg.msgData.errorText);
+                        easyrtc.showError(ackmsg.msgData.errCode, ackmsg.msgData.errText);
                     }
                 }
         );
@@ -3654,7 +3662,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         function(msg) {
             var room;
             if (msg.msgType === "error") {
-                errorCallback(msg.msgData.errorCode, msg.msgData.errorText);
+                errorCallback(msg.msgData.errCode, msg.msgData.errorText);
                 easyrtc.roomJoin = {};
             }
             else {
@@ -4037,7 +4045,7 @@ easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, o
                 }
                 easyrtc.connect(applicationName, nextInitializationStep, connectError);
             },
-            function(errorcode, errorText) {
+            function(errorCode, errorText) {
                 if (gotMediaCallback) {
                     gotMediaCallback(false, errorText);
                 }
