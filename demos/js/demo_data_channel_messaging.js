@@ -123,9 +123,9 @@ function startCall(otherEasyrtcid) {
                         connectList[otherEasyrtcid] = true;
                     }
                 },
-                function(errText) {
+                function(errorCode, errorText) {
                     connectList[otherEasyrtcid] = false;
-                    easyrtc.showError("CALL-FAILURE", errText);
+                    easyrtc.showError(errorCode, errorText);
                 },
                 function(wasAccepted) {
                     // console.log("was accepted=" + wasAccepted);

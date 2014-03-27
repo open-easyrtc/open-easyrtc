@@ -1278,6 +1278,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
     if (easyrtc.debugPrinter) {
         easyrtc.debugPrinter("about to request local media");
     }
+    
 
     if (!errorCallback) {
         errorCallback = function(errorCode, errorText) {
@@ -1288,12 +1289,13 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
             easyrtc.showError(easyrtc.errCodes.MEDIA_ERR, message);
         };
     }
-    
-    if (!window.getUserMedia) {
-        errorCallback(easyrtc.getConstantString("noWebrtcSupport"));
+
+    if( !easyrtc.supportsGetUserMedia()) {
+        errorCallback(easyrtc.errCodes.MEDIA_ERR, easyrtc.getConstantString("noWebrtcSupport"));
+        return;
     }
 
-
+    
 
     if (!successCallback) {
         easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, 
@@ -2317,6 +2319,11 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     " video=" + easyrtc.videoEnabled +
                     " data=" + easyrtc.dataEnabled);
         }
+        
+        if( !easyrtc.supportsPeerConnections()) {
+            callFailureCB(easyrtc.errCodes.CALL_ERR, easyrtc.getConstantString("noWebrtcSupport"));
+            return;
+        }
 
         var i, message;
         //
@@ -3058,6 +3065,11 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     easyrtc.debugPrinter("offer accept=" + wasAccepted);
                 }
                 delete easyrtc.offersPending[caller];
+                if( !easyrtc.supportsPeerConnections()) {
+                    callFailureCB(easyrtc.errCodes.CALL_ERR, easyrtc.getConstantString("noWebrtcSupport"));
+                    return;
+                }
+
                 if (wasAccepted) {
                     doAnswer(caller, msgData);
                     flushCachedCandidates(caller);
@@ -4199,6 +4211,11 @@ if (navigator.mozGetUserMedia) {
     console.log("Browser does not appear to be WebRTC-capable");
 }
 
+if( !window.createIceServer ) {
+    window.createIceServer = function(url, username, credential) {
+       return {'url': url, 'credential': credential, 'username': username}; 
+    };
+}
 
 /** @private */
 easyrtc.isMozilla = (webrtcDetectedBrowser === "firefox");
