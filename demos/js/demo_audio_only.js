@@ -38,6 +38,7 @@ function enable(domId) {
 function connect() {
     console.log("Initializing.");
     easyrtc.enableVideo(false);
+    easyrtc.enableVideoReceive(false);
     easyrtc.setRoomOccupantListener(convertListToButtons);
     easyrtc.initMediaSource(
         function(){        // success callback

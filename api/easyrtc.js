@@ -1278,6 +1278,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
     if (easyrtc.debugPrinter) {
         easyrtc.debugPrinter("about to request local media");
     }
+    
 
     if (!errorCallback) {
         errorCallback = function(errorCode, errorText) {
@@ -1288,12 +1289,13 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
             easyrtc.showError(easyrtc.errCodes.MEDIA_ERR, message);
         };
     }
-    
-    if (!window.getUserMedia) {
-        errorCallback(easyrtc.getConstantString("noWebrtcSupport"));
+
+    if( !easyrtc.supportsGetUserMedia()) {
+        errorCallback(easyrtc.errCodes.MEDIA_ERR, easyrtc.getConstantString("noWebrtcSupport"));
+        return;
     }
 
-
+    
 
     if (!successCallback) {
         easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, 
@@ -1421,7 +1423,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
     var firstCallTime;
     if (easyrtc.videoEnabled || easyrtc.audioEnabled) {
         //
-        // getUserMedia fails the first time I call it. I suspect it's a page loading
+        // getUserMedia sopm fails the first time I call it. I suspect it's a page loading
         // issue. So I'm going to try adding a 3 second delay to allow things to settle down first.
         // In addition, I'm going to try again after 3 seconds.
         //
@@ -2317,6 +2319,11 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     " video=" + easyrtc.videoEnabled +
                     " data=" + easyrtc.dataEnabled);
         }
+        
+        if( !easyrtc.supportsPeerConnections()) {
+            callFailureCB(easyrtc.errCodes.CALL_ERR, easyrtc.getConstantString("noWebrtcSupport"));
+            return;
+        }
 
         var i, message;
         //
@@ -3058,6 +3065,11 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     easyrtc.debugPrinter("offer accept=" + wasAccepted);
                 }
                 delete easyrtc.offersPending[caller];
+                if( !easyrtc.supportsPeerConnections()) {
+                    callFailureCB(easyrtc.errCodes.CALL_ERR, easyrtc.getConstantString("noWebrtcSupport"));
+                    return;
+                }
+
                 if (wasAccepted) {
                     doAnswer(caller, msgData);
                     flushCachedCandidates(caller);
@@ -3217,7 +3229,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 clearQueuedMessages(caller);
                 break;
             case "error":
-                easyrtc.showError(msg.errCode, msg.errText);
+                easyrtc.showError(msg.errorCode, msg.errorText);
                 break;
             default:
                 console.error("received unknown message type from server, msgType is " + msgType);
@@ -3578,7 +3590,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                         processIceConfig(ackmsg.msgData.iceConfig);
                     }
                     else {
-                        easyrtc.showError(ackmsg.msgData.errCode, ackmsg.msgData.errText);
+                        easyrtc.showError(ackmsg.msgData.errorCode, ackmsg.msgData.errorText);
                     }
                 }
         );
@@ -3662,7 +3674,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         function(msg) {
             var room;
             if (msg.msgType === "error") {
-                errorCallback(msg.msgData.errCode, msg.msgData.errorText);
+                errorCallback(msg.msgData.errorCode, msg.msgData.errorText);
                 easyrtc.roomJoin = {};
             }
             else {
@@ -4045,7 +4057,7 @@ easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, o
                 }
                 easyrtc.connect(applicationName, nextInitializationStep, connectError);
             },
-            function(errorCode, errorText) {
+            function(errorcode, errorText) {
                 if (gotMediaCallback) {
                     gotMediaCallback(false, errorText);
                 }
@@ -4199,6 +4211,11 @@ if (navigator.mozGetUserMedia) {
     console.log("Browser does not appear to be WebRTC-capable");
 }
 
+if( !window.createIceServer ) {
+    window.createIceServer = function(url, username, credential) {
+       return {'url': url, 'credential': credential, 'username': username}; 
+    };
+}
 
 /** @private */
 easyrtc.isMozilla = (webrtcDetectedBrowser === "firefox");
