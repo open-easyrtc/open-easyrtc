@@ -39,6 +39,7 @@ function connect() {
     easyrtc.enableDebug(false);
     console.log("Initializing.");
     easyrtc.enableAudio(false);
+    easyrtc.enableAudioReceive(false);
     easyrtc.setRoomOccupantListener(convertListToButtons);
     easyrtc.initMediaSource(
         function(){        // success callback
