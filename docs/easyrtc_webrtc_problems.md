@@ -7,7 +7,7 @@ Many of these issues are general WebRTC or browser issues and not specific to Ea
 No Self Video
 -------------
 
- - Ensure no other program is using the camera
+ - Ensure no other program is using the camera (such as another brand of browser: Chrome and Firefox can't share a single camera on Windows).
  - Test camera in another application (such as Skype or WebEx)
  - Completely close the browser then reopen it.
  - Shutdown / reset camera and computer. Some cameras seem to freeze up (even Apple ones).
@@ -67,6 +67,7 @@ Sound Quality
  - Reduce video resolution to allow more bandwidth for audio
  - Feedback?
    - Especially common with laptops and tablets.
+   - Don't run two clients in the same physical room (sound from the speaker on one computer enters the microphone of the other computer).
    - Reduce the speaker volume.
    - Use a headset.
    - Use a conference microphone/speaker with built-in noise cancelling.
@@ -75,6 +76,23 @@ Sound Quality
 
 If You Run Into Problems
 ------------------------
-Please feel free to post on our discussion forum:
+We have a dicussion forum you can find at:
 
  - [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
+
+Note, if you are having trouble getting the demos to work on your own machine, here is a suite of easy tests for you to try before posting to our discussion forum.
+
+Which of the following tests work when you point your browsers at [http://demo.easyrtc.com/demos/demo_audio_video_simple.html] (http://demo.easyrtc.com/demos/demo_audio_video_simple.html)
+1. Two instances running on the same client computer (ie, two different windows or tabs on the same browser). This test verifies that your browser/hardware is capable of WebRTC.
+2. Two instances, each running on a different computer on the same subnet. 
+3. Two computers on different subnets.
+
+Which of the following tests work when you point your browsers at demo_audio_video_simple.html on your own instance of easyrtc?
+1. Two instances running on the same client computer (ie, two different windows or tabs on the same browser). If this test fails, your server probably isn't letting through websocket communication.
+2. Two instances, each running on a different computer on the same subnet. 
+3. Two computers on different subnets. If this is the only test that fails, then you need a TURN server because you are dealing with a tight firewall or a router enforcing symmetric NAT.
+
+
+
+
+
