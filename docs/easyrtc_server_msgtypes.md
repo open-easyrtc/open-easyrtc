@@ -311,7 +311,6 @@ Initiates an authenticated EasyRTC application. Note this may be sent multiple t
 **msgData Fields:**
 
  - **easyrtcid** (required)
- - **easyrtcsid** (if available)
  - **field** (optional - map of connection fields)
    - **fieldName**
    - **fieldValue**
