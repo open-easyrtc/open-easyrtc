@@ -180,6 +180,8 @@ easyrtc.localStream = null;
 easyrtc.videoFeatures = true; // default video
 easyrtc.audioFeatures = true; // default audio
 
+easyrtc.sessionFields = [];
+
 easyrtc.mediaConstraints = {
     'mandatory': {
         'OfferToReceiveAudio': true,
@@ -742,7 +744,7 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
         });
     }
     else {
-        callback({"statistics": easyrtc.getConstantString("statsNotSupported") });
+        callback({"statistics": easyrtc.getConstantString("statsNotSupported")});
     }
 };
 
@@ -1278,7 +1280,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
     if (easyrtc.debugPrinter) {
         easyrtc.debugPrinter("about to request local media");
     }
-    
+
 
     if (!errorCallback) {
         errorCallback = function(errorCode, errorText) {
@@ -1290,16 +1292,16 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
         };
     }
 
-    if( !easyrtc.supportsGetUserMedia()) {
+    if (!easyrtc.supportsGetUserMedia()) {
         errorCallback(easyrtc.errCodes.MEDIA_ERR, easyrtc.getConstantString("noWebrtcSupport"));
         return;
     }
 
-    
+
 
     if (!successCallback) {
-        easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, 
-            "easyrtc.initMediaSource not supplied a successCallback");
+        easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR,
+                "easyrtc.initMediaSource not supplied a successCallback");
         return;
     }
 
@@ -1343,8 +1345,8 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
                                     easyrtc.nativeVideoWidth !== easyrtc.videoFeatures.mandatory.minWidth)) {
                         easyrtc.showError(easyrtc.errCodes.MEDIA_WARNING,
                                 easyrtc.format(easyrtc.getConstantString("resolutionWarning"),
-                                easyrtc.videoFeatures.mandatory.minWidth, easyrtc.videoFeatures.mandatory.minHeight,
-                                easyrtc.nativeVideoWidth, easyrtc.nativeVideoHeight));
+                                        easyrtc.videoFeatures.mandatory.minWidth, easyrtc.videoFeatures.mandatory.minHeight,
+                                        easyrtc.nativeVideoWidth, easyrtc.nativeVideoHeight));
                     }
                     easyrtc.setVideoObjectSrc(videoObj, "");
                     if (videoObj.removeNode) {
@@ -1385,10 +1387,10 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
             easyrtc.debugPrinter("failed to get local media");
         }
         var errText;
-        if( typeof error == 'string') {
+        if (typeof error == 'string') {
             errText = error;
         }
-        else if( error.name) {
+        else if (error.name) {
             errText = error.name;
         }
         else {
@@ -2319,8 +2321,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     " video=" + easyrtc.videoEnabled +
                     " data=" + easyrtc.dataEnabled);
         }
-        
-        if( !easyrtc.supportsPeerConnections()) {
+
+        if (!easyrtc.supportsPeerConnections()) {
             callFailureCB(easyrtc.errCodes.CALL_ERR, easyrtc.getConstantString("noWebrtcSupport"));
             return;
         }
@@ -2472,12 +2474,12 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
         var sawAConnection = false,
                 onHangupSucess = function() {
-        },
+                },
                 onHangupFailure = function(errorCode, errorText) {
-            if (easyrtc.debugPrinter) {
-                easyrtc.debugPrinter("hangup failed:" + errorText);
-            }
-        };
+                    if (easyrtc.debugPrinter) {
+                        easyrtc.debugPrinter("hangup failed:" + errorText);
+                    }
+                };
 
         for (var otherUser in easyrtc.peerConns) {
 
@@ -3065,7 +3067,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     easyrtc.debugPrinter("offer accept=" + wasAccepted);
                 }
                 delete easyrtc.offersPending[caller];
-                if( !easyrtc.supportsPeerConnections()) {
+                if (!easyrtc.supportsPeerConnections()) {
                     callFailureCB(easyrtc.errCodes.CALL_ERR, easyrtc.getConstantString("noWebrtcSupport"));
                     return;
                 }
@@ -3480,11 +3482,13 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         }
     };
     function processSessionData(sessionData) {
-        if (sessionData.easyrtcsid) {
-            easyrtc.easyrtcsid = sessionData.easyrtcsid;
-        }
-        if (sessionData.field) {
-            easyrtc.sessionFields = sessionData.field;
+        if (sessionData) {
+            if (sessionData.easyrtcsid) {
+                easyrtc.easyrtcsid = sessionData.easyrtcsid;
+            }
+            if (sessionData.field) {
+                easyrtc.sessionFields = sessionData.field;
+            }
         }
     }
 
@@ -3498,9 +3502,6 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         var id, removeId;
         for (roomname in easyrtc.roomData) {
             if (roomData[roomname].roomStatus === "join") {
-                if (easyrtc.roomEntryListener) {
-                    easyrtc.roomEntryListener(true, roomname);
-                }
                 if (!(easyrtc.roomJoin[roomname])) {
                     easyrtc.roomJoin[roomname] = roomData[roomname];
                 }
@@ -3535,6 +3536,11 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             }
             if (easyrtc.roomJoin[roomname] && roomData[roomname].field) {
                 easyrtc.fields.rooms[roomname] = roomData[roomname].field;
+            }
+            if (roomData[roomname].roomStatus === "join") {
+                if (easyrtc.roomEntryListener) {
+                    easyrtc.roomEntryListener(true, roomname);
+                }
             }
             processOccupantList(roomname, easyrtc.lastLoggedInList[roomname]);
         }
@@ -4211,9 +4217,9 @@ if (navigator.mozGetUserMedia) {
     console.log("Browser does not appear to be WebRTC-capable");
 }
 
-if( !window.createIceServer ) {
+if (!window.createIceServer) {
     window.createIceServer = function(url, username, credential) {
-       return {'url': url, 'credential': credential, 'username': username}; 
+        return {'url': url, 'credential': credential, 'username': username};
     };
 }
 
