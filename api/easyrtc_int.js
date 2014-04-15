@@ -3528,7 +3528,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     }
                 }
                 stuffToRemove = roomData[roomname].clientListDelta.removeClient;
-                if (stuffToRemove) {
+                if (stuffToRemove && easyrtc.lastLoggedInList[roomname]) {
                     for (removeId in stuffToRemove) {
                         delete easyrtc.lastLoggedInList[roomname][removeId];
                     }
