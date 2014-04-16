@@ -36,7 +36,7 @@
  */
 
 
-var easyrtc = {};
+window.easyrtc = window.easyrtc || {};
 /**
  * This function performs a printf like formatting. It actually takes an unlimited
  * number of arguments, the declared arguments arg1, arg2, arg3 are present just for
@@ -3041,7 +3041,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     candidate: msgData.candidate
                 });
             }
-            pc = easyrtc.peerConns[caller].pc;
+            pc = easyrtc.peerConns[caller].pc;       
             pc.addIceCandidate(candidate);
 
             if (msgData.candidate.indexOf("typ relay") > 0) {
