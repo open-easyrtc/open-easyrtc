@@ -1,4 +1,4 @@
-
+window.easyrtc = window.easyrtc || {};
 easyrtc.constantStrings = {
   "unableToEnterRoom":"Unable to enter room {0} because {1}" ,
   "resolutionWarning": "Requested video size of {0}x{1} but got size of {2}x{3}",
