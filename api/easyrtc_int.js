@@ -1532,7 +1532,7 @@ easyrtc.setCallCancelled = function(callCancelled) {
 easyrtc.setOnStreamClosed = function(onStreamClosed) {
     easyrtc.onStreamClosed = onStreamClosed;
 };
-/**
+/** @deprecated No longer supported by Google.
  * Sets the bandwidth for sending video data.
  * Setting the rate too low will cause connection attempts to fail. 40 is probably good lower limit.
  * The default is 50. A value of zero will remove bandwidth limits.
@@ -1541,15 +1541,7 @@ easyrtc.setOnStreamClosed = function(onStreamClosed) {
  *    easyrtc.setVideoBandwidth( 40);
  */
 easyrtc.setVideoBandwidth = function(kbitsPerSecond) {
-    if (easyrtc.debugPrinter) {
-        easyrtc.debugPrinter("video bandwidth set to " + kbitsPerSecond + " kbps");
-    }
-    if (kbitsPerSecond > 0) {
-        easyrtc.videoBandwidthString = "b=AS:" + kbitsPerSecond;
-    }
-    else {
-        easyrtc.videoBandwidthString = "";
-    }
+    easyrtc.showError("easyrtc.setVideoBandwidth is deprecated, it no longer has an effect.");
 };
 
 /** Determines whether the current browser supports the new data channels.
@@ -3041,7 +3033,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     candidate: msgData.candidate
                 });
             }
-            pc = easyrtc.peerConns[caller].pc;       
+            pc = easyrtc.peerConns[caller].pc;
             pc.addIceCandidate(candidate);
 
             if (msgData.candidate.indexOf("typ relay") > 0) {
@@ -4095,6 +4087,16 @@ if (navigator.mozGetUserMedia) {
     webrtcDetectedBrowser = "firefox";
     webrtcDetectedVersion =
             parseInt(navigator.userAgent.match(/Firefox\/([0-9]+)\./)[1]);
+
+    //
+    // better version detection for gecko based browsers provided by
+    // Kévin Poulet.
+    //
+    var matches = navigator.userAgent.match(/\srv:([0-9]+)\./);
+    if (matches !== null && matches.length > 1) {
+        webrtcDetectedVersion = parseInt(matches[1]);
+    }
+    
     // The RTCPeerConnection object.
     window.RTCPeerConnection = mozRTCPeerConnection;
     // The RTCSessionDescription object.
