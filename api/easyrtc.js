@@ -612,15 +612,10 @@ var count = 0;
 easyrtc.getPeerStatistics = function(peerId, callback, filter) {
     count++;
 
-    if (!easyrtc.peerConns[peerId]) {
-        callback({"notConnected": peerId});
-    }
-    else if (easyrtc.peerConns[peerId].pc.getStats) {
-
-        easyrtc.peerConns[peerId].pc.getStats(function(stats) {
+    function reportHandler(stats) {
 
             var localStats = {};
-            var part, parts = stats.result();
+            var part, parts;
             var i, j;
             var itemKeys;
             var itemKey;
@@ -634,7 +629,24 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
             var turnAddress = null;
             var hasActive, curReceived;
             var localAddress, remoteAddress;
-
+            
+            if( easyrtc.isMozilla ) {
+                if( !filter ) {
+                    stats.forEach(function(record){
+                        var firstSet = record[0];
+                        var id = firstSet.id;
+                        for( itemKey in firstSet ) {
+                            if( itemKey !== id ) {
+                                localStats[id + "." + itemKey] = firstSet[itemKey];
+                            }
+                        }
+                    });
+                }
+                else {
+                }
+            }
+            
+            parts = stats.result();
             if (!filter) {
                 for (i = 0; i < parts.length; i++) {
                     names = parts[i].names();
@@ -741,7 +753,28 @@ easyrtc.getPeerStatistics = function(peerId, callback, filter) {
                 localStats.remoteAddress = turnAddress;
             }
             callback(peerId, localStats);
-        });
+        }
+        
+    if (!easyrtc.peerConns[peerId]) {
+        callback({"notConnected": peerId});
+    }
+    else if (easyrtc.peerConns[peerId].pc.getStats) {
+        //
+        // mozilla use the prototype  (mediatrack, callback)
+        // while google uses (callback)
+        //
+        
+        if( easyrtc.isMozilla ) {
+            /*
+            easyrtc.peerConns[peerId].pc.getStats(null, reportHandler, function() {
+                console.log("error handler of getStats invoked");
+            });
+            */
+        }
+        else {
+            easyrtc.peerConns[peerId].pc.getStats(reportHandler);
+        }
+        
     }
     else {
         callback({"statistics": easyrtc.getConstantString("statsNotSupported")});
@@ -2586,8 +2619,16 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                     // turn server. The \d symbol in the regular expression matches a number.
                     // 
                     if (event.candidate.candidate.indexOf("typ relay") > 0) {
-                        var ipaddress = event.candidate.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/)[2];
-                        easyrtc._turnServers[ipaddress] = true;
+                        var ipreg = /(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/i;
+                        var matches = event.candidate.candidate.match(ipreg);
+                        var ipaddress;
+                        if( matches.length >= 3 ) {
+                            var ipaddress = matches[2];
+                            easyrtc._turnServers[ipaddress] = true;
+                        }
+                        else {
+                            console.log("didn't see udp num ipaddress in string " + event.candidate.candidate);
+                        }
                     }
 
                     if (easyrtc.peerConns[otherUser].startedAV) {
@@ -3045,7 +3086,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             pc.addIceCandidate(candidate);
 
             if (msgData.candidate.indexOf("typ relay") > 0) {
-                var ipaddress = msgData.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/)[1];
+                var ipaddress = msgData.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/i)[1];
                 easyrtc._turnServers[ipaddress] = true;
             }
         };
