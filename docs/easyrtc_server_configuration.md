@@ -160,6 +160,7 @@ Available Server Options
    - Defaults to: true
  - **demosPublicFolder**
    - Demos public folder without trailing slash.
+   - This sets the public URL where where demos are hosted, such as http://yourdomain/demos/
    - Defaults to: "/demos"
 
 
