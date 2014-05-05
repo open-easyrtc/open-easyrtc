@@ -35,9 +35,7 @@ The following server.js code snippet includes three ways of setting EasyRTC opti
 
     // Setup and configure Express http server. Expect a subfolder called "static" to be the web root.
     var httpApp = express();
-    httpApp.configure(function() {
-        httpApp.use(express.static(__dirname + "/static/"));
-    });
+    httpApp.use(express.static(__dirname + "/static/"));
 
     var webServer = http.createServer(httpApp).listen(8080);
     var socketServer = io.listen(webServer);
