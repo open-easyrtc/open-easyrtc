@@ -169,7 +169,7 @@ Leaves a room. Upon leaving a room, the API should remove all room info (incl. c
 
 ### msgType - 'setRoomApiField'
 
-Sets the apiField value for a connection. This apiField is sent to all other connections in the roomData. It is important to realize that this field is not unique to a room. Upon receiving 
+Sets the apiField value for a connection. This apiField is sent to all other connections in the roomData. It is important to realize that this field is not unique to a room. Upon receiving an empty string, the field is removed.
 
 **Fields:**
  - **msgData** (required)

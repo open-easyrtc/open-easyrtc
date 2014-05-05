@@ -3048,7 +3048,10 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
         };
     };
 
+
+
     function processConnectedList(connectedList) {
+<<<<<<< HEAD
         var i;
         for (i in easyrtc.peerConns) {
             if( !easyrtc.peerConns.hasOwnProperty(i)) {
@@ -3058,10 +3061,31 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
                 if (easyrtc.peerConns[i].startedAV) {
                     onRemoteHangup(i);
                     clearQueuedMessages(i);
+=======
+        var id, someRoom;
+        for (id in easyrtc.peerConns) {
+            if (typeof connectedList[id] === 'undefined' && easyrtc.peerConns[id].startedAV) {
+                //
+                // check to see the person is still in at least one room. If not, we'll hangup
+                // on them. This isn't the correct behavior, but it's the best we can do without
+		// changes to the server.
+                //
+                var foundInARoom = false;
+		for(someRoom in easyrtc.lastLoggedInList ) {
+                  if( easyrtc.lastLoggedInList[someRoom][id] ) {
+                      foundInARoom = true;
+	          }
+
+                  if (!foundInARoom) {
+                      onRemoteHangup(id);
+                      clearQueuedMessages(id);
+                  }
+>>>>>>> ef9f0aa096aa4f5f2ddd82b9f77b46637e4bb1dc
                 }
             }
         }
     }
+
 
     function processOccupantList(roomName, list) {
         var myInfo = null;
@@ -4236,7 +4260,7 @@ if (navigator.mozGetUserMedia) {
 
     //
     // better version detection for gecko based browsers provided by
-    // KÃ©vin Poulet.
+    // Kévin Poulet.
     //
     var matches = navigator.userAgent.match(/\srv:([0-9]+)\./);
     if (matches !== null && matches.length > 1) {
