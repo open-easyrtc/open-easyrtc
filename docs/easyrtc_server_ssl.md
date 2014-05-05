@@ -38,10 +38,8 @@ Example server.js file using SSL:
     
     // Setup and configure Express http server. Expect a subfolder called "static" to be the web root.
     var httpApp = express();
-    httpApp.configure(function() {
-        httpApp.use(express.static(__dirname + "/static/"));
-    });
-    
+    httpApp.use(express.static(__dirname + "/static/"));
+
     // Start Express https server on port 8443
     var webServer = https.createServer(
     {
