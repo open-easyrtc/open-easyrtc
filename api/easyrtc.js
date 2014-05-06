@@ -210,7 +210,13 @@ easyrtc.enableVideoReceive = function(value) {
 /**
  * Gets a list of the available video sources (ie, cameras)
  * @param {Function} callback receives list of {facing:String, label:String, id:String, kind:"video"}
- * Note: the label string alway seems to be the empty string.
+ * Note: the label string alway seems to be the empty string if you aren't using https.
+ * @example  easyrtc.getVideoSourceList( function(list) {
+ *               var i;
+ *               for( i = 0; i < list.length; i++ ) {
+ *                   console.log("label=" + list[i].label + ", id= " + list[i].id);
+ *               }
+ *          });
  */
 easyrtc.getVideoSourceList = function( callback) {
     MediaStreamTrack.getSources(function(sources){
@@ -395,8 +401,9 @@ easyrtc._desiredVideoProperties = {}; // default camera
 
 
 /**
- * Specify particular video source.
- * @param {String}videoSrcId is a id value from one of the entries fetched by getVideoSrcList. null for default.
+ * Specify particular video source. Call this before you call easyrtc.initLocalMedia().
+ * @param {String}videoSrcId is a id value from one of the entries fetched by getVideoSourceList. null for default.
+ * @example easyrtc.setVideoSrc( videoSrcId);
  */
 easyrtc.setVideoSrc = function(videoSrcId){
     easyrtc._desiredVideoProperties.videoSrcId = videoSrcId;
@@ -1567,6 +1574,20 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
     }
 
     var firstCallTime;
+
+    function tryAgain(error) {
+        var currentTime = getCurrentTime();
+        if (currentTime < firstCallTime + 1000) {
+            console.log("Trying getUserMedia a second time");
+            setTimeout(function() {
+                getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
+            }, 3000);
+        }
+        else {
+            onUserMediaError(error);
+        }
+    }
+
     if (easyrtc.videoEnabled || easyrtc.audioEnabled) {
         //
         // getUserMedia sometimes fails the first time I call it. I suspect it's a page loading
@@ -1574,18 +1595,7 @@ easyrtc.initMediaSource = function(successCallback, errorCallback) {
         // In addition, I'm going to try again after 3 seconds.
         //
 
-        function tryAgain(error) {
-            var currentTime = getCurrentTime();
-            if (currentTime < firstCallTime + 1000) {
-                console.log("Trying getUserMedia a second time");
-                setTimeout(function() {
-                    getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
-                }, 3000);
-            }
-            else {
-                onUserMediaError(error);
-            }
-        }
+
 
         setTimeout(function() {
             try {
@@ -2326,7 +2336,8 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             }
             else {
                 if (successCB) {
-                    successCB(response.msgType, response.msgData);
+                    // firefox complains if you pass an undefined as an parameter.
+                    successCB(response.msgType, response.msgData?response.msgData:null);
                 }
             }
         }
@@ -2360,7 +2371,7 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
             }
             else {
                 if (successCB) {
-                    successCB(response.msgType, response.msgData);
+                    successCB(response.msgType, response.msgData?response.msgData:null);
                 }
             }
         }
@@ -3184,10 +3195,6 @@ easyrtc.connect = function(applicationName, successCallback, errorCallback) {
 
     var onChannelCmd = function(msg, ackAcceptorFn) {
 
-        if (easyrtc.debugPrinter) {
-            easyrtc.debugPrinter("received message from socket server=" + JSON.stringify(msg));
-        }
-
         var caller = msg.senderEasyrtcid;
         var msgType = msg.msgType;
         var msgData = msg.msgData;
@@ -3996,7 +4003,7 @@ easyrtc.easyAppBody = function(monitorVideoId, videoIds) {
     }
 
     function videoIsFree(obj) {
-        return (obj.caller === "" || obj.caller === null || obj.caller === undefined);
+        return (obj.dataset.caller === "" || obj.dataset.caller === null || obj.dataset.caller === undefined);
     }
 
     if (!easyrtc._validateVideoIds(monitorVideoId, videoIdsP)) {
@@ -4049,7 +4056,8 @@ easyrtc.easyAppBody = function(monitorVideoId, videoIds) {
         if (i < 0 || i > videoIdsP.length) {
             return null;
         }
-        return getIthVideo(i).caller;
+        var vid = getIthVideo(i);
+        return vid.dataset.caller;
     };
     easyrtc.getSlotOfCaller = function(easyrtcid) {
         var i;
@@ -4070,9 +4078,9 @@ easyrtc.easyAppBody = function(monitorVideoId, videoIds) {
         var i;
         for (i = 0; i < numPEOPLE; i++) {
             var video = getIthVideo(i);
-            if (video.caller === caller) {
+            if (video.dataset.caller === caller) {
                 hideVideo(video);
-                video.caller = "";
+                video.dataset.caller = "";
                 if (onHangup) {
                     onHangup(caller, i);
                 }
@@ -4119,7 +4127,7 @@ easyrtc.easyAppBody = function(monitorVideoId, videoIds) {
         }
         for (i = 0; i < numPEOPLE; i++) {
             video = getIthVideo(i);
-            if (video.caller === caller) {
+            if (video.dataset.caller === caller) {
                 showVideo(video, stream);
                 if (onCall) {
                     onCall(caller, i);
@@ -4130,8 +4138,8 @@ easyrtc.easyAppBody = function(monitorVideoId, videoIds) {
 
         for (i = 0; i < numPEOPLE; i++) {
             video = getIthVideo(i);
-            if (!video.caller || videoIsFree(video)) {
-                video.caller = caller;
+            if (!video.dataset.caller || videoIsFree(video)) {
+                video.dataset.caller = caller;
                 if (onCall) {
                     onCall(caller, i);
                 }
@@ -4144,13 +4152,13 @@ easyrtc.easyAppBody = function(monitorVideoId, videoIds) {
 //
         video = getIthVideo(0);
         if (video) {
-            easyrtc.hangup(video.caller);
+            easyrtc.hangup(video.dataset.caller);
             showVideo(video, stream);
             if (onCall) {
                 onCall(caller, 0);
             }
         }
-        video.caller = caller;
+        video.dataset.caller = caller;
     });
 
     (function() {
@@ -4159,14 +4167,14 @@ easyrtc.easyAppBody = function(monitorVideoId, videoIds) {
 
             addControls = function (video) {
                 parentDiv = video.parentNode;
-                video.caller = "";
+                video.dataset.caller = "";
                 closeButton = document.createElement("div");
                 closeButton.className = "easyrtc_closeButton";
                 closeButton.onclick = function () {
-                    if (video.caller) {
-                        easyrtc.hangup(video.caller);
+                    if (video.dataset.caller) {
+                        easyrtc.hangup(video.dataset.caller);
                         hideVideo(video);
-                        video.caller = "";
+                        video.dataset.caller = "";
                     }
                 };
                 parentDiv.appendChild(closeButton);

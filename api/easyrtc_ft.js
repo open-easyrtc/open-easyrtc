@@ -631,6 +631,9 @@ easyrtc_ft.saveAs = (function() {
                     if (filesaver.readyState !== filesaver.DONE) {
                         return func.apply(this, arguments);
                     }
+                    else {
+                        return null;
+                    }
                 };
             }
             , create_if_not_found = {create: true, exclusive: false}
