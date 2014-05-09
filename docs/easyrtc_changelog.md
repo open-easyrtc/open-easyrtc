@@ -1,5 +1,21 @@
 EasyRTC: Change Log
 ===================
+v1.0.11
+-------
+New Features:
+   - API - New function getVideoSourceList to get the list of video sources (cameras).
+   - API - New function setVideoSource to set the video source before calling initLocalMedia.
+
+Changes:
+   - API - Redid getStatistics support for Firefox.
+
+Fixes:
+   - API - Fixed a bug in which entering a new room would cause you to drop any calls you had. The fix isn't perfect, leaving all rooms will still drop any calls you have.
+   - API - RoomJoinListener fires after storing updated data rather than before.
+   - API - Made candidate regexp matching case insensitive to support Firefox better.
+   - API - Better version number detection for Gecko not-Firefox browser userAgent strings.
+   - API - A number of minor code and documentation fixes/changes to minimize warnings from Webstorm code inspection and Firefox execution.
+
 
 v1.0.10
 -------

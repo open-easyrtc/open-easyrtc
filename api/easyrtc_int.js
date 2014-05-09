@@ -1,4 +1,4 @@
-/** @class
+﻿/** @class
  *@version 1.0.10
  *<p>
  * Provides client side support for the EasyRTC framework.
@@ -165,7 +165,7 @@ easyrtc.errCodes = {
 };
 easyrtc.apiVersion = "1.0.10";
 /** Most basic message acknowledgment object */
-easyrtc.ackMessage = {msgType: "ack", msgData: {}};
+easyrtc.ackMessage = {msgType: "ack"};
 /** Regular expression pattern for user ids. This will need modification to support non US character sets */
 easyrtc.usernameRegExp = /^(.){1,64}$/;
 /** @private */
@@ -404,10 +404,15 @@ easyrtc._desiredVideoProperties = {}; // default camera
  * @param {String}videoSrcId is a id value from one of the entries fetched by getVideoSourceList. null for default.
  * @example easyrtc.setVideoSrc( videoSrcId);
  */
-easyrtc.setVideoSrc = function (videoSrcId) {
+easyrtc.setVideoSource = function (videoSrcId) {
     easyrtc._desiredVideoProperties.videoSrcId = videoSrcId;
     delete easyrtc._desiredVideoProperties.screenCapture;
 }
+
+/**
+  * Temporary alias for easyrtc.setVideoSource
+  */
+easyrtc.setVideoSrc = easyrtc.setVideoSource;
 
 
 delete easyrtc._desiredVideoProperties.screenCapture;
