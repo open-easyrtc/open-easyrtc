@@ -424,7 +424,7 @@ In your JavaScript, add the below:
                    if( wasAccepted && easyrtc.getConnectionCount() > 0 ) {
                         easyrtc.hangupAll();
                    }
-                   cb(wasAccepted);
+                   reporterFunction(wasAccepted);
                 }
                 document.getElementById("callAcceptButton").onclick = function() { acceptTheCall(true);};
                 document.getElementById("callRejectButton").onclick =function() { acceptTheCall(false);};
