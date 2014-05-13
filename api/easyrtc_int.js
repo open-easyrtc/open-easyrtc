@@ -3102,51 +3102,89 @@ easyrtc.connect = function (applicationName, successCallback, errorCallback) {
         };
     };
 
-    function processConnectedList(connectedList) {
-        var id, someRoom;
+
+    //
+    // checks to see if a particular peer is in any room at all.
+    //
+    function isPeerInAnyRoom(id) {
+        var roomName;
+        for (roomName in easyrtc.lastLoggedInList) {
+            if (!easyrtc.lastLoggedInList.hasOwnProperty(roomName)) {
+                continue;
+            }
+            if (easyrtc.lastLoggedInList[roomName][id]) {
+                return true;
+            }
+        }
+        return false;
+    }
+    //
+    //
+    //
+    function processLostPeers(peersInRoom) {
+        var id;
+        //
+        // check to see the person is still in at least one room. If not, we'll hangup
+        // on them. This isn't the correct behavior, but it's the best we can do without
+        // changes to the server.
+        //
+
+
         for (id in easyrtc.peerConns) {
             if (easyrtc.peerConns.hasOwnProperty(id) &&
-                typeof connectedList[id] === 'undefined' &&
-                easyrtc.peerConns[id].startedAV) {
-                //
-                // check to see the person is still in at least one room. If not, we'll hangup
-                // on them. This isn't the correct behavior, but it's the best we can do without
-                // changes to the server.
-                //
-                var foundInARoom = false;
-                for (someRoom in easyrtc.lastLoggedInList) {
-                    if (!easyrtc.lastLoggedInList.hasOwnProperty(someRoom)) {
-                        continue;
-                    }
-                    if (easyrtc.lastLoggedInList[someRoom][id]) {
-                        foundInARoom = true;
-                    }
-
-                    if (!foundInARoom) {
+                typeof peersInRoom[id] === 'undefined') {
+                if (!isPeerInAnyRoom(id)) {
+                    if( easyrtc.peerConns[id].startedAV || easyrtc.peerConns[id].isInitiator) {
                         onRemoteHangup(id);
-                        clearQueuedMessages(id);
                     }
+                    delete easyrtc.offersPending[id];
+                    delete easyrtc.acceptancePending[id];
+                    clearQueuedMessages(id);
                 }
             }
         }
+
+        for( id in easyrtc.offersPending) {
+            if( easyrtc.offersPending.hasOwnProperty(id) && !isPeerInAnyRoom(id)) {
+                onRemoteHangup(id);
+                clearQueuedMessages(id);
+                delete easyrtc.offersPending[id];
+                delete easyrtc.acceptancePending[id];
+            }
+        }
+
+        for( id in easyrtc.acceptancePending) {
+            if( easyrtc.acceptancePending.hasOwnProperty(id) && !isPeerInAnyRoom(id)) {
+                onRemoteHangup(id);
+                clearQueuedMessages(id);
+                delete easyrtc.acceptancePending[id];
+            }
+        }
+
     }
 
-    function processOccupantList(roomName, list) {
+    //
+    // this function gets called for each room when there is a room update.
+    //
+    function processOccupantList(roomName, occupantList) {
         var myInfo = null;
         easyrtc.reducedList = {};
         var id;
-        for (id in list) {
-            if (!list.hasOwnProperty(id)) {
-                continue;
-            }
-            if (id !== easyrtc.myEasyrtcid) {
-                easyrtc.reducedList[id] = list[id];
-            }
-            else {
-                myInfo = list[id];
+        for (id in occupantList) {
+            if (occupantList.hasOwnProperty(id) ) {
+                if (id === easyrtc.myEasyrtcid) {
+                    myInfo = occupantList[id];
+                }
+                else {
+                    easyrtc.reducedList[id] = occupantList[id];
+                }
             }
         }
-        processConnectedList(easyrtc.reducedList);
+        //
+        // processLostPeers detects peers that have gone away and performs
+        // house keeping accordingly.
+        //
+        processLostPeers(easyrtc.reducedList);
         if (easyrtc.roomOccupantListener) {
             easyrtc.roomOccupantListener(roomName, easyrtc.reducedList, myInfo);
         }
