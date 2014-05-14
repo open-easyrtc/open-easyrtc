@@ -2072,6 +2072,8 @@ easyrtc.connect = function (applicationName, successCallback, errorCallback) {
     easyrtc.disconnectBody = function () {
         var key;
         easyrtc.loggingOut = true;
+        easyrtc.offersPending = {};
+        easyrtc.acceptancePending = {};
         easyrtc.disconnecting = true;
         easyrtc.closedChannel = easyrtc.webSocket;
         if (easyrtc.webSocketConnected) {
@@ -3791,6 +3793,9 @@ easyrtc.connect = function (applicationName, successCallback, errorCallback) {
         var i;
         var item, fixedItem, username, ipAddress;
 
+        if( !window.createIceServer ) {
+            return;
+        }
         for (i = 0; i < iceConfig.iceServers.length; i++) {
             item = iceConfig.iceServers[i];
             if (item.url.indexOf('turn:') === 0) {
