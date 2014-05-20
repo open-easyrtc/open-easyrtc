@@ -1,42 +1,73 @@
 EasyRTC: Change Log
 ===================
-v1.0.11
+v1.0.11-beta
 -------
+
 New Features:
-   - API - New function getVideoSourceList to get the list of video sources (cameras).
-   - API - New function setVideoSource to set the video source before calling initLocalMedia.
+
+   - API - New function getVideoSourceList() to get the list of video sources (cameras).
+   - API - New function setVideoSource() to set the video source before calling initLocalMedia.
+   - Server - New function appObj.deleteRoom() - Can now delete a room! See issue #16
+   - Server - New function getRoomName() for returning the associated room name. Added to roomObj and connectionRoomObj.
+   - Server - New synchronous function appObj.isRoomSync() for returning a quick boolean to indicate if a room exists
+   - Server - New synchronous functions getFieldSync() and getFieldValueSync() added to objects which support fields.
+   - Server - New function sessionObj.emitSessionDataFieldUpdate() added for emitting session fields to all connections with the same session id.
 
 Changes:
+
    - API - Redid getStatistics support for Firefox.
+   - Server - Depreciating roomObj.setConnection() It was incomplete and improperly documented.
 
 Fixes:
+
    - API - Fixed a bug in which entering a new room would cause you to drop any calls you had. The fix isn't perfect, leaving all rooms will still drop any calls you have.
    - API - RoomJoinListener fires after storing updated data rather than before.
    - API - Made candidate regexp matching case insensitive to support Firefox better.
-   - API - Better version number detection for Gecko not-Firefox browser userAgent strings.
+   - API - Better version number detection for Gecko not-Firefox browser userAgent strings. See issue #54
    - API - A number of minor code and documentation fixes/changes to minimize warnings from Webstorm code inspection and Firefox execution.
+   - Server - Fixed custom callback issue in roomObj.getConnectionObjects() which could affect custom listeners
+   - Server - Fixed callbacks not always being called on default listeners for 'msgTypeRoomLeave', 'msgTypeGetIceConfig', 'msgTypeGetRoomList', 'msgTypeSetPresence'. This would cause problems in cases where custom listeners need to know when the default listener is complete.
+   - Server - Added some extra checking for a condition when a client disconnected at the same time as a room field update is sent.
+   - Server - Added roomParameter field to roomJoin event. This fixes issue #53
+   - Server - Added additional error handling in several function to ensure objects are present
+   - Server - Code cleanup. Spelling, documentation, formatting, and minor javascript fixes for issues found during code review
+   - Server - Fixed message reply to setRoomApiField request which was invalid
+   - Server - Fixed bad reference to default application name option. Added error handler so attempts to get a non-existant option are logged. 
+   - Documentation - Updated ICE server help document to properly reference server option "appIceServers" 
+   - Documentation - Several documentation updates to fix type-Os and improve clarity. Includes issue #39, #42
+   - Documentation - Removed httpApp.configure() which caused a crash with Express v4. See issue #49, #57, #59.
+   - Documentation - Improved documentation for 'demosPublicFolder' option. See issue #56
+   - Server Example - Removed httpApp.configure() which caused a crash with Express v4. See issue #49, #57, #59.
+   - Server Example - Specify Socket.io v0.9.x in package.json. Socket.io v1.0 is not currently supported.
 
 
 v1.0.10
 -------
+
 New Features:
+
   - API - Beginnings of internationalization support. This will be expanded upon in future versions.
   - API - New media constraint function enableAudioReceive(). Control if client requests audio from peer.
   - API - New media constraint function enableVideoReceive(). Control if client requests video from peer.
 
 Changes:
+
  - API: - Updates to getPeerStatistics() to better support Firefox
 
 Fixes:
+
   - Server - Removed reference to Express's configure() which they removed in v4.0.0 (issue #49)
 
 
 v1.0.9
 ------
+
 New Features:
+
   - Documentation - New document entitled "WebRTC Common Problems and Solutions"
 
 Changes:
+
   - API - Removed support for TURN urls of the form "turn:name@domain:port" in favour of the newer form that separates the username field. Attempts to use the older form will result in an meaningful error message.
   - API - If the first attempt to call to getUserMedia fails or throws an exception, wait two seconds and try again.
   - Server - Bumped Underscore module to v1.5.x.
@@ -44,6 +75,7 @@ Changes:
   - Documentation - New documentation for upgrading EasyRTC using NPM. (issue #43)
 
 Fixes:
+
   - API - Updated data channel support for Firefox so that it interops with Chrome again. 
   - API - Fixed the easyrtc.supportsDataChannel methods check for Android browsers. Data channels aren't currently supported for Android by EasyRTC.
   - API - When data channels are opened, an initial message is sent each way to verify that data channels work.
@@ -53,17 +85,21 @@ Fixes:
 
 v1.0.8
 ------
+
 New Features:
+
  - API - Added easyrtc.getRoomApiField() convenience method to get a peers API fields.
  - Documentation - New install directions for Git users. (issue #29)
 
 Changes:
+
  - API - Better TURN detection for Firefox and Chrome
  - API - Enabled 'force new connection' flag in socket.io.
  - Documentation - Various updates (inc. issue #41)
  - Demos - Added disconnect button to Instant Messaging Rooms demo
 
 Fixes:
+
  - API - A couple type-o fixes in easyrtc.supportsDataChannels()
  - API - Fixed type-o in easyrtc.connect() causing bad reference to listener for signal failure. See issue #32 
  - API - Fixed reference to error code in easyrtc.connect()
@@ -78,17 +114,20 @@ v1.0.7
 ------
 
 New Features:
+
  - Server - New function connectionObj.getUsername() to return the username of the specified connection.
  - Documentation - New guide for handling ICE configuration, including STUN and TURN
  - Documentation - New guide for handling authentication.
 
 Changes:
+
  - API - Renamed easyrtc.usernamePattern to easyrtc.usernameRegExp to align with server option name. Set the default value to align with default server option value.
  - Server - Cleanup of logging and error handling
  - Server - connectionObj.roomJoin() will no longer create a room if a room doesn't already exist. This logic is handled by the roomJoin event.
  - Demos - General cleanup including variable renaming (Why shoeldn't "signaling" have two L's?)
 
 Fixes:
+
  - Server - Fixed issue when joining rooms when roomAutoCreateEnable option is disabled. When joining room fails, an error message is now returned rather than an empty roomData object. Related to issue #17 
  - Demos - Fixes and improvements for rooms demo.
 
@@ -97,6 +136,7 @@ v1.0.6-beta
 -----------
 
 New Features:
+
  - API - New convenience function to return an array of easyrtcid's which match a username. easyrtc.usernameToIds()
  - Server - New application level function for determining if an easyrtcid is currently connected. appObj.isConnected()
  - Documentation - New guide for installing EasyRTC alongside another server
@@ -104,6 +144,7 @@ New Features:
  - Documentation - New guide for using rooms (still in progress)
 
 Changes:
+
  - API - easyrtc_closeicon uses an inline svg in the easyrtc.css file instead of an external svg.
  - API - easyrtc.easyApp now renders remote video object invisible on stream close
  - API - Fixed some handling in joinRoom and leaveRoom (which now optionally allows success and failure callbacks)
@@ -111,6 +152,7 @@ Changes:
  - Documentation - Updates to server configuration, upcoming features, and client tutorial.
 
 Fixes:
+
  - API - Handle a possibility of the lastLoggedInList not having a room entry before adding an easyrtcid to it (Related to issue #14)
  - Demos - Screen share and rooms demo now properly use easyrtc.setUsername()
  - Server - Now disconnects client if an easyrtcAuth message is received when they are already logged in.
@@ -121,10 +163,12 @@ v1.0.5-beta
 -----------
 
 Changes:
+
  - API - Additional improvements to file sharing API such as better handling of aborted transfers. 
  - Server - Renamed server option to `appIceServers` to match other application level options.
 
 Fixes:
+
  - API - Fixed a string split issue when sending easyrtcsid value
  - Server - Fixed bug which resulted in the iceServers message to be wrapped in another iceServers object. (Issue #20) 
 
@@ -135,18 +179,22 @@ v1.0.0-beta to v1.0.4-beta
 Due to merge issues, these versions weren't fully released. (But may have made it onto NPM)
 
 Changes:
+
  - Moved alpha branch to beta branch
  - Demos - Referenced Opera's WebRTC capabilities in the demo homepage
  - Demos - Cleaned up simple video demo
  - Documentation - Updated 'Alpha' to 'Beta' in a few spots which were missed.
 
 Fixes:
+
  - Server Example - Switched package.json to match modules with '-' due to npm problems
 
 
 v0.10.4-alpha
 -------------
+
 Fixes:
+
  - Server - Fixed onRoomCreate event force close bug.
 
 
@@ -154,6 +202,7 @@ Fixes:
 ------------
 
 New Features:
+
  - API + Server - API fields. These are basically variables which are set by the client and shared to others in the room. Many possibilities!
  - API + Server - ICE Config improvements. Client can now request an updated ICE configuration from the server, or server can force new one on client.
  - Server - isConnected() function added to connection object.
@@ -161,10 +210,12 @@ New Features:
  - Server - Added pub.events.emitDefault() method. The previous method of finding the default listener in an object was clunky.
 
 Changes:
-  - API + Demos - Renaming initManaged() to easyApp(). Old name remains for the time being
-  - Server - isAuthenticated() now a synchronous function and returns a boolean 
+
+ - API + Demos - Renaming initManaged() to easyApp(). Old name remains for the time being
+ - Server - isAuthenticated() now a synchronous function and returns a boolean 
 
 Fixes:
+
  - Lots. But please let us know if there's any others which need doing.
 
 
@@ -172,6 +223,7 @@ Fixes:
 ------------
 
 New Features:
+
  - Server - Many changes to public object to ease development, including exposing events and util objects at every level.
  - Server - easyrtc_default_event_listeners.js has been improved by the addition of several new listeners. JSDoc's have been written for each default listener.
  - Server - New events "authenticate", "roomJoin", "roomCreate", "roomLeave"
@@ -179,43 +231,51 @@ New Features:
  - Server - Support for checking for minified version of API (not yet provided).
 
 Changes:
-  - API - Added better treatment of server disconnect
-  - Server - Additional support for fields.
-  - Server - Many existing events have been renamed or improved. Too many to list here.
-  - Documentation - JSDoc's of client API and server code is in separate folders.
+
+ - API - Added better treatment of server disconnect
+ - Server - Additional support for fields.
+ - Server - Many existing events have been renamed or improved. Too many to list here.
+ - Documentation - JSDoc's of client API and server code is in separate folders.
 
 Fixes:
+
  - Lots. But please let us know if there's any others which need doing.
  - Demos - Fixed several of the demos which broke in 0.10.1a
 
 
 v0.10.1a
 --------
+
 New Features:
-  - API - easyrtc_ft.js - A separate official EasyRTC module for handling file transfers. See the updated file sharing demo for an example.
-  - API - Function to get list of currently subscribed rooms - getRoomsJoined()
-  - API - Functions to support fields - getRoomFields(), getApplicationFields(), getConnectionFields()
-  - Server/API - Support for fields (Application, room, and connection level)
-  - Server - Capability to set server options for specific applications, and rooms. Added parameter to createApp() and createRoom() to support this.
-  - Server - Added setOption() and getOption() methods to application and room objects.
-  - Server - Support for setting fields with new functions added to the application, room, and connection objects.
-    - getField()
-    - getFields()
-    - setField()
-  - Server - New server options for setting default field variables at the application, room, and connection level.
-    - "appDefaultFieldObj", "roomDefaultFieldObj", and "connectionDefaultFieldObj"
+
+ - API - easyrtc_ft.js - A separate official EasyRTC module for handling file transfers. See the updated file sharing demo for an example.
+ - API - Function to get list of currently subscribed rooms - getRoomsJoined()
+ - API - Functions to support fields - getRoomFields(), getApplicationFields(), getConnectionFields()
+ - Server/API - Support for fields (Application, room, and connection level)
+ - Server - Capability to set server options for specific applications, and rooms. Added parameter to createApp() and createRoom() to support this.
+ - Server - Added setOption() and getOption() methods to application and room objects.
+ - Server - Support for setting fields with new functions added to the application, room, and connection objects.
+   - getField()
+   - getFields()
+   - setField()
+ - Server - New server options for setting default field variables at the application, room, and connection level.
+   - "appDefaultFieldObj", "roomDefaultFieldObj", and "connectionDefaultFieldObj"
 
 Changes:
-  - API - setPeerListener() - Updated to allow the setting of listeners for specific message types and from specific peers.
-  - Documentation - Lots more updates to support new release. Much more to do.
+
+ - API - setPeerListener() - Updated to allow the setting of listeners for specific message types and from specific peers.
+ - Documentation - Lots more updates to support new release. Much more to do.
 
 Fixes:
+
  - Lots. But please let us know if there's any others which need doing.
 
 
 v0.10.0a
 --------
+
 New Features:
+
  - Server/API - Rooms. An EasyRTC application can have multiple rooms. A user can be in one or more rooms at the same time. Users can only see other users in the same room. If no room is provided, connections will be entered into a room named `default`.
  - Server/API - Custom authentication method. Username / Credential can be provided. Username is broadcast to other authenticated users, so it may be used by apps.
  - Server - Reworked to be node.js module. (BIGGEST NEW FEATURE)
@@ -224,20 +284,24 @@ New Features:
  - Documentation - New documentation for internal EasyRTC command messages which highlight how the API and server communicate to each other.
 
 Changes:
+
  - Server/API - Delta lists. When the online list is changed, only the changed connections are broadcast. This should reduce bandwidth and improve scalability.
  - Server/API - Initial authentication and application setup now handled by a separate socket.io message type called 'easyrtcAuth'. This allows us to easily ignore other messages until a client has authenticated.
  - Server - Better incoming message validation. Now it's handled once right after the message is received.
  - Documentation - While the EasyRTC logo remains, when in text form, EasyRTC will have a capitol "E", which should make writing about it in sentences easier.
 
 Removed Features:
+
  - Server - No longer includes modules for express, socket.io. These must now be included in your server app. (See our server examples)
  - Server - No longer uses the winston module for logging. The default listener logs to the console. This can be easily overruled by setting your own `log` listener.
  - Server - No longer includes the experimental STUN server. If there is enough demand we can release it as a separate module, otherwise there are several good STUN and TURN solutions now available.
 
 Fixes:
+
  - Lots. But please let us know if there's any others which need doing.
 
 Upgrade Note:
+
  - This is a major release which will require existing installations to carefully upgrade.
 
 
@@ -245,10 +309,12 @@ v0.9.0
 ------
 
 New Features:
+
  - API - new easyrtc.setPeerListener() function. Sets a listener for data sent from another client. Replacement for set data listener.
  - API - new easyrtc.setServerListener() function. Listens for messages from the server which are not from another peer.
 
 Changes:
+
  - API - Implementing methods used in Google's adapter.js for cross browser support
  - Server/API - Renamed easyRTCcmd socket message type to easyrtcCmd. Should have no outside effect.
  - Server - Moved API files to the /api/ folder thus cleaning up the /static/. API files are publicly linked using /easyrtc/easyrtc.js and /easyrtc/easyrtc.css. For transitional purposes, the old public file locations are still accessible.
@@ -257,6 +323,7 @@ Changes:
  - Documentation - Added links and images in readme.md to the various documentation and youtube resources
 
 Fixes:
+
  - API - Firefox - Strips TURN servers from ICE config if they are present. Firefox doesn't currently handle TURN servers well.
  - API - Added one second delay to getUserMedia call to try and correct some page loading problems.
 
@@ -265,6 +332,7 @@ v0.8.0
 ------
 
 New Features:
+
  - API - Added support for grabbing the screen as the local media source. Currently this only works in Canary, and causes the browser to crash if you try to use it in a peer connection.
  - API - Added support for grabbing video at high-definition instead of the default standard definition. Warning: the browser may cheat and give you a lower resolution than you asked for that has the desired aspect ratio.
  - API - Added a number of callbacks to the initManaged method to support richer interactions with the client.
@@ -279,12 +347,14 @@ New Features:
  - Documentation - Moved the client API documentation from mark-down format to jsDoc and added inline examples. Check out the easyrtc.html file in the docs directory. The easyrtcjs.html file is a helper file that shouldn't be looked at directly.
 
 Changes:
+
  - Demos - In demos which show the local media stream as both audio and video (as a mirror), the video object with the local media stream is muted and given a volume of 0.
  - Demos - Removed references to Firefox requiring flags
  - Server - Version bumps for node modules express (3.2.x) and winston (0.7.x).
  - Server - Added additional public stun servers
 
 Fixes:
+
  - API - The mozRTCSessionDescription object didn't used to work properly in Firefox. Now it appears to be required.
  - API - When initMediaSource is called, the API creates a temporary video object to determine the pixel dimensions of the local camera. Until this version, that video object wasn't being explicitly destroyed, which resulted in a feedback shriek in Firefox and the most recent versions of Chrome. The temporary video object is now being destroyed.
 
@@ -293,6 +363,7 @@ v0.7.0
 ------
 
 New Features:
+
  - API - Added initial support for Data Channels.
  - API - Added more debugging output and provided a means to control it through the easyrtc.debugPrinter variable and easyrtc.enableDebug function.
  - API - Added code to log application state (WRT webrtc) to the server.
@@ -307,6 +378,7 @@ New Features:
  - Documentation - This changelog :)
 
 Changes:
+
  - API - The callSuccessCB argument to easyrtc.call now has a second argument, which can be either 'audiovideo' or 'datachannel'. The callSuccessCB function may be get called twice if the peer connection is using data channels as well as audio or video.
  - API - Fixed easyrtc.connect so that you can reconnect after calling disconnect.
  - Server - Websocket 'onMessage' section moved to external function for easier editing.
@@ -315,6 +387,7 @@ Changes:
  - Demos - Removed unneeded CSS for selfVideo tag from demo_audio_only.html, changed callerVideo id to callerAudio id, removed selfVideo tag and javascript which referenced it, changed a variable name from 'video' to 'audio'.
 
 Fixes:
+
  - Server - Bad link to a stun server.
 
 
@@ -322,14 +395,18 @@ v0.6.0
 ------
 
 New Features:
+
  - Demos - Demo landing page which includes links and compatibility chart.
  - Server - Option to disable demos in config.js.
  - API - powered_by_easyrtc.png image. Please use it to promote the project.
 
 Changes:
+
  - Demos - Change Split live demos to their own folder.
  - Demos - Change Major graphical upgrade for demos and landing page.
 
+
 v0.5.0
 ------
+
  - Initial release.
