@@ -1,4 +1,4 @@
-EasyRTC: Server Events
+EasyRTC Server: Events
 ======================
 
 Customizing the server behavior of an EasyRTC application is done by creating listeners and associating them with EasyRTC events.

@@ -1,5 +1,5 @@
-EasyRTC Framework Tutorial
-=======================
+EasyRTC JS Client: Framework Tutorial
+=====================================
 
 Overview
 ---------

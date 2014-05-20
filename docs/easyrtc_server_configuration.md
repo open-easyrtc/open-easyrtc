@@ -1,4 +1,4 @@
-EasyRTC: Server Configuration
+EasyRTC Server: Configuration
 =============================
 
 Configuration levels - Server versus Application versus Room

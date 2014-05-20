@@ -1,4 +1,4 @@
-EasyRTC: Server Installation
+EasyRTC Server: Installation
 ============================
 
 Ubuntu EasyRTC Install Steps:

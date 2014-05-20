@@ -1,5 +1,5 @@
-EasyRTC: Using SSL
-==================
+EasyRTC Server: Using SSL
+=========================
 
 Being a signaling server, EasyRTC sends many message in plain text between the client and server. It is a good idea to connect to EasyRTC via SSL.
 

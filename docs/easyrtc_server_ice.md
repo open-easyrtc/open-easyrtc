@@ -1,5 +1,5 @@
-EasyRTC: ICE Configuration
-==========================
+EasyRTC Server: ICE Configuration
+=================================
 
 WebRTC utilizes a technique called [ICE, Interactive Connectivity Establishment](http://en.wikipedia.org/wiki/Interactive_Connectivity_Establishment), to traverse NAT's and firewalls. As part of the ICE process, the browser may utilize [STUN](http://en.wikipedia.org/wiki/STUN) and [TURN](http://en.wikipedia.org/wiki/Traversal_Using_Relays_around_NAT) servers. The addresses to STUN and TURN servers are sent to the browser via an ICE configuration.
 
