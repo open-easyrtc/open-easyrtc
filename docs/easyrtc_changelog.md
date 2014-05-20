@@ -1,6 +1,7 @@
 EasyRTC: Change Log
 ===================
-v1.0.11-beta
+
+v1.0.11
 -------
 
 New Features:
@@ -16,7 +17,7 @@ New Features:
 Changes:
 
    - JS Client - Redid getStatistics support for Firefox.
-   - Server - Depreciating roomObj.setConnection() It was incomplete and improperly documented.
+   - Server - Depreciating roomObj.setConnection() It was incomplete and improperly documented. It works as before, but logs a warning.
    - Documentation - Changelog now says 'JS Client' instead of 'API' to reference the JavaScript client.
 
 Fixes:
@@ -31,9 +32,9 @@ Fixes:
    - Server - Added some extra checking for a condition when a client disconnected at the same time as a room field update is sent.
    - Server - Added roomParameter field to roomJoin event. This fixes issue #53
    - Server - Added additional error handling in several function to ensure objects are present
-   - Server - Code cleanup. Spelling, documentation, formatting, and minor javascript fixes for issues found during code review
+   - Server - Code clean-up. Spelling, documentation, formatting, and minor JavaScript fixes for issues found during code review
    - Server - Fixed message reply to setRoomApiField request which was invalid
-   - Server - Fixed bad reference to default application name option. Added error handler so attempts to get a non-existant option are logged. 
+   - Server - Fixed bad reference to default application name option. Added error handler so attempts to get a non-existent option are logged. 
    - Documentation - Updated ICE server help document to properly reference server option "appIceServers" 
    - Documentation - Several documentation updates to fix type-Os and improve clarity. Includes issue #39, #42
    - Documentation - Removed httpApp.configure() which caused a crash with Express v4. See issue #49, #57, #59.
