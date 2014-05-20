@@ -82,7 +82,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 2669
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 3029
     </li></ul></dd>
     
     
@@ -156,7 +156,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 2683
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 3043
     </li></ul></dd>
     
     
@@ -208,7 +208,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 2691
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 3051
     </li></ul></dd>
     
     
@@ -273,7 +273,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 2700
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 3060
     </li></ul></dd>
     
     
@@ -360,7 +360,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 2711
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 3071
     </li></ul></dd>
     
     
@@ -447,7 +447,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 2722
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 3082
     </li></ul></dd>
     
     
@@ -493,7 +493,7 @@
         
             
 <dt>
-    <h4 class="name" id="sessionObj.getField"><span class="type-signature">&lt;static> </span>sessionObj.getField<span class="signature">(Field, callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="sessionObj.getField"><span class="type-signature">&lt;static> </span>sessionObj.getField<span class="signature">(fieldName, callback)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -501,7 +501,7 @@
     
     
     <div class="description">
-        Returns session level field object for a given field name.
+        Returns session level field object for a given field name to a provided callback.
     </div>
     
 
@@ -535,7 +535,7 @@
 	
         <tr>
             
-                <td class="name"><code>Field</code></td>
+                <td class="name"><code>fieldName</code></td>
             
             
             <td class="type">
@@ -551,7 +551,7 @@
             
             
             
-            <td class="description last">name</td>
+            <td class="description last">Field name</td>
         </tr>
 	
 	
@@ -564,7 +564,7 @@
             <td class="type">
             
                 
-<span class="param-type">function(Error, Object)</span>
+<span class="param-type">function(?Error, Object=)</span>
 
 
             
@@ -605,7 +605,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 2742
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 3102
     </li></ul></dd>
     
     
@@ -637,7 +637,7 @@
     
     
     <div class="description">
-        Returns an object containing all field names and values within the session. Can be limited to fields with isShared option set to true.
+        Returns an object containing all field names and values within the session to a provided callback. Can be limited to fields with isShared option set to true.
     </div>
     
 
@@ -700,7 +700,7 @@
             <td class="type">
             
                 
-<span class="param-type">function(Error, object)</span>
+<span class="param-type">function(?Error, Object=)</span>
 
 
             
@@ -741,7 +741,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 2759
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 3149
     </li></ul></dd>
     
     
@@ -758,6 +758,276 @@
     
     
     
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="sessionObj.getFieldSync"><span class="type-signature">&lt;static> </span>sessionObj.getFieldSync<span class="signature">(fieldName)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Returns session level field object for a given field name. If the field is not set, it will return a field object will a null field value.  This is a synchronous function, thus may not be available in custom cases where state is not kept in memory.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>fieldName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Field name</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 3119
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    Field object
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="sessionObj.getFieldValueSync"><span class="type-signature">&lt;static> </span>sessionObj.getFieldValueSync<span class="signature">(fieldName)</span><span class="type-signature"> &rarr; {*}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Returns session level field value for a given field name. If the field is not set, it will return a null field value.  This is a synchronous function, thus may not be available in custom cases where state is not kept in memory.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>fieldName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Field name</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 3134
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    Field value
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">*</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
 </dd>
@@ -953,7 +1223,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 2782
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, line 3172
     </li></ul></dd>
     
     
@@ -996,7 +1266,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Wed Mar 05 2014 12:50:35 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Tue May 20 2014 14:10:41 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,5 +1,5 @@
-EasyRTC: ICE Configuration
-==========================
+EasyRTC Server: ICE Configuration
+=================================
 
 WebRTC utilizes a technique called [ICE, Interactive Connectivity Establishment](http://en.wikipedia.org/wiki/Interactive_Connectivity_Establishment), to traverse NAT's and firewalls. As part of the ICE process, the browser may utilize [STUN](http://en.wikipedia.org/wiki/STUN) and [TURN](http://en.wikipedia.org/wiki/Traversal_Using_Relays_around_NAT) servers. The addresses to STUN and TURN servers are sent to the browser via an ICE configuration.
 
@@ -23,10 +23,10 @@ Setting appIceConfig Option
 
 The appIceConfig option accepts an array containing zero or more URL's to STUN and TURN servers along with additional authentication details. It is useful when setting a common configuration for all connections. 
 
-**Example ICE Config Array**
+**Example ICE Servers Array**
 
 
-    var myIceConfig = [
+    var myIceServers = [
       {"url":"stun:[ADDRESS]:[PORT]"},
       {
         "url":"turn:[ADDRESS]:[PORT]",
@@ -41,15 +41,15 @@ The appIceConfig option accepts an array containing zero or more URL's to STUN a
     ];
 
 
-**Setting appIceConfig Across Server**
+**Setting appIceServers Across Server**
 
-    easyrtc.setOption("appIceConfig", myIceConfig);
+    easyrtc.setOption("appIceServers", myIceServers);
 
 
 **Can be Application Specific**
 Run setOption() from the application object to give a unique configuration for the specific application.
 
-    appObj.setOption("appIceConfig", myIceConfig);
+    appObj.setOption("appIceServers", myIceServers);
 
 
 **Order Maters**
@@ -66,7 +66,7 @@ Create a custom listener for the event "getIceConfig" in cases where a custom IC
 In this example we are supplying a custom username for the TURN server.
 
     easyrtc.on("getIceConfig", function(connectionObj, callback){
-      var myIceConfig=[
+      var myIceServers=[
         {"url":"stun:stun.easyrtc.com:3478"},
         {
           "url":        "turn:turn.easyrtc.com:3478",
@@ -75,7 +75,7 @@ In this example we are supplying a custom username for the TURN server.
         }
       ];
     
-      callback(null, myIceConfig);
+      callback(null, myIceServers);
     });
 
 For more information about EasyRTC server events, see [easyrtc_server_events.md](easyrtc_server_events.md)

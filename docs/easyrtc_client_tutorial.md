@@ -1,5 +1,5 @@
-EasyRTC Framework Tutorial
-=======================
+EasyRTC JS Client: Framework Tutorial
+=====================================
 
 Overview
 ---------
@@ -414,17 +414,17 @@ In your JavaScript, add the below:
         easyrtc.setAcceptChecker( function(callerId, reporterFunction) {
                 document.getElementById('acceptCallBox').style.display = "block";
                 if( easyrtc.getConnectionCount() > 0 ) {
-                    document.getElementById('acceptCallLabel').innerHTML = "Drop current call and accept new from " + caller + " ?";
+                    document.getElementById('acceptCallLabel').innerHTML = "Drop current call and accept new from " + callerId + " ?";
                 }
                 else {
-                    document.getElementById('acceptCallLabel').innerHTML = "Accept incoming call from " + caller + " ?";
+                    document.getElementById('acceptCallLabel').innerHTML = "Accept incoming call from " + callerId + " ?";
                 }
                 var acceptTheCall = function(wasAccepted) {
                    document.getElementById('acceptCallBox').style.display = "none";
                    if( wasAccepted && easyrtc.getConnectionCount() > 0 ) {
                         easyrtc.hangupAll();
                    }
-                   cb(wasAccepted);
+                   reporterFunction(wasAccepted);
                 }
                 document.getElementById("callAcceptButton").onclick = function() { acceptTheCall(true);};
                 document.getElementById("callRejectButton").onclick =function() { acceptTheCall(false);};

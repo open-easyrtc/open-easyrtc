@@ -1,4 +1,4 @@
-EasyRTC: Server Installation
+EasyRTC Server: Installation
 ============================
 
 Ubuntu EasyRTC Install Steps:
@@ -131,7 +131,7 @@ Below is a small upstart script which can be saved as /etc/init/easyrtc.conf
     respawn limit 10 5
 
     script
-        # Note: To run as a non root user, use exec sudu -u USERNAME /var/nodes/easyrtc/server.js
+        # Note: To run as a non root user, use exec sudo -u USERNAME node /var/nodes/easyrtc/server.js
         exec /usr/bin/node /var/nodes/easyrtc/server.js
     end script
 

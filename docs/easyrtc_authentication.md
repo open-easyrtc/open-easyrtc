@@ -5,8 +5,8 @@ By default EasyRTC allows all connections, however it can be locked down to work
 
 Even if authentication is not needed, setting the username can be used to create a visible alternative to the easyrtcid.
 
-Setting Username and Credential in Client
------------------------------------------
+Setting Username and Credential in JS Client
+--------------------------------------------
 
 **easyrtc.setUsername()**
 

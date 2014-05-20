@@ -1,5 +1,5 @@
 /** @class
- *@version 1.0.10
+ *@version 1.0.11
  *<p>
  * Provides support file and data transfer support to easyrtc.
  * </p>
@@ -630,6 +630,9 @@ easyrtc_ft.saveAs = (function() {
                 return function() {
                     if (filesaver.readyState !== filesaver.DONE) {
                         return func.apply(this, arguments);
+                    }
+                    else {
+                        return null;
                     }
                 };
             }

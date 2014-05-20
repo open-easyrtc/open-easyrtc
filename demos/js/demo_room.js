@@ -544,8 +544,8 @@ function callEverybodyElse(roomName, otherPeople) {
                 establishConnection(position-1);
             }
         }
-        function callFailure() {
-            easyrtc.showError("CALL-REJECTED", "Rejected by other party");
+        function callFailure(errorCode, errorText) {
+            easyrtc.showError(errorCode, errorText);
             if( connectCount < maxCALLERS && position > 0) {
                 establishConnection(position-1);
             }
