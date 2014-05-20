@@ -1,4 +1,4 @@
-/** @class
+﻿/** @class
  *@version 1.0.10
  *<p>
  * Provides client side support for the EasyRTC framework.
@@ -1357,9 +1357,8 @@ window.Easyrtc = function() {
             element.mozSrcObject = null;
         } else if (typeof element.src !== 'undefined') {
             //noinspection JSUndefinedPropertyAssignment
-            element.src = null;
-        } else {
-        }
+            element.src = "";
+        } 
     };
     /**
      *  Sets a video or audio object from a media stream.
