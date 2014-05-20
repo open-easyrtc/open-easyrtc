@@ -1,4 +1,4 @@
-﻿//
+//
 // the below code is a copy of the standard polyfill adapter.js
 //
 var getUserMedia = null;
@@ -185,7 +185,7 @@ if (!window.createIceServer) {
  *</p>
  */
 
-window.Easyrtc = function() {
+var Easyrtc = function() {
     var self = this;
     var isFirefox = (webrtcDetectedBrowser === "firefox");
     /**
@@ -384,8 +384,9 @@ window.Easyrtc = function() {
 
     /**
      * Gets a list of the available video sources (ie, cameras)
-     * @param {Function} callback receives list of {facing:String, label:String, id:String, kind:"video"}
-     * Note: the label string alway seems to be the empty string if you aren't using https.
+     * @param {function} callback receives list of {facing:String, label:String, id:String, kind:"video"}
+     * Note: the label string always seems to be the empty string if you aren't using https.
+     * Note: not supported by Firefox. 
      * @example  easyrtc.getVideoSourceList( function(list) {
      *               var i;
      *               for( i = 0; i < list.length; i++ ) {
@@ -394,16 +395,21 @@ window.Easyrtc = function() {
      *          });
      */
     this.getVideoSourceList = function(callback) {
-        MediaStreamTrack.getSources(function(sources) {
-            var results = [];
-            for (var i = 0; i < sources.length; i++) {
-                var source = sources[i];
-                if (source.kind === "video") {
-                    results.push(source);
+        if( MediaStreamTrack.getSources ) {
+            MediaStreamTrack.getSources(function(sources) {
+                var results = [];
+                for (var i = 0; i < sources.length; i++) {
+                    var source = sources[i];
+                    if (source.kind === "video") {
+                        results.push(source);
+                    }
                 }
-            }
-            callback(results);
-        });
+                callback(results);
+            });
+        }
+        else {
+            callback([]);
+        }
     };
 
 
@@ -471,8 +477,8 @@ window.Easyrtc = function() {
      * This method allows you to join a single room. It may be called multiple times to be in
      * multiple rooms simultaneously. It may be called before or after connecting to the server.
      * Note: the successCB and failureDB will only be called if you are already connected to the server.
-     * @param {String} roomName
-     * @param {String} roomParameters : application specific parameters, can be null.
+     * @param {String} roomName the room to be joined.
+     * @param {String} roomParameters application specific parameters, can be null.
      * @param {Function} successCB called once, with a roomName as it's argument, once the room is joined.
      * @param {Function} failureCB called if the room can not be joined. The arguments of failureCB are errorCode, errorText, roomName.
      */
@@ -579,6 +585,7 @@ window.Easyrtc = function() {
 
     /**
      * Specify particular video source. Call this before you call easyrtc.initMediaSource().
+     * Note: this function isn't supported by Firefox.
      * @param {String} videoSrcId is a id value from one of the entries fetched by getVideoSourceList. null for default.
      * @example easyrtc.setVideoSrc( videoSrcId);
      */
@@ -619,6 +626,10 @@ window.Easyrtc = function() {
     };
     /** This function requests that screen capturing be used to provide the local media source
      * rather than a webcam. If you have multiple screens, they are composited side by side.
+     * Note: this functionality is not supported by Firefox, has to be called before calling initMediaSource (or easyApp), we don't currently supply a way to 
+     * turn it off (once it's on), only works if the website is hosted SSL (https), and the image quality is rather 
+     * poor going across a network because it tries to transmit so much data. In short, screen sharing
+     * through WebRTC isn't worth using at this point, but it is provided here so people can try it out.
      * @example
      *    easyrtc.setScreenCapture();
      */
@@ -1125,8 +1136,8 @@ window.Easyrtc = function() {
     /** Provide a set of application defined fields that will be part of this instances
      * configuration information. This data will get sent to other peers via the websocket
      * path.
-     * @param roomName
-     * @param fieldName - the name of the field.
+     * @param {String} roomName - the room the field is attached to.
+     * @param {String} fieldName - the name of the field.
      * @param {Object} fieldValue - the value of the field.
      * @example
      *   easyrtc.setRoomApiFields("trekkieRoom",  "favorite_alien", "Mr Spock");
@@ -1881,7 +1892,7 @@ window.Easyrtc = function() {
 
     /** Determines whether the current browser supports the new data channels.
      * EasyRTC will not open up connections with the old data channels.
-     * @returns {boolean}
+     * @returns {Boolean}
      */
     this.supportsDataChannels = function() {
         if (navigator.userAgent.match(/android/i)) {
@@ -2158,14 +2169,14 @@ window.Easyrtc = function() {
     }
     ;
     /** Determines if a particular peer2peer connection has an audio track.
-     * @param easyrtcid - the id of the other caller in the connection. If easyrtcid is not supplied, checks the local media.
+     * @param {String} easyrtcid - the id of the other caller in the connection. If easyrtcid is not supplied, checks the local media.
      * @return {Boolean} true if there is an audio track or the browser can't tell us.
      */
     this.haveAudioTrack = function(easyrtcid) {
         return _haveTracks(easyrtcid, true);
     };
     /** Determines if a particular peer2peer connection has a video track.
-     * @param easyrtcid - the id of the other caller in the connection. If easyrtcid is not supplied, checks the local media.
+     * @param {String} easyrtcid - the id of the other caller in the connection. If easyrtcid is not supplied, checks the local media.
      * @return {Boolean} true if there is an video track or the browser can't tell us.
      */
     this.haveVideoTrack = function(easyrtcid) {
