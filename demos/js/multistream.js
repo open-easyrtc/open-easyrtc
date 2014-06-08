@@ -27,6 +27,19 @@ var selfEasyrtcid = "";
 var haveSelfVideo = false;
 var otherEasyrtcid = null;
 
+
+function disable(domId) {
+    console.log("about to try disabling "  +domId);
+    document.getElementById(domId).disabled = "disabled";
+}
+
+
+function enable(domId) {
+    console.log("about to try enabling "  +domId);
+    document.getElementById(domId).disabled = "";
+}
+
+
 function createLabelledButton(buttonLabel) {
     var button = document.createElement("button");
     button.appendChild(document.createTextNode(buttonLabel));
@@ -36,7 +49,7 @@ function createLabelledButton(buttonLabel) {
 
 function createLocalVideo(stream) {
     var video = document.createElement("video");
-    document.getElement("localVideos").appendChild(video);
+    document.getElementById("localVideos").appendChild(video);
     video.autoplay = true;
     video.muted = true;
     easyrtc.setVideoObjectSrc(video, stream);
@@ -46,8 +59,7 @@ function addSrcButton(buttonLabel, videoId) {
     var button = createLabelledButton(buttonLabel);
     button.onclick = function() {
         easyrtc.setVideoSource(videoId);
-        easyrtc.enableScreenCapture(false);
-        easyrt.initMediaSource(
+        easyrtc.initMediaSource(
                 function(stream) {
                     createLocalVideo(stream);
                     if( otherEasyrtcid) {
@@ -62,8 +74,6 @@ function addSrcButton(buttonLabel, videoId) {
 
 function connect() {
     console.log("Initializing.");
-    easyrtc.enableAudio(document.getElementById('shareAudio').checked);
-    easyrtc.enableVideo(document.getElementById('shareVideo').checked);
     easyrtc.setRoomOccupantListener(convertListToButtons);
     easyrtc.connect("easyrtc.audioVideo", loginSuccess, loginFailure);
     easyrtc.getVideoSourceList(function(videoSrcList) {
@@ -73,10 +83,10 @@ function connect() {
         //
         // add an extra button for screen sharing
         //
-        var screenShareButton = createButton("Screen capture/share");
+        var screenShareButton = createLabelledButton("Screen capture/share");
         screenShareButton.onclick = function() {
             easyrtc.setScreenCapture(true);
-            easyrt.initMediaSource(
+            easyrtc.initMediaSource(
                     function(stream) {
                         createLocalVideo(stream);
                         if( otherEasyrtcid) {
@@ -137,17 +147,14 @@ function performCall(otherEasyrtcid) {
 
     var successCB = function() {
         otherEasyrtcid = easyrtcid;
-        var keys = easyrtc.getLocalMediaIds();
-        var i;
-        for( i = 0; i < keys.length; i++) {
-            easyrtc.addStreamToCall(otherEasyrtcid, keys[i]);
-        }
         enable('hangupButton');
     };
     var failureCB = function() {
         enable('otherClients');
     };
-    easyrtc.call(otherEasyrtcid, successCB, failureCB, acceptedCB);
+    var keys = easyrtc.getLocalMediaIds();
+
+    easyrtc.call(otherEasyrtcid, successCB, failureCB, acceptedCB, keys);
     enable('hangupButton');
 }
 
@@ -178,7 +185,7 @@ function disconnect() {
 
 easyrtc.setStreamAcceptor(function(easyrtcid, stream) {
     var video = document.createElement("video");
-    document.getElement("remoteVideos").appendChild(video);
+    document.getElementById("remoteVideos").appendChild(video);
     video.autoplay = true;
     video.muted = true;
     easyrtc.setVideoSource(video, stream);
