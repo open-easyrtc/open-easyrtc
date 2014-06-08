@@ -356,7 +356,7 @@ var Easyrtc = function() {
     /** Most basic message acknowledgment object */
     this.ackMessage = {msgType: "ack"};
     /** Regular expression pattern for user ids. This will need modification to support non US character sets */
-    usernameRegExp = /^(.){1,64}$/;
+    this.usernameRegExp = /^(.){1,64}$/;
     /** @private */
     var cookieId = "easyrtcsid";
     /** @private */
