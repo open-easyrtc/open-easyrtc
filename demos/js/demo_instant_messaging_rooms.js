@@ -386,7 +386,16 @@ function updatePresence()
     easyrtc.updatePresence(currentShowState, currentShowText);
 }
 
-
+function queryRoomNames() {
+    var roomName = document.getElementById("queryRoom").value;
+    if( !roomName ) {
+        roomName = "default";
+    }
+    if( roomName ) {
+        console.log("getRoomOccupantsAsArray("+ roomName + ")=" + JSON.stringify(easyrtc.getRoomOccupantsAsArray(roomName)));
+        console.log("getRoomOccupantsAsMap(" + roomName + ")=" + JSON.stringify(easyrtc.getRoomOccupantsAsMap(roomName)));
+    }
+}
 function addApiField() {
     var roomName = document.getElementById("apiroomname").value;
     var fieldname = document.getElementById("apifieldname").value;
