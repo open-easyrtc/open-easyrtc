@@ -234,7 +234,7 @@ var Easyrtc = function() {
 
     /**
      * Gets a list of the available video sources (ie, cameras)
-     * @param {function} callback receives list of {facing:String, label:String, id:String, kind:"video"}
+     * @param {Function} callback receives list of {facing:String, label:String, id:String, kind:"video"}
      * Note: the label string always seems to be the empty string if you aren't using https.
      * Note: not supported by Firefox. 
      * @example  easyrtc.getVideoSourceList( function(list) {
@@ -3801,6 +3801,47 @@ var Easyrtc = function() {
         self.emitEvent("roomOccupant", lastLoggedInList);
     }
 
+    /**
+     * Returns an array of easyrtcid's of peers in a particular room.
+     * @param roomName
+     * @returns {Array} of easyrtcids or null if the client is not in the room.
+     * @example
+     *     var occupants = easyrtc.getRoomOccupants("default");
+     *     var i;
+     *     for( i = 0; i < occupants.length; i++ ) {
+     *         console.log( occupants[i] + " is in the room");
+     *     }
+     */
+    this.getRoomOccupantsAsArray = function(roomName) {
+        if( !lastLoggedInList[roomName]) {
+            return null;
+        }
+        else {
+            return lastLoggedInList[roomName].keys();
+        }
+    }
+
+    /**
+     * Returns a map of easyrtcid's of peers in a particular room. You should only test elements in the map to see if they are
+     * null; their actual values are not guaranteed to be the same in different releases.
+     * @param roomName
+     * @returns {Object} of easyrtcids or null if the client is not in the room.
+     * @example
+     *      if( easyrtc.getRoomOccupantsAsMap("default")[some_easyrtcid]) {
+     *          console.log("yep, " + some_easyrtcid + " is in the room");
+     *      }
+     */
+    this.getRoomOccupantsAsMap = function(roomName) {
+         return lastLoggedInList[roomName];
+    }
+
+    /**
+     * Returns true if the ipAddress parameter was the address of a turn server. This is done by checking against information
+     * collected during peer to peer calls. Don't expect it to work before the first call, or to identify turn servers that aren't
+     * in the ice config.
+     * @param ipAddress
+     * @returns {boolean} true if ip address is known to be that of a turn server, false otherwise.
+     */
     this.isTurnServer = function(ipAddress) {
         return !!self._turnServers[ipAddress];
     };
