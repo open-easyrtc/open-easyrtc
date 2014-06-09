@@ -1669,7 +1669,7 @@ var Easyrtc = function() {
      * @param {String} streamName is the name of the new media stream.
      * @param {Array} audioTracks is an array of MediaStreamTracks
      * @param {Array} videoTracks is an array of MediaStreamTracks
-     * @returns {MediaStream}
+     * @returns {void}
      * @example
      *    easyrtc.buildLocalMediaStream("myComposedStream",
      *             easyrtc.getLocalStream("camera1").getVideoTracks(),
