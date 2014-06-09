@@ -806,7 +806,7 @@
         
             
 <dt>
-    <h3 class="name" id="addStreamToCall"><span class="type-signature"></span>addStreamToCall<span class="signature">(easyrtcId, streamId)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="addStreamToCall"><span class="type-signature"></span>addStreamToCall<span class="signature">(easyrtcId, streamName)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -871,7 +871,7 @@
 	
         <tr>
             
-                <td class="name"><code>streamId</code></td>
+                <td class="name"><code>streamName</code></td>
             
             
             <td class="type">
@@ -937,7 +937,184 @@
         
             
 <dt>
-    <h3 class="name" id="call"><span class="type-signature"></span>call<span class="signature">(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB, streamIds)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="buildLocalMediaStream"><span class="type-signature"></span>buildLocalMediaStream<span class="signature">(streamName, audioTracks, videoTracks)</span><span class="type-signature"> &rarr; {MediaStream}</span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        This function builds a new named local media stream from a set of existing audio and video tracks from other media streams.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>streamName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">is the name of the new media stream.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>audioTracks</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">is an array of MediaStreamTracks</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>videoTracks</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">is an array of MediaStreamTracks</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">MediaStream</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>   easyrtc.buildLocalMediaStream("myComposedStream",            easyrtc.getLocalStream("camera1").getVideoTracks(),            easyrtc.getLocalStream("camera2").getAudioTracks());</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="call"><span class="type-signature"></span>call<span class="signature">(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB, streamNames)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -1071,7 +1248,7 @@
 	
         <tr>
             
-                <td class="name"><code>streamIds</code></td>
+                <td class="name"><code>streamNames</code></td>
             
             
             <td class="type">
@@ -1087,7 +1264,7 @@
             
             
             
-            <td class="description last">optional array of streamIds.</td>
+            <td class="description last">optional array of streamNames.</td>
         </tr>
 	
 	
@@ -1390,7 +1567,7 @@
         
             
 <dt>
-    <h3 class="name" id="closeLocalMediaStream"><span class="type-signature"></span>closeLocalMediaStream<span class="signature">(streamId)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="closeLocalMediaStream"><span class="type-signature"></span>closeLocalMediaStream<span class="signature">(streamName)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -1432,7 +1609,7 @@
 	
         <tr>
             
-                <td class="name"><code>streamId</code></td>
+                <td class="name"><code>streamName</code></td>
             
             
             <td class="type">
@@ -2310,7 +2487,7 @@
         
             
 <dt>
-    <h3 class="name" id="enableCamera"><span class="type-signature"></span>enableCamera<span class="signature">(enable, streamId)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="enableCamera"><span class="type-signature"></span>enableCamera<span class="signature">(enable, streamName)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -2375,7 +2552,7 @@
 	
         <tr>
             
-                <td class="name"><code>streamId</code></td>
+                <td class="name"><code>streamName</code></td>
             
             
             <td class="type">
@@ -2667,7 +2844,7 @@
         
             
 <dt>
-    <h3 class="name" id="enableMicrophone"><span class="type-signature"></span>enableMicrophone<span class="signature">(enable, streamId)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="enableMicrophone"><span class="type-signature"></span>enableMicrophone<span class="signature">(enable, streamName)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -2732,7 +2909,7 @@
 	
         <tr>
             
-                <td class="name"><code>streamId</code></td>
+                <td class="name"><code>streamName</code></td>
             
             
             <td class="type">
@@ -2748,7 +2925,7 @@
             
             
             
-            <td class="description last">an optional streamId</td>
+            <td class="description last">an optional streamName</td>
         </tr>
 	
 	
@@ -3816,7 +3993,7 @@
         
             
 <dt>
-    <h3 class="name" id="getRemoteStream"><span class="type-signature"></span>getRemoteStream<span class="signature">(easyrtcid, remoteStreamId)</span><span class="type-signature"> &rarr; {Object}</span></h3>
+    <h3 class="name" id="getRemoteStream"><span class="type-signature"></span>getRemoteStream<span class="signature">(easyrtcid, remotestreamName)</span><span class="type-signature"> &rarr; {Object}</span></h3>
     
     
 </dt>
@@ -3881,7 +4058,7 @@
 	
         <tr>
             
-                <td class="name"><code>remoteStreamId</code></td>
+                <td class="name"><code>remotestreamName</code></td>
             
             
             <td class="type">
@@ -3897,7 +4074,7 @@
             
             
             
-            <td class="description last">an optional argument supplying the streamId.</td>
+            <td class="description last">an optional argument supplying the streamName.</td>
         </tr>
 	
 	
@@ -5393,7 +5570,7 @@
         
             
 <dt>
-    <h3 class="name" id="haveAudioTrack"><span class="type-signature"></span>haveAudioTrack<span class="signature">(easyrtcid, streamId)</span><span class="type-signature"> &rarr; {Boolean}</span></h3>
+    <h3 class="name" id="haveAudioTrack"><span class="type-signature"></span>haveAudioTrack<span class="signature">(easyrtcid, streamName)</span><span class="type-signature"> &rarr; {Boolean}</span></h3>
     
     
 </dt>
@@ -5458,7 +5635,7 @@
 	
         <tr>
             
-                <td class="name"><code>streamId</code></td>
+                <td class="name"><code>streamName</code></td>
             
             
             <td class="type">
@@ -5546,7 +5723,7 @@
         
             
 <dt>
-    <h3 class="name" id="haveVideoTrack"><span class="type-signature"></span>haveVideoTrack<span class="signature">(easyrtcid, streamId)</span><span class="type-signature"> &rarr; {Boolean}</span></h3>
+    <h3 class="name" id="haveVideoTrack"><span class="type-signature"></span>haveVideoTrack<span class="signature">(easyrtcid, streamName)</span><span class="type-signature"> &rarr; {Boolean}</span></h3>
     
     
 </dt>
@@ -5611,7 +5788,7 @@
 	
         <tr>
             
-                <td class="name"><code>streamId</code></td>
+                <td class="name"><code>streamName</code></td>
             
             
             <td class="type">
@@ -5834,7 +6011,7 @@
         
             
 <dt>
-    <h3 class="name" id="initMediaSource"><span class="type-signature"></span>initMediaSource<span class="signature">(successCallback, errorCallback, streamId)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="initMediaSource"><span class="type-signature"></span>initMediaSource<span class="signature">(successCallback, errorCallback, streamName)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -5922,7 +6099,7 @@
 	
         <tr>
             
-                <td class="name"><code>streamId</code></td>
+                <td class="name"><code>streamName</code></td>
             
             
             <td class="type">
@@ -5938,7 +6115,7 @@
             
             
             
-            <td class="description last">an optional id for the media source so you can use multiple cameras and screen share simultaneously.</td>
+            <td class="description last">an optional name for the media source so you can use multiple cameras and screen share simultaneously.</td>
         </tr>
 	
 	
@@ -5993,7 +6170,7 @@
         
             
 <dt>
-    <h3 class="name" id="initScreenCapture"><span class="type-signature"></span>initScreenCapture<span class="signature">(successCallback, errorCallback, streamId)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="initScreenCapture"><span class="type-signature"></span>initScreenCapture<span class="signature">(successCallback, errorCallback, streamName)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -6001,7 +6178,7 @@
     
     
     <div class="description">
-        This is the new desktop capture code. It will require yours to install a google plugin. It also requires being run from an https page.
+        This is the new desktop capture code. This code makes use of an API that is only available to google extensions, which are self-contained sets of files you download from the Chrome Store. It will not run in a page hosted on your website.
     </div>
     
 
@@ -6081,7 +6258,7 @@
 	
         <tr>
             
-                <td class="name"><code>streamId</code></td>
+                <td class="name"><code>streamName</code></td>
             
             
             <td class="type">
@@ -6813,7 +6990,7 @@
         
             
 <dt>
-    <h3 class="name" id="makeLocalStreamFromRemoteStream"><span class="type-signature"></span>makeLocalStreamFromRemoteStream<span class="signature">(easyrtcid, remoteStreamId, localStreamId)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="makeLocalStreamFromRemoteStream"><span class="type-signature"></span>makeLocalStreamFromRemoteStream<span class="signature">(easyrtcid, remotestreamName, localstreamName)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -6821,7 +6998,7 @@
     
     
     <div class="description">
-        Assign a local streamId to a remote stream so that it can be forwarded to other callers.
+        Assign a local streamName to a remote stream so that it can be forwarded to other callers.
     </div>
     
 
@@ -6878,7 +7055,7 @@
 	
         <tr>
             
-                <td class="name"><code>remoteStreamId</code></td>
+                <td class="name"><code>remotestreamName</code></td>
             
             
             <td class="type">
@@ -6894,14 +7071,14 @@
             
             
             
-            <td class="description last">the streamId supplied by the peer.</td>
+            <td class="description last">the streamName supplied by the peer.</td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>localStreamId</code></td>
+                <td class="name"><code>localstreamName</code></td>
             
             
             <td class="type">
@@ -6917,7 +7094,7 @@
             
             
             
-            <td class="description last">streamId used when passing the stream to other peers.</td>
+            <td class="description last">streamName used when passing the stream to other peers.</td>
         </tr>
 	
 	
@@ -8071,7 +8248,7 @@
             
             
             
-            <td class="description last">takes the arguments (callerEasyrtcid, function():boolean ){}The acceptCheck callback is passed (as it's second argument) a function that should be called with eithera true value (accept the call) or false value( reject the call) as it's first argument. An array of streamIds can be supplied as a second argument.</td>
+            <td class="description last">takes the arguments (callerEasyrtcid, function():boolean ){}The acceptCheck callback is passed (as it's second argument) a function that should be called with eithera true value (accept the call) or false value( reject the call) as it's first argument. An array of streamNames can be supplied as a second argument.</td>
         </tr>
 	
 	
@@ -8247,7 +8424,7 @@
     
     
     <div class="description">
-        Controls whether a default local media stream should be acquired automatically during calls and acceptsif a list of streamIds is not supplied. The default is true, which mimicks the behaviour of earlier releasesthat didn't support multiple streams. This function should be called before easyrtc.call or before entering an accept checker callback.
+        Controls whether a default local media stream should be acquired automatically during calls and acceptsif a list of streamNames is not supplied. The default is true, which mimicks the behaviour of earlier releasesthat didn't support multiple streams. This function should be called before easyrtc.call or before entering an accept checker callback.
     </div>
     
 
@@ -8287,7 +8464,7 @@
             <td class="type">
             
                 
-<span class="param-type">Boolena</span>
+<span class="param-type">Boolean</span>
 
 
             
@@ -11192,7 +11369,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Sun Jun 08 2014 13:48:15 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Sun Jun 08 2014 18:24:52 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

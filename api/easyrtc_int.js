@@ -43,10 +43,10 @@ var Easyrtc = function() {
 
     /**
      * Controls whether a default local media stream should be acquired automatically during calls and accepts
-     * if a list of streamIds is not supplied. The default is true, which mimicks the behaviour of earlier releases
+     * if a list of streamNames is not supplied. The default is true, which mimicks the behaviour of earlier releases
      * that didn't support multiple streams. This function should be called before easyrtc.call or before entering an 
      * accept checker callback.
-     * @param {Boolena} flag true to allocate a default local media stream.
+     * @param {Boolean} flag true to allocate a default local media stream.
      */
     this.setAutoInitUserMedia = function(flag) {
         autoInitUserMedia = !!flag;
@@ -1310,13 +1310,13 @@ var Easyrtc = function() {
     ;
 
     //
-    // fetches a stream by name. Treat a null/undefined streamId as "default".
+    // fetches a stream by name. Treat a null/undefined streamName as "default".
     //
-    function getLocalMediaStreamByName(streamId) {
-        if (!streamId) {
-            streamId = "default";
+    function getLocalMediaStreamByName(streamName) {
+        if (!streamName) {
+            streamName = "default";
         }
-        return namedLocalMediaStreams[streamId];
+        return namedLocalMediaStreams[streamName];
     }
 
     /**
@@ -1329,21 +1329,21 @@ var Easyrtc = function() {
 
     function buildMediaIds() {
         var mediaMap = {};
-        var streamId;
-        for (streamId in namedLocalMediaStreams) {
-            mediaMap[streamId] = namedLocalMediaStreams[streamId].id;
+        var streamName;
+        for (streamName in namedLocalMediaStreams) {
+            mediaMap[streamName] = namedLocalMediaStreams[streamName].id;
         }
         return mediaMap;
     }
 
 
-    function registerLocalMediaStreamByName(stream, streamId) {
+    function registerLocalMediaStreamByName(stream, streamName) {
         var roomName;
-        if (!streamId) {
-            streamId = "default";
+        if (!streamName) {
+            streamName = "default";
         }
-        namedLocalMediaStreams[streamId] = stream;
-        if (streamId !== "default") {
+        namedLocalMediaStreams[streamName] = stream;
+        if (streamName !== "default") {
             var mediaIds = buildMediaIds();
             for (roomName in self.roomData) {
                 self.setRoomApiField(roomName, "mediaIds", mediaIds);
@@ -1355,32 +1355,32 @@ var Easyrtc = function() {
     //
     // look up a stream's name from the stream.id
     //
-    function getNameOfRemoteStream(easyrtcId, webrtcStreamId) {
+    function getNameOfRemoteStream(easyrtcId, webrtcstreamName) {
         var roomName;
         var mediaIds;
-        var streamId;
+        var streamName;
         for (roomName in self.roomData) {
             mediaIds = self.getRoomApiField(roomName, easyrtcId, "mediaIds");
             if (!mediaIds)
                 continue;
-            for (streamId in mediaIds) {
-                if (mediaIds.hasOwnProperty(streamId) &&
-                        mediaIds[streamId] === webrtcStreamId) {
-                    return streamId;
+            for (streamName in mediaIds) {
+                if (mediaIds.hasOwnProperty(streamName) &&
+                        mediaIds[streamName] === webrtcstreamName) {
+                    return streamName;
                 }
             }
         }
         return undefined;
     }
 
-    function closeLocalMediaStreamByName(streamId) {
-        if (!streamId) {
-            streamId = "default";
+    function closeLocalMediaStreamByName(streamName) {
+        if (!streamName) {
+            streamName = "default";
         }
-        if (namedLocalMediaStreams[streamId]) {
-            namedLocalMediaStreams[streamId].stop();
-            delete namedLocalMediaStreams[streamId];
-            if (streamId !== "default") {
+        if (namedLocalMediaStreams[streamName]) {
+            namedLocalMediaStreams[streamName].stop();
+            delete namedLocalMediaStreams[streamName];
+            if (streamName !== "default") {
                 var mediaIds = buildMediaIds();
                 for (roomName in self.roomData) {
                     self.setRoomApiField(roomName, "mediaIds", mediaIds);
@@ -1391,20 +1391,20 @@ var Easyrtc = function() {
     /**
      * Close the local media stream. You usually need to close the existing media stream
      * of a camera before reacquring it at a different resolution.
-     * @param {String} streamId - an option stream name.
+     * @param {String} streamName - an option stream name.
      */
-    this.closeLocalMediaStream = function(streamId) {
-        return closeLocalMediaStream(streamId);
+    this.closeLocalMediaStream = function(streamName) {
+        return closeLocalMediaStream(streamName);
     }
     /**
      * This function is used to enable and disable the local camera. If you disable the
      * camera, video objects display it will "freeze" until the camera is re-enabled. *
      * By default, a camera is enabled.
      * @param {Boolean} enable - true to enable the camera, false to disable it.
-     * @param {String} streamId - the name of the stream, optional.
+     * @param {String} streamName - the name of the stream, optional.
      */
-    this.enableCamera = function(enable, streamId) {
-        var stream = getLocalMediaStreamByName(streamId);
+    this.enableCamera = function(enable, streamName) {
+        var stream = getLocalMediaStreamByName(streamName);
         if (stream && stream.getVideoTracks) {
             enableMediaTracks(enable, stream.getVideoTracks());
         }
@@ -1414,10 +1414,10 @@ var Easyrtc = function() {
      * the microphone, sounds stops being transmitted to your peers. By default, the microphone
      * is enabled.
      * @param {Boolean} enable - true to enable the microphone, false to disable it.
-     * @param {String} streamId - an optional streamId
+     * @param {String} streamName - an optional streamName
      */
-    this.enableMicrophone = function(enable, streamId) {
-        var stream = getLocalMediaStreamByName(streamId);
+    this.enableMicrophone = function(enable, streamName) {
+        var stream = getLocalMediaStreamByName(streamName);
         if (stream && stream.getAudioTracks) {
             enableMediaTracks(enable, stream.getAudioTracks());
         }
@@ -1447,13 +1447,13 @@ var Easyrtc = function() {
      * Returns a URL for your local camera and microphone.
      *  It can be called only after easyrtc.initMediaSource has succeeded.
      *  It returns a url that can be used as a source by the Chrome video element or the &lt;canvas&gt; element.
-     *  @param {String} streamId - an option stream name.
+     *  @param {String} streamName - an option stream name.
      *  @return {URL}
      *  @example
      *      document.getElementById("myVideo").src = easyrtc.getLocalStreamAsUrl();
      */
-    self.getLocalStreamAsUrl = function(streamId) {
-        var stream = getLocalMediaStreamByName(streamId);
+    self.getLocalStreamAsUrl = function(streamName) {
+        var stream = getLocalMediaStreamByName(streamName);
         if (stream === null) {
             throw "Developer error: attempt to get a MediaStream without invoking easyrtc.initMediaSource successfully";
         }
@@ -1467,8 +1467,8 @@ var Easyrtc = function() {
      * @example
      *    easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());
      */
-    this.getLocalStream = function(streamId) {
-        return getLocalMediaStreamByName(streamId);
+    this.getLocalStream = function(streamName) {
+        return getLocalMediaStreamByName(streamName);
     };
     /** Clears the media stream on a video object.
      *
@@ -1512,6 +1512,44 @@ var Easyrtc = function() {
             self.clearMediaStream(videoObject);
         }
     };
+
+
+    /**
+     * This function builds a new named local media stream from a set of existing audio and video tracks from other media streams.
+     * @param {String} streamName is the name of the new media stream.
+     * @param {Array} audioTracks is an array of MediaStreamTracks
+     * @param {Array} videoTracks is an array of MediaStreamTracks
+     * @returns {MediaStream}
+     * @example
+     *    easyrtc.buildLocalMediaStream("myComposedStream",
+     *             easyrtc.getLocalStream("camera1").getVideoTracks(),
+     *             easyrtc.getLocalStream("camera2").getAudioTracks());
+     */
+    this.buildLocalMediaStream = function(streamName, audioTracks, videoTracks){
+       var fullTrackList = [];
+       var i;
+
+       if( typeof streamName !== 'string') {
+           easyrtc.showError( this.errCodes.DEVELOPER_ERR, "easyrtc.buildLocalMediaStream not supplied a stream name");
+           return;
+       }
+
+       if( audioTracks ) {
+           for( i = 0; i < audioTracks.length; i++ ) {
+              fullTrackList.push(audioTracks[i]);
+           }
+       }
+       
+       if( videoTracks ) {
+           for( i = 0; i < videoTracks.length; i++ ) {
+              fullTrackList.push(videoTracks[i]);
+           }
+       }
+       
+       var stream =  new MediaStream(fullTrackList);
+       registerLocalMediaStreamByName(stream, streamName);
+    };
+
 
     /* @private*/
     /** Load Easyrtc Stylesheet.
@@ -1585,11 +1623,10 @@ var Easyrtc = function() {
     };
 
     /**
-     * This is the new desktop capture code. It will require yours to install a google plugin. It also requires being run from an 
-     * https page.
+     * This is the new desktop capture code. This code makes use of an API that is only available to google extensions, which are self-contained sets of files you download from the Chrome Store. It will not run in a page hosted on your website. 
      * @param {function(Object)} successCallback - will be called with localmedia stream on success. 
      * @param {function(String,String)} errorCallback - is called with an error code and error description.
-     * @param {String} streamId - an optional id for the media source so you can use multiple cameras and screen share simultaneously.
+     * @param {String} streamName - an optional id for the media source so you can use multiple cameras and screen share simultaneously.
      * @example
      *       easyrtc.initScreenCapture(
      *          function(mediastream){
@@ -1599,13 +1636,13 @@ var Easyrtc = function() {
      *               easyrtc.showError(errorCode, errorText);
      *          });
      */
-    this.initScreenCapture = function(onSuccess, onFailure, streamId) {
-        if (!chrome || !chrome.desktopCapture || !chrome.desktopCapture.chooseDesktopMedia) {
-            onFailure("browser-notsupport", "You can't access your desktop except with Chrome");
+    this.initScreenCapture = function(onSuccess, onFailure, streamName) {
+        if (!chrome|| !chrome.desktopCapture || !chrome.desktopCapture.chooseDesktopMedia) {
+            onFailure(self.errCodes.DEVELOPER_ERR, "The initScreenCapture api can only be used inside a chrome extensions. This is chrome security feature. Sorry.");
             return;
         }
         //
-        // the code for doing the new screen capture was taken from Muaz-Khan's desktop sharing example.
+        // the code for doing the screen capture was taken from Muaz-Khan's desktop sharing example.
         //        
         function onAccessApproved(desktop_id) {
             if (!desktop_id) {
@@ -1632,7 +1669,7 @@ var Easyrtc = function() {
                     onFailure(self.errCodes.MEDIA_ERR, self.format(self.getConstantString("gumFailed"), "cancelled"));
                     return;
                 }
-                 registerLocalMediaStreamByName(stream, streamId);
+                 registerLocalMediaStreamByName(stream, streamName);
                  onSuccess(stream);
                 // create RTCPeerConnection to stream desktop in realtime!
             }
@@ -1666,7 +1703,7 @@ var Easyrtc = function() {
      * calling easyrtc.initMediaSource.
      * @param {function(Object)} successCallback - will be called with localmedia stream on success. 
      * @param {function(String,String)} errorCallback - is called with an error code and error description.
-     * @param {String} streamId - an optional id for the media source so you can use multiple cameras and screen share simultaneously.
+     * @param {String} streamName - an optional name for the media source so you can use multiple cameras and screen share simultaneously.
      * @example
      *       easyrtc.initMediaSource(
      *          function(mediastream){
@@ -1677,14 +1714,14 @@ var Easyrtc = function() {
      *          });
      *
      */
-    this.initMediaSource = function(successCallback, errorCallback, streamId) {
+    this.initMediaSource = function(successCallback, errorCallback, streamName) {
 
         if (self.debugPrinter) {
             self.debugPrinter("about to request local media");
         }
 
-        if (!streamId) {
-            streamId = "default";
+        if (!streamName) {
+            streamName = "default";
         }
 
         haveAudioVideo = {
@@ -1728,7 +1765,7 @@ var Easyrtc = function() {
                 self.debugPrinter("successfully got local media");
             }
 
-            registerLocalMediaStreamByName(stream, streamId);
+            registerLocalMediaStreamByName(stream, streamName);
 
             var videoObj, triesLeft, tryToGetSize, ele;
             if (haveAudioVideo.video) {
@@ -1799,7 +1836,7 @@ var Easyrtc = function() {
                 console.log("invoking error callback", errText);
                 errorCallback(self.errCodes.MEDIA_ERR, self.format(self.getConstantString("gumFailed"), errText));
             }
-            unregisterLocalMediaStreamByName(null, streamId);
+            unregisterLocalMediaStreamByName(null, streamName);
             haveAudioVideo = {
                 audio: false,
                 video: false
@@ -1856,7 +1893,7 @@ var Easyrtc = function() {
      * @param {Function} acceptCheck takes the arguments (callerEasyrtcid, function():boolean ){}
      * The acceptCheck callback is passed (as it's second argument) a function that should be called with either
      * a true value (accept the call) or false value( reject the call) as it's first argument. 
-     * An array of streamIds can be supplied as a second argument.
+     * An array of streamNames can be supplied as a second argument.
      * @example
      *      easyrtc.setAcceptChecker( function(easyrtcid, acceptor){
      *           if( easyrtc.idToName(easyrtcid) === 'Fred' ){
@@ -2185,10 +2222,10 @@ var Easyrtc = function() {
      * @param easyrtcid
      * @param checkAudio
      */
-    function _haveTracks(easyrtcid, checkAudio, streamId) {
+    function _haveTracks(easyrtcid, checkAudio, streamName) {
         var stream, peerConnObj;
         if (!easyrtcid) {
-            stream = getLocalMediaStreamByName(streamId);
+            stream = getLocalMediaStreamByName(streamName);
         }
         else {
             peerConnObj = peerConns[easyrtcid];
@@ -2196,7 +2233,7 @@ var Easyrtc = function() {
                 console.error("Developer error: haveTracks called about a peer you don't have a connection to");
                 return false;
             }
-            stream = peerConnObj.getStreamIdByName(streamId);
+            stream = peerConnObj.getStreamByName(streamName);
         }
         if (!stream) {
             return false;
@@ -2220,19 +2257,19 @@ var Easyrtc = function() {
     ;
     /** Determines if a particular peer2peer connection has an audio track.
      * @param {String} easyrtcid - the id of the other caller in the connection. If easyrtcid is not supplied, checks the local media.
-     * @param {String} streamId - an optional stream id.
+     * @param {String} streamName - an optional stream id.
      * @return {Boolean} true if there is an audio track or the browser can't tell us.
      */
-    this.haveAudioTrack = function(easyrtcid, streamId) {
-        return _haveTracks(easyrtcid, true, streamId);
+    this.haveAudioTrack = function(easyrtcid, streamName) {
+        return _haveTracks(easyrtcid, true, streamName);
     };
     /** Determines if a particular peer2peer connection has a video track.
      * @param {String} easyrtcid - the id of the other caller in the connection. If easyrtcid is not supplied, checks the local media.
-     * @param {String} streamId - an optional stream id.     *
+     * @param {String} streamName - an optional stream id.     *
      * @return {Boolean} true if there is an video track or the browser can't tell us.
      */
-    this.haveVideoTrack = function(easyrtcid, streamId) {
-        return _haveTracks(easyrtcid, false, streamId);
+    this.haveVideoTrack = function(easyrtcid, streamName) {
+        return _haveTracks(easyrtcid, false, streamName);
     };
 
     /**
@@ -2685,7 +2722,7 @@ var Easyrtc = function() {
      * @param {Function} callSuccessCB (otherCaller, mediaType) - is called when the datachannel is established or the MediaStream is established. mediaType will have a value of "audiovideo" or "datachannel"
      * @param {Function} callFailureCB (errorCode, errMessage) - is called if there was a system error interfering with the call.
      * @param {Function} wasAcceptedCB (wasAccepted:boolean,otherUser:string) - is called when a call is accepted or rejected by another party. It can be left null.
-     * @param {Array} streamIds - optional array of streamIds.
+     * @param {Array} streamNames - optional array of streamNames.
      * @example
      *    easyrtc.call( otherEasyrtcid,
      *        function(easyrtcid, mediaType){
@@ -2703,14 +2740,14 @@ var Easyrtc = function() {
      *            }
      *        });
      */
-    this.call = function(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB, streamIds) {
+    this.call = function(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB, streamNames) {
 
-        if (streamIds) {
-            if (typeof streamIds === "string") { // accept a string argument if passed.
-                streamIds = [streamIds];
+        if (streamNames) {
+            if (typeof streamNames === "string") { // accept a string argument if passed.
+                streamNames = [streamNames];
             }
-            else if (streamIds.length === undefined) {
-                easyrtc.showError(self.errCodes.DEVELOPER_ERR, "easyrtc.call passed bad streamids");
+            else if (streamNames.length === undefined) {
+                easyrtc.showError(self.errCodes.DEVELOPER_ERR, "easyrtc.call passed bad streamNames");
                 return;
             }
         }
@@ -2732,7 +2769,7 @@ var Easyrtc = function() {
         // If we are sharing audio/video and we haven't allocated the local media stream yet,
         // we'll do so, recalling ourself on success.
         //
-        if (!streamIds && autoInitUserMedia) {
+        if (!streamNames && autoInitUserMedia) {
             var stream = self.getLocalStream();
             if (stream === null && (audioEnabled || videoEnabled)) {
                 self.initMediaSource(function() {
@@ -2755,7 +2792,7 @@ var Easyrtc = function() {
         //
         if (offersPending[otherUser]) {
             wasAcceptedCB(true);
-            doAnswer(otherUser, offersPending[otherUser], streamIds);
+            doAnswer(otherUser, offersPending[otherUser], streamNames);
             delete offersPending[otherUser];
             self.callCancelled(otherUser, false);
             return;
@@ -2772,7 +2809,7 @@ var Easyrtc = function() {
         }
 
         acceptancePending[otherUser] = true;
-        var pc = buildPeerConnection(otherUser, true, callFailureCB, streamIds);
+        var pc = buildPeerConnection(otherUser, true, callFailureCB, streamNames);
         if (!pc) {
             message = "buildPeerConnection failed, call not completed";
             if (self.debugPrinter) {
@@ -2900,36 +2937,36 @@ var Easyrtc = function() {
      * Return the media stream shared by a particular peer. This is needed when you
      * add a stream in the middle of a call.
      * @param {String} easyrtcid the peer.
-     * @param {String} remoteStreamId an optional argument supplying the streamId. 
+     * @param {String} remotestreamName an optional argument supplying the streamName.
      * @returns {Object} A mediaStream.
      */
-    this.getRemoteStream = function(easyrtcid, remoteStreamId) {
+    this.getRemoteStream = function(easyrtcid, remotestreamName) {
         if (!peerConns[easyrtcid]) {
             self.showError(self.errCodes.DEVELOPER_ERR, "attempt to get stream of uncalled party");
         }
         else {
-            return peerConns[easyrtcid].getRemoteStreamByName(remoteStreamId);
+            return peerConns[easyrtcid].getRemoteStreamByName(remotestreamName);
         }
     }
     /**
-     * Assign a local streamId to a remote stream so that it can be forwarded to other callers.
+     * Assign a local streamName to a remote stream so that it can be forwarded to other callers.
      * @param {String} easyrtcid the peer supplying the remote stream
-     * @param {String} remoteStreamId the streamId supplied by the peer.
-     * @param {String} localStreamId streamId used when passing the stream to other peers.
+     * @param {String} remotestreamName the streamName supplied by the peer.
+     * @param {String} localstreamName streamName used when passing the stream to other peers.
      * @example
      *    easyrtc.makeLocalStreamFromRemoteStream(sourcePeer, "default", "forwardedStream");
      *    easyrtc.call(nextPeer, callSuccessCB, callFailureCB, wasAcceptedCB, ["forwardedStream"]);
      */
-    this.makeLocalStreamFromRemoteStream = function(easyrtcid, remoteStreamId, localStreamId) {
-        if (!streamId) {
-            streamId = "default";
+    this.makeLocalStreamFromRemoteStream = function(easyrtcid, remotestreamName, localstreamName) {
+        if (!streamName) {
+            streamName = "default";
         }
         var remoteStream;
         if (peerConns[easyrtcid].pc) {
-            remoteStream = peerConns[easyrtcid].getRemoteStreamByName(remoteStreamId);
+            remoteStream = peerConns[easyrtcid].getRemoteStreamByName(remotestreamName);
 
             if (remoteStream) {
-                registerLocalMediaStreamByName(remoteStream, localStreamId);
+                registerLocalMediaStreamByName(remoteStream, localstreamName);
             }
             else {
                 throw "Developer err: no such stream"
@@ -2943,13 +2980,13 @@ var Easyrtc = function() {
     /**
      * Add a named local stream to a call.
      * @param {String} easyrtcId The id of client receiving the stream.
-     * @param {String} streamId The name of the stream.
+     * @param {String} streamName The name of the stream.
      */
-    this.addStreamToCall = function(easyrtcId, streamId) {
-        console.log("adding stream with id " + streamId + " to call(" + easyrtcId + ")");
-        var stream = getLocalMediaStreamByName(streamId);
+    this.addStreamToCall = function(easyrtcId, streamName) {
+        console.log("adding stream with id " + streamName + " to call(" + easyrtcId + ")");
+        var stream = getLocalMediaStreamByName(streamName);
         if (!stream) {
-            console.log("attempt to add nonexistent stream " + streamId);
+            console.log("attempt to add nonexistent stream " + streamName);
         }
         else if (!peerConns[easyrtcId] || !peerConns[easyrtcId].pc) {
             console.log("Can't add stream before a call has started.");
@@ -3021,7 +3058,7 @@ var Easyrtc = function() {
     }
 
 
-    var buildPeerConnection = function(otherUser, isInitiator, failureCB, streamIds) {
+    var buildPeerConnection = function(otherUser, isInitiator, failureCB, streamNames) {
         var pc;
         var message;
         var newPeerConn;
@@ -3061,12 +3098,12 @@ var Easyrtc = function() {
                 candidatesToSend: [],
                 startedAV: false,
                 isInitiator: isInitiator,
-                getRemoteStreamByName: function(streamId) {
+                getRemoteStreamByName: function(streamName) {
                     var remoteStreams = pc.getRemoteStreams();
                     var i = 0;
                     var keyToMatch = null;
                     var roomName;
-                    if (streamId) {
+                    if (streamName) {
                         //
                         // there is a better way of mapping user assigned mediasream ids to 
                         // webrtc assigned mediastream ids. It hasn't occurred to me what it
@@ -3074,13 +3111,13 @@ var Easyrtc = function() {
                         //
                         for (roomName in self.roomData) {
                             var mediaIds = self.getRoomApiField(roomName, otherUser, "mediaIds");
-                            keyToMatch = mediaIds ? mediaIds[streamId] : null;
+                            keyToMatch = mediaIds ? mediaIds[streamName] : null;
                             if (keyToMatch) {
                                 break;
                             }
                         }
                         if (!keyToMatch) {
-                            self.showError(self.errCodes.DEVELOPER_ERR, "remote peer does not have media stream called " + streamId);
+                            self.showError(self.errCodes.DEVELOPER_ERR, "remote peer does not have media stream called " + streamName);
                         }
                     }
                     for (i = 0; i < remoteStreams.length; i++) {
@@ -3179,14 +3216,14 @@ var Easyrtc = function() {
         }
 
         var i, stream;
-        if (streamIds) {
-            for (i = 0; i < streamIds.length; i++) {
-                stream = getLocalMediaStreamByName(streamIds[i]);
+        if (streamNames) {
+            for (i = 0; i < streamNames.length; i++) {
+                stream = getLocalMediaStreamByName(streamNames[i]);
                 if (stream) {
                     pc.addStream(stream);
                 }
                 else {
-                    console.log("Developer error, attempt to access unknown local media stream " + streamIds[i]);
+                    console.log("Developer error, attempt to access unknown local media stream " + streamNames[i]);
                 }
             }
         }
@@ -3348,8 +3385,8 @@ var Easyrtc = function() {
         return pc;
     };
 
-    var doAnswer = function(caller, msgData, streamIds) {
-        if (!streamIds && autoInitUserMedia) {
+    var doAnswer = function(caller, msgData, streamNames) {
+        if (!streamNames && autoInitUserMedia) {
             var localStream = self.getLocalStream();
             if (!localStream && (videoEnabled || audioEnabled)) {
                 self.initMediaSource(
@@ -3365,7 +3402,7 @@ var Easyrtc = function() {
 
         var pc = buildPeerConnection(caller, false, function(message) {
             self.showError(self.errCodes.SYSTEM_ERR, message);
-        }, streamIds);
+        }, streamNames);
         var newPeerConn = peerConns[caller];
         if (!pc) {
             if (self.debugPrinter) {
@@ -3440,8 +3477,18 @@ var Easyrtc = function() {
             self.debugPrinter("Saw onRemote hangup event");
         }
         if (peerConns[caller]) {
-            peerConns[caller].cancelled = true;
+            peerConns[caller].cancelled = true;            
             if (peerConns[caller].startedAV) {
+                //
+                // close any remote streams.
+                //
+                var remoteStreams = pc.getRemoteStreams();
+                if( remoteStreams ) {
+                    var i;
+                    for( i = 0; i < remoteStreams.length; i++) {
+                       remoteStreams[i].stop();
+                    }
+                }
                 if (self.onStreamClosed) {
                     self.onStreamClosed(caller);
                 }
@@ -3637,14 +3684,14 @@ var Easyrtc = function() {
 
         var processOffer = function(caller, msgData) {
 
-            var helper = function(wasAccepted, streamIds) {
+            var helper = function(wasAccepted, streamNames) {
 
-                if (streamIds) {
-                    if (typeof streamIds === "string") {
-                        streamIds = [streamIds];
+                if (streamNames) {
+                    if (typeof streamNames === "string") {
+                        streamNames = [streamNames];
                     }
-                    else if (streamIds.length === undefined) {
-                        easyrtc.showError(self.errCodes.DEVELOPER_ERR, "accept callback passed invalid streamIds");
+                    else if (streamNames.length === undefined) {
+                        easyrtc.showError(self.errCodes.DEVELOPER_ERR, "accept callback passed invalid streamNames");
                         return;
                     }
                 }
@@ -3658,7 +3705,7 @@ var Easyrtc = function() {
                 }
 
                 if (wasAccepted) {
-                    doAnswer(caller, msgData, streamIds);
+                    doAnswer(caller, msgData, streamNames);
                     flushCachedCandidates(caller);
                 }
                 else {

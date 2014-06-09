@@ -18,7 +18,7 @@
         <!-- Assumes global locations for socket.io.js and easyrtc.js -->
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
-        <script type="text/javascript" src="js/multistream.js"></script>
+        <script type="text/javascript" src="js/demo_multistream.js"></script>
 
         <!--hide-->
         <!-- Styles used within the demo -->
@@ -74,13 +74,14 @@
 
                 <!--hide-->
                 <!-- Main Content -->
-                <h1>EasyRTC Demo: Audio and Video Chat</h1>
+                <h1>EasyRTC Demo: Multiple-Stream Calls</h1>
 
-                <p>The application provides an audio-video chat where sharing of audio and video can be controlled individually before connection.</p>
+                <p>This application demonstrates sending multiple video streams from one caller to another.
+                    You can open up the media streams before or after establishing the call to the other peer.</p>
 
                 <p>To use it, press the Connect button.
-                    You should see buttons representing other people using this demo.
-                    Click one of those buttons to initiate a chat.</p>
+                    You should see buttons representing the video sources and a list of buttons representing other people using this demo.
+                    Click one of those buttons to initiate a chat. Note: this demo looks much better when hosted on an https site.</p>
 
                 <hr />
                 <h2>The Demo</h2>
@@ -101,7 +102,9 @@
                     </div>
 
                     <div id="videos">
+                        <h3>Local media streams</h3>
                         <div autoplay="autoplay" id="localVideos"></div>
+                        <h3>Remote media streams</h3>
                         <div autoplay="autoplay" id="remoteVideos"></div>
                         <div id="acceptCallBox"> <!-- Should be initially hidden using CSS -->
                             <div id="acceptCallLabel"></div>
