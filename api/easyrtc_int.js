@@ -4719,9 +4719,6 @@ var Easyrtc = function() {
         var gotMediaCallback = null,
                 gotConnectionCallback = null;
 
-        if (!_validateVideoIds(monitorVideoId, videoIds)) {
-            throw "bad video id";
-        }
 
         easyAppBody(monitorVideoId, videoIds);
 
