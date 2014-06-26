@@ -1454,7 +1454,7 @@ var Easyrtc = function() {
      */
     self.getLocalStreamAsUrl = function(streamName) {
         var stream = getLocalMediaStreamByName(streamName);
-        if (stream === null) {
+        if (!stream) {
             throw "Developer error: attempt to get a MediaStream without invoking easyrtc.initMediaSource successfully";
         }
         return self.createObjectURL(stream);
@@ -1836,12 +1836,7 @@ var Easyrtc = function() {
                 console.log("invoking error callback", errText);
                 errorCallback(self.errCodes.MEDIA_ERR, self.format(self.getConstantString("gumFailed"), errText));
             }
-            unregisterLocalMediaStreamByName(null, streamName);
-            haveAudioVideo = {
-                audio: false,
-                video: false
-            };
-            updateConfigurationInfo();
+           closeLocalMediaStreamByName(streamName);
         };
         if (!audioEnabled && !videoEnabled) {
             onUserMediaError(self.getConstantString("requireAudioOrVideo"));
@@ -2771,7 +2766,7 @@ var Easyrtc = function() {
         //
         if (!streamNames && autoInitUserMedia) {
             var stream = self.getLocalStream();
-            if (stream === null && (audioEnabled || videoEnabled)) {
+            if (!stream && (audioEnabled || videoEnabled)) {
                 self.initMediaSource(function() {
                     self.call(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB);
                 }, callFailureCB);
@@ -4217,7 +4212,7 @@ var Easyrtc = function() {
             return null;
         }
         else {
-            return lastLoggedInList[roomName].keys();
+            return Object.keys(lastLoggedInList[roomName]);
         }
     }
 
