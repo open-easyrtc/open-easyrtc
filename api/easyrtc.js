@@ -10,6 +10,8 @@ if (navigator.mozGetUserMedia) {
 // console.log("This appears to be Firefox");
 
     webrtcDetectedBrowser = "firefox";
+    webrtcDetectedVersion =
+            parseInt(navigator.userAgent.match(/Firefox\/([0-9]+)\./)[1]);
 
     //
     // better version detection for gecko based browsers provided by
@@ -137,41 +139,6 @@ if (navigator.mozGetUserMedia) {
         webkitRTCPeerConnection.prototype.getRemoteStreams = function() {
             return this.remoteStreams;
         };
-    }
-} else if( window.ActiveXObject ){ // appears to IE so check for the wrapper.
-    var head = document.getElementsByTagName('head')[0];
-    var i;
-    var adapterAddress;
-    var wrapperPresent = false;
-
-    //
-    // we look for the adapter as well as the wrapper because if we don't find the
-    // wrapper, we'll look for it in the same directory as the adapter was found.
-    //
-    for( i = 0; i < head.childNodes.length; i++) {
-        var child = head.childNodes[i];
-        if( /\/adapter.js$/.test(child.src)) {
-            adapterAddress = child.src;
-        }
-        else if( /\/rtcplugin.js$/.test(child.src)) {
-            wrapperPresent = true;
-        }
-    }
-
-
-    if( wrapperPresent) {
-        addIEDeclarations();
-    }
-    else if( adapterAddress) {
-        var script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = adapterAddress.replace(/\/adapter.js$/, "/rtcplugin.js");
-        src.onload = addIEDeclarations;
-        src.onerror = function () {
-            alert("Developer error: this page requires the Priologic IE Webrtc plugin wrapper (rtcplugin.js) to run when using Internet Explorer, which the developer has not supplied.");
-            throw new Error("No rtcplugin.js found. It should be in the same folder as your adapter.js or you can include it yourself before the adapter.js");
-        }
-        head.appendChild(script);
     }
 } else {
     console.log("Browser does not appear to be WebRTC-capable");
@@ -1637,7 +1604,7 @@ var Easyrtc = function() {
      */
     self.getLocalStreamAsUrl = function(streamName) {
         var stream = getLocalMediaStreamByName(streamName);
-        if (!stream) {
+        if (stream === null) {
             throw "Developer error: attempt to get a MediaStream without invoking easyrtc.initMediaSource successfully";
         }
         return self.createObjectURL(stream);
@@ -2019,7 +1986,12 @@ var Easyrtc = function() {
                 console.log("invoking error callback", errText);
                 errorCallback(self.errCodes.MEDIA_ERR, self.format(self.getConstantString("gumFailed"), errText));
             }
-           closeLocalMediaStreamByName(streamName);
+            unregisterLocalMediaStreamByName(null, streamName);
+            haveAudioVideo = {
+                audio: false,
+                video: false
+            };
+            updateConfigurationInfo();
         };
         if (!audioEnabled && !videoEnabled) {
             onUserMediaError(self.getConstantString("requireAudioOrVideo"));
@@ -2949,7 +2921,7 @@ var Easyrtc = function() {
         //
         if (!streamNames && autoInitUserMedia) {
             var stream = self.getLocalStream();
-            if (!stream && (audioEnabled || videoEnabled)) {
+            if (stream === null && (audioEnabled || videoEnabled)) {
                 self.initMediaSource(function() {
                     self.call(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB);
                 }, callFailureCB);
@@ -4395,7 +4367,7 @@ var Easyrtc = function() {
             return null;
         }
         else {
-            return Object.keys(lastLoggedInList[roomName]);
+            return lastLoggedInList[roomName].keys();
         }
     }
 
