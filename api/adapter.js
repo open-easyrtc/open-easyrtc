@@ -10,8 +10,6 @@ if (navigator.mozGetUserMedia) {
 // console.log("This appears to be Firefox");
 
     webrtcDetectedBrowser = "firefox";
-    webrtcDetectedVersion =
-            parseInt(navigator.userAgent.match(/Firefox\/([0-9]+)\./)[1]);
 
     //
     // better version detection for gecko based browsers provided by
@@ -37,13 +35,13 @@ if (navigator.mozGetUserMedia) {
         var url_parts = url.split(':');
         var turn_url_parts;
         if (url_parts[0].indexOf('stun') === 0) {
-// Create iceServer with stun url.
+            // Create iceServer with stun url.
             iceServer = {'url': url};
         } else if (url_parts[0].indexOf('turn') === 0 &&
                 (url.indexOf('transport=udp') !== -1 ||
                         url.indexOf('?transport') === -1)) {
-// Create iceServer with turn url.
-// Ignore the transport parameter from TURN url.
+            // Create iceServer with turn url.
+            // Ignore the transport parameter from TURN url.
             turn_url_parts = url.split("?");
             iceServer = {'url': turn_url_parts[0],
                 'credential': password,
@@ -140,6 +138,41 @@ if (navigator.mozGetUserMedia) {
             return this.remoteStreams;
         };
     }
+//} else if( window.ActiveXObject ){ // appears to IE so check for the wrapper.
+//    var head = document.getElementsByTagName('head')[0];
+//    var i;
+//    var adapterAddress;
+//    var wrapperPresent = false;
+//
+//    //
+//    // we look for the adapter as well as the wrapper because if we don't find the
+//    // wrapper, we'll look for it in the same directory as the adapter was found.
+//    //
+//    for( i = 0; i < head.childNodes.length; i++) {
+//        var child = head.childNodes[i];
+//        if( /\/adapter.js$/.test(child.src)) {
+//            adapterAddress = child.src;
+//        }
+//        else if( /\/rtcplugin.js$/.test(child.src)) {
+//            wrapperPresent = true;
+//        }
+//    }
+//
+//
+//    if( wrapperPresent) {
+//        addIEDeclarations();
+//    }
+//    else if( adapterAddress) {
+//        var script = document.createElement('script');
+//        script.type = 'text/javascript';
+//        script.src = adapterAddress.replace(/\/adapter.js$/, "/rtcplugin.js");
+//        src.onload = addIEDeclarations;
+//        src.onerror = function () {
+//            alert("Developer error: this page requires the Priologic IE Webrtc plugin wrapper (rtcplugin.js) to run when using Internet Explorer, which the developer has not supplied.");
+//            throw new Error("No rtcplugin.js found. It should be in the same folder as your adapter.js or you can include it yourself before the adapter.js");
+//        }
+//        head.appendChild(script);
+//    }
 } else {
     console.log("Browser does not appear to be WebRTC-capable");
 }

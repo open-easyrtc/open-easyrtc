@@ -1937,7 +1937,7 @@ var Easyrtc = function() {
      * @example
      *     easyrtc.setCallCancelled( function(easyrtcid, explicitlyCancelled){
      *        if( explicitlyCancelled ){
-     *            console..log(easyrtc.idToName(easyrtcid) + " stopped trying to reach you");
+     *            console.log(easyrtc.idToName(easyrtcid) + " stopped trying to reach you");
      *         }
      *         else{
      *            console.log("Implicitly called "  + easyrtc.idToName(easyrtcid));
@@ -3473,11 +3473,11 @@ var Easyrtc = function() {
         }
         if (peerConns[caller]) {
             peerConns[caller].cancelled = true;            
-            if (peerConns[caller].startedAV) {
+            if (peerConns[caller].pc) {
                 //
                 // close any remote streams.
                 //
-                var remoteStreams = pc.getRemoteStreams();
+                var remoteStreams = peerConns[caller].pc.getRemoteStreams();
                 if( remoteStreams ) {
                     var i;
                     for( i = 0; i < remoteStreams.length; i++) {
@@ -3487,15 +3487,15 @@ var Easyrtc = function() {
                 if (self.onStreamClosed) {
                     self.onStreamClosed(caller);
                 }
+                try {
+                    peerConns[caller].pc.close();
+                } catch (anyErrors) {
+                }
             }
             else {
                 if (self.callCancelled) {
                     self.callCancelled(caller, true);
                 }
-            }
-            try {
-                peerConns[caller].pc.close();
-            } catch (anyErrors) {
             }
             delete peerConns[caller];
             updateConfigurationInfo();
