@@ -2347,7 +2347,9 @@ var Easyrtc = function() {
         self.disconnecting = true;
         closedChannel = self.webSocket;
         if (self.webSocketConnected) {
-            self.webSocket.close();
+            if( !preallocatedSocketIo) {
+                self.webSocket.close();
+            }
             self.webSocketConnected = false;
         }
         self.hangupAll();
@@ -3878,7 +3880,10 @@ var Easyrtc = function() {
 
     function connectToWSServer(successCallback, errorCallback) {
         var i;
-        if (!self.webSocket) {
+        if( preallocatedSocketIo) {
+            self.webSocket = preallocatedSocketIo;
+        }
+        else if (!self.webSocket) {
             self.webSocket = io.connect(serverPath, {
                 'connect timeout': 10000,
                 'force new connection': true
@@ -3887,15 +3892,15 @@ var Easyrtc = function() {
                 throw "io.connect failed";
             }
         }
-        else {
-            for (i in self.websocketListeners) {
-                if (!self.websocketListeners.hasOwnProperty(i)) {
-                    continue;
-                }
-                self.webSocket.removeEventListener(self.websocketListeners[i].event,
-                        self.websocketListeners[i].handler);
+
+        for (i in self.websocketListeners) {
+            if (!self.websocketListeners.hasOwnProperty(i)) {
+                continue;
             }
+            self.webSocket.removeEventListener(self.websocketListeners[i].event,
+                    self.websocketListeners[i].handler);
         }
+
         self.websocketListeners = [];
         function addSocketListener(event, handler) {
             self.webSocket.on(event, handler);
@@ -4803,14 +4808,31 @@ var Easyrtc = function() {
      */
     this.initManaged = this.easyApp;
 
+    var preallocatedSocketIo = null;
 
+    /**
+     * Supply a socket.io connection that will be used instead of allocating a new socket.
+     * The expected usage is that you allocate a websocket, assign options to it, call
+     * easyrtc.useThisSocketConnection, followed by easyrtc.connect or easyrtc.easyApp. Easyrtc will not attempt to
+     * close sockets that were supplied with easyrtc.useThisSocketConnection.
+     * @param {Object} alreadyAllocatedSocketIo A value allocated with the connect method of socket.io.
+     */
+    this.useThisSocketConnection = function(alreadyAllocatedSocketIo) {
+       preallocatedSocketIo = alreadyAllocatedSocketIo;
+    }
+    /**
+     * Connect to the easyrtc signaling server.
+     * @param applicationName
+     * @param successCallback
+     * @param errorCallback
+     */
     this.connect = function(applicationName, successCallback, errorCallback) {
 
         if (!window.io) {
             self.showError("Developer error", "Your HTML has not included the socket.io.js library");
         }
 
-        if (self.webSocket) {
+        if (!preallocatedSocketIo && self.webSocket) {
             console.error("Developer error: attempt to connect when already connected to socket server");
             return;
         }
