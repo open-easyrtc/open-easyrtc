@@ -4109,7 +4109,7 @@ var Easyrtc = function() {
         addSocketListener("connect", function(event) {
 
             self.webSocketConnected = true;
-            if (!self.webSocket || !self.webSocket.socket || !self.webSocket.socket.sessionid) {
+            if (!self.webSocket) {
                 self.showError(self.errCodes.CONNECT_ERR, self.getConstantString("badsocket"));
             }
 
@@ -4400,7 +4400,7 @@ var Easyrtc = function() {
             return null;
         }
         else {
-            return lastLoggedInList[roomName].keys();
+            return Object.keys(lastLoggedInList[roomName]);
         }
     }
 
