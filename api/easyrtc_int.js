@@ -40,7 +40,20 @@ var Easyrtc = function() {
     var isFirefox = (webrtcDetectedBrowser === "firefox");
 
     var autoInitUserMedia = true;
+    var sdpLocalFilter = null,
+        sdpRemoteFilter = null;
 
+    /**
+     * Sets functions which filter sdp records before calling setLocalDescription or setRemoteDescription.
+     * This is advanced functionality which can break things, easily. See the easyrtc_rates.js file for a
+     * filter builder.
+     * @param {Function} localFilter a function that takes an sdp string and returns an sdp string.
+     * @param {Function} remoteFilter a function that takes an sdp string and returns an sdp string.
+     */
+    this.setSdpFilters = function( localFilter, remoteFilter) {
+       sdpLocalFilter = localFilter;
+       sdpRemoteFilter = remoteFilter;
+    };
     /**
      * Controls whether a default local media stream should be acquired automatically during calls and accepts
      * if a list of streamNames is not supplied. The default is true, which mimicks the behaviour of earlier releases
@@ -2832,6 +2845,9 @@ var Easyrtc = function() {
 
                 sendSignalling(otherUser, "offer", sessionDescription, null, callFailureCB);
             };
+            if( sdpLocalFilter) {
+                sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
+            }
             pc.setLocalDescription(sessionDescription, sendOffer,
                     function(errorText) {
                         callFailureCB(self.errCodes.CALL_ERR, errorText);
@@ -2997,6 +3013,9 @@ var Easyrtc = function() {
             var pc = peerConns[easyrtcId].pc;
             pc.addStream(stream);
             pc.createOffer(function(sdp) {
+                if( sdpLocalFilter) {
+                    sdp.sdp = sdpLocalFilter(sdp.sdp);
+                }
                 pc.setLocalDescription(sdp, function() {
                     self.sendPeerMessage(easyrtcId, "_addedMediaStream", {sdp: sdp});
                 }, function() {
@@ -3017,8 +3036,14 @@ var Easyrtc = function() {
         else {
             var sdp = msgData.sdp;
             var pc = peerConns[easyrtcid].pc;
+            if( sdpRemoteFilter) {
+                sdp.sdp = sdpRemoteFilter(sdp.sdp);
+            }
             pc.setRemoteDescription(new RTCSessionDescription(sdp));
             pc.createAnswer(function(sdp) {
+                if( sdpLocalFilter) {
+                    sdp.sdp = sdpLocalFilter(sdp.sdp);
+                }
                 pc.setLocalDescription(sdp, function() {
                     self.sendPeerMessage(easyrtcid, "__gotAddedMediaStream", {sdp: sdp});
                 }, function() {
@@ -3034,6 +3059,9 @@ var Easyrtc = function() {
         }
         else {
             var sdp = msgData.sdp;
+            if( sdpRemoteFilter) {
+                sdp.sdp = sdpRemoteFilter(sdp.sdp);
+            }
             var pc = peerConns[easyrtcid].pc;
             pc.setRemoteDescription(new RTCSessionDescription(sdp));
         }
@@ -3433,6 +3461,9 @@ var Easyrtc = function() {
                     pc.connectDataConnection(5002, 5001);
                 }
             };
+            if( sdpLocalFilter) {
+                sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
+            }
             pc.setLocalDescription(sessionDescription, sendAnswer, function(message) {
                 self.showError(self.errCodes.INTERNAL_ERR, "setLocalDescription: " + message);
             });
@@ -3460,7 +3491,9 @@ var Easyrtc = function() {
             self.debugPrinter("about to call setRemoteDescription in doAnswer");
         }
         try {
-
+            if( sdpRemoteFilter) {
+                sd.sdp = sdpRemoteFilter(sd.sdp);
+            }
             pc.setRemoteDescription(sd, invokeCreateAnswer, function(message) {
                 self.showError(self.errCodes.INTERNAL_ERR, "set-remote-description: " + message);
             });
@@ -3801,6 +3834,9 @@ var Easyrtc = function() {
                 self.debugPrinter("about to call initiating setRemoteDescription");
             }
             try {
+                if( sdpRemoteFilter) {
+                    sd.sdp = sdpRemoteFilter(sd.sdp);
+                }
                 pc.setRemoteDescription(sd, function() {
                     if (pc.connectDataConnection) {
                         if (self.debugPrinter) {
