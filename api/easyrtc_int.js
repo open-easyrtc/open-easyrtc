@@ -1,5 +1,5 @@
 /** @class
- *@version 1.0.12-beta
+ *@version 1.0.12
  *<p>
  * Provides client side support for the EasyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
@@ -40,20 +40,7 @@ var Easyrtc = function() {
     var isFirefox = (webrtcDetectedBrowser === "firefox");
 
     var autoInitUserMedia = true;
-    var sdpLocalFilter = null,
-        sdpRemoteFilter = null;
 
-    /**
-     * Sets functions which filter sdp records before calling setLocalDescription or setRemoteDescription.
-     * This is advanced functionality which can break things, easily. See the easyrtc_rates.js file for a
-     * filter builder.
-     * @param {Function} localFilter a function that takes an sdp string and returns an sdp string.
-     * @param {Function} remoteFilter a function that takes an sdp string and returns an sdp string.
-     */
-    this.setSdpFilters = function( localFilter, remoteFilter) {
-       sdpLocalFilter = localFilter;
-       sdpRemoteFilter = remoteFilter;
-    };
     /**
      * Controls whether a default local media stream should be acquired automatically during calls and accepts
      * if a list of streamNames is not supplied. The default is true, which mimicks the behaviour of earlier releases
@@ -215,7 +202,7 @@ var Easyrtc = function() {
         ALREADY_CONNECTED: "ALREADY_CONNECTED",
         "BAD_CREDENTIAL": "BAD_CREDENTIAL"
     };
-    this.apiVersion = "1.0.12-beta";
+    this.apiVersion = "1.0.12";
     /** Most basic message acknowledgment object */
     this.ackMessage = {msgType: "ack"};
     /** Regular expression pattern for user ids. This will need modification to support non US character sets */
@@ -1368,17 +1355,24 @@ var Easyrtc = function() {
     //
     // look up a stream's name from the stream.id
     //
-    function getNameOfRemoteStream(easyrtcId, webrtcstreamName) {
+    function getNameOfRemoteStream(easyrtcId, webrtcstreamId) {
         var roomName;
         var mediaIds;
         var streamName;
+        if( peerConns[easyrtcId]) {
+            streamName =  peerConns[easyrtcId].remoteStreamIdToName[webrtcstreamId];
+            if( streamName) {
+                return streamName;
+            }
+        }
+
         for (roomName in self.roomData) {
             mediaIds = self.getRoomApiField(roomName, easyrtcId, "mediaIds");
             if (!mediaIds)
                 continue;
             for (streamName in mediaIds) {
                 if (mediaIds.hasOwnProperty(streamName) &&
-                        mediaIds[streamName] === webrtcstreamName) {
+                        mediaIds[streamName] === webrtcstreamId) {
                     return streamName;
                 }
             }
@@ -1390,8 +1384,29 @@ var Easyrtc = function() {
         if (!streamName) {
             streamName = "default";
         }
+        var stream = self.getLocalStream(streamName);
+        if( !stream) {
+            return;
+        }
+        var streamId = stream.id;
+
         if (namedLocalMediaStreams[streamName]) {
-            namedLocalMediaStreams[streamName].stop();
+
+
+            for( id in peerConns) {
+                if( peerConns.hasOwnProperty(id)) {
+                    if( peerConns[id].pc.getStreamById(streamId)) {
+                        peerConns[id].pc.removeStream(stream);
+                        self.sendPeerMessage(id, "__closingMediaStream", {streamId:streamId, streamName:streamName});
+                    }
+                }
+            }
+            try {
+                namedLocalMediaStreams[streamName].stop();
+            } catch(err) {
+                // not worth reporting an error at this location
+                // since we didn't want the media stream anyhow.
+            }
             delete namedLocalMediaStreams[streamName];
             if (streamName !== "default") {
                 var mediaIds = buildMediaIds();
@@ -1407,8 +1422,14 @@ var Easyrtc = function() {
      * @param {String} streamName - an option stream name.
      */
     this.closeLocalMediaStream = function(streamName) {
-        return closeLocalMediaStream(streamName);
+        return closeLocalMediaStreamByName(streamName);
     }
+
+    /**
+     * Alias for closeLocalMediaStream
+     */
+    this.closeLocalStream = this.closeLocalMediaStream;
+
     /**
      * This function is used to enable and disable the local camera. If you disable the
      * camera, video objects display it will "freeze" until the camera is re-enabled. *
@@ -1849,7 +1870,7 @@ var Easyrtc = function() {
                 console.log("invoking error callback", errText);
                 errorCallback(self.errCodes.MEDIA_ERR, self.format(self.getConstantString("gumFailed"), errText));
             }
-            unregisterLocalMediaStreamByName(null, streamName);
+            closeLocalMediaStreamByName(streamName);
             haveAudioVideo = {
                 audio: false,
                 video: false
@@ -1968,11 +1989,11 @@ var Easyrtc = function() {
     /**  Sets a callback to receive notification of a media stream closing. The usual
      *  use of this is to clear the source of your video object so you aren't left with
      *  the last frame of the video displayed on it.
-     *  @param {Function} onStreamClosed takes an easyrtcid as it's first parameter.
+     *  @param {Function} onStreamClosed takes an easyrtcid as it's first parameter, the stream as it's second argument, and name of the video stream as it's third.
      *  @example
-     *     easyrtc.setOnStreamClosed( function(easyrtcid){
+     *     easyrtc.setOnStreamClosed( function(easyrtcid, stream, streamName){
      *         easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), "");
-     *         ( easyrtc.idToName(easyrtcid) + " went away");
+     *         ( easyrtc.idToName(easyrtcid) + " closed stream " + stream.id + " " + streamName);
      *     });
      */
     this.setOnStreamClosed = function(onStreamClosed) {
@@ -2360,9 +2381,7 @@ var Easyrtc = function() {
         self.disconnecting = true;
         closedChannel = self.webSocket;
         if (self.webSocketConnected) {
-            if( !preallocatedSocketIo) {
-                self.webSocket.close();
-            }
+            self.webSocket.close();
             self.webSocketConnected = false;
         }
         self.hangupAll();
@@ -2845,9 +2864,6 @@ var Easyrtc = function() {
 
                 sendSignalling(otherUser, "offer", sessionDescription, null, callFailureCB);
             };
-            if( sdpLocalFilter) {
-                sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
-            }
             pc.setLocalDescription(sessionDescription, sendOffer,
                     function(errorText) {
                         callFailureCB(self.errCodes.CALL_ERR, errorText);
@@ -2873,9 +2889,14 @@ var Easyrtc = function() {
                     peerConns[otherUser].pc.close();
                 } catch (ignoredError) {
                 }
+                var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
+                for( i = 0; i < remoteStreams.length; i++) {
+                    emitOnStreamClosed(otherUser, remoteStreams[i].id);
+                    try {
+                        remoteStreams[i].close();
+                    }catch(oops){
 
-                if (self.onStreamClosed) {
-                    self.onStreamClosed(otherUser);
+                    }
                 }
             }
 
@@ -3013,9 +3034,6 @@ var Easyrtc = function() {
             var pc = peerConns[easyrtcId].pc;
             pc.addStream(stream);
             pc.createOffer(function(sdp) {
-                if( sdpLocalFilter) {
-                    sdp.sdp = sdpLocalFilter(sdp.sdp);
-                }
                 pc.setLocalDescription(sdp, function() {
                     self.sendPeerMessage(easyrtcId, "_addedMediaStream", {sdp: sdp});
                 }, function() {
@@ -3027,7 +3045,7 @@ var Easyrtc = function() {
     }
 
     //
-    // these two listeners support the ability to add additional mediastreams on the fly.
+    // these three listeners support the ability to add/remove additional mediastreams on the fly.
     //
     this.setPeerListener(function(easyrtcid, msgType, msgData) {
         if (!peerConns[easyrtcid] || !peerConns[easyrtcid].pc) {
@@ -3036,14 +3054,8 @@ var Easyrtc = function() {
         else {
             var sdp = msgData.sdp;
             var pc = peerConns[easyrtcid].pc;
-            if( sdpRemoteFilter) {
-                sdp.sdp = sdpRemoteFilter(sdp.sdp);
-            }
             pc.setRemoteDescription(new RTCSessionDescription(sdp));
             pc.createAnswer(function(sdp) {
-                if( sdpLocalFilter) {
-                    sdp.sdp = sdpLocalFilter(sdp.sdp);
-                }
                 pc.setLocalDescription(sdp, function() {
                     self.sendPeerMessage(easyrtcid, "__gotAddedMediaStream", {sdp: sdp});
                 }, function() {
@@ -3059,14 +3071,28 @@ var Easyrtc = function() {
         }
         else {
             var sdp = msgData.sdp;
-            if( sdpRemoteFilter) {
-                sdp.sdp = sdpRemoteFilter(sdp.sdp);
-            }
             var pc = peerConns[easyrtcid].pc;
             pc.setRemoteDescription(new RTCSessionDescription(sdp));
         }
 
     }, "__gotAddedMediaStream");
+
+    this.setPeerListener(function(easyrtcid, msgType, msgData) {
+        if (!peerConns[easyrtcid] || !peerConns[easyrtcid].pc) {
+        }
+        else {
+            onRemoveStreamHelper(easyrtcid, msgData.streamId, msgData.streamName);
+        }
+
+    }, "__closingMediaStream");
+
+
+    function onRemoveStreamHelper(easyrtcid, streamId) {
+        if( peerConns[easyrtcid] && peerConns[easyrtcid].remoteStreamIdToName[streamId]) {
+            emitOnStreamClosed(easyrtcid, streamId);
+            updateConfigurationInfo();
+        }
+    }
 
 
     this.dumpPeerConnectionInfo = function() {
@@ -3128,6 +3154,7 @@ var Easyrtc = function() {
                 candidatesToSend: [],
                 startedAV: false,
                 isInitiator: isInitiator,
+                remoteStreamIdToName: {},
                 getRemoteStreamByName: function(streamName) {
                     var remoteStreams = pc.getRemoteStreams();
                     var i = 0;
@@ -3217,23 +3244,19 @@ var Easyrtc = function() {
                         updateConfiguration();
                     }
                 }
+                var remoteName = getNameOfRemoteStream(otherUser, event.stream.id);
                 if (self.streamAcceptor) {
                     self.streamAcceptor(otherUser, event.stream, getNameOfRemoteStream(otherUser, event.stream.id));
                 }
+                peerConns[otherUser].remoteStreamIdToName[event.stream.id] = remoteName;
             };
+
 
             pc.onremovestream = function(event) {
                 if (self.debugPrinter) {
                     self.debugPrinter("saw remove on remote media stream");
                 }
-
-                if (peerConns[otherUser]) {
-                    if (self.onStreamClosed) {
-                        self.onStreamClosed(otherUser, event.stream);
-                    }
-//                  delete peerConns[otherUser];
-                    updateConfigurationInfo();
-                }
+                onRemoveStreamHelper(caller, event.stream.id);
 
             };
             peerConns[otherUser] = newPeerConn;
@@ -3461,9 +3484,6 @@ var Easyrtc = function() {
                     pc.connectDataConnection(5002, 5001);
                 }
             };
-            if( sdpLocalFilter) {
-                sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
-            }
             pc.setLocalDescription(sessionDescription, sendAnswer, function(message) {
                 self.showError(self.errCodes.INTERNAL_ERR, "setLocalDescription: " + message);
             });
@@ -3491,9 +3511,7 @@ var Easyrtc = function() {
             self.debugPrinter("about to call setRemoteDescription in doAnswer");
         }
         try {
-            if( sdpRemoteFilter) {
-                sd.sdp = sdpRemoteFilter(sd.sdp);
-            }
+
             pc.setRemoteDescription(sd, invokeCreateAnswer, function(message) {
                 self.showError(self.errCodes.INTERNAL_ERR, "set-remote-description: " + message);
             });
@@ -3505,6 +3523,24 @@ var Easyrtc = function() {
             self.showError(self.errCodes.INTERNAL_ERR, "setRemoteDescription failed: " + srdError.message);
         }
     };
+
+    //
+    // This function calls the users onStreamClosed handler, passing it the easyrtcid of the peer, the stream itself,
+    // and the name of the stream.
+    //
+    function emitOnStreamClosed(easyrtcid, streamId) {
+        if( !peerConns[easyrtcid]) {
+            return;
+        }
+        var streamName = peerConns[easyrtcid].remoteStreamIdToName[streamId]
+        var stream = peerConns[easyrtcid].pc.getStreamById(streamId);
+        if(streamName ) {
+            if (self.onStreamClosed) {
+                self.onStreamClosed(easyrtcid, stream, streamName);
+            }
+            delete peerConns[easyrtcid].remoteStreamIdToName[streamId];
+        }
+    }
 
     var onRemoteHangup = function(caller) {
         delete offersPending[caller];
@@ -3521,12 +3557,13 @@ var Easyrtc = function() {
                 if( remoteStreams ) {
                     var i;
                     for( i = 0; i < remoteStreams.length; i++) {
-                       remoteStreams[i].stop();
+                        emitOnStreamClosed(caller, remoteStreams[i].id);
+                        try {
+                            remoteStreams[i].stop();
+                        }catch(err) {};
                     }
                 }
-                if (self.onStreamClosed) {
-                    self.onStreamClosed(caller);
-                }
+
                 try {
                     peerConns[caller].pc.close();
                 } catch (anyErrors) {
@@ -3834,9 +3871,6 @@ var Easyrtc = function() {
                 self.debugPrinter("about to call initiating setRemoteDescription");
             }
             try {
-                if( sdpRemoteFilter) {
-                    sd.sdp = sdpRemoteFilter(sd.sdp);
-                }
                 pc.setRemoteDescription(sd, function() {
                     if (pc.connectDataConnection) {
                         if (self.debugPrinter) {
@@ -3916,10 +3950,7 @@ var Easyrtc = function() {
 
     function connectToWSServer(successCallback, errorCallback) {
         var i;
-        if( preallocatedSocketIo) {
-            self.webSocket = preallocatedSocketIo;
-        }
-        else if (!self.webSocket) {
+        if (!self.webSocket) {
             self.webSocket = io.connect(serverPath, {
                 'connect timeout': 10000,
                 'force new connection': true
@@ -3928,15 +3959,15 @@ var Easyrtc = function() {
                 throw "io.connect failed";
             }
         }
-
-        for (i in self.websocketListeners) {
-            if (!self.websocketListeners.hasOwnProperty(i)) {
-                continue;
+        else {
+            for (i in self.websocketListeners) {
+                if (!self.websocketListeners.hasOwnProperty(i)) {
+                    continue;
+                }
+                self.webSocket.removeEventListener(self.websocketListeners[i].event,
+                        self.websocketListeners[i].handler);
             }
-            self.webSocket.removeEventListener(self.websocketListeners[i].event,
-                    self.websocketListeners[i].handler);
         }
-
         self.websocketListeners = [];
         function addSocketListener(event, handler) {
             self.webSocket.on(event, handler);
@@ -3949,7 +3980,10 @@ var Easyrtc = function() {
         addSocketListener('error', function(event) {
             function handleErrorEvent() {
                 if (self.myEasyrtcid) {
-                    if (self.webSocket.socket.connected) {
+                    //
+                    // socket.io version 1 got rid of the socket member, moving everything up one level.
+                    //
+                    if (self.webSocket.connected || (self.webSocket.socket && self.webSocket.socket.connected)) {
                         self.showError(self.errCodes.SIGNAL_ERROR, self.getConstantString("miscSignalError"));
                     }
                     else {
@@ -3960,9 +3994,10 @@ var Easyrtc = function() {
                 else {
                     errorCallback(self.errCodes.CONNECT_ERR, self.getConstantString("noServer"));
                 }
+                console.log(event);
             }
-
-            setTimeout(handleErrorEvent, 1);
+            handleErrorEvent();
+            //setTimeout(handleErrorEvent, 1);
         });
         addSocketListener("connect", function(event) {
 
@@ -4844,31 +4879,14 @@ var Easyrtc = function() {
      */
     this.initManaged = this.easyApp;
 
-    var preallocatedSocketIo = null;
 
-    /**
-     * Supply a socket.io connection that will be used instead of allocating a new socket.
-     * The expected usage is that you allocate a websocket, assign options to it, call
-     * easyrtc.useThisSocketConnection, followed by easyrtc.connect or easyrtc.easyApp. Easyrtc will not attempt to
-     * close sockets that were supplied with easyrtc.useThisSocketConnection.
-     * @param {Object} alreadyAllocatedSocketIo A value allocated with the connect method of socket.io.
-     */
-    this.useThisSocketConnection = function(alreadyAllocatedSocketIo) {
-       preallocatedSocketIo = alreadyAllocatedSocketIo;
-    }
-    /**
-     * Connect to the easyrtc signaling server.
-     * @param applicationName
-     * @param successCallback
-     * @param errorCallback
-     */
     this.connect = function(applicationName, successCallback, errorCallback) {
 
         if (!window.io) {
             self.showError("Developer error", "Your HTML has not included the socket.io.js library");
         }
 
-        if (!preallocatedSocketIo && self.webSocket) {
+        if (self.webSocket) {
             console.error("Developer error: attempt to connect when already connected to socket server");
             return;
         }
