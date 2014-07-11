@@ -56,7 +56,7 @@ function addMediaStreamToDiv(divId, stream, streamName)
     var labelBlock = document.createElement("div");
     labelBlock.style.width = "220px";
     labelBlock.style.cssFloat = "left";
-    labelBlock.innerHTML = "<pre>" + formattedName + "</pre>";
+    labelBlock.innerHTML = "<pre>" + formattedName + "</pre><br>";
     container.appendChild(labelBlock);
     var video = document.createElement("video");
     video.width = 320;
@@ -67,12 +67,20 @@ function addMediaStreamToDiv(divId, stream, streamName)
     video.autoplay = true;
     video.muted = false;
     easyrtc.setVideoObjectSrc(video, stream);
+    return labelBlock;
 }
 
 
 
 function createLocalVideo(stream, streamName) {
-    addMediaStreamToDiv("localVideos", stream, streamName);
+    var labelBlock = addMediaStreamToDiv("localVideos", stream, streamName);
+    var closeButton = createLabelledButton("close");
+    closeButton.onclick = function() {
+        easyrtc.closeLocalStream(streamName);
+        labelBlock.parentNode.parentNode.removeChild(labelBlock.parentNode);
+    }
+    labelBlock.appendChild(closeButton);
+    
 }
 
 function addSrcButton(buttonLabel, videoId) {
@@ -213,13 +221,16 @@ function disconnect() {
 }
 
 easyrtc.setStreamAcceptor(function(easyrtcid, stream, streamName) {
-    addMediaStreamToDiv("remoteVideos", stream, streamName);
+    var labelBlock = addMediaStreamToDiv("remoteVideos", stream, streamName);
+    labelBlock.parentNode.id = "remoteBlock" + easyrtcid + streamName;
+
 });
 
 
 
-easyrtc.setOnStreamClosed(function(easyrtcid) {
-    disable("hangupButton");
+easyrtc.setOnStreamClosed(function(easyrtcid, stream, streamName) {
+    var item = document.getElementById("remoteBlock" + easyrtcid + streamName);
+    item.parentNode.removeChild(item);
 });
 
 
