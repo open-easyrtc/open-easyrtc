@@ -54,7 +54,7 @@ The CSS file provides some styling for an error messages dialog.
 
     <head>
       ...
-        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.js" />
+        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
         <script type="text/javascript" src="mylogic.js"></script>
