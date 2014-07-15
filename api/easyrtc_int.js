@@ -1025,7 +1025,7 @@ var Easyrtc = function() {
      * @param {String} fieldName - the name of the field.
      * @param {Object} fieldValue - the value of the field.
      * @example
-     *   easyrtc.setRoomApiFields("trekkieRoom",  "favorite_alien", "Mr Spock");
+     *   easyrtc.setRoomApiField("trekkieRoom",  "favorite_alien", "Mr Spock");
      *   easyrtc.setRoomOccupantListener( function(roomName, list){
      *      for( var i in list ){
      *         console.log("easyrtcid=" + i + " favorite alien is " + list[i].apiFields.favorite_alien);
