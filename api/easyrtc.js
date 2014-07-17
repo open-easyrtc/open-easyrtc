@@ -446,28 +446,34 @@ var Easyrtc = function() {
         receivedMediaContraints.mandatory.OfferToReceiveVideo = value;
     };
 
- /**
+    /**
      * Gets a list of the available video sources (ie, cameras)
      * @param {Function} callback receives list of {facing:String, label:String, id:String, kind:"video"}
+     * @param {String} kind filter source by kind (optional)
      * Note: the label string always seems to be the empty string if you aren't using https.
-     * Note: not supported by Firefox. 
-     * @example  easyrtc.getVideoSourceList( function(list) {
+     * Note: not supported by Firefox and will return empty array. 
+     * @example  easyrtc.getSourceList( function(list) {
      *               var i;
      *               for( i = 0; i < list.length; i++ ) {
      *                   console.log("label=" + list[i].label + ", id= " + list[i].id);
      *               }
      *          });
      */
-    this.getVideoSourceList = function(callback) {
+    this.getSourceList = function(callback, kind) {
         if( MediaStreamTrack.getSources ) {
             MediaStreamTrack.getSources(function(sources) {
                 var results = [];
                 for (var i = 0; i < sources.length; i++) {
                     var source = sources[i];
-                    if (source.kind === "video") {
                         results.push(source);
-                    }
                 }
+
+                if (kind) {
+                    results = results.filter(function (result) {
+                        return result.kind === kind;
+                    });
+                }
+
                 callback(results);
             });
         }
@@ -476,6 +482,37 @@ var Easyrtc = function() {
         }
     };
 
+    /**
+     * Gets a list of the available video sources (ie, cameras)
+     * @param {Function} callback receives list of {facing:String, label:String, id:String, kind:"video"}
+     * Note: the label string always seems to be the empty string if you aren't using https.
+     * Note: not supported by Firefox and will return empty array. 
+     * @example  easyrtc.getVideoSourceList( function(list) {
+     *               var i;
+     *               for( i = 0; i < list.length; i++ ) {
+     *                   console.log("label=" + list[i].label + ", id= " + list[i].id);
+     *               }
+     *          });
+     */
+    this.getVideoSourceList = function(callback) {
+        this.getSourceList(callback, 'video');
+    };
+
+    /**
+     * Gets a list of the available audio sources (ie, cameras)
+     * @param {Function} callback receives list of {facing:String, label:String, id:String, kind:"video"}
+     * Note: the label string always seems to be the empty string if you aren't using https.
+     * Note: not supported by Firefox and will return empty array. 
+     * @example  easyrtc.getAudioSourceList( function(list) {
+     *               var i;
+     *               for( i = 0; i < list.length; i++ ) {
+     *                   console.log("label=" + list[i].label + ", id= " + list[i].id);
+     *               }
+     *          });
+     */
+    this.getAudioSourceList = function(callback) {
+        this.getSourceList(callback, 'audio');
+    };
 
     /** @private */
     var audioEnabled = true;
