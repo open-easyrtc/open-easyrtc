@@ -460,18 +460,16 @@ var Easyrtc = function() {
      *          });
      */
     this.getSourceList = function(callback, kind) {
+
         if( MediaStreamTrack.getSources ) {
             MediaStreamTrack.getSources(function(sources) {
                 var results = [];
-                for (var i = 0; i < sources.length; i++) {
+                for (var i = 0, l = sources.length; i < l; i++) {
                     var source = sources[i];
-                        results.push(source);
-                }
 
-                if (kind) {
-                    results = results.filter(function (result) {
-                        return result.kind === kind;
-                    });
+                    if (!kind || source.kind === kind) {
+                        results.push(source); 
+                    }
                 }
 
                 callback(results);
