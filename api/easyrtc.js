@@ -461,8 +461,13 @@ var Easyrtc = function() {
      */
     this.getSourceList = function(callback, kind) {
 
-        if( MediaStreamTrack.getSources ) {
-            MediaStreamTrack.getSources(function(sources) {
+        // "getSources" will be replaced with "getMediaDevices", check the for available method.
+        var getMediaDevices = MediaStreamTrack.getMediaDevices || MediaStreamTrack.getSources;
+
+        if(getMediaDevices) {
+
+            getMediaDevices(function(sources) {
+
                 var results = [];
                 for (var i = 0, l = sources.length; i < l; i++) {
                     var source = sources[i];
