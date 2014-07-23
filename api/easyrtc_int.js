@@ -2262,9 +2262,52 @@ var Easyrtc = function() {
     /* used in easyrtc.connect */
     /** @private */
     this.webSocket = null;
-    /** @private  */
     var pc_config = {};
-    /** @private  */
+    var pc_config_to_use = null;
+    var use_fresh_ice_each_peer = false;
+    /**
+     * Determines whether fresh ice server configuration should be requested from the server for each peer connection.
+     * @param {Boolean} value the default is false.
+     */
+    this.useFreshIceEachPeerConnection = function (value){
+        use_fresh_ice_each_peer = value;
+    };
+    /**
+     * Returns the last ice config supplied by the EasyRTC server. This function is not normally used, it is provided
+     * for people who want to try filtering ice server configuration on the client.
+     * @return {Object}
+     */
+    this.getServerIce = function() {
+        return pc_config;
+    };
+
+    /**
+     * Sets the ice server configuration that will be used in subsequent calls. You only need this function if you are filtering
+     * the ice server configuration on the client or if you are using TURN certificates that have a very short lifespan.
+     * @param {Object} ice An object with iceServers element containing an array of ice server entries.
+     * @example
+     *     easyrtc.setIceUsedInCalls( {"iceServers": [
+     *      {
+	 *			"url": "stun:stun.sipgate.net"
+	 *		},
+     *      {
+     *         "url": "stun:217.10.68.152"
+     *      },
+     *      {
+     *         "url": "stun:stun.sipgate.net:10000"
+     *      }
+     *      ]});
+     *      easyrtc.call(...);
+     */
+    this.setIceUsedInCalls = function(ice) {
+        if( !ice.iceServers ) {
+            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "Bad ice configuration passed to easyrtc.setIceUsedInCalls");
+        }
+        else {
+            pc_config_to_use = ice;
+        }
+    };
+
     var closedChannel = null;
     /** @private
      * @param easyrtcid
@@ -2766,6 +2809,7 @@ var Easyrtc = function() {
         return {optional: options};
     }
 
+
     /**
      *  Initiates a call to another user. If it succeeds, the streamAcceptor callback will be called.
      * @param {String} otherUser - the easyrtcid of the peer being called.
@@ -2804,9 +2848,9 @@ var Easyrtc = function() {
 
         if (self.debugPrinter) {
             self.debugPrinter("initiating peer to peer call to " + otherUser +
-                    " audio=" + audioEnabled +
-                    " video=" + videoEnabled +
-                    " data=" + dataEnabled);
+                " audio=" + audioEnabled +
+                " video=" + videoEnabled +
+                " data=" + dataEnabled);
         }
 
         if (!self.supportsPeerConnections()) {
@@ -2822,12 +2866,13 @@ var Easyrtc = function() {
         if (!streamNames && autoInitUserMedia) {
             var stream = self.getLocalStream();
             if (!stream && (audioEnabled || videoEnabled)) {
-                self.initMediaSource(function() {
+                self.initMediaSource(function () {
                     self.call(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB);
                 }, callFailureCB);
                 return;
             }
         }
+
         if (!self.webSocket) {
             message = "Attempt to make a call prior to connecting to service";
             if (self.debugPrinter) {
@@ -2858,6 +2903,22 @@ var Easyrtc = function() {
             return;
         }
 
+        if( use_fresh_ice_each_peer) {
+            self.getFreshIceConfig( function(succeeded){
+                if( succeeded) {
+                    callBody(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB, streamNames);
+                }
+                else {
+                    callFailureCB(self.errCodes.CALL_ERR, "Attempt to get fresh ice configuration failed");
+                }
+            });
+        }
+        else {
+            callBody(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB, streamNames);
+        }
+    };
+
+    function callBody(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB, streamNames){
         acceptancePending[otherUser] = true;
         var pc = buildPeerConnection(otherUser, true, callFailureCB, streamNames);
         if (!pc) {
@@ -2884,17 +2945,19 @@ var Easyrtc = function() {
                 sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
             }
             pc.setLocalDescription(sessionDescription, sendOffer,
-                    function(errorText) {
-                        callFailureCB(self.errCodes.CALL_ERR, errorText);
-                    });
+                function(errorText) {
+                    callFailureCB(self.errCodes.CALL_ERR, errorText);
+                });
         };
         setTimeout(function() {
             pc.createOffer(setLocalAndSendMessage0, function(errorObj) {
-                callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(errorObj));
-            },
-                    receivedMediaContraints);
+                    callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(errorObj));
+                },
+                receivedMediaContraints);
         }, 100);
     };
+
+
 
 
     function hangupBody(otherUser) {
@@ -3149,6 +3212,7 @@ var Easyrtc = function() {
         var pc;
         var message;
         var newPeerConn;
+        var iceConfig = pc_config_to_use? pc_config_to_use: pc_config;
 
         if (self.debugPrinter) {
             self.debugPrinter("building peer connection to " + otherUser);
@@ -3158,10 +3222,10 @@ var Easyrtc = function() {
         // we don't support data channels on chrome versions < 31
         //
         try {
-            pc = self.createRTCPeerConnection(pc_config, buildPeerConstraints());
+            pc = self.createRTCPeerConnection(iceConfig, buildPeerConstraints());
             if (!pc) {
                 message = "Unable to create PeerConnection object, check your ice configuration(" +
-                        JSON.stringify(pc_config) + ")";
+                        JSON.stringify(ice_config) + ")";
                 if (self.debugPrinter) {
                     self.debugPrinter(message);
                 }
@@ -3477,16 +3541,32 @@ var Easyrtc = function() {
             var localStream = self.getLocalStream();
             if (!localStream && (videoEnabled || audioEnabled)) {
                 self.initMediaSource(
-                        function() {
-                            doAnswer(caller, msgData);
-                        },
-                        function(errorCode, errorObj) {
-                            self.showError(self.errCodes.MEDIA_ERR, self.format(self.getConstantString("localMediaError")));
-                        });
+                    function () {
+                        doAnswer(caller, msgData);
+                    },
+                    function (errorCode, errorObj) {
+                        self.showError(self.errCodes.MEDIA_ERR, self.format(self.getConstantString("localMediaError")));
+                    });
                 return;
             }
         }
+        if( use_fresh_ice_each_peer) {
+            self.getFreshIceConfig(function(succeeded){
+                if(succeeded) {
+                    doAnswerBody(caller, msgData, streamNames);
+                }
+                else {
+                    self.showError(self.errCodes.CALL_ERR, "Failed to get fresh ice config");
+                }
+            });
+        }
+        else {
+            doAnswerBody(caller, msgData, streamNames);
+        }
+    }
 
+
+    var doAnswerBody = function(caller, msgData, streamNames) {
         var pc = buildPeerConnection(caller, false, function(message) {
             self.showError(self.errCodes.SYSTEM_ERR, message);
         }, streamNames);
@@ -4399,9 +4479,9 @@ var Easyrtc = function() {
     /**
      * Request fresh ice config information from the server.
      * This should be done periodically by long running applications.
-     * There are no parameters or return values.
+     * @param {Function} callback is called with a value of true on success, false on failure.
      */
-    this.getFreshIceConfig = function() {
+    this.getFreshIceConfig = function(callback) {
         var dataToShip = {
             msgType: "getIceConfig",
             msgData: {}
@@ -4410,9 +4490,11 @@ var Easyrtc = function() {
                 function(ackMsg) {
                     if (ackMsg.msgType === "iceConfig") {
                         processIceConfig(ackMsg.msgData.iceConfig);
+                        callback(true);
                     }
                     else {
                         self.showError(ackMsg.msgData.errorCode, ackMsg.msgData.errorText);
+                        callback(false);
                     }
                 }
         );
