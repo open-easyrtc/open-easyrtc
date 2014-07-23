@@ -89,7 +89,7 @@
                     <div id="connectControls">
                         <input type="checkbox" checked="checked" id="shareAudio" />Share audio
                         <input type="checkbox" checked="checked" id="shareVideo" />Share video<br />
-                        <input type="checkbox" id="useFreshIce" onclick="easyrtc.useFreshIceEachPeerConnection(this.value);"/>Fresh Ice<br />
+                        <input type="checkbox" id="useFreshIce" onclick="easyrtc.setUseFreshIceEachPeerConnection(this.value);"/>Fresh Ice<br />
                         <button id="connectButton" onclick="connect()">Connect</button>
                         <button id="hangupButton" disabled="disabled" onclick="hangup()">Hangup</button>
                         <div id="iam">Not yet connected...</div>

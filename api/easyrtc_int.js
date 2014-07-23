@@ -2269,7 +2269,7 @@ var Easyrtc = function() {
      * Determines whether fresh ice server configuration should be requested from the server for each peer connection.
      * @param {Boolean} value the default is false.
      */
-    this.useFreshIceEachPeerConnection = function (value){
+    this.setUseFreshIceEachPeerConnection = function (value){
         use_fresh_ice_each_peer = value;
     };
     /**
