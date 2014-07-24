@@ -4486,6 +4486,9 @@ var Easyrtc = function() {
             msgType: "getIceConfig",
             msgData: {}
         };
+        if( !callback) {
+            callback = function(){};
+        }
         self.webSocket.json.emit("easyrtcCmd", dataToShip,
                 function(ackMsg) {
                     if (ackMsg.msgType === "iceConfig") {
