@@ -255,7 +255,7 @@ var Easyrtc = function() {
     };
 
     /**
-     * Control whether the client requests audio from a peer during a call.
+     * Control whether the client requests video from a peer during a call.
      * Must be called before the call to have an effect.
      * @param value - true to receive video, false otherwise. The default is true.
      */
@@ -263,7 +263,7 @@ var Easyrtc = function() {
         receivedMediaContraints.mandatory.OfferToReceiveVideo = value;
     };
 
- /**
+   /**
      * Gets a list of the available video sources (ie, cameras)
      * @param {Function} callback receives list of {facing:String, label:String, id:String, kind:"video"}
      * Note: the label string always seems to be the empty string if you aren't using https.
