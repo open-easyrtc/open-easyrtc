@@ -1320,7 +1320,7 @@ var Easyrtc = function() {
             }
         }
     }
-    
+
 
     //
     // fetches a stream by name. Treat a null/undefined streamName as "default".
@@ -1381,8 +1381,9 @@ var Easyrtc = function() {
 
         for (roomName in self.roomData) {
             mediaIds = self.getRoomApiField(roomName, easyrtcId, "mediaIds");
-            if (!mediaIds)
+            if (!mediaIds) {
                 continue;
+            }
             for (streamName in mediaIds) {
                 if (mediaIds.hasOwnProperty(streamName) &&
                         mediaIds[streamName] === webrtcstreamId) {
@@ -1670,80 +1671,7 @@ var Easyrtc = function() {
         }
     };
 
-    /**
-     * This is the new desktop capture code. This code makes use of an API that is only available to google extensions, which are self-contained sets of files you download from the Chrome Store. It will not run in a page hosted on your website. 
-     * @param {function(Object)} successCallback - will be called with localmedia stream on success. 
-     * @param {function(String,String)} errorCallback - is called with an error code and error description.
-     * @param {String} streamName - an optional id for the media source so you can use multiple cameras and screen share simultaneously.
-     * @example
-     *       easyrtc.initScreenCapture(
-     *          function(mediastream){
-     *              easyrtc.setVideoObjectSrc( document.getElementById("mirrorVideo"), mediastream);
-     *          },
-     *          function(errorCode, errorText){
-     *               easyrtc.showError(errorCode, errorText);
-     *          });
-     */
-    this.initScreenCapture = function(onSuccess, onFailure, streamName) {
-        if (!chrome|| !chrome.desktopCapture || !chrome.desktopCapture.chooseDesktopMedia) {
-            onFailure(self.errCodes.DEVELOPER_ERR, "The initScreenCapture api can only be used inside a chrome extensions. This is chrome security feature. Sorry.");
-            return;
-        }
-        //
-        // the code for doing the screen capture was taken from Muaz-Khan's desktop sharing example.
-        //        
-        function onAccessApproved(desktop_id) {
-            if (!desktop_id) {
-                onFailure("user-err", "no desktop selected");
-                return;
-            }
-
-            navigator.webkitGetUserMedia({
-                audio: false,
-                video: {
-                    mandatory: {
-                        chromeMediaSource: 'desktop',
-                        chromeMediaSourceId: desktop_id,
-                        minWidth: 1280,
-                        maxWidth: 1280,
-                        minHeight: 720,
-                        maxHeight: 720
-                    }
-                }
-            }, gotStream, getUserMediaError);
-
-            function gotStream(stream) {
-                if (!stream) {
-                    onFailure(self.errCodes.MEDIA_ERR, self.format(self.getConstantString("gumFailed"), "cancelled"));
-                    return;
-                }
-                 registerLocalMediaStreamByName(stream, streamName);
-                 onSuccess(stream);
-                // create RTCPeerConnection to stream desktop in realtime!
-            }
-
-            function getUserMediaError(error) {
-                var errText;
-                if (typeof error === 'string') {
-                    errText = error;
-                }
-                else if (error.name) {
-                    errText = error.name;
-                }
-                else {
-                    errText = "Unknown";
-                }
-                if (errorCallback) {
-                    console.log("invoking error callback", errText);
-                    errorCallback(self.errCodes.MEDIA_ERR, self.format(self.getConstantString("gumFailed"), errText));
-                }
-            }
-        }
-
-        pre_desktop_id = chrome.desktopCapture.chooseDesktopMedia(
-                ["screen", "window"], onAccessApproved);
-
-    }
+   
     /** Initializes your access to a local camera and microphone.
      *  Failure could be caused a browser that didn't support WebRTC, or by the user
      * not granting permission.
