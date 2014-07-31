@@ -1320,7 +1320,7 @@ var Easyrtc = function() {
             }
         }
     }
-    ;
+    
 
     //
     // fetches a stream by name. Treat a null/undefined streamName as "default".
