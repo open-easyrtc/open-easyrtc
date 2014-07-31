@@ -241,7 +241,7 @@ var Easyrtc = function() {
      * Controls whether a default local media stream should be acquired automatically during calls and accepts
      * if a list of streamNames is not supplied. The default is true, which mimicks the behaviour of earlier releases
      * that didn't support multiple streams. This function should be called before easyrtc.call or before entering an 
-     * accept checker callback.
+     * accept  callback.
      * @param {Boolean} flag true to allocate a default local media stream.
      */
     this.setAutoInitUserMedia = function(flag) {
@@ -307,7 +307,7 @@ var Easyrtc = function() {
      * @param {String} eventName
      * @param {String} callingFunction the name of the calling function.
      */
-    function eventChecker(eventName, callingFunction) {
+    function event(eventName, callingFunction) {
         if (typeof eventName !== 'string') {
             self.showError(self.errCodes.DEVELOPER_ERR, src + " called without a string as the first argument");
             throw "developer error";
@@ -328,7 +328,7 @@ var Easyrtc = function() {
      * @returns {void}
      */
     this.addEventListener = function(eventName, eventListener) {
-        eventChecker(eventName, "addEventListener");
+        event(eventName, "addEventListener");
         if (typeof eventListener !== 'function') {
             self.showError(self.errCodes.DEVELOPER_ERR, "addEventListener called with a non-function for second argument");
             throw "developer error";
@@ -349,7 +349,7 @@ var Easyrtc = function() {
      * @param {Function} eventListener
      */
     this.removeEventListener = function(eventName, eventListener) {
-        eventChecker(eventName, "removeEventListener");
+        event(eventName, "removeEventListener");
         var listeners = eventListeners[eventName];
         var i = 0;
         if (listeners) {
@@ -370,7 +370,7 @@ var Easyrtc = function() {
      * @param {Object} eventData
      */
     this.emitEvent = function(eventName, eventData) {
-        eventChecker(eventName, "emitEvent");
+        event(eventName, "emitEvent");
         var listeners = eventListeners[eventName];
         var i = 0;
         if (listeners) {
@@ -2121,17 +2121,19 @@ var Easyrtc = function() {
     };
     /**
      * Sets the callback used to decide whether to accept or reject an incoming call.
-     * @param {Function} acceptCheck takes the arguments (callerEasyrtcid, function():boolean ){}
-     * The acceptCheck callback is passed (as it's second argument) a function that should be called with either
-     * a true value (accept the call) or false value( reject the call) as it's first argument. 
-     * An array of streamNames can be supplied as a second argument.
+     * @param {Function} acceptCheck takes the arguments (callerEasyrtcid, acceptor).     
+     * The acceptCheck callback is passed an easyrtcid and an aceptor function. The acceptor function should be called with either
+     * a true value (accept the call) or false value( reject the call) as it's first argument, and optionally,
+     * an array of local media streamNames as a second argument.
      * @example
-     *      easyrtc.setAcceptChecker( function(easyrtcid, acceptor){
+     *      easyrtc.( function(easyrtcid, acceptor){
      *           if( easyrtc.idToName(easyrtcid) === 'Fred' ){
      *              acceptor(true);
      *           }
      *           else if( easyrtc.idToName(easyrtcid) === 'Barney' ){
-     *              setTimeout( function(){ acceptor(true)}, 10000);
+     *              setTimeout( function(){ 
+                       acceptor(true, ['myOtherCam']); // myOtherCam presumed to a streamName
+                     }, 10000);
      *           }
      *           else{
      *              acceptor(false);
@@ -2458,7 +2460,7 @@ var Easyrtc = function() {
     /**
      * Returns the last ice config supplied by the EasyRTC server. This function is not normally used, it is provided
      * for people who want to try filtering ice server configuration on the client.
-     * @return {Object}
+     * @return {Object} which has the form {iceServers:[ice_server_entry, ice_server_entry, ...]}
      */
     this.getServerIce = function() {
         return pc_config;

@@ -108,8 +108,12 @@ function convertListToButtons(roomName, occupantList, isPrimary) {
 
 function updateButtonState(otherEasyrtcid) {
     var isConnected = channelIsActive[otherEasyrtcid];
-    document.getElementById('connect_' + otherEasyrtcid).disabled = isConnected;
-    document.getElementById('send_' + otherEasyrtcid).disabled = !isConnected;
+    if(document.getElementById('connect_' + otherEasyrtcid)) {
+        document.getElementById('connect_' + otherEasyrtcid).disabled = isConnected;
+    }
+    if( document.getElementById('send_' + otherEasyrtcid)) {
+        document.getElementById('send_' + otherEasyrtcid).disabled = !isConnected;
+    }
 }
 
 
