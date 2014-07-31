@@ -47,7 +47,7 @@ function performCall(otherEasyrtcid) {
 
 var iceMap = [];
 
-getModifiedIceList = function(){
+function getModifiedIceList(){
    var iceList = [];
    var i;
 
