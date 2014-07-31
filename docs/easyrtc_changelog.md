@@ -1,6 +1,31 @@
 EasyRTC: Change Log
 ===================
 
+V1.0.12
+-------
+New Features
+    - JS Client - New Function setAutoInitUserMedia() sets whether the local media is automatically acquired before a call or answer (if not already acquired).
+    - JS Client - New function setSdpFilters() for modifying SDP's just before a call.
+    - JS Client - Labs directory with example SDP filters.
+    - JS Client - New function getServerIce() gets the list of ice servers as supplied by the server.
+    - JS Client - New function setIceUsedInCalls() sets the configuration used in the next call. 
+    - JS Client - New function setUseFreshIceEachPeerConnection() causes the client to ask the server for a fresh ice config in the middle of each call or answer.
+	- JS Client - Added support for multiple named mediastreams per connection (supported through the mediaIds apifield, getMediaStreamByName(), getLocalMediaIds(), closeLocalMediaStream(), buildLocalMediaStream(), getRemoteStream(), addStreamToCall(),
+	- JS Client - Three new internal peer messages with types "__gotAddedMediaStream", "__closingMediaStream", 
+   and "_addedMediaStream" 
+	- JS Client - New function getRoomOccupantsAsArray() and getRoomOccupantsAsMap()
+	- JS Client - New function useThisSocketConnection() for people that want to allocate the websocket themselves.
+ 
+Changes
+    - JS Client - enableCamera(), enableMicrophone(), getLocalStreamAsUrl(), initMediaSource(), call(), now take optional media stream names.
+    - JS Client - initMediaSource's successCallback get	passed the new media stream.
+    - JS Client - an onStreamClosed listener gets passed an easyrtcid plus the stream and the stream name.
+    - JS Client - Added documentation for isTurnServer().
+	- JS Client - getFreshIceConfig() now takes an optional callback.
+
+Fixes
+	- JS Client - Numerous documentation fixes.
+ 
 v1.0.11
 -------
 

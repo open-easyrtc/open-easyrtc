@@ -1671,7 +1671,7 @@ var Easyrtc = function() {
         }
     };
 
-   
+
     /** Initializes your access to a local camera and microphone.
      *  Failure could be caused a browser that didn't support WebRTC, or by the user
      * not granting permission.
@@ -2994,6 +2994,7 @@ var Easyrtc = function() {
     this.getRemoteStream = function(easyrtcid, remotestreamName) {
         if (!peerConns[easyrtcid]) {
             self.showError(self.errCodes.DEVELOPER_ERR, "attempt to get stream of uncalled party");
+            throw "Developer err: no such stream";
         }
         else {
             return peerConns[easyrtcid].getRemoteStreamByName(remotestreamName);
@@ -3020,7 +3021,7 @@ var Easyrtc = function() {
                 registerLocalMediaStreamByName(remoteStream, localstreamName);
             }
             else {
-                throw "Developer err: no such stream"
+                throw "Developer err: no such stream";
             }
         }
         else {
