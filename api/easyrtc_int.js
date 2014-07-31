@@ -1402,7 +1402,7 @@ var Easyrtc = function() {
         if( !stream) {
             return;
         }
-        var streamId = stream.id;
+        var streamId = stream.id || "anonymous";
 
         if (namedLocalMediaStreams[streamName]) {
 
@@ -3270,14 +3270,14 @@ var Easyrtc = function() {
                         updateConfiguration();
                     }
                 }
-                var remoteName = getNameOfRemoteStream(otherUser, event.stream.id);
+                var remoteName = getNameOfRemoteStream(otherUser, event.stream.id || "anonymous");
                 if( !remoteName) {
                     remoteName = "default";
                 }
                 if (self.streamAcceptor) {
                     self.streamAcceptor(otherUser, event.stream, remoteName);
                 }
-                peerConns[otherUser].remoteStreamIdToName[event.stream.id] = remoteName;
+                peerConns[otherUser].remoteStreamIdToName[event.stream.id || "anonymous"] = remoteName;
             };
 
 
@@ -3285,7 +3285,7 @@ var Easyrtc = function() {
                 if (self.debugPrinter) {
                     self.debugPrinter("saw remove on remote media stream");
                 }
-                onRemoveStreamHelper(caller, event.stream.id);
+                onRemoveStreamHelper(caller, event.stream.id || "anonymous");
 
             };
             peerConns[otherUser] = newPeerConn;
