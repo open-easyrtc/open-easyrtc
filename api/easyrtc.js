@@ -3234,7 +3234,7 @@ var Easyrtc = function() {
                     sdp.sdp = sdpLocalFilter(sdp.sdp);
                 }
                 pc.setLocalDescription(sdp, function() {
-                    self.sendPeerMessage(easyrtcId, "_addedMediaStream", {sdp: sdp});
+                    self.sendPeerMessage(easyrtcId, "__addedMediaStream", {sdp: sdp});
                 }, function() {
                 });
             }, function(errorObj) {
@@ -3269,7 +3269,7 @@ var Easyrtc = function() {
                 console.log("unexpected error creating answer");
             });
         }
-    }, "_addedMediaStream");
+    }, "__addedMediaStream");
 
     this.setPeerListener(function(easyrtcid, msgType, msgData) {
         if (!peerConns[easyrtcid] || !peerConns[easyrtcid].pc) {
