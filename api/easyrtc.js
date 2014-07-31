@@ -3080,10 +3080,6 @@ var Easyrtc = function() {
         clearQueuedMessages(otherUser);
         if (peerConns[otherUser]) {
             if (peerConns[otherUser].startedAV) {
-                try {
-                    peerConns[otherUser].pc.close();
-                } catch (ignoredError) {
-                }
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
                 for( i = 0; i < remoteStreams.length; i++) {
                     emitOnStreamClosed(otherUser, remoteStreams[i].id);
@@ -3092,6 +3088,10 @@ var Easyrtc = function() {
                     }catch(oops){
 
                     }
+                }
+                try {
+                    peerConns[otherUser].pc.close();
+                } catch (ignoredError) {
                 }
             }
 
