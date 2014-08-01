@@ -530,7 +530,6 @@ function callEverybodyElse(roomName, otherPeople) {
 
     var list = [];
     var connectCount = 0;
-
     for(var easyrtcid in otherPeople ) {
         list.push(easyrtcid);
     }
@@ -561,7 +560,6 @@ function callEverybodyElse(roomName, otherPeople) {
 
 
 function loginSuccess() {
-//    console.log("Successfully connected");
     expandThumb(0);  // expand the mirror image initially.
 }
 
@@ -709,7 +707,6 @@ function appInit() {
 
     easyrtc.setOnHangup(function(easyrtcid, slot) {
         boxUsed[slot+1] = false;
-        console.log("hanging up on " + easyrtcid);
         if(activeBox > 0 && slot+1 == activeBox) {
             collapseToThumb();
         }
