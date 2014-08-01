@@ -1333,7 +1333,12 @@ var Easyrtc = function() {
         if (!streamName) {
             streamName = "default";
         }
-        return namedLocalMediaStreams[streamName];
+        if( namedLocalMediaStreams.hasOwnProperty(streamName)) {
+            return namedLocalMediaStreams[streamName];
+        }
+        else {
+            return null;
+        }
     }
 
     /**
