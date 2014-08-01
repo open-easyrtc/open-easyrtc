@@ -3503,7 +3503,7 @@ var Easyrtc = function() {
                 if (self.debugPrinter) {
                     self.debugPrinter("saw remove on remote media stream");
                 }
-                onRemoveStreamHelper(caller, event.stream, event.stream.id || "anonymous");
+                onRemoveStreamHelper(otherUser, event.stream, event.stream.id || "anonymous");
 
             };
             peerConns[otherUser] = newPeerConn;
