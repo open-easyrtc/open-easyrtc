@@ -744,6 +744,10 @@ var Easyrtc = function() {
             if (self._desiredVideoProperties.videoSrcId) {
                 constraints.video.optional.push({sourceId: self._desiredVideoProperties.videoSrcId});
             }
+            // hack for opera
+            if( constraints.video.mandatory.length === 0 && constraints.video.optional.length === 0) {
+                constraints.video = true;
+            }
         }
         constraints.audio = audioEnabled;
         return constraints;
@@ -1527,7 +1531,7 @@ var Easyrtc = function() {
         var mediaMap = {};
         var streamName;
         for (streamName in namedLocalMediaStreams) {
-            mediaMap[streamName] = namedLocalMediaStreams[streamName].id;
+            mediaMap[streamName] = namedLocalMediaStreams[streamName].id || "anonymous";
         }
         return mediaMap;
     }
@@ -1555,6 +1559,9 @@ var Easyrtc = function() {
         var roomName;
         var mediaIds;
         var streamName;
+        if(!webrtcstreamId) {
+            webrtcstreamId = "anonymous";
+        }
         if( peerConns[easyrtcId]) {
             streamName =  peerConns[easyrtcId].remoteStreamIdToName[webrtcstreamId];
             if( streamName) {
@@ -1592,10 +1599,10 @@ var Easyrtc = function() {
 
             for( id in peerConns) {
                 if( peerConns.hasOwnProperty(id)) {
-                    if( peerConns[id].pc.getStreamById(streamId)) {
+                    try {
                         peerConns[id].pc.removeStream(stream);
-                        self.sendPeerMessage(id, "__closingMediaStream", {streamId:streamId, streamName:streamName});
-                    }
+                    } catch(err) {}
+                    self.sendPeerMessage(id, "__closingMediaStream", {streamId: streamId, streamName: streamName});
                 }
             }
             try {
@@ -2437,7 +2444,7 @@ var Easyrtc = function() {
                 console.error("Developer error: haveTracks called about a peer you don't have a connection to");
                 return false;
             }
-            stream = peerConnObj.getStreamByName(streamName);
+            stream = peerConnObj.getRemoteStreamByName(streamName);
         }
         if (!stream) {
             return false;
@@ -2637,6 +2644,9 @@ var Easyrtc = function() {
             self.webSocket.json.emit("easyrtcCmd", dataToShip,
                     function(ackMsg) {
                         if (ackMsg.msgType !== "error") {
+                            if( !ackMsg.hasOwnProperty("msgData")) {
+                                ackMsg.msgData = null;
+                            }
                             if (successCallback) {
                                 successCallback(ackMsg.msgType, ackMsg.msgData);
                             }
@@ -3074,6 +3084,7 @@ var Easyrtc = function() {
 
 
     function hangupBody(otherUser) {
+        var i;
         if (self.debugPrinter) {
             self.debugPrinter("Hanging up on " + otherUser);
         }
@@ -3082,16 +3093,16 @@ var Easyrtc = function() {
             if (peerConns[otherUser].startedAV) {
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
                 for( i = 0; i < remoteStreams.length; i++) {
-                    emitOnStreamClosed(otherUser, remoteStreams[i].id);
+                    emitOnStreamClosed(otherUser, remoteStreams[i]);
                     try {
                         remoteStreams[i].close();
-                    }catch(oops){
+                    }catch(err){
 
                     }
                 }
                 try {
                     peerConns[otherUser].pc.close();
-                } catch (ignoredError) {
+                } catch (err) {
                 }
             }
 
@@ -3289,15 +3300,18 @@ var Easyrtc = function() {
         if (!peerConns[easyrtcid] || !peerConns[easyrtcid].pc) {
         }
         else {
-            onRemoveStreamHelper(easyrtcid, msgData.streamId, msgData.streamName);
+            var stream = peerConns[easyrtcid].getRemoteStreamByName( msgData.streamName);
+            if( stream) {
+                onRemoveStreamHelper(easyrtcid, stream, msgData.streamName);
+            }
         }
 
     }, "__closingMediaStream");
 
 
-    function onRemoveStreamHelper(easyrtcid, streamId) {
-        if( peerConns[easyrtcid] && peerConns[easyrtcid].remoteStreamIdToName[streamId]) {
-            emitOnStreamClosed(easyrtcid, streamId);
+    function onRemoveStreamHelper(easyrtcid, stream) {
+        if( peerConns[easyrtcid] ) {
+            emitOnStreamClosed(easyrtcid, stream);
             updateConfigurationInfo();
         }
     }
@@ -3369,27 +3383,42 @@ var Easyrtc = function() {
                     var i = 0;
                     var keyToMatch = null;
                     var roomName;
-                    if (streamName) {
-                        //
-                        // there is a better way of mapping user assigned mediasream ids to 
-                        // webrtc assigned mediastream ids. It hasn't occurred to me what it
-                        // might be yet though.
-                        //
-                        for (roomName in self.roomData) {
-                            var mediaIds = self.getRoomApiField(roomName, otherUser, "mediaIds");
-                            keyToMatch = mediaIds ? mediaIds[streamName] : null;
-                            if (keyToMatch) {
-                                break;
-                            }
+                    if( !streamName ) {
+                        streamName = "default";
+                    }
+
+                    if( streamName === "default") {
+                        if( remoteStreams.length > 0) {
+                            return remoteStreams[0];
                         }
-                        if (!keyToMatch) {
-                            self.showError(self.errCodes.DEVELOPER_ERR, "remote peer does not have media stream called " + streamName);
+                        else {
+                            return null;
                         }
                     }
+                    for (roomName in self.roomData) {
+                        var mediaIds = self.getRoomApiField(roomName, otherUser, "mediaIds");
+                        keyToMatch = mediaIds ? mediaIds[streamName] : null;
+                        if (keyToMatch) {
+                            break;
+                        }
+                    }
+                    if (!keyToMatch) {
+                        self.showError(self.errCodes.DEVELOPER_ERR, "remote peer does not have media stream called " + streamName);
+                    }
+
                     for (i = 0; i < remoteStreams.length; i++) {
-                        if (!keyToMatch || remoteStreams[i].id === keyToMatch) {
+                        var remoteId;
+                        if( remoteStreams[i].hasOwnProperty("id")) {
+                            remoteId = remoteStreams[i].id;
+                        }
+                        else {
+                            remoteId = "anonymous";
+                        }
+
+                        if (!keyToMatch || remoteId === keyToMatch) {
                             return remoteStreams[i];
                         }
+
                     }
                     return null;
                 }
@@ -3457,10 +3486,10 @@ var Easyrtc = function() {
                 if( !remoteName) {
                     remoteName = "default";
                 }
+                peerConns[otherUser].remoteStreamIdToName[event.stream.id || "anonymous"] = remoteName;
                 if (self.streamAcceptor) {
                     self.streamAcceptor(otherUser, event.stream, remoteName);
                 }
-                peerConns[otherUser].remoteStreamIdToName[event.stream.id || "anonymous"] = remoteName;
             };
 
 
@@ -3468,7 +3497,7 @@ var Easyrtc = function() {
                 if (self.debugPrinter) {
                     self.debugPrinter("saw remove on remote media stream");
                 }
-                onRemoveStreamHelper(caller, event.stream.id || "anonymous");
+                onRemoveStreamHelper(caller, event.stream, event.stream.id || "anonymous");
 
             };
             peerConns[otherUser] = newPeerConn;
@@ -3520,7 +3549,7 @@ var Easyrtc = function() {
                         self.receivePeerDistribute(otherUser, msg, null);
                     }
                 }
-                catch (oops) {
+                catch (err) {
                 }
             }
         }
@@ -3762,18 +3791,23 @@ var Easyrtc = function() {
     // This function calls the users onStreamClosed handler, passing it the easyrtcid of the peer, the stream itself,
     // and the name of the stream.
     //
-    function emitOnStreamClosed(easyrtcid, streamId) {
+    function emitOnStreamClosed(easyrtcid, stream) {
         if( !peerConns[easyrtcid]) {
             return;
         }
-        var streamName = peerConns[easyrtcid].remoteStreamIdToName[streamId]
-        var stream = peerConns[easyrtcid].pc.getStreamById(streamId);
-        if(streamName ) {
-            if (self.onStreamClosed) {
-                self.onStreamClosed(easyrtcid, stream, streamName);
-            }
-            delete peerConns[easyrtcid].remoteStreamIdToName[streamId];
+        var streamName;
+        var id;
+        if( stream.hasOwnProperty("id")) {
+            id = stream.id;
         }
+        else {
+            id = "anonymous";
+        }
+        streamName = peerConns[easyrtcid].remoteStreamIdToName[id] || "default";
+        if (self.onStreamClosed) {
+            self.onStreamClosed(easyrtcid, stream, streamName);
+        }
+        delete peerConns[easyrtcid].remoteStreamIdToName[id];
     }
 
     var onRemoteHangup = function(caller) {
@@ -3791,7 +3825,7 @@ var Easyrtc = function() {
                 if( remoteStreams ) {
                     var i;
                     for( i = 0; i < remoteStreams.length; i++) {
-                        emitOnStreamClosed(caller, remoteStreams[i].id);
+                        emitOnStreamClosed(caller, remoteStreams[i]);
                         try {
                             remoteStreams[i].stop();
                         }catch(err) {};
