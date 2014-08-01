@@ -27,19 +27,16 @@ var selfEasyrtcid = "";
 var haveSelfVideo = false;
 
 function disable(domId) {
-    console.log("about to try disabling "  +domId);
     document.getElementById(domId).disabled = "disabled";
 }
 
 
 function enable(domId) {
-    console.log("about to try enabling "  +domId);
     document.getElementById(domId).disabled = "";
 }
 
 
 function connect() {
-    console.log("Initializing.");
     easyrtc.enableAudio(document.getElementById('shareAudio').checked);
     easyrtc.enableVideo(document.getElementById('shareVideo').checked);
     easyrtc.setRoomOccupantListener(convertListToButtons);
@@ -138,7 +135,6 @@ easyrtc.setStreamAcceptor( function(easyrtcid, stream) {
     setUpMirror();
     var video = document.getElementById('callerVideo');
     easyrtc.setVideoObjectSrc(video,stream);
-    console.log("saw video from " + easyrtcid);
     enable("hangupButton");
 });
 
