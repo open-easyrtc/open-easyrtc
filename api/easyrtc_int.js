@@ -1276,9 +1276,7 @@ var Easyrtc = function() {
         var i;
         for (i in peerConns) {
             if (peerConns.hasOwnProperty(i)) {
-                if (peerConns[i].startedAV) {
-                    count++;
-                }
+                count++;
             }
         }
         return count;
@@ -2731,7 +2729,7 @@ var Easyrtc = function() {
      *     }
      */
     this.getConnectStatus = function(otherUser) {
-        if (typeof peerConns[otherUser] === 'undefined') {
+        if (!peerConns.hasOwnProperty(otherUser)) {
             return self.NOT_CONNECTED;
         }
         var peer = peerConns[otherUser];
@@ -2912,7 +2910,7 @@ var Easyrtc = function() {
         }
         clearQueuedMessages(otherUser);
         if (peerConns[otherUser]) {
-            if (peerConns[otherUser].startedAV) {
+            if (peerConns[otherUser].pc) {
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
                 for( i = 0; i < remoteStreams.length; i++) {
                     emitOnStreamClosed(otherUser, remoteStreams[i]);
@@ -2922,6 +2920,9 @@ var Easyrtc = function() {
 
                     }
                 }
+                //
+                // todo: may need to add a few lines here for closing the data channels
+                //
                 try {
                     peerConns[otherUser].pc.close();
                 } catch (err) {
@@ -3273,7 +3274,7 @@ var Easyrtc = function() {
                         self._turnServers[ipAddress] = true;
                     }
 
-                    if (peerConns[otherUser].startedAV) {
+                    if (peerConns[otherUser].pc) {
                         sendSignalling(otherUser, "candidate", candidateData, null, function() {
                             failureCB(self.errCodes.PEER_GONE, "Candidate disappeared");
                         });
@@ -3555,7 +3556,7 @@ var Easyrtc = function() {
                             delete peerConns[caller];
                             self.showError(errorCode, errorText);
                         });
-                peerConns[caller].startedAV = true;
+                // peerConns[caller].startedAV = true;
                 if (pc.connectDataConnection) {
                     if (self.debugPrinter) {
                         self.debugPrinter("calling connectDataConnection(5002,5001)");
@@ -3706,13 +3707,11 @@ var Easyrtc = function() {
         // on them. This isn't the correct behavior, but it's the best we can do without
         // changes to the server.
         //
-
-
         for (id in peerConns) {
             if (peerConns.hasOwnProperty(id) &&
                     typeof peersInRoom[id] === 'undefined') {
                 if (!isPeerInAnyRoom(id)) {
-                    if (peerConns[id].startedAV || peerConns[id].isInitiator) {
+                    if (peerConns[id].pc || peerConns[id].isInitiator) {
                         onRemoteHangup(id);
                     }
                     delete offersPending[id];
@@ -3934,7 +3933,7 @@ var Easyrtc = function() {
                 self.showError(errorCode, errorText);
             };
             var i;
-            peerConns[caller].startedAV = true;
+            // peerConns[caller].startedAV = true;
             for (i = 0; i < peerConns[caller].candidatesToSend.length; i++) {
                 sendSignalling(
                         caller,
@@ -3980,7 +3979,7 @@ var Easyrtc = function() {
 
         function processCandidateQueue(caller, msgData) {
 
-            if (peerConns[caller] && peerConns[caller].startedAV) {
+            if (peerConns[caller] && peerConns[caller].pc) {
                 processCandidateBody(caller, msgData);
             }
             else {
