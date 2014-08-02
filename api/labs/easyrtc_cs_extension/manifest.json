@@ -1,0 +1,29 @@
+{
+  "name": "EasyRTC ScreenShare Addons",
+  "short_name": "EasyRTC ScreenShare",
+  "description": "EasyRTC ScreenShare Addons.",
+  "version": "0.1",
+  "manifest_version": 2,
+  "minimum_chrome_version": "34",
+  "homepage_url": "http://demo.easyrtc.com/",
+  "background": {
+      "scripts": ["background-script.js"],
+      "persistent": false
+  },
+  "content_scripts": [ {
+     "js": [ "content-script.js" ],
+     "matches": ["*://localhost:*/*", "https://demo.easyrtc.com/*"]
+  }],
+  "externally_connectable": {
+    "matches": ["*://localhost:*/*", "https://demo.easyrtc.com/*"]
+  },
+  "icons": {
+    "16": "Icon-16.png", 
+    "64": "Icon-64.png" 
+  },
+  "permissions": [
+    "unlimitedStorage",
+    "notifications",
+    "desktopCapture"
+  ]
+}
