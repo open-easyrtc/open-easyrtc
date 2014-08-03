@@ -33,8 +33,12 @@
  *</p>
  */
 
-// Patch easyrtc
 
+/**
+ * Patch easyrtc media constraints for sharing screen Chrome using 
+ * the experimental chromeMediaSource and chromeMediaSourceId
+ * properties.
+ */
 var getUserMediaConstraints = easyrtc.getUserMediaConstraints;
 easyrtc.getUserMediaConstraints = function () {
 
@@ -54,7 +58,10 @@ easyrtc.getUserMediaConstraints = function () {
     return constraints;
 };
 
-
+/**
+ * EasyRTC Sceen Capture api.
+ * @note Require EasyRTC Chome Extension (see easyrtc_sc/README.md dir)
+ */
 var easyrtc_sc = {
 
     // chromeMedia extension prop
@@ -197,24 +204,27 @@ var easyrtc_sc = {
         } else {
 
             if (!easyrtc_sc.chromeMedia) {
+
+                // Save listener for future CG
                 easyrtc_sc.chromeMedia = easyrtc_sc.chromeExtentionListener.bind(easyrtc_sc);
                 window.addEventListener('message', easyrtc_sc.chromeMedia);
             }
 
+            // Check cache
             if (easyrtc_sc.chromeMediaExtention) {
                 callback(true);
+
+            // Send message to extension
             } else {
 
                 // ask extension if it is available
                	window.postMessage('is-extension-loaded', '*');
 
+                // Under 2000 ms may create failure due chrome exention response delay.
                 setTimeout(function () {
-                    
                     easyrtc_sc.chromeMediaExtention = easyrtc_sc.chromeMediaSource === 'desktop';
-
                     callback(easyrtc_sc.chromeMediaExtention);
-
-                }, 2000); // Under 2000 ms may create failure
+                }, 2000); 
             }                
         }
     },
@@ -239,7 +249,7 @@ var easyrtc_sc = {
 
 	        // Remove listener
 	        window.removeEventListener('message', easyrtc_sc.chromeMedia);
+            easyrtc_sc.chromeMedia = null;
         }
-
     }
 };
