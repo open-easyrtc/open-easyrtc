@@ -1,7 +1,7 @@
 {
-  "name": "EasyRTC ScreenShare Addons",
-  "short_name": "EasyRTC ScreenShare",
-  "description": "EasyRTC ScreenShare Addons.",
+  "name": "EasyRTC Screen Capture",
+  "short_name": "EasyRTC SC",
+  "description": "EasyRTC screen capture Chrome extension",
   "version": "0.1",
   "manifest_version": 2,
   "minimum_chrome_version": "34",
