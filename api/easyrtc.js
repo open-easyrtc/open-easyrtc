@@ -4885,10 +4885,9 @@ var Easyrtc = function() {
             document.getElementById(monitorVideoId).muted = "muted";
         }
 
-        /** Sets an event handler that gets called when a call is established.
-         * It's only purpose (so far) is to support transitions on video elements.
-         * This function is only defined after easyrtc.easyApp is called.
-         * The slot argument is the index into the array of video ids.
+        /** Sets an event handler that gets called when an incoming MediaStream is assigned 
+         * to a video object. The name is poorly chosen and reflects a simpler era when you could
+         * only have one media stream per peer connection.
          * @param {Function} cb has the signature function(easyrtcid, slot){}
          * @example
          *   easyrtc.setOnCall( function(easyrtcid, slot){
