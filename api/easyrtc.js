@@ -3461,7 +3461,6 @@ var Easyrtc = function() {
                         });
                     }
                     else {
-                        console.log("queing ice ice");
                         peerConns[otherUser].candidatesToSend.push(candidateData);
                     }
                 }
@@ -4121,6 +4120,15 @@ var Easyrtc = function() {
 
             delete acceptancePending[caller];
             peerConns.connectionAccepted = true;
+
+            //
+            // if we've discarded the peer connection, ignore the answer.
+            //
+            if( !peerConns[caller]) {
+                return;
+            }
+
+
             if (peerConns[caller].wasAcceptedCB) {
                 peerConns[caller].wasAcceptedCB(true, caller);
             }
