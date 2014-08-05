@@ -1459,7 +1459,9 @@ var Easyrtc = function() {
         var i;
         for (i in peerConns) {
             if (peerConns.hasOwnProperty(i)) {
-                count++;
+                if( self.getConnectStatus(i) === self.IS_CONNECTED) {
+                    count++;
+                }
             }
         }
         return count;
@@ -4119,7 +4121,7 @@ var Easyrtc = function() {
         function processAnswer(caller, msgData) {
 
             delete acceptancePending[caller];
-            peerConns.connectionAccepted = true;
+            peerConns[caller].connectionAccepted = true;
 
             //
             // if we've discarded the peer connection, ignore the answer.

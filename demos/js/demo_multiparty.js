@@ -695,8 +695,9 @@ function appInit() {
         easyrtc.showError("LOST-CONNECTION", "Lost connection to signaling server");
     });
     easyrtc.setOnCall( function(easyrtcid, slot) {
+        console.log("getConnection count="  + easyrtc.getConnectionCount() );
         boxUsed[slot+1] = true;
-        if(activeBox == 0 &&  easyrtc.getConnectionCount() == 1) { // first connection
+        if(activeBox == 0 ) { // first connection
             collapseToThumb();
             document.getElementById('textEntryButton').style.display = 'block';
         }
