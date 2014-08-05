@@ -251,7 +251,7 @@ function acceptRejectCB(otherGuy, fileNameList, wasAccepted) {
 function receiveStatusCB(otherGuy, msg) {
     var receiveBlock = document.getElementById(buildReceiveAreaName(otherGuy));
     if( !receiveBlock) return;
-    
+
     switch (msg.status) {
         case "started":
             break;

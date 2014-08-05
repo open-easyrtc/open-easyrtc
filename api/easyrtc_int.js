@@ -3199,6 +3199,7 @@ var Easyrtc = function() {
                 pc: pc,
                 candidatesToSend: [],
                 startedAV: false,
+                connectionAccepted: false,
                 isInitiator: isInitiator,
                 remoteStreamIdToName: {},
                 getRemoteStreamByName: function(streamName) {
@@ -3248,9 +3249,6 @@ var Easyrtc = function() {
                 //                var remoteStreams = peerConns[i].pc.getRemoteStreams();
             };
             pc.onicecandidate = function(event) {
-//                if(self.debugPrinter){
-//                    self.debugPrinter("saw ice message:\n" + event.candidate);
-//                }
                 if (newPeerConn.cancelled) {
                     return;
                 }
@@ -3274,12 +3272,13 @@ var Easyrtc = function() {
                         self._turnServers[ipAddress] = true;
                     }
 
-                    if (peerConns[otherUser].pc) {
+                    if (peerConns[otherUser].connectionAccepted) {
                         sendSignalling(otherUser, "candidate", candidateData, null, function() {
                             failureCB(self.errCodes.PEER_GONE, "Candidate disappeared");
                         });
                     }
                     else {
+                        console.log("queing ice ice");
                         peerConns[otherUser].candidatesToSend.push(candidateData);
                     }
                 }
@@ -3550,13 +3549,18 @@ var Easyrtc = function() {
                 if (self.debugPrinter) {
                     self.debugPrinter("sending answer");
                 }
+                function onSignalSuccess(){}
+
+                function onSignalFailure(errorCode, errorText) {
+                    delete peerConns[caller];
+                    self.showError(errorCode, errorText);
+                }
+
                 sendSignalling(caller, "answer", sessionDescription,
-                        null,
-                        function(errorCode, errorText) {
-                            delete peerConns[caller];
-                            self.showError(errorCode, errorText);
-                        });
-                // peerConns[caller].startedAV = true;
+                        onSignalSuccess, onSignalFailure);
+                peerConns[caller].connectionAccepted = true;
+                sendQueuedCandidates(caller, onSignalSuccess, onSignalFailure);
+
                 if (pc.connectDataConnection) {
                     if (self.debugPrinter) {
                         self.debugPrinter("calling connectDataConnection(5002,5001)");
@@ -3767,6 +3771,19 @@ var Easyrtc = function() {
         }
     }
 
+    function sendQueuedCandidates(peer, onSignalSuccess, onSignalFailure) {
+        var i;
+        for (i = 0; i < peerConns[peer].candidatesToSend.length; i++) {
+            sendSignalling(
+                peer,
+                "candidate",
+                peerConns[peer].candidatesToSend[i],
+                onSignalSuccess,
+                onSignalFailure
+            );
+        }
+    }
+
     var onChannelMsg = function(msg, ackAcceptorFunc) {
 
         var targeting = {};
@@ -3843,6 +3860,8 @@ var Easyrtc = function() {
             }
         };
 
+
+
         var processOffer = function(caller, msgData) {
 
             var helper = function(wasAccepted, streamNames) {
@@ -3918,6 +3937,7 @@ var Easyrtc = function() {
         function processAnswer(caller, msgData) {
 
             delete acceptancePending[caller];
+            peerConns.connectionAccepted = true;
             if (peerConns[caller].wasAcceptedCB) {
                 peerConns[caller].wasAcceptedCB(true, caller);
             }
@@ -3934,15 +3954,7 @@ var Easyrtc = function() {
             };
             var i;
             // peerConns[caller].startedAV = true;
-            for (i = 0; i < peerConns[caller].candidatesToSend.length; i++) {
-                sendSignalling(
-                        caller,
-                        "candidate",
-                        peerConns[caller].candidatesToSend[i],
-                        onSignalSuccess,
-                        onSignalFailure
-                        );
-            }
+            sendQueuedCandidates(caller, onSignalSuccess, onSignalFailure);
 
             pc = peerConns[caller].pc;
             var sd = null;
