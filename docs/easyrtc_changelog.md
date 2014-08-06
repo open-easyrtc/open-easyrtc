@@ -6,33 +6,36 @@ v1.0.12
 
 New Features:
 
-    - JS Client - New Function setAutoInitUserMedia() sets whether the local media is automatically acquired before a call or answer (if not already acquired).
-    - JS Client - New function setSdpFilters() for modifying SDP's just before a call.
-    - JS Client - Labs directory with example SDP filters.
-    - JS Client - New function getServerIce() gets the list of ice servers as supplied by the server.
-    - JS Client - New function setIceUsedInCalls() sets the configuration used in the next call. 
-    - JS Client - New function setUseFreshIceEachPeerConnection() causes the client to ask the server for a fresh ice config in the middle of each call or answer.
-	- JS Client - Added support for multiple named mediastreams per connection (supported through the mediaIds apifield, getMediaStreamByName(), getLocalMediaIds(), closeLocalMediaStream(), buildLocalMediaStream(), getRemoteStream(), addStreamToCall(),
-	- JS Client - Three new internal peer messages with types "__gotAddedMediaStream", "__closingMediaStream", and "_addedMediaStream" 
-	- JS Client - New function getRoomOccupantsAsArray() and getRoomOccupantsAsMap()
-	- JS Client - New function useThisSocketConnection() for people that want to allocate the websocket themselves.
-	- Server - Socket.io v1.0 support. See issue #64
-	- Server - Support for hosting experimental API's in labs. New server option 'apiLabsEnable' defaults to true. See issue #76
+  - JS Client - New Function setAutoInitUserMedia() sets whether the local media is automatically acquired before a call or answer (if not already acquired).
+  - JS Client - New function setSdpFilters() for modifying SDP's just before a call. See issue #77.
+  - JS Client - Labs directory with example SDP filters. See issue #77.
+  - JS Client - New function getServerIce() gets the list of ice servers as supplied by the server.
+  - JS Client - New function setIceUsedInCalls() sets the configuration used in the next call. 
+  - JS Client - New function setUseFreshIceEachPeerConnection() causes the client to ask the server for a fresh ice config in the middle of each call or answer.
+  - JS Client - Added support for multiple named mediastreams per connection , supported through the mediaIds apifield, getMediaStreamByName(), getLocalMediaIds(), closeLocalMediaStream(), buildLocalMediaStream(), getRemoteStream(), addStreamToCall(). See issue #34.
+  - JS Client - Three new internal peer messages with types "__gotAddedMediaStream", "__closingMediaStream", and "__addedMediaStream" 
+  - JS Client - New function getRoomOccupantsAsArray() and getRoomOccupantsAsMap().
+  - JS Client - New function useThisSocketConnection() for people that want to allocate the websocket themselves. See issue #62.
+  - Server - Socket.io v1.0 support. See issue #64.
+  - Server - Support for hosting experimental API's in labs. New server option 'apiLabsEnable' defaults to true. See issue #76, #77.
  
 Changes:
 
-    - JS Client - enableCamera(), enableMicrophone(), getLocalStreamAsUrl(), initMediaSource(), call(), now take optional media stream names.
-    - JS Client - initMediaSource's successCallback get	passed the new media stream.
-    - JS Client - an onStreamClosed listener gets passed an easyrtcid plus the stream and the stream name.
-    - JS Client - Added documentation for isTurnServer().
-	- JS Client - getFreshIceConfig() now takes an optional callback.
-	- Demos - Changed the titles of the demos and their labels to make them consistent. 
-	- Demos - Gave a different app name to each demo.
-    - Demos - Added a few new demos (multistream and low bandwidth).
+ - JS Client - enableCamera(), enableMicrophone(), getLocalStreamAsUrl(), initMediaSource(), call(), now take optional media stream names.
+ - JS Client - initMediaSource's successCallback get	passed the new media stream.
+ - JS Client - an onStreamClosed listener gets passed an easyrtcid plus the stream and the stream name.
+ - JS Client - Added documentation for isTurnServer().
+ - JS Client - getFreshIceConfig() now takes an optional callback.
+ - Demos - Changed the titles of the demos and their labels to make them consistent. 
+ - Demos - Gave a different app name to each demo.
+ - Demos - Added a few new demos (multistream and low bandwidth).
+ - JS Client - reduce the number of places where videoIds and the monitorVideoId was validated. See issue #68.
 
 Fixes:
 
-	- JS Client - Numerous documentation fixes.
+ - JS Client - Numerous documentation fixes.	
+ - Demos - Fixed formatting in the hd definition demo. See issue #73.
+ - JS Client - Fixed a null peer connection. See issue #72.
 
 
 v1.0.11
