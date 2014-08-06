@@ -130,6 +130,53 @@
         
             
 <dt>
+    <h3 class="name" id="closeLocalStream"><span class="type-signature"></span>closeLocalStream<span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Alias for closeLocalMediaStream
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h3 class="name" id="errCodes"><span class="type-signature"></span>errCodes<span class="type-signature"> :Object</span></h3>
     
     
@@ -370,7 +417,7 @@
 <dd>
     
     <div class="description">
-        The width of the local media stream video in pixels. This field is set an indeterminate periodof time after easyrtc.initMediaSource succeeds.
+        The width of the local media stream video in pixels. This field is set an indeterminate periodof time after easyrtc.initMediaSource succeeds.  Note: in actuality, the dimensions of a video streamchange dynamically in response to external factors, you should check the videoWidth and videoHeight attributesof your video objects before you use them for pixel specific operations.
     </div>
     
     
@@ -464,7 +511,7 @@
 <dd>
     
     <div class="description">
-        The rooms the user is in. This only applies to room oriented applications and is set at the sametime a token is received.  Note: in actuality, the dimensions of a video streamchange dynamically in response to external factors, you should check the videoWidth and videoHeight attributesof your video objects before you use them for pixel specific operations.
+        The rooms the user is in. This only applies to room oriented applications and is set at the sametime a token is received.
     </div>
     
     
@@ -806,7 +853,315 @@
         
             
 <dt>
-    <h3 class="name" id="call"><span class="type-signature"></span>call<span class="signature">(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="addStreamToCall"><span class="type-signature"></span>addStreamToCall<span class="signature">(easyrtcId, streamName)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Add a named local stream to a call.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>easyrtcId</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The id of client receiving the stream.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>streamName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The name of the stream.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="buildLocalMediaStream"><span class="type-signature"></span>buildLocalMediaStream<span class="signature">(streamName, audioTracks, videoTracks)</span><span class="type-signature"> &rarr; {void}</span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        This function builds a new named local media stream from a set of existing audio and video tracks from other media streams.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>streamName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">is the name of the new media stream.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>audioTracks</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">is an array of MediaStreamTracks</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>videoTracks</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">is an array of MediaStreamTracks</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">void</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>   easyrtc.buildLocalMediaStream("myComposedStream",            easyrtc.getLocalStream("camera1").getVideoTracks(),            easyrtc.getLocalStream("camera2").getAudioTracks());</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="call"><span class="type-signature"></span>call<span class="signature">(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB, streamNames)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -934,6 +1289,29 @@
             
             
             <td class="description last">(wasAccepted:boolean,otherUser:string) - is called when a call is accepted or rejected by another party. It can be left null.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>streamNames</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">optional array of streamNames.</td>
         </tr>
 	
 	
@@ -1230,6 +1608,253 @@
         
     <pre class="prettyprint"><code>   easyrtc.clearMediaStream( document.getElementById('selfVideo'));</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="closeLocalMediaStream"><span class="type-signature"></span>closeLocalMediaStream<span class="signature">(streamName)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Close the local media stream. You usually need to close the existing media streamof a camera before reacquring it at a different resolution.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>streamName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">an option stream name.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="connect"><span class="type-signature"></span>connect<span class="signature">(applicationName, successCallback, errorCallback)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Connect to the easyrtc signaling server.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>applicationName</code></td>
+            
+            
+            <td class="type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>successCallback</code></td>
+            
+            
+            <td class="type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>errorCallback</code></td>
+            
+            
+            <td class="type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
     
 </dd>
 
@@ -2048,7 +2673,7 @@
         
             
 <dt>
-    <h3 class="name" id="enableCamera"><span class="type-signature"></span>enableCamera<span class="signature">(enable)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="enableCamera"><span class="type-signature"></span>enableCamera<span class="signature">(enable, streamName)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -2107,6 +2732,29 @@
             
             
             <td class="description last">true to enable the camera, false to disable it.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>streamName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">the name of the stream, optional.</td>
         </tr>
 	
 	
@@ -2382,7 +3030,7 @@
         
             
 <dt>
-    <h3 class="name" id="enableMicrophone"><span class="type-signature"></span>enableMicrophone<span class="signature">(enable)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="enableMicrophone"><span class="type-signature"></span>enableMicrophone<span class="signature">(enable, streamName)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -2441,6 +3089,29 @@
             
             
             <td class="description last">true to enable the microphone, false to disable it.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>streamName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">an optional streamName</td>
         </tr>
 	
 	
@@ -2611,7 +3282,7 @@
     
     
     <div class="description">
-        Control whether the client requests audio from a peer during a call.Must be called before the call to have an effect.
+        Control whether the client requests video from a peer during a call.Must be called before the call to have an effect.
     </div>
     
 
@@ -3287,7 +3958,7 @@
         
             
 <dt>
-    <h3 class="name" id="getFreshIceConfig"><span class="type-signature"></span>getFreshIceConfig<span class="signature">()</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="getFreshIceConfig"><span class="type-signature"></span>getFreshIceConfig<span class="signature">(callback)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -3295,7 +3966,7 @@
     
     
     <div class="description">
-        Request fresh ice config information from the server.This should be done periodically by long running applications.There are no parameters or return values.
+        Request fresh ice config information from the server.This should be done periodically by long running applications.
     </div>
     
 
@@ -3303,6 +3974,54 @@
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">is called with a value of true on success, false on failure.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
     
     
     
@@ -3347,6 +4066,84 @@
         
             
 <dt>
+    <h3 class="name" id="getLocalMediaIds"><span class="type-signature"></span>getLocalMediaIds<span class="signature">()</span><span class="type-signature"> &rarr; {Array}</span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Returns the user assigned id's of currently active local media streams.
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Array</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h3 class="name" id="getLocalStream"><span class="type-signature"></span>getLocalStream<span class="signature">()</span><span class="type-signature"> &rarr; {MediaStream}</span></h3>
     
     
@@ -3355,7 +4152,7 @@
     
     
     <div class="description">
-        Returns a media stream for your local camera and microphone. It can be called only after easyrtc.initMediaSource has succeeded. It returns a stream that can be used as an argument to easyrtc.setVideoObjectSrc.
+        Returns a media stream for your local camera and microphone. It can be called only after easyrtc.initMediaSource has succeeded. It returns a stream that can be used as an argument to easyrtc.setVideoObjectSrc. Returns null if there is no local media stream acquired yet.
     </div>
     
 
@@ -3424,6 +4221,159 @@
         
     <pre class="prettyprint"><code>   easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="getRemoteStream"><span class="type-signature"></span>getRemoteStream<span class="signature">(easyrtcid, remotestreamName)</span><span class="type-signature"> &rarr; {Object}</span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Return the media stream shared by a particular peer. This is needed when youadd a stream in the middle of a call.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>easyrtcid</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">the peer.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>remotestreamName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">an optional argument supplying the streamName.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    A mediaStream.
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+        
+    
     
 </dd>
 
@@ -4025,6 +4975,266 @@
         
             
 <dt>
+    <h3 class="name" id="getRoomOccupantsAsArray"><span class="type-signature"></span>getRoomOccupantsAsArray<span class="signature">(roomName)</span><span class="type-signature"> &rarr; {Array}</span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Returns an array of easyrtcid's of peers in a particular room.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>roomName</code></td>
+            
+            
+            <td class="type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    of easyrtcids or null if the client is not in the room.
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Array</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>    var occupants = easyrtc.getRoomOccupants("default");    var i;    for( i = 0; i < occupants.length; i++ ) {        console.log( occupants[i] + " is in the room");    }</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="getRoomOccupantsAsMap"><span class="type-signature"></span>getRoomOccupantsAsMap<span class="signature">(roomName)</span><span class="type-signature"> &rarr; {Object}</span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Returns a map of easyrtcid's of peers in a particular room. You should only test elements in the map to see if they arenull; their actual values are not guaranteed to be the same in different releases.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>roomName</code></td>
+            
+            
+            <td class="type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    of easyrtcids or null if the client is not in the room.
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>     if( easyrtc.getRoomOccupantsAsMap("default")[some_easyrtcid]) {         console.log("yep, " + some_easyrtcid + " is in the room");     }</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
     <h3 class="name" id="getRoomsJoined"><span class="type-signature"></span>getRoomsJoined<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h3>
     
     
@@ -4083,6 +5293,88 @@
             
 <div class="param-desc">
     A map whose keys are the room names
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="getServerIce"><span class="type-signature"></span>getServerIce<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Returns the last ice config supplied by the EasyRTC server. This function is not normally used, it is providedfor people who want to try filtering ice server configuration on the client.
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    which has the form {iceServers:[ice_server_entry, ice_server_entry, ...]}
 </div>
 
 
@@ -4351,7 +5643,7 @@
             <td class="type">
             
                 
-<span class="param-type">function</span>
+<span class="param-type">Function</span>
 
 
             
@@ -4594,7 +5886,7 @@
         
             
 <dt>
-    <h3 class="name" id="haveAudioTrack"><span class="type-signature"></span>haveAudioTrack<span class="signature">(easyrtcid)</span><span class="type-signature"> &rarr; {Boolean}</span></h3>
+    <h3 class="name" id="haveAudioTrack"><span class="type-signature"></span>haveAudioTrack<span class="signature">(easyrtcid, streamName)</span><span class="type-signature"> &rarr; {Boolean}</span></h3>
     
     
 </dt>
@@ -4653,6 +5945,29 @@
             
             
             <td class="description last">the id of the other caller in the connection. If easyrtcid is not supplied, checks the local media.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>streamName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">an optional stream id.</td>
         </tr>
 	
 	
@@ -4724,7 +6039,7 @@
         
             
 <dt>
-    <h3 class="name" id="haveVideoTrack"><span class="type-signature"></span>haveVideoTrack<span class="signature">(easyrtcid)</span><span class="type-signature"> &rarr; {Boolean}</span></h3>
+    <h3 class="name" id="haveVideoTrack"><span class="type-signature"></span>haveVideoTrack<span class="signature">(easyrtcid, streamName)</span><span class="type-signature"> &rarr; {Boolean}</span></h3>
     
     
 </dt>
@@ -4783,6 +6098,29 @@
             
             
             <td class="description last">the id of the other caller in the connection. If easyrtcid is not supplied, checks the local media.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>streamName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">an optional stream id.     *</td>
         </tr>
 	
 	
@@ -4989,7 +6327,7 @@
         
             
 <dt>
-    <h3 class="name" id="initMediaSource"><span class="type-signature"></span>initMediaSource<span class="signature">(successCallback, errorCallback)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="initMediaSource"><span class="type-signature"></span>initMediaSource<span class="signature">(successCallback, errorCallback, streamName)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -5037,7 +6375,7 @@
             <td class="type">
             
                 
-<span class="param-type">function()</span>
+<span class="param-type">function(Object)</span>
 
 
             
@@ -5047,7 +6385,7 @@
             
             
             
-            <td class="description last">will be called when the media source is ready.</td>
+            <td class="description last">will be called with localmedia stream on success.</td>
         </tr>
 	
 	
@@ -5071,6 +6409,29 @@
             
             
             <td class="description last">is called with an error code and error description.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>streamName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">an optional name for the media source so you can use multiple cameras and screen share simultaneously.</td>
         </tr>
 	
 	
@@ -5117,7 +6478,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>      easyrtc.initMediaSource(         function(){             easyrtc.setVideoObjectSrc( document.getElementById("mirrorVideo"), easyrtc.getLocalStream());         },         function(errorCode, errorText){              easyrtc.showError(errorCode, errorText);         });</code></pre>
+    <pre class="prettyprint"><code>      easyrtc.initMediaSource(         function(mediastream){             easyrtc.setVideoObjectSrc( document.getElementById("mirrorVideo"), mediastream);         },         function(errorCode, errorText){              easyrtc.showError(errorCode, errorText);         });</code></pre>
 
     
 </dd>
@@ -5254,6 +6615,131 @@
         
     <pre class="prettyprint"><code>   var name = document.getElementById('nameField').value;   if( !easyrtc.isNameValid(name)){       console.error("Bad user name");   }</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="isTurnServer"><span class="type-signature"></span>isTurnServer<span class="signature">(ipAddress)</span><span class="type-signature"> &rarr; {boolean}</span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Returns true if the ipAddress parameter was the address of a turn server. This is done by checking against informationcollected during peer to peer calls. Don't expect it to work before the first call, or to identify turn servers that aren'tin the ice config.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>ipAddress</code></td>
+            
+            
+            <td class="type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    true if ip address is known to be that of a turn server, false otherwise.
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">boolean</span>
+
+
+	</dd>
+</dl>
+
+        
+    
     
 </dd>
 
@@ -5654,6 +7140,165 @@
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>      easyrtc.loadStylesheet();</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="makeLocalStreamFromRemoteStream"><span class="type-signature"></span>makeLocalStreamFromRemoteStream<span class="signature">(easyrtcid, remotestreamName, localstreamName)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Assign a local streamName to a remote stream so that it can be forwarded to other callers.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>easyrtcid</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">the peer supplying the remote stream</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>remotestreamName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">the streamName supplied by the peer.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>localstreamName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">streamName used when passing the stream to other peers.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>   easyrtc.makeLocalStreamFromRemoteStream(sourcePeer, "default", "forwardedStream");   easyrtc.call(nextPeer, callSuccessCB, callFailureCB, wasAcceptedCB, ["forwardedStream"]);</code></pre>
 
     
 </dd>
@@ -6760,7 +8405,7 @@
             
             
             
-            <td class="description last">takes the arguments (callerEasyrtcid, function():boolean ){}The acceptCheck callback is passed (as it's second argument) a function that should be called with eithera true value (accept the call) or false value( reject the call).</td>
+            <td class="description last">takes the arguments (callerEasyrtcid, acceptor).     The acceptCheck callback is passed an easyrtcid and an aceptor function. The acceptor function should be called with eithera true value (accept the call) or false value( reject the call) as it's first argument, and optionally,an array of local media streamNames as a second argument.</td>
         </tr>
 	
 	
@@ -6807,7 +8452,9 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>     easyrtc.setAcceptChecker( function(easyrtcid, acceptor){          if( easyrtc.idToName(easyrtcid) === 'Fred' ){             acceptor(true);          }          else if( easyrtc.idToName(easyrtcid) === 'Barney' ){             setTimeout( function(){ acceptor(true)}, 10000);          }          else{             acceptor(false);          }     });</code></pre>
+    <pre class="prettyprint"><code>     easyrtc.( function(easyrtcid, acceptor){          if( easyrtc.idToName(easyrtcid) === 'Fred' ){             acceptor(true);          }          else if( easyrtc.idToName(easyrtcid) === 'Barney' ){             setTimeout( function(){ 
+                       acceptor(true, ['myOtherCam']); // myOtherCam presumed to a streamName
+                     }, 10000);          }          else{             acceptor(false);          }     });</code></pre>
 
     
 </dd>
@@ -6928,6 +8575,114 @@
         
             
 <dt>
+    <h3 class="name" id="setAutoInitUserMedia"><span class="type-signature"></span>setAutoInitUserMedia<span class="signature">(flag)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Controls whether a default local media stream should be acquired automatically during calls and acceptsif a list of streamNames is not supplied. The default is true, which mimicks the behaviour of earlier releasesthat didn't support multiple streams. This function should be called before easyrtc.call or before entering an accept  callback.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>flag</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">true to allocate a default local media stream.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h3 class="name" id="setCallCancelled"><span class="type-signature"></span>setCallCancelled<span class="signature">(callCancelled)</span><span class="type-signature"></span></h3>
     
     
@@ -7033,7 +8788,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.setCallCancelled( function(easyrtcid, explicitlyCancelled){       if( explicitlyCancelled ){           console..log(easyrtc.idToName(easyrtcid) + " stopped trying to reach you");        }        else{           console.log("Implicitly called "  + easyrtc.idToName(easyrtcid));        }    });</code></pre>
+    <pre class="prettyprint"><code>    easyrtc.setCallCancelled( function(easyrtcid, explicitlyCancelled){       if( explicitlyCancelled ){           console.log(easyrtc.idToName(easyrtcid) + " stopped trying to reach you");        }        else{           console.log("Implicitly called "  + easyrtc.idToName(easyrtcid));        }    });</code></pre>
 
     
 </dd>
@@ -7596,6 +9351,119 @@
         
             
 <dt>
+    <h3 class="name" id="setIceUsedInCalls"><span class="type-signature"></span>setIceUsedInCalls<span class="signature">(ice)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sets the ice server configuration that will be used in subsequent calls. You only need this function if you are filteringthe ice server configuration on the client or if you are using TURN certificates that have a very short lifespan.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>ice</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">An object with iceServers element containing an array of ice server entries.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>    easyrtc.setIceUsedInCalls( {"iceServers": [     {			"url": "stun:stun.sipgate.net"		},     {        "url": "stun:217.10.68.152"     },     {        "url": "stun:stun.sipgate.net:10000"     }     ]});     easyrtc.call(...);</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
     <h3 class="name" id="setOnStreamClosed"><span class="type-signature"></span>setOnStreamClosed<span class="signature">(onStreamClosed)</span><span class="type-signature"></span></h3>
     
     
@@ -7654,7 +9522,7 @@
             
             
             
-            <td class="description last">takes an easyrtcid as it's first parameter.</td>
+            <td class="description last">takes an easyrtcid as it's first parameter, the stream as it's second argument, and name of the video stream as it's third.</td>
         </tr>
 	
 	
@@ -7701,7 +9569,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.setOnStreamClosed( function(easyrtcid){        easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), "");        ( easyrtc.idToName(easyrtcid) + " went away");    });</code></pre>
+    <pre class="prettyprint"><code>    easyrtc.setOnStreamClosed( function(easyrtcid, stream, streamName){        easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), "");        ( easyrtc.idToName(easyrtcid) + " closed stream " + stream.id + " " + streamName);    });</code></pre>
 
     
 </dd>
@@ -8019,7 +9887,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>  easyrtc.setRoomApiFields("trekkieRoom",  "favorite_alien", "Mr Spock");  easyrtc.setRoomOccupantListener( function(roomName, list){     for( var i in list ){        console.log("easyrtcid=" + i + " favorite alien is " + list[i].apiFields.favorite_alien);     }  });</code></pre>
+    <pre class="prettyprint"><code>  easyrtc.setRoomApiField("trekkieRoom",  "favorite_alien", "Mr Spock");  easyrtc.setRoomOccupantListener( function(roomName, list){     for( var i in list ){        console.log("easyrtcid=" + i + " favorite alien is " + list[i].apiFields.favorite_alien);     }  });</code></pre>
 
     
 </dd>
@@ -8086,6 +9954,137 @@
         
     <pre class="prettyprint"><code>   easyrtc.setScreenCapture();</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="setSdpFilters"><span class="type-signature"></span>setSdpFilters<span class="signature">(localFilter, remoteFilter)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sets functions which filter sdp records before calling setLocalDescription or setRemoteDescription.This is advanced functionality which can break things, easily. See the easyrtc_rates.js file for afilter builder.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>localFilter</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">a function that takes an sdp string and returns an sdp string.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>remoteFilter</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">a function that takes an sdp string and returns an sdp string.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
     
 </dd>
 
@@ -8425,6 +10424,114 @@
         
     <pre class="prettyprint"><code> easyrtc.setStreamAcceptor(function(easyrtcid, stream){    document.getElementById('callerName').innerHTML = easyrtc.idToName(easyrtcid);    easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), stream); });</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="setUseFreshIceEachPeerConnection"><span class="type-signature"></span>setUseFreshIceEachPeerConnection<span class="signature">(value)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Determines whether fresh ice server configuration should be requested from the server for each peer connection.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">the default is false.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
     
 </dd>
 
@@ -9754,6 +11861,114 @@
     
 </dd>
 
+        
+            
+<dt>
+    <h3 class="name" id="useThisSocketConnection"><span class="type-signature"></span>useThisSocketConnection<span class="signature">(alreadyAllocatedSocketIo)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Supply a socket.io connection that will be used instead of allocating a new socket.The expected usage is that you allocate a websocket, assign options to it, calleasyrtc.useThisSocketConnection, followed by easyrtc.connect or easyrtc.easyApp. Easyrtc will not attempt toclose sockets that were supplied with easyrtc.useThisSocketConnection.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>alreadyAllocatedSocketIo</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">A value allocated with the connect method of socket.io.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
         </dl>
     
     
@@ -9773,7 +11988,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Tue May 20 2014 15:55:58 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Tue Aug 05 2014 15:20:12 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

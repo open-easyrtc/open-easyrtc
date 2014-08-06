@@ -530,7 +530,6 @@ function callEverybodyElse(roomName, otherPeople) {
 
     var list = [];
     var connectCount = 0;
-
     for(var easyrtcid in otherPeople ) {
         list.push(easyrtcid);
     }
@@ -561,7 +560,6 @@ function callEverybodyElse(roomName, otherPeople) {
 
 
 function loginSuccess() {
-//    console.log("Successfully connected");
     expandThumb(0);  // expand the mirror image initially.
 }
 
@@ -691,14 +689,15 @@ function appInit() {
 
 
     easyrtc.setRoomOccupantListener(callEverybodyElse);
-    easyrtc.easyApp("roomDemo", "box0", ["box1", "box2", "box3"], loginSuccess);
+    easyrtc.easyApp("easyrtc.multiparty", "box0", ["box1", "box2", "box3"], loginSuccess);
     easyrtc.setPeerListener(messageListener);
     easyrtc.setDisconnectListener( function() {
         easyrtc.showError("LOST-CONNECTION", "Lost connection to signaling server");
     });
     easyrtc.setOnCall( function(easyrtcid, slot) {
+        console.log("getConnection count="  + easyrtc.getConnectionCount() );
         boxUsed[slot+1] = true;
-        if(activeBox == 0 &&  easyrtc.getConnectionCount() == 1) { // first connection
+        if(activeBox == 0 ) { // first connection
             collapseToThumb();
             document.getElementById('textEntryButton').style.display = 'block';
         }
@@ -709,7 +708,6 @@ function appInit() {
 
     easyrtc.setOnHangup(function(easyrtcid, slot) {
         boxUsed[slot+1] = false;
-        console.log("hanging up on " + easyrtcid);
         if(activeBox > 0 && slot+1 == activeBox) {
             collapseToThumb();
         }

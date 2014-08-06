@@ -250,6 +250,8 @@ function acceptRejectCB(otherGuy, fileNameList, wasAccepted) {
 
 function receiveStatusCB(otherGuy, msg) {
     var receiveBlock = document.getElementById(buildReceiveAreaName(otherGuy));
+    if( !receiveBlock) return;
+
     switch (msg.status) {
         case "started":
             break;
@@ -257,7 +259,7 @@ function receiveStatusCB(otherGuy, msg) {
             receiveBlock.innerHTML = "Finished file";
             break;
         case "done":
-            receiveBlock.innerHTML = "Stopped because " + msg.reason;
+            receiveBlock.innerHTML = "Stopped because " +msg.reason;
             setTimeout(function() {
                 receiveBlock.style.display = "none";
             }, 1000);

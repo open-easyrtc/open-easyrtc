@@ -1,5 +1,5 @@
-EasyRTC JS Client: Framework Tutorial
-=====================================
+EasyRTC Framework Tutorial
+=======================
 
 Overview
 ---------
@@ -39,7 +39,7 @@ Terminology
 Installing EasyRTC and Getting Help
 --------------
 
-The EasyRTC framework can be easily installed on most platforms in 10 minutes.  We have install  instructions for Windows, Mac and Linux available. The files that make up EasyRTC at the [https://github.com/priologic/easyrtc](github repository for EasyRTC) start with the README.md file. The docs directory of EasyRTC distribution has documentation in HTML for both server and client side components.
+The EasyRTC framework can be easily installed on most platforms in 10 minutes.  We have install  instructions for Windows, Mac and Linux available. The files that make up EasyRTC at [https://github.com/priologic/easyrtc] start with the README.md file. The docs directory of EasyRTC distribution has documentation in HTML for both server and client side components.
 
 If you find yourself running into problems installing check out the various sources for connecting with us and the community also listed in the README.md file.
 
@@ -54,7 +54,7 @@ The CSS file provides some styling for an error messages dialog.
 
     <head>
       ...
-        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.js" />
+        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
         <script type="text/javascript" src="mylogic.js"></script>
@@ -363,6 +363,55 @@ The entire JavaScript looks like the below code:
            );
         }
 
+Sharing Multiple Local Media Streams
+------------------------------------
+The basis idea in using multiple local media streams is that you need to name them each stream
+when it is created. 
+When you call initMediaSource, pass it a third argument which is the name you want 
+assigned to the resulting media. Such as:
+
+    easyrtc.initMediaStream( success, failure, "timesSquareCamera");
+
+If you don't pass a name when creating the stream, it implicitly gets named 'default'. 
+Usually you don't need to know this of course.
+
+
+You can get a list of the names of your local media streams using easyrtc.getLocalMediaIds.
+
+    var ids = easyrtc.getLocalMediaIds();
+    var i;
+    for( i = 0; i < ids.length; i++ ) {
+        console.log(ids[i]);
+    }
+
+When you initiate a call, you can supply an array list of stream names as the fifth argument.
+Similarly, when you accept a call, you can pass a list of stream names as the 
+second argument to the accept callback.
+
+    easyrtc.call(otherEasyrtcId, successCB, failCB, wasAcceptedCB, ["timesSquareCamera"]);
+    easyrtc.setAcceptChecker(function(otherGuy, acceptorCallback){
+        acceptorCallback(true, [ "livingRoomCamera", ["kitchenCamera"]);
+    });
+
+You can also add a stream to an existing call using easyrtc.addStreamToCall. It takes a stream name
+and a stream name as arguments. If successful, the receiver's streamAcceptor callback gets called with 
+the media stream. The streamAcceptor gets passed three arguments: the peer's easyrtcid, the
+stream itself, and the name of the remote stream.
+
+ 
+Note: The EasyApp framework is not designed to work with multiple media streams. It's based on 
+the simplifying assumption that there is only one local media stream. 
+If you want to use multiple multiple media streams, you have to accept the effort of managing their assignment
+to video tags yourself.
+
+Screen Sharing
+--------------
+The new way of desktop sharing is to first create a media stream using esayrtc.initScreenCapture.
+It takes the same arguments as easyrtc.initMediaSource.
+
+    easyrtc.initScreenCapture( successCB, failCB, "myScreen");
+    ...
+    easyrtc.call(otherEasyrtcId, successCB, failCB, wasAcceptedCB, ["myScreen"]);
 
 Useful Extras
 -------------
@@ -414,17 +463,17 @@ In your JavaScript, add the below:
         easyrtc.setAcceptChecker( function(callerId, reporterFunction) {
                 document.getElementById('acceptCallBox').style.display = "block";
                 if( easyrtc.getConnectionCount() > 0 ) {
-                    document.getElementById('acceptCallLabel').innerHTML = "Drop current call and accept new from " + callerId + " ?";
+                    document.getElementById('acceptCallLabel').innerHTML = "Drop current call and accept new from " + caller + " ?";
                 }
                 else {
-                    document.getElementById('acceptCallLabel').innerHTML = "Accept incoming call from " + callerId + " ?";
+                    document.getElementById('acceptCallLabel').innerHTML = "Accept incoming call from " + caller + " ?";
                 }
                 var acceptTheCall = function(wasAccepted) {
                    document.getElementById('acceptCallBox').style.display = "none";
                    if( wasAccepted && easyrtc.getConnectionCount() > 0 ) {
                         easyrtc.hangupAll();
                    }
-                   reporterFunction(wasAccepted);
+                   cb(wasAccepted);
                 }
                 document.getElementById("callAcceptButton").onclick = function() { acceptTheCall(true);};
                 document.getElementById("callRejectButton").onclick =function() { acceptTheCall(false);};

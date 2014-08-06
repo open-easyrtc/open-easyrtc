@@ -56,6 +56,21 @@ As the specification gets closer to recommendation status, we expect those brows
 
 Some browsers may wait until after the standard reaches recommendation status to implement WebRTC.
 
+Screen sharing
+--------------
+
+WebRTC has screen capture and sharing but with following issues:
+- It's not supported by Firefox.
+- It can only be accessed from a page hosted on an SSL server.
+- You may need to enable a chrome flag on the sending browser.
+- The video is usually down sampled by 2 in each dimension before transmission to another computer.
+- Some people can't seem to get it to work on their machine. There isn't much we can do to change that.
+
+
+Recording Audio and Video
+-------------------------
+Recording audio and video requires a media server. This version of EasyRTC does not support any media servers. 
+
 
 How About Data Channels?
 ------------------------
@@ -89,9 +104,7 @@ Node.JS is a powerful asynchronous server platform which has several qualities w
 Are there plans to integrating with SIP?
 ----------------------------------------
 
-SIP is an extensive protocol, and developing a WebRTC platform which supports it in a way casual developers could use it would be difficult. Unless we can come up with a way to make this "easy", it won't happen. This does allow for SIP and VOIP gateways to implement WebRTC using EasyRTC.
-
-Priologic Software has been working on SIP integration methods commercially (shameless plug).
+SIP is an extensive protocol, and developing a WebRTC platform which supports it in a way casual developers could use it would be difficult. 
 
 
 What are the common connection, audio, and video problems?
@@ -114,3 +127,11 @@ You Didn't Answer My Question!
  Ask away on our forum. We do monitor it!
 
  - [https://groups.google.com/forum/?forum/#!forum/easyrtc](https://groups.google.com/forum/?forum/#!forum/easyrtc)
+ 
+How do I get help?
+------------------
+If you need confidential assistance, you can contact our services division at info@priologic.com.
+
+Otherwise, feel free to ask on our forum (see above). Be as clear, precise, and concrete as possible; while it may sometimes appear otherwise, our mindreading abilities are limited in range to about 40 ft.
+
+If you are going to post a problem report, bear in mind that you should include the files needed to reproduce your problem, trimmed down to the minimum needed to demonstrate the problem. The easier you make it for someone to help you, the more likely they'll bother. 

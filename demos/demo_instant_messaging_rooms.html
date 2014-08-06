@@ -69,7 +69,7 @@
             <div id="main">
 
                 <!-- Main Content -->
-                <h1>EasyRTC Demo: Instant Messaging + Rooms </h1>
+                <h1>EasyRTC Demo: Instant Messaging + Rooms</h1>
                 <p><strong>Note:</strong> This is primarily an application
                     developed to test new features going into EasyRTC Modular (v1.0.x). It's currently not written to be a tutorial,
                     but it does demonstrate how to use various features like presence and room targeted messaging.</p>
@@ -131,6 +131,12 @@
                     <input type="text" id="apifieldname" placeholder="field name"><br>
                     <input size="50" type="text" id="apifieldvalue" placeholder="field value"><br>
                     <button onclick="addApiField()">Add the api field</button>
+                </div>
+                
+                <div>
+                    <h3>Getting the list of room occupants</h3>
+                    <input type="text" id="queryRoom" placeholder="room name">
+                    <button onclick="queryRoomNames();">Dump occupant names to console</button>
                 </div>
 
                 <div class="postconnection">

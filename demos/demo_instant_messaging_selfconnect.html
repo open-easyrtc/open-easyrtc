@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
+        <title>EasyRTC Demo: User Supplied Socket.io</title>
+        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
+
+        <!--hide-->
+        <link rel="stylesheet" type="text/css" href="css/landing.css" />
+
+        <!-- Prettify Code -->
+        <script type="text/javascript" src="js/prettify/prettify.js"></script>
+        <link rel="stylesheet" type="text/css" href="js/prettify/prettify.css" />
+        <script type="text/javascript" src="js/prettify/loadAndFilter.js"></script>
+        <script type="text/javascript" src="js/prettify/jquery.min.js"></script>
+        <!--show-->
+        <!-- Assumes global locations for socket.io.js and easyrtc.js -->
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
+        <script type="text/javascript" src="js/demo_instant_messaging_selfconnect.js"></script>
+        <!--hide-->
+        <!-- Styles used within the demo -->
+        <style type="text/css">
+            #stuffToSend {width:300px;}
+            #sendMessageArea{
+                float:left;
+                width:400px;
+                padding-right:20px;
+            }
+            #sendMessageText{
+                width:100%;
+            }
+            #conversation {
+                height:300px;
+                border:solid 1px gray;
+                overflow-y:scroll;
+            }
+        </style>
+        <!--show-->
+    </head>
+    <body onload="connect()">
+        <!--hide-->
+        <div id="container">
+            <div id="header">
+                <a href="index.html"><img id="logo_easyrtc" src="images/easyrtc_logo.png" alt="EasyRTC" style="" /></a>
+            </div>
+            <div id="menu"><a class="menu_link" href="index.html"><div class="menu_item">Local Demos</div></a><a class="menu_link" href="https://github.com/priologic/easyrtc/tree/master/docs"><div class="menu_item">Documentation</div></a><a class="menu_link" href="https://groups.google.com/forum/#!forum/easyrtc"><div class="menu_item">Support: Discussion Group</div></a><a class="menu_link" href="http://www.easyrtc.com/"><div class="menu_item">EasyRTC.com</div></a></div>
+            <div id="main">
+
+                <!-- Main Content -->
+                <h1>EasyRTC Demo: User Supplied Socket.io</h1>
+                <p>This variation on instant messaging uses a socket.io connection
+                allocated by the application rather than internally. This can be useful if you have more advanced 
+                socket.io requirements.</p>
+
+                <p>To use it, enter a message into the text box on the left side of the page.
+                    Then press one of the buttons for another peer to send the message to that peer.
+                    The message should appear on the text box to the right on both this page, and that of the peer.</p>
+
+                <hr />
+                <h2>The Demo</h2>
+                <!--show-->
+                <div id="sendMessageArea">
+                    <div id="iam">Obtaining ID...</div>
+                    <textarea id="sendMessageText"></textarea>
+                    <div id="otherClients"></div>
+                </div>
+                <div id="receiveMessageArea">
+                    Received Messages:
+                    <div id="conversation"></div>
+                </div>
+
+                <!--hide-->
+                <hr />
+
+                <h2>The Code</h2>
+                <h3>HTML</h3>
+                <pre  id="prettyHtml" class="prettyprint linenums:1">
+                </pre>
+                <h3>JavaScript</h3>
+                <p>The contents of demo_instant_messaging.js:</p>
+                <pre  id="prettyJS" class="prettyprint linenums:1">
+                </pre>
+
+
+                <!-- Runs the SyntaxHighlighter -->
+                <script type="text/javascript">
+                    loadAndFilter(window.location.href, "prettyHtml",2 );
+                    loadAndFilter(getHelperPath("js"), "prettyJS", 2);
+               </script>
+
+                <!-- End Main Content -->
+            </div>
+            <!--hide-->
+            <div id="footer">
+                <a href="http://www.priologic.com/?from=landing"><img id="logo_priologic" src="images/priologic_logo_white.png" height="40" width="150" alt="Created By Priologic Software Inc." /></a>
+                <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="/easyrtc/img/powered_by_easyrtc.png" height="60" width="200" alt="Powered By EasyRTC" /></a>
+                <p><em>&copy; 2014 - Priologic Software Inc., All Rights Reserved.</em></p>
+                <p id="license">EasyRTC source code released under a BSD2 License. <a href="https://github.com/priologic/easyrtc/blob/master/LICENSE">See LICENSE file in project folder</a> for details.</p>
+            </div>
+        </div>
+        <!--show-->
+    </body>
+</html>
