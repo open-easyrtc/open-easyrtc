@@ -24,6 +24,7 @@ Changes
 	- JS Client - getFreshIceConfig() now takes an optional callback.
 	- Demos - Changed the titles of the demos and their labels to make them consistent. 
 	- Demos - Gave a different app name to each demo.
+    - Demos - Added a few new demos (multistream and low bandwidth).
 
 Fixes
 	- JS Client - Numerous documentation fixes.
