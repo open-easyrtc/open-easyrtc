@@ -22,6 +22,8 @@ Changes
     - JS Client - an onStreamClosed listener gets passed an easyrtcid plus the stream and the stream name.
     - JS Client - Added documentation for isTurnServer().
 	- JS Client - getFreshIceConfig() now takes an optional callback.
+	- Demos - Changed the titles of the demos and their labels to make them consistent. 
+	- Demos - Gave a different app name to each demo.
 
 Fixes
 	- JS Client - Numerous documentation fixes.
