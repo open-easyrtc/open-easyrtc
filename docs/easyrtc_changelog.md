@@ -16,6 +16,8 @@ New Features:
 	- JS Client - Three new internal peer messages with types "__gotAddedMediaStream", "__closingMediaStream", and "_addedMediaStream" 
 	- JS Client - New function getRoomOccupantsAsArray() and getRoomOccupantsAsMap()
 	- JS Client - New function useThisSocketConnection() for people that want to allocate the websocket themselves.
+	- Server - Socket.io v1.0 support. See issue #64
+	- Server - Support for hosting experimental API's in labs. New server option 'apiLabsEnable' defaults to true. See issue #76
  
 Changes:
 
