@@ -52,7 +52,7 @@ function connect() {
         easyrtc.useThisSocketConnection(mysocket);
     }
     
-    easyrtc.connect("easyrtc.instantMessaging", loginSuccess, loginFailure);
+    easyrtc.connect("easyrtc.reconnect", loginSuccess, loginFailure);
 }
 
 

@@ -11,7 +11,7 @@ function connect() {
     });
     easyrtc.setSdpFilters(localFilter, remoteFilter);
     easyrtc.setRoomOccupantListener(convertListToButtons);
-    easyrtc.easyApp("easyrtc.audioVideo", "selfVideo", ["callerVideo"], loginSuccess, loginFailure);
+    easyrtc.easyApp("easyrtc.lowbandwidth", "selfVideo", ["callerVideo"], loginSuccess, loginFailure);
  }
 
 
