@@ -940,10 +940,11 @@ var Easyrtc = function() {
     this.callCancelled = function(easyrtcid) {
     };
 
-    /*
+    /**
      * This function gets the statistics for a particular peer connection.
      * @param {String} peerId
-     * @param {String} callback gets a map of {userDefinedKey: value}
+     * @param {String} callback gets a map of {userDefinedKey: value}. If there is no peer connection to peerId, then this will
+     *  have a value of {connected:false}. 
      * @param {String} filter has is a map of maps of the form {reportNum:{googleKey: userDefinedKey}}
      * It is still experimental and hence isn't advertised in the documentation.
      */
@@ -959,7 +960,7 @@ var Easyrtc = function() {
     this.getFirefoxPeerStatistics = function(peerId, callback, filter) {
 
         if (!peerConns[peerId]) {
-            callback({"notConnected": peerId});
+            callback(peerId, {"connected": false});
         }
         else if (peerConns[peerId].pc.getStats) {
             peerConns[peerId].pc.getStats(null, function(stats) {
@@ -1008,7 +1009,7 @@ var Easyrtc = function() {
                     });
         }
         else {
-            callback({"statistics": self.getConstantString("statsNotSupported")});
+            callback(peerId, {"statistics": self.getConstantString("statsNotSupported")});
         }
     };
 
@@ -1016,7 +1017,7 @@ var Easyrtc = function() {
     this.getChromePeerStatistics = function(peerId, callback, filter) {
 
         if (!peerConns[peerId]) {
-            callback({"notConnected": peerId});
+             callback(peerId, {"connected": false});
         }
         else if (peerConns[peerId].pc.getStats) {
 
@@ -1153,7 +1154,7 @@ var Easyrtc = function() {
             });
         }
         else {
-            callback({"statistics": self.getConstantString("statsNotSupported")});
+            callback(peerId, {"statistics": self.getConstantString("statsNotSupported")});
         }
     };
 
