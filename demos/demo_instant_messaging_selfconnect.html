@@ -38,7 +38,7 @@
         </style>
         <!--show-->
     </head>
-    <body onload="connect()">
+    <body >
         <!--hide-->
         <div id="container">
             <div id="header">
@@ -53,13 +53,15 @@
                 allocated by the application rather than internally. This can be useful if you have more advanced 
                 socket.io requirements.</p>
 
-                <p>To use it, enter a message into the text box on the left side of the page.
-                    Then press one of the buttons for another peer to send the message to that peer.
-                    The message should appear on the text box to the right on both this page, and that of the peer.</p>
+                <p>It supports two options, connecting immediately after creating a websocket,
+                    connecting 10 seconds after creating the websocket. <command></p>
 
                 <hr />
                 <h2>The Demo</h2>
                 <!--show-->
+                <button id="buttonImmediate" onclick="connect(true);">Easyrtc Connect Immediately</button>
+                <button id="buttonDelayed" onclick="connect(false);">Easyrtc connect after 10 seconds</button><br>
+
                 <div id="sendMessageArea">
                     <div id="iam">Obtaining ID...</div>
                     <textarea id="sendMessageText"></textarea>

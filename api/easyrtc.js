@@ -946,7 +946,7 @@ var Easyrtc = function() {
      * @param {String} callback gets a map of {userDefinedKey: value}. If there is no peer connection to peerId, then this will
      *  have a value of {connected:false}. 
      * @param {String} filter has is a map of maps of the form {reportNum:{googleKey: userDefinedKey}}
-     * It is still experimental and hence isn't advertised in the documentation.
+     * It is still experimental.
      */
     this.getPeerStatistics = function(peerId, callback, filter) {
         if (isFirefox) {
@@ -4298,8 +4298,8 @@ var Easyrtc = function() {
             }
             handleErrorEvent();
         });
-        addSocketListener("connect", function(event) {
 
+        function connectHandler(event) {
             self.webSocketConnected = true;
             if (!self.webSocket) {
                 self.showError(self.errCodes.CONNECT_ERR, self.getConstantString("badsocket"));
@@ -4315,7 +4315,12 @@ var Easyrtc = function() {
                 errorCallback(self.errCodes.SIGNAL_ERROR, self.getConstantString("icf"));
             }
         }
-        );
+        if( preallocatedSocketIo && preallocatedSocketIo.socket.connected) {
+            connectHandler(null);
+        }
+        else {
+            addSocketListener("connect", connectHandler);
+        }
         addSocketListener("easyrtcMsg", onChannelMsg);
         addSocketListener("easyrtcCmd", onChannelCmd);
         addSocketListener("disconnect", function(/* code, reason, wasClean */) {

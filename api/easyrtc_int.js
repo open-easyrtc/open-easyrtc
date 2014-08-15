@@ -4115,8 +4115,8 @@ var Easyrtc = function() {
             }
             handleErrorEvent();
         });
-        addSocketListener("connect", function(event) {
 
+        function connectHandler(event) {
             self.webSocketConnected = true;
             if (!self.webSocket) {
                 self.showError(self.errCodes.CONNECT_ERR, self.getConstantString("badsocket"));
@@ -4132,7 +4132,12 @@ var Easyrtc = function() {
                 errorCallback(self.errCodes.SIGNAL_ERROR, self.getConstantString("icf"));
             }
         }
-        );
+        if( preallocatedSocketIo && preallocatedSocketIo.socket.connected) {
+            connectHandler(null);
+        }
+        else {
+            addSocketListener("connect", connectHandler);
+        }
         addSocketListener("easyrtcMsg", onChannelMsg);
         addSocketListener("easyrtcCmd", onChannelCmd);
         addSocketListener("disconnect", function(/* code, reason, wasClean */) {
