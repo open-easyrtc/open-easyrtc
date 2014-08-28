@@ -338,7 +338,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         haveFilesWaiting = false;
         if (filesWaiting.length > 0) {
             setTimeout(function() {
-                var fileset = filesWaiting.pop();
+                var fileset = filesWaiting.shift();
                 sendFilesOffer(fileset.files, fileset.areBinary);
             }, 240);
         }
