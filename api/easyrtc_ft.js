@@ -267,7 +267,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
                 return;
             }
             else {
-                curFile = filesBeingSent.pop();
+                curFile = filesBeingSent.shift();
                 progressListener({status: "started_file", name: curFile.name});
                 curFileSize = curFile.size;
                 positionAcked = 0;
@@ -343,8 +343,8 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
             }, 240);
         }
     }
-    
-    
+
+
     function sendFilesOffer(files, areBinary) {
         if (haveFilesWaiting) {
             filesWaiting.push({files: files, areBinary: areBinary});
