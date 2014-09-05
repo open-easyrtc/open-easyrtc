@@ -109,10 +109,10 @@ var Easyrtc = function() {
 
     //
     // this is a list of the events supported by the generalized event listener.
-    // currently, it's just the "roomOccupant" event.
     //
     var allowedEvents = {
-        roomOccupant: true
+        roomOccupant: true,  // this receives the list of everybody in any room you belong to
+        roomOccupants: true  // this receives a {roomName:..., occupants:...} value for a specific room
     };
     //
     // A map of eventListeners. The key is the event type.
@@ -3746,6 +3746,46 @@ var Easyrtc = function() {
 
     }
 
+    /**
+     * The idea of aggregating timers is that there are events that convey state and these can fire more frequently
+    * than desired. Aggregating timers allow a bunch of events to be collapsed into one by only firing the last
+    * event.
+     * @private
+    */
+    var aggregatingTimers = {};
+
+    /**
+     * This function sets a timeout for a function to be called with the feature that if another
+     * invocation comes along within a particular interval (with the same key), the second invocation
+     * replaces the first. To prevent a continuous stream of events from preventing a callback from ever
+     * firing, we'll collapse no more than 20 events.
+     * @param {String} key A key used to identify callbacks that should be aggregated.
+     * @param {Function} callback The callback to invoke.
+     * @param {Number} period The aggregating period in milliseconds.
+     * @private
+     */
+    function addAggregatingTimer(key, callback, period) {
+        if( !period) {
+            period = 100; // 0.1 second
+        }
+        var counter = 0;
+        if( aggregatingTimers[key]) {
+            clearTimeout(aggregatingTimers[key].timer);
+            counter = aggregatingTimers[key].counter;
+        }
+        if( counter > 20) {
+            delete aggregatingTimers[key];
+            callback();
+        }
+        else {
+            aggregatingTimers[key] = {counter: counter +1};
+            aggregatingTimers[key].timer = setTimeout(function () {
+                delete aggregatingTimers[key];
+                callback();
+            }, period);
+        }
+    }
+
     //
     // this function gets called for each room when there is a room update.
     //
@@ -3768,9 +3808,16 @@ var Easyrtc = function() {
         // house keeping accordingly.
         //
         processLostPeers(self.reducedList);
-        if (roomOccupantListener) {
-            roomOccupantListener(roomName, self.reducedList, myInfo);
-        }
+        //
+        //
+        //
+        addAggregatingTimer("roomOccupants&" + roomName, function(){
+            if (roomOccupantListener) {
+                roomOccupantListener(roomName, self.reducedList, myInfo);
+            }
+            self.emitEvent("roomOccupants", {roomName:roomName, occupants:lastLoggedInList});
+        }, 100);
+
     }
 
     function sendQueuedCandidates(peer, onSignalSuccess, onSignalFailure) {
