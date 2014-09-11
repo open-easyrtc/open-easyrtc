@@ -2816,6 +2816,14 @@ var Easyrtc = function() {
                     });
         };
         setTimeout(function() {
+            //
+            // if the call was cancelled, we don't want to continue getting the offer.
+            // we can tell the call was cancelled because there won't be a peerConn object
+            // for it.
+            //
+            if( !peerConns[otherUser]) {
+                return;
+            }
             pc.createOffer(setLocalAndSendMessage0, function(errorObj) {
                 callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(errorObj));
             },
