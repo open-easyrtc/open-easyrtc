@@ -2,16 +2,8 @@ var selfEasyrtcid = "";
 
 
 function connect() {
-
-    var localFilter = easyrtc.buildLocalSdpFilter( {
-        audioRecvBitrate:20, videoRecvBitrate:30
-    });
-    var remoteFilter = easyrtc.buildRemoteSdpFilter({
-        audioSendBitrate: 20, videoSendBitrate:30
-    });
-    easyrtc.setSdpFilters(localFilter, remoteFilter);
     easyrtc.setRoomOccupantListener(convertListToButtons);
-    easyrtc.easyApp("easyrtc.lowbandwidth", "selfVideo", ["callerVideo"], loginSuccess, loginFailure);
+    easyrtc.easyApp("easyrtc.iceFilter", "selfVideo", ["callerVideo"], loginSuccess, loginFailure);
  }
 
 
@@ -43,16 +35,47 @@ function convertListToButtons (roomName, data, isPrimary) {
 
 function performCall(otherEasyrtcid) {
     easyrtc.hangupAll();
-
+    easyrtc.setIceUsedInCalls( getModifiedIceList());
     var successCB = function() {};
     var failureCB = function() {};
     easyrtc.call(otherEasyrtcid, successCB, failureCB);
 }
 
 
+
+
+
+var iceMap = [];
+
+function getModifiedIceList(){
+   var iceList = [];
+   var i;
+
+   for( i = 0; i < iceMap.length; i++ ) {
+      if( document.getElementById("iscb" + i).checked ) {
+         iceList.push( iceMap[i]);
+      }
+   }
+   return {iceServers: iceList};
+}
+
+
 function loginSuccess(easyrtcid) {
+    var i;
+
     selfEasyrtcid = easyrtcid;
     document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyrtcid);
+    var blockentries = "<h3>Ice Entries</h3>";
+    var iceServers = easyrtc.getServerIce();
+    for(i = 0; i < iceServers.iceServers.length; i++ ) {
+	    iceMap[i] = iceServers.iceServers[i];
+        var label = "iscb" + i;
+	    blockentries += '<div style="width:100%;overflow:hidden;text-align:left"><input type="checkbox" id="' + label + '" + checked="checked" style="float:left>' +
+                    '<label for="' + label + '" style="float:left">' +  iceServers.iceServers[i].url + '></div>';
+
+    }
+    document.getElementById("iceEntries").innerHTML = blockentries;
+
 }
 
 

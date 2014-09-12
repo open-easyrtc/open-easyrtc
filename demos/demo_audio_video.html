@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
-        <title>EasyRTC Demo: Audio and Video Chat</title>
+        <title>EasyRTC Demo: Audio and Video</title>
         <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
 
         <!--hide-->
@@ -74,7 +74,7 @@
 
                 <!--hide-->
                 <!-- Main Content -->
-                <h1>EasyRTC Demo: Audio and Video Chat</h1>
+                <h1>EasyRTC Demo: Audio and Video</h1>
 
                 <p>The application provides an audio-video chat where sharing of audio and video can be controlled individually before connection.</p>
 
@@ -88,7 +88,8 @@
                 <div id="demoContainer">
                     <div id="connectControls">
                         <input type="checkbox" checked="checked" id="shareAudio" />Share audio
-                        <input type="checkbox" checked="checked" id="shareVideo" />Share video <br />
+                        <input type="checkbox" checked="checked" id="shareVideo" />Share video<br />
+                        <input type="checkbox" id="useFreshIce" onclick="easyrtc.setUseFreshIceEachPeerConnection(this.value);"/>Fresh Ice<br />
                         <button id="connectButton" onclick="connect()">Connect</button>
                         <button id="hangupButton" disabled="disabled" onclick="hangup()">Hangup</button>
                         <div id="iam">Not yet connected...</div>

@@ -3282,7 +3282,7 @@
     
     
     <div class="description">
-        Control whether the client requests audio from a peer during a call.Must be called before the call to have an effect.
+        Control whether the client requests video from a peer during a call.Must be called before the call to have an effect.
     </div>
     
 
@@ -3958,7 +3958,7 @@
         
             
 <dt>
-    <h3 class="name" id="getFreshIceConfig"><span class="type-signature"></span>getFreshIceConfig<span class="signature">()</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="getFreshIceConfig"><span class="type-signature"></span>getFreshIceConfig<span class="signature">(callback)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -3966,7 +3966,7 @@
     
     
     <div class="description">
-        Request fresh ice config information from the server.This should be done periodically by long running applications.There are no parameters or return values.
+        Request fresh ice config information from the server.This should be done periodically by long running applications.
     </div>
     
 
@@ -3974,6 +3974,54 @@
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">is called with a value of true on success, false on failure.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
     
     
     
@@ -4173,6 +4221,160 @@
         
     <pre class="prettyprint"><code>   easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="getPeerStatistics"><span class="type-signature"></span>getPeerStatistics<span class="signature">(peerId, callback, filter)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        This function gets the statistics for a particular peer connection.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>peerId</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">gets a map of {userDefinedKey: value}. If there is no peer connection to peerId, then this will have a value of {connected:false}.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>filter</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">has is a map of maps of the form {reportNum:{googleKey: userDefinedKey}}It is still experimental.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
     
 </dd>
 
@@ -5245,6 +5447,88 @@
             
 <div class="param-desc">
     A map whose keys are the room names
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="getServerIce"><span class="type-signature"></span>getServerIce<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Returns the last ice config supplied by the EasyRTC server. This function is not normally used, it is providedfor people who want to try filtering ice server configuration on the client.
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    which has the form {iceServers:[ice_server_entry, ice_server_entry, ...]}
 </div>
 
 
@@ -6349,165 +6633,6 @@
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>      easyrtc.initMediaSource(         function(mediastream){             easyrtc.setVideoObjectSrc( document.getElementById("mirrorVideo"), mediastream);         },         function(errorCode, errorText){              easyrtc.showError(errorCode, errorText);         });</code></pre>
-
-    
-</dd>
-
-        
-            
-<dt>
-    <h3 class="name" id="initScreenCapture"><span class="type-signature"></span>initScreenCapture<span class="signature">(successCallback, errorCallback, streamName)</span><span class="type-signature"></span></h3>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        This is the new desktop capture code. This code makes use of an API that is only available to google extensions, which are self-contained sets of files you download from the Chrome Store. It will not run in a page hosted on your website.
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>successCallback</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">function(Object)</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">will be called with localmedia stream on success.</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>errorCallback</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">function(String,String)</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">is called with an error code and error description.</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>streamName</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">an optional id for the media source so you can use multiple cameras and screen share simultaneously.</td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-    
-    
-    
-    
-    
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>      easyrtc.initScreenCapture(         function(mediastream){             easyrtc.setVideoObjectSrc( document.getElementById("mirrorVideo"), mediastream);         },         function(errorCode, errorText){              easyrtc.showError(errorCode, errorText);         });</code></pre>
 
     
 </dd>
@@ -8434,7 +8559,7 @@
             
             
             
-            <td class="description last">takes the arguments (callerEasyrtcid, function():boolean ){}The acceptCheck callback is passed (as it's second argument) a function that should be called with eithera true value (accept the call) or false value( reject the call) as it's first argument. An array of streamNames can be supplied as a second argument.</td>
+            <td class="description last">takes the arguments (callerEasyrtcid, acceptor).     The acceptCheck callback is passed an easyrtcid and an aceptor function. The acceptor function should be called with eithera true value (accept the call) or false value( reject the call) as it's first argument, and optionally,an array of local media streamNames as a second argument.</td>
         </tr>
 	
 	
@@ -8481,7 +8606,9 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>     easyrtc.setAcceptChecker( function(easyrtcid, acceptor){          if( easyrtc.idToName(easyrtcid) === 'Fred' ){             acceptor(true);          }          else if( easyrtc.idToName(easyrtcid) === 'Barney' ){             setTimeout( function(){ acceptor(true)}, 10000);          }          else{             acceptor(false);          }     });</code></pre>
+    <pre class="prettyprint"><code>     easyrtc.( function(easyrtcid, acceptor){          if( easyrtc.idToName(easyrtcid) === 'Fred' ){             acceptor(true);          }          else if( easyrtc.idToName(easyrtcid) === 'Barney' ){             setTimeout( function(){ 
+                       acceptor(true, ['myOtherCam']); // myOtherCam presumed to a streamName
+                     }, 10000);          }          else{             acceptor(false);          }     });</code></pre>
 
     
 </dd>
@@ -8610,7 +8737,7 @@
     
     
     <div class="description">
-        Controls whether a default local media stream should be acquired automatically during calls and acceptsif a list of streamNames is not supplied. The default is true, which mimicks the behaviour of earlier releasesthat didn't support multiple streams. This function should be called before easyrtc.call or before entering an accept checker callback.
+        Controls whether a default local media stream should be acquired automatically during calls and acceptsif a list of streamNames is not supplied. The default is true, which mimicks the behaviour of earlier releasesthat didn't support multiple streams. This function should be called before easyrtc.call or before entering an accept  callback.
     </div>
     
 
@@ -9371,6 +9498,119 @@
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>   easyrtc.setDisconnectListener(function(){       easyrtc.showError("SYSTEM-ERROR", "Lost our connection to the socket server");   });</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="setIceUsedInCalls"><span class="type-signature"></span>setIceUsedInCalls<span class="signature">(ice)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sets the ice server configuration that will be used in subsequent calls. You only need this function if you are filteringthe ice server configuration on the client or if you are using TURN certificates that have a very short lifespan.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>ice</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">An object with iceServers element containing an array of ice server entries.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>    easyrtc.setIceUsedInCalls( {"iceServers": [     {			"url": "stun:stun.sipgate.net"		},     {        "url": "stun:217.10.68.152"     },     {        "url": "stun:stun.sipgate.net:10000"     }     ]});     easyrtc.call(...);</code></pre>
 
     
 </dd>
@@ -10338,6 +10578,114 @@
         
     <pre class="prettyprint"><code> easyrtc.setStreamAcceptor(function(easyrtcid, stream){    document.getElementById('callerName').innerHTML = easyrtc.idToName(easyrtcid);    easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), stream); });</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="setUseFreshIceEachPeerConnection"><span class="type-signature"></span>setUseFreshIceEachPeerConnection<span class="signature">(value)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Determines whether fresh ice server configuration should be requested from the server for each peer connection.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">the default is false.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
     
 </dd>
 
@@ -11794,7 +12142,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Tue Jul 15 2014 13:48:16 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Sep 05 2014 09:46:41 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,5 +1,5 @@
 
-easyrtc_constantStrings = {
+var easyrtc_constantStrings = {
   "unableToEnterRoom":"Unable to enter room {0} because {1}" ,
   "resolutionWarning": "Requested video size of {0}x{1} but got size of {2}x{3}",
   "badUserName": "Illegal username {0}",

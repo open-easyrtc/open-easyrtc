@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
-        <title>EasyRTC Demo: Low-bandwidth Chat</title>
+        <title>EasyRTC Demo: Ice Filter</title>
         <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
 
         <!--hide-->
@@ -18,9 +18,7 @@
         <!-- Assumes global locations for socket.io.js and easyrtc.js -->
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
-        <script type="text/javascript" src="/easyrtc/labs/easyrtc_rates.js"></script>
-        <script type="text/javascript" src="js/demo_lowbandwidth.js"></script>
-
+        <script type="text/javascript" src="js/demo_ice_filter.js"></script>
 
     </head>
     <body onload="connect();">
@@ -32,24 +30,27 @@
             <div id="menu"><a class="menu_link" href="index.html"><div class="menu_item">Local Demos</div></a><a class="menu_link" href="https://github.com/priologic/easyrtc/tree/master/docs"><div class="menu_item">Documentation</div></a><a class="menu_link" href="https://groups.google.com/forum/#!forum/easyrtc"><div class="menu_item">Support: Discussion Group</div></a><a class="menu_link" href="http://www.easyrtc.com/"><div class="menu_item">EasyRTC.com</div></a></div>
             <div id="main">
                 <!-- Main Content -->
-                <h1>EasyRTC Demo: Low-bandwidth Chat</h1>
+                <h1>EasyRTC Demo: Ice Filter</h1>
 
-                <p>The application provides a simple audio-video chat using experimental SDP filters to reduce the bandwidth used.</p>
+                <p>Client side filtering of ICE configuration.</p>
 
-                <p>Connection is handled using an onload statement in the body. Requests are automatically accepted.<p>
-
-                <p>To hang-up on a call, hover your mouse over the upper right of the video, and click on the 'X' which appears at the top right of other person's video object.</p>
+                <p>Client-side ice filtering is meant as a experimenting tool, not something you should need to do in a
+                    production environment.
+                <p>
 
                 <hr />
                 <h2>The Demo</h2>
                 <!--show-->
-                <div id="demoContainer">
+                <div id="demoContainer" >
                     <div id="connectControls">
                         <div id="iam">Not yet connected...</div>
                         <br />
-                        <strong>Connected users:</strong>
+                        <div id="iceEntries" style="clear:both;width:100%;overflow-x:hidden">
+                        </div>
+                        <h3>Connected users:</h3>
                         <div id="otherClients"></div>
                     </div>
+
                     <div id="videos">
                         <video autoplay="autoplay" class="easyrtcMirror" id="selfVideo" muted="muted" volume="0" ></video>
                         <div style="position:relative;float:left;">
@@ -57,6 +58,7 @@
                         </div>
                         <!-- each caller video needs to be in it's own div so it's close button can be positioned correctly -->
                     </div>
+
                 </div>
                 <!--hide-->
                 <br style="clear:both;" />
@@ -65,12 +67,6 @@
                 <h2>The Code</h2>
                 <h3>HTML</h3>
                 <pre   id="prettyHtml" class="prettyprint linenums:1">
-
-                </pre>
-
-                <h3>CSS</h3>
-                <p>In order to show the 'X' in the upper right corner, the callerVideo video tag must be in a div with relative positioning.:</p>
-                <pre id="prettyCSS" class="prettyprint linenums:1">
                 </pre>
 
                 <h3>JavaScript</h3>
@@ -83,7 +79,6 @@
                 <script type="text/javascript">
                     loadAndFilter(window.location.href, "prettyHtml",2 );
                     loadAndFilter(getHelperPath("js"), "prettyJS", 2);
-                    loadAndFilter(getHelperPath("css"), "prettyCSS", 2);
                 </script>
 
                 <!-- End Main Content -->

@@ -39,7 +39,7 @@ Terminology
 Installing EasyRTC and Getting Help
 --------------
 
-The EasyRTC framework can be easily installed on most platforms in 10 minutes.  We have install  instructions for Windows, Mac and Linux available. The files that make up EasyRTC at the [https://github.com/priologic/easyrtc](github repository for EasyRTC) start with the README.md file. The docs directory of EasyRTC distribution has documentation in HTML for both server and client side components.
+The EasyRTC framework can be easily installed on most platforms in 10 minutes.  We have install  instructions for Windows, Mac and Linux available. The files that make up EasyRTC at [https://github.com/priologic/easyrtc] start with the README.md file. The docs directory of EasyRTC distribution has documentation in HTML for both server and client side components.
 
 If you find yourself running into problems installing check out the various sources for connecting with us and the community also listed in the README.md file.
 
