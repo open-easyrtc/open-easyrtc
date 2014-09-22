@@ -8,65 +8,68 @@ var isChrome = !!navigator.webkitGetUserMedia;
 
 // DetectRTC.js - github.com/muaz-khan/WebRTC-Experiment/tree/master/DetectRTC
 // Below code is taken from RTCMultiConnection-v1.8.js (http://www.rtcmulticonnection.org/changes-log/#v1.8)
+// and modified.
 var DetectRTC = {};
 
 (function() {
     var screenCallback;
 
     DetectRTC.screen = {
-        chromeMediaSource: 'screen',
+        supported: false,
         getSourceId: function(callback) {
             if (!callback)
                 throw '"callback" parameter is mandatory.';
             screenCallback = callback;
-            window.postMessage('get-sourceId', '*');
+            window.postMessage('desktopcapture-get-sourceId', '*');
         },
         isChromeExtensionAvailable: function(callback) {
-            if (!callback)
+            if (!callback) {
                 return;
+            }
 
-            if (DetectRTC.screen.chromeMediaSource == 'desktop')
+            if (DetectRTC.screen.supported) {
                 callback(true);
+            }
 
             // ask extension if it is available
-            window.postMessage('are-you-there', '*');
+            window.postMessage('desktopcapture-are-you-there', '*');
 
             setTimeout(function() {
-                if (DetectRTC.screen.chromeMediaSource == 'screen') {
-                    callback(false);
-                } else
-                    callback(true);
+                callback(DetectRTC.screen.supported);
             }, 2000);
         },
         onMessageCallback: function(data) {
-            console.log('chrome message', data);
+            console.log('chrome message: ', data);
 
             // "cancel" button is clicked
             if (data == 'PermissionDeniedError') {
                 DetectRTC.screen.chromeMediaSource = 'PermissionDeniedError';
-                if (screenCallback)
-                    return screenCallback('PermissionDeniedError');
-                else
+                if (screenCallback) {
+                   return screenCallback('PermissionDeniedError');
+                }
+                else {
                     throw new Error('PermissionDeniedError');
+                }
             }
 
             // extension notified his presence
-            if (data == 'rtcmulticonnection-extension-loaded') {
-                DetectRTC.screen.chromeMediaSource = 'desktop';
+            if (data == 'desktopcapture-loaded') {
+                DetectRTC.screen.supported = true;
             }
 
             // extension shared temp sourceId
             if (data.sourceId) {
                 DetectRTC.screen.sourceId = data.sourceId;
-                if (screenCallback)
-                    screenCallback(DetectRTC.screen.sourceId);
+                if (screenCallback) {
+                    screenCallback(null);
+                }
             }
         }
     };
 
     // check if desktop-capture extension installed.
     if (window.postMessage && isChrome) {
-        DetectRTC.screen.isChromeExtensionAvailable();
+        DetectRTC.screen.isChromeExtensionAvailable(function(){});
     }
 })();
 
@@ -78,23 +81,26 @@ window.addEventListener('message', function(event) {
     DetectRTC.screen.onMessageCallback(event.data);
 });
 
-easyrtc.isDesktopInstalled = function() {
-    return DetectRTC.screen.chromeMediaSource == 'desktop';
+easyrtc.isDesktopCaptureInstalled = function() {
+    return DetectRTC.screen.supported;
 }
 
 easyrtc.initDesktopStream = function(successCallback, failureCallback, streamName) {
-    if (!easyrtc.isDesktopInstalled()) {
+    if (!easyrtc.isDesktopCaptureInstalled()) {
         failureCallback(easyrtc.errCodes.DEVELOPER_ERR, "Desktop capture plugin not installed").
                 return;
     }
 
     DetectRTC.screen.getSourceId(function(error) {
-        if (DetectRTC.screen.sourceId) {
+        if( error) {
+            failureCallback(easyrtc.errCodes.MEDIA_ERR, error);
+        }
+        else if (DetectRTC.screen.sourceId) {
             easyrtc._presetMediaConstraints = {
                 video: {
                     mandatory: {
                         chromeMediaSource: 'desktop',
-                        chromeMediaSourceId: event.data.chromeMediaSourceId,
+                        chromeMediaSourceId: DetectRTC.screen.sourceId,
                         maxWidth: 1920,
                         maxHeight: 1080,
                         minAspectRatio: 1.77
@@ -108,4 +114,30 @@ easyrtc.initDesktopStream = function(successCallback, failureCallback, streamNam
             failureCallback(easyrtc.errCodes.MEDIA_CANCELLED, "Desktop capture plugin not installed");
         }
     });
+}
+
+/**
+ * This method builds a function that can be attached to a button to install an extension.
+ * @param extensionId - the google webstore extensionId
+ * @param successCallback - function to call on success
+ * @param failureCallback - function to call on failure. Will be passed an error code and error message.
+ */
+easyrtc.extensionInstaller = function(extensionId, successCallback, failureCallback) {
+   return function() {
+     if( !navigator.webkitGetUserMedia ||
+         !window.chrome ||
+         !chrome.webstore ||
+         !chrome.webstore.install ) {
+         failureCallback(easyrtc.errCodes.DEVELOPER_ERR, "Can't install plugin on non-chrome browsers");
+     }
+     else {
+        chrome.webstore.install(
+             "https://chrome.google.com/webstore/detail/" + extensionId, 
+             successCallback, 
+             function(error) {
+               failureCallback(eayrtc.errCodes.DEVELOPER_ERR, "Plugin not installed");
+             }
+         );
+     };
+   }
 }
