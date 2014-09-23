@@ -1820,7 +1820,7 @@ var Easyrtc = function() {
      * a true value (accept the call) or false value( reject the call) as it's first argument, and optionally,
      * an array of local media streamNames as a second argument.
      * @example
-     *      easyrtc.( function(easyrtcid, acceptor){
+     *      easyrtc.setAcceptChecker( function(easyrtcid, acceptor){
      *           if( easyrtc.idToName(easyrtcid) === 'Fred' ){
      *              acceptor(true);
      *           }
