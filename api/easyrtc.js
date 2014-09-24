@@ -675,7 +675,7 @@ var Easyrtc = function() {
         var constraints = {};
         //
         // _presetMediaConstraints allow you to provide your own contraints to be used
-        // with initLocalMediaSource.
+        // with initMediaSource.
         //
         if (self._presetMediaConstraints) {
             constraints = self._presetMediaConstraints;
@@ -1496,6 +1496,7 @@ var Easyrtc = function() {
         if (!streamName) {
             streamName = "default";
         }
+        stream.streamName = streamName;
         namedLocalMediaStreams[streamName] = stream;
         if (streamName !== "default") {
             var mediaIds = buildMediaIds();
@@ -1536,6 +1537,15 @@ var Easyrtc = function() {
             }
         }
         return undefined;
+    }
+
+    this.getNameOfRemoteStream = function(easyrtcId, webrtcStream){
+        if(typeof webrtcStream == "string") {
+            return getNameOfRemoteStream(easyrtcId, webrtcStream);
+        }
+        else if( webrtcStream.id) {
+            return getNameOfRemoteStream(easyrtcId, webrtcStream.id);
+        }
     }
 
     function closeLocalMediaStreamByName(streamName) {
@@ -1875,6 +1885,7 @@ var Easyrtc = function() {
                 self.debugPrinter("successfully got local media");
             }
 
+            stream.streamName = streamName;
             registerLocalMediaStreamByName(stream, streamName);
             var videoObj, triesLeft, tryToGetSize, ele;
             if (haveAudioVideo.video) {
@@ -2003,7 +2014,7 @@ var Easyrtc = function() {
      * a true value (accept the call) or false value( reject the call) as it's first argument, and optionally,
      * an array of local media streamNames as a second argument.
      * @example
-     *      easyrtc.( function(easyrtcid, acceptor){
+     *      easyrtc.setAcceptChecker( function(easyrtcid, acceptor){
      *           if( easyrtc.idToName(easyrtcid) === 'Fred' ){
      *              acceptor(true);
      *           }
@@ -3406,6 +3417,7 @@ var Easyrtc = function() {
                     remoteName = "default";
                 }
                 peerConns[otherUser].remoteStreamIdToName[event.stream.id || "anonymous"] = remoteName;
+                event.stream.streamName = remoteName;
                 if (self.streamAcceptor) {
                     self.streamAcceptor(otherUser, event.stream, remoteName);
                 }

@@ -80,7 +80,8 @@ function createLocalVideo(stream, streamName) {
         labelBlock.parentNode.parentNode.removeChild(labelBlock.parentNode);
     }
     labelBlock.appendChild(closeButton);
-    
+
+    console.log("created local video, stream.streamName = " + stream.streamName);
 }
 
 function addSrcButton(buttonLabel, videoId) {
@@ -222,7 +223,8 @@ function disconnect() {
 easyrtc.setStreamAcceptor(function(easyrtcid, stream, streamName) {
     var labelBlock = addMediaStreamToDiv("remoteVideos", stream, streamName);
     labelBlock.parentNode.id = "remoteBlock" + easyrtcid + streamName;
-
+    console.log("accepted incoming stream with name " + stream.streamName);
+    console.log("checking incoming " + easyrtc.getNameOfRemoteStream(easyrtcid, stream));
 });
 
 

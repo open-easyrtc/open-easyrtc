@@ -221,6 +221,9 @@ easyrtc.setStreamAcceptor(function(easyrtcid, stream, streamName) {
     var labelBlock = addMediaStreamToDiv("remoteVideos", stream, streamName);
     labelBlock.parentNode.id = "remoteBlock" + easyrtcid + streamName;
 
+    console.log("accepted incoming stream with name " + stream.streamName);
+    console.log("checking incoming " + easyrtc.getNameOfRemoteStream(easyrtcid, stream));
+
 });
 
 
@@ -248,7 +251,7 @@ easyrtc.setAcceptChecker(function(easyrtcid, callback) {
     callback(true, easyrtc.getLocalMediaIds());
 });
 
-var mypluginId = "";
+var mypluginId = "tawk-desktop-capture/bemabaogbdfpbkkganibcmhbgjogabfj";
 
 setTimeout(
      function() {
@@ -257,11 +260,6 @@ setTimeout(
              :"Desktop capture not installed";
      }, 3000);
 
-document.getElementById("installPluginButton").onclick = easyrtc.extensionInstaller(mypluginId,
-    function() {
-       easyrtc.showError("Plugin is now installed. This is good!");
-    },
-    function(errorCode, errorText) {
-        easyrtc.showError(errorCode, errorText);
-    }
-);
+document.getElementById("installPluginButton").onclick = function() {
+chrome.webstore.install();
+};
