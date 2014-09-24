@@ -39,8 +39,6 @@ var DetectRTC = {};
             }, 2000);
         },
         onMessageCallback: function(data) {
-            console.log('chrome message: ', data);
-
             // "cancel" button is clicked
             if (data == 'PermissionDeniedError') {
                 DetectRTC.screen.chromeMediaSource = 'PermissionDeniedError';

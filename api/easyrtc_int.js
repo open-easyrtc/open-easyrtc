@@ -341,7 +341,7 @@ var Easyrtc = function() {
             console.error("Developer error: attempt to join room " + roomName + " which you are already in.");
             return;
         }
-        var mediaIds = buildMediaIds();
+
         var newRoomData = {roomName: roomName};
         if (roomParameters) {
             try {
@@ -388,9 +388,6 @@ var Easyrtc = function() {
         }
         else {
             self.roomJoin[roomName] = newRoomData;
-        }
-        if (mediaIds !== {}) {
-            self.setRoomApiField(roomName, "mediaIds", mediaIds);
         }
 
     };
@@ -4291,6 +4288,10 @@ var Easyrtc = function() {
             if (roomData[roomName].roomStatus === "join") {
                 if (!(self.roomJoin[roomName])) {
                     self.roomJoin[roomName] = roomData[roomName];
+                }
+                var mediaIds = buildMediaIds();
+                if (mediaIds !== {}) {
+                    self.setRoomApiField(roomName, "mediaIds", mediaIds);
                 }
             }
             else if (roomData[roomName].roomStatus === "leave") {
