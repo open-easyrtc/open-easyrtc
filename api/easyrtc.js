@@ -856,8 +856,9 @@ var Easyrtc = function() {
 //        connectTime: timestamp when the connection was started
 //        sharingAudio: true if audio is being shared
 //        sharingVideo: true if video is being shared
-//        cancelled: temporarily true if a connection was cancelled by the peer asking to initiate it.
+//        cancelled: temporarily true if a connection was cancelled by the peer asking to initiate it
 //        candidatesToSend: SDP candidates temporarily queued
+//        streamsAddedAcks: ack callbacks waiting for stream received messages
 //        pc: RTCPeerConnection
 //        mediaStream: mediaStream
 //     function callSuccessCB(string) - see the easyrtc.call documentation.
@@ -3163,8 +3164,14 @@ var Easyrtc = function() {
      * Add a named local stream to a call.
      * @param {String} easyrtcId The id of client receiving the stream.
      * @param {String} streamName The name of the stream.
+     * @param {Function} receiptHandler is a function that gets called when the other side sends a message
+     *   that the stream has been received. The receiptHandler gets called with an easyrtcid and a stream name. This
+     *   argument is optional.
      */
-    this.addStreamToCall = function(easyrtcId, streamName) {
+    this.addStreamToCall = function(easyrtcId, streamName, receiptHandler) {
+        if( !streamName) {
+            streamName = "default";
+        }
         console.log("adding stream with id " + streamName + " to call(" + easyrtcId + ")");
         var stream = getLocalMediaStreamByName(streamName);
         if (!stream) {
@@ -3187,6 +3194,9 @@ var Easyrtc = function() {
             }, function(errorObj) {
                 console.log("unexpected error in creating offer");
             });
+            if( receiptHandler ) {
+                peerConns[easyrtcId].streamsAddedAcks[streamName] = receiptHandler;
+            }
         }
     }
 
@@ -3310,6 +3320,7 @@ var Easyrtc = function() {
                 connectionAccepted: false,
                 isInitiator: isInitiator,
                 remoteStreamIdToName: {},
+                streamsAddedAcks: {},
                 getRemoteStreamByName: function(streamName) {
                     var remoteStreams = pc.getRemoteStreams();
                     var i = 0;
@@ -3417,6 +3428,11 @@ var Easyrtc = function() {
                 event.stream.streamName = remoteName;
                 if (self.streamAcceptor) {
                     self.streamAcceptor(otherUser, event.stream, remoteName);
+                    //
+                    // Inform the other user that the stream they provided has been received.
+                    // This should be moved into signalling at some point
+                    //
+                    self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
                 }
             };
             pc.onremovestream = function(event) {
@@ -3592,6 +3608,16 @@ var Easyrtc = function() {
                 self.debugPrinter("setup pc.onconnection ");
             }
         };
+
+        //
+        // Temporary support for responding to acknowledgements of about streams being added.
+        //
+        self.setPeerListener(function(easyrtcid, msgType, msgData, targeting){
+             if( newPeerConn.streamsAddedAcks[msgData.streamName]) {
+                 (newPeerConn.streamsAddedAcks[msgData.streamName])(easyrtcid, msgData.streamName);
+                 delete newPeerConn.streamsAddedAcks[msgData.streamName];
+             }
+        }, "easyrtc_streamReceived", otherUser);
         return pc;
     };
     var doAnswer = function(caller, msgData, streamNames) {

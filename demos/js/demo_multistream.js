@@ -92,7 +92,9 @@ function addSrcButton(buttonLabel, videoId) {
                 function(stream) {
                     createLocalVideo(stream, buttonLabel);
                     if( otherEasyrtcid) {
-                        easyrtc.addStreamToCall(otherEasyrtcid, buttonLabel);
+                        easyrtc.addStreamToCall(otherEasyrtcid, buttonLabel, function(easyrtcid, streamName){
+                            easyrtc.showError("Informational", "other party " + easyrtcid + " acknowledges receiving " + streamName);
+                        });
                     }
                 },
                 function(errCode, errText) {
