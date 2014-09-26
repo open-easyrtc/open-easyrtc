@@ -133,7 +133,7 @@ easyrtc.extensionInstaller = function(extensionId, successCallback, failureCallb
              "https://chrome.google.com/webstore/detail/" + extensionId, 
              successCallback, 
              function(error) {
-               failureCallback(eayrtc.errCodes.DEVELOPER_ERR, "Plugin not installed");
+               failureCallback(easyrtc.errCodes.DEVELOPER_ERR, error);
              }
          );
      };
