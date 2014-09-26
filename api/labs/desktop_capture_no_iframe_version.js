@@ -1,5 +1,5 @@
 //
-// This code was taken from: https://github.com/muaz-khan/WebRTC-Experiment/tree/master/Pluginfree-Screen-Sharing 
+// This code was taken from: https://github.com/muaz-khan/WebRTC-Experiment/tree/master/Pluginfree-Screen-Sharing
 // and modified to fit with EasyRTC.
 //
 
@@ -117,7 +117,8 @@ easyrtc.initDesktopStream = function(successCallback, failureCallback, streamNam
 /**
  * This method builds a function that can be attached to a button to install an extension.
  * The install will only work on a {@link https://support.google.com/webmasters/answer/34592?hl=en|Google Verified Website}
- * with a `link` tag pointing to the extension.
+ * with a `link` tag pointing to the extension, which is required by chrome for
+ * {@link https://developer.chrome.com/webstore/inline_installation|Inline Installations}.
  *
  * @example
  *
