@@ -39,9 +39,10 @@ function enable(domId) {
 function connect() {
     easyrtc.enableAudio(document.getElementById('shareAudio').checked);
     easyrtc.enableVideo(document.getElementById('shareVideo').checked);
+    easyrtc.enableVideoReceive(document.getElementById('expectVideo').checked);
+    easyrtc.enableAudioReceive(document.getElementById('expectAudio').checked);
     easyrtc.setRoomOccupantListener(convertListToButtons);
     easyrtc.connect("easyrtc.audioVideo", loginSuccess, loginFailure);
-
 }
 
 
