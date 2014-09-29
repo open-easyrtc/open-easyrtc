@@ -73,8 +73,10 @@ if (navigator.mozGetUserMedia) {
 //    console.log("This appears to be Chrome");
 
     webrtcDetectedBrowser = "chrome";
-    webrtcDetectedVersion =
-            parseInt(navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./)[2]);
+    webrtcDetectedVersion = (function () {
+        var version = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
+        return version && version[2];
+    }());
     // Creates iceServer from the url for Chrome.
     window.createIceServer = function(url, username, password) {
         var iceServer = null;
