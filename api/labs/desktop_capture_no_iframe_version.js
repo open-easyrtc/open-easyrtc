@@ -1,5 +1,5 @@
 //
-// This code was taken from: https://github.com/muaz-khan/WebRTC-Experiment/tree/master/Pluginfree-Screen-Sharing 
+// This code was taken from: https://github.com/muaz-khan/WebRTC-Experiment/tree/master/Pluginfree-Screen-Sharing
 // and modified to fit with EasyRTC.
 //
 
@@ -116,26 +116,51 @@ easyrtc.initDesktopStream = function(successCallback, failureCallback, streamNam
 
 /**
  * This method builds a function that can be attached to a button to install an extension.
- * @param extensionId - the google webstore extensionId
- * @param successCallback - function to call on success
- * @param failureCallback - function to call on failure. Will be passed an error code and error message.
+ * The install will only work on a {@link https://support.google.com/webmasters/answer/34592?hl=en|Google Verified Website}
+ * with a `link` tag pointing to the extension, which is required by chrome for
+ * {@link https://developer.chrome.com/webstore/inline_installation|Inline Installations}.
+ *
+ * @example
+ *
+ * <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/bemabaogbdfpbkkganibcmhbgjogabfj" id="custom-app-id" />
+ *
+ * easyrtc.chromeInstall("custom-app_id", function() {
+ *         // success
+ *     },
+ *     function(errorCode, errorText) {
+ *         // failure
+ *     });
+ *
+ * @param  {String} extensionId The id of the `link` tag pointing to your extension.
+ * @param  {Function} successCallback Function to call on success.
+ * @param  {Function} failureCallback Function to call on failure.  Will pass argument `errorCode` and `errorMessage`.
  */
-easyrtc.extensionInstaller = function(extensionId, successCallback, failureCallback) {
-   return function() {
-     if( !navigator.webkitGetUserMedia ||
-         !window.chrome ||
-         !chrome.webstore ||
-         !chrome.webstore.install ) {
-         failureCallback(easyrtc.errCodes.DEVELOPER_ERR, "Can't install plugin on non-chrome browsers");
-     }
-     else {
-        chrome.webstore.install(
-             "https://chrome.google.com/webstore/detail/" + extensionId, 
-             successCallback, 
-             function(error) {
-               failureCallback(easyrtc.errCodes.DEVELOPER_ERR, error);
-             }
-         );
-     };
-   }
+easyrtc.chromeInstaller = function(extensionId, successCallback, failureCallback) {
+    return function() {
+        var el, url;
+        if( !navigator.webkitGetUserMedia ||
+            !window.chrome ||
+            !chrome.webstore ||
+            !chrome.webstore.install ) {
+            failureCallback(easyrtc.errCodes.DEVELOPER_ERR, "Can't install plugin on non-chrome browsers");
+        }
+        else {
+            try {
+                var el = document.querySelector('head link#' + extensionId);
+
+                if ( ! el) throw new Error("Can't find a `link` element in `head` with id `"+extensionId+"`");
+
+                // get the chrome extension url from the link's href attribute
+                var url = el.attributes.href.value;
+
+                chrome.webstore.install(url, successCallback, function(error) {
+                    failureCallback(easyrtc.errCodes.DEVELOPER_ERR, error);
+                });
+
+            }
+            catch (error) {
+                failureCallback(easyrtc.errCodes.DEVELOPER_ERR, error.message);
+            }
+        }
+    }
 }
