@@ -2923,9 +2923,6 @@ var Easyrtc = function() {
             }
             sawAConnection = true;
             hangupBody(otherUser);
-            if (self.webSocket) {
-                sendSignalling(otherUser, "hangup", null, onHangupSuccess, onHangupFailure);
-            }
         }
 
         if (sawAConnection) {

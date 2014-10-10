@@ -224,6 +224,12 @@ var Easyrtc = function() {
     var autoInitUserMedia = true;
     var sdpLocalFilter = null,
             sdpRemoteFilter = null;
+    
+    var connectionOptions =  {
+                'connect timeout': 10000,
+                'force new connection': true
+            };
+   
     /**
      * Sets functions which filter sdp records before calling setLocalDescription or setRemoteDescription.
      * This is advanced functionality which can break things, easily. See the easyrtc_rates.js file for a
@@ -852,7 +858,6 @@ var Easyrtc = function() {
 //        dataChannelS: RTPDataChannel for outgoing messages if present
 //        dataChannelR: RTPDataChannel for incoming messages if present
 //        dataChannelReady: true if the data channel can be used for sending yet
-//        dataChannelWorks: true if the data channel has been tested and found to work.
 //        connectTime: timestamp when the connection was started
 //        sharingAudio: true if audio is being shared
 //        sharingVideo: true if video is being shared
@@ -2198,14 +2203,19 @@ var Easyrtc = function() {
      * pages from a regular web server, but the EasyRTC library can still reach the
      * socket server.
      * @param {String} socketUrl
+     * @param {Object} options an optional dictionary of options for socket.io's connect method. 
+     * The default is {'connect timeout': 10000,'force new connection': true }
      * @example
-     *     easyrtc.setSocketUrl(":8080");
+     *     easyrtc.setSocketUrl(":8080", options);
      */
-    this.setSocketUrl = function(socketUrl) {
+    this.setSocketUrl = function(socketUrl, options) {
         if (self.debugPrinter) {
             self.debugPrinter("WebRTC signaling server URL set to " + socketUrl);
         }
         serverPath = socketUrl;
+        if( options ) {
+            connectionOptions = options;
+        }
     };
     /**
      * Sets the user name associated with the connection.
@@ -3096,9 +3106,6 @@ var Easyrtc = function() {
             }
             sawAConnection = true;
             hangupBody(otherUser);
-            if (self.webSocket) {
-                sendSignalling(otherUser, "hangup", null, onHangupSuccess, onHangupFailure);
-            }
         }
 
         if (sawAConnection) {
@@ -4219,10 +4226,7 @@ var Easyrtc = function() {
             self.webSocket = preallocatedSocketIo;
         }
         else if (!self.webSocket) {
-            self.webSocket = io.connect(serverPath, {
-                'connect timeout': 10000,
-                'force new connection': true
-            });
+            self.webSocket = io.connect(serverPath, connectionOptions);
             if (!self.webSocket) {
                 throw "io.connect failed";
             }
