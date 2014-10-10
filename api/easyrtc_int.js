@@ -41,6 +41,12 @@ var Easyrtc = function() {
     var autoInitUserMedia = true;
     var sdpLocalFilter = null,
             sdpRemoteFilter = null;
+    
+    var connectionOptions =  {
+                'connect timeout': 10000,
+                'force new connection': true
+            };
+   
     /**
      * Sets functions which filter sdp records before calling setLocalDescription or setRemoteDescription.
      * This is advanced functionality which can break things, easily. See the easyrtc_rates.js file for a
@@ -2014,14 +2020,19 @@ var Easyrtc = function() {
      * pages from a regular web server, but the EasyRTC library can still reach the
      * socket server.
      * @param {String} socketUrl
+     * @param {Object} options an optional dictionary of options for socket.io's connect method. 
+     * The default is {'connect timeout': 10000,'force new connection': true }
      * @example
-     *     easyrtc.setSocketUrl(":8080");
+     *     easyrtc.setSocketUrl(":8080", options);
      */
-    this.setSocketUrl = function(socketUrl) {
+    this.setSocketUrl = function(socketUrl, options) {
         if (self.debugPrinter) {
             self.debugPrinter("WebRTC signaling server URL set to " + socketUrl);
         }
         serverPath = socketUrl;
+        if( options ) {
+            connectionOptions = options;
+        }
     };
     /**
      * Sets the user name associated with the connection.
@@ -4035,10 +4046,7 @@ var Easyrtc = function() {
             self.webSocket = preallocatedSocketIo;
         }
         else if (!self.webSocket) {
-            self.webSocket = io.connect(serverPath, {
-                'connect timeout': 10000,
-                'force new connection': true
-            });
+            self.webSocket = io.connect(serverPath, connectionOptions);
             if (!self.webSocket) {
                 throw "io.connect failed";
             }
