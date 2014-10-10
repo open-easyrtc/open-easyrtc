@@ -669,7 +669,6 @@ var Easyrtc = function() {
 //        dataChannelS: RTPDataChannel for outgoing messages if present
 //        dataChannelR: RTPDataChannel for incoming messages if present
 //        dataChannelReady: true if the data channel can be used for sending yet
-//        dataChannelWorks: true if the data channel has been tested and found to work.
 //        connectTime: timestamp when the connection was started
 //        sharingAudio: true if audio is being shared
 //        sharingVideo: true if video is being shared
