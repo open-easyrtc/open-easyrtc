@@ -36,13 +36,20 @@ function enable(domId) {
 }
 
 
-function connect() {
-    easyrtc.enableAudio(document.getElementById('shareAudio').checked);
-    easyrtc.enableVideo(document.getElementById('shareVideo').checked);
-    easyrtc.setRoomOccupantListener(convertListToButtons);
-    easyrtc.connect("easyrtc.audioVideo", loginSuccess, loginFailure);
-
-}
+function connect() {	
+  easyrtc.enableAudio(document.getElementById("shareAudio").checked);
+  easyrtc.enableVideo(document.getElementById("shareVideo").checked);
+  easyrtc.enableDataChannels(true);
+  easyrtc.setRoomOccupantListener( convertListToButtons);    
+  easyrtc.initMediaSource(
+		  function(){        // success callback
+			  var selfVideo = document.getElementById("selfVideo");			
+			  easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());			 
+			  easyrtc.connect("easyrtc.audioVideo", loginSuccess, loginFailure);			  
+		  },
+		  loginFailure
+	);
+} 
 
 
 function hangup() {
@@ -113,6 +120,7 @@ function loginSuccess(easyrtcid) {
     enable('otherClients');
     selfEasyrtcid = easyrtcid;
     document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyrtcid);
+    easyrtc.showError("noerror", "logged in");
 }
 
 
@@ -122,13 +130,16 @@ function loginFailure(errorCode, message) {
 
 
 function disconnect() {
-    document.getElementById("iam").innerHTML = "logged out";
-    easyrtc.disconnect();
-    enable("connectButton");
-//    disable("disconnectButton");
-    clearConnectList();
-    easyrtc.setVideoObjectSrc(document.getElementById('selfVideo'), "");
-}
+  easyrtc.disconnect();			  
+  document.getElementById("iam").innerHTML = "logged out";
+  enable("connectButton");
+  disable("disconnectButton"); 
+  easyrtc.clearMediaStream( document.getElementById('selfVideo'));
+  easyrtc.setVideoObjectSrc(document.getElementById("selfVideo"),"");
+  easyrtc.closeLocalMediaStream();
+  easyrtc.setRoomOccupantListener( function(){});  
+  clearConnectList();
+} 
 
 
 easyrtc.setStreamAcceptor( function(easyrtcid, stream) {

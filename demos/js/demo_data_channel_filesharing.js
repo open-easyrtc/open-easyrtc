@@ -135,7 +135,7 @@ function convertListToButtons(roomName, occupants, isPrimary) {
                 case "working":
                     statusDiv.innerHTML = state.name + ":" + state.position + "/" + state.size + "(" + state.numFiles + " files)";
                     break;
-                case "cancelled":
+                case "rejected":
                     statusDiv.innerHTML = "cancelled";
                     setTimeout(function() {
                         statusDiv.innerHTML = "";
