@@ -3072,6 +3072,7 @@ var Easyrtc = function() {
             var stream = peerConns[easyrtcid].getRemoteStreamByName(msgData.streamName);
             if (stream) {
                 onRemoveStreamHelper(easyrtcid, stream, msgData.streamName);
+                stream.ended = true;
             }
         }
 
@@ -3080,8 +3081,7 @@ var Easyrtc = function() {
         if (peerConns[easyrtcid]) {
             emitOnStreamClosed(easyrtcid, stream);
             updateConfigurationInfo();
-            if( peerConns[easyrtcid] &&
-                peerConns[easyrtcid].pc ) {
+            if( peerConns[easyrtcid].pc ) {
                  try {
                     peerConns[easyrtcid].pc.removeStream(stream);
                  } catch( err) {}
@@ -3153,6 +3153,7 @@ var Easyrtc = function() {
                 isInitiator: isInitiator,
                 remoteStreamIdToName: {},
                 streamsAddedAcks: {},
+                liveRemoteStreams: {},
                 getRemoteStreamByName: function(streamName) {
                     var remoteStreams = pc.getRemoteStreams();
                     var i = 0;
@@ -3257,6 +3258,7 @@ var Easyrtc = function() {
                     remoteName = "default";
                 }
                 peerConns[otherUser].remoteStreamIdToName[event.stream.id || "anonymous"] = remoteName;
+                peerConns[otherUser].liveRemoteStreams[remoteName] = true;
                 event.stream.streamName = remoteName;
                 if (self.streamAcceptor) {
                     self.streamAcceptor(otherUser, event.stream, remoteName);
@@ -3581,7 +3583,9 @@ var Easyrtc = function() {
             id = "anonymous";
         }
         streamName = peerConns[easyrtcid].remoteStreamIdToName[id] || "default";
-        if (self.onStreamClosed) {
+        if (peerConns[easyrtcid].liveRemoteStreams[streamName] &&
+            self.onStreamClosed) {
+            delete peerConns[easyrtcid].liveRemoteStreams[streamName];
             self.onStreamClosed(easyrtcid, stream, streamName);
         }
         delete peerConns[easyrtcid].remoteStreamIdToName[id];
