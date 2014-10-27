@@ -3043,11 +3043,12 @@ var Easyrtc = function() {
             if (peerConns[otherUser].pc) {
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
                 for (i = 0; i < remoteStreams.length; i++) {
-                    emitOnStreamClosed(otherUser, remoteStreams[i]);
-                    try {
-                        remoteStreams[i].close();
-                    } catch (err) {
-
+                    if( !remoteStreams[i].ended ) {
+                        emitOnStreamClosed(otherUser, remoteStreams[i]);
+                        try {
+                            remoteStreams[i].close();
+                        } catch (err) {
+                        }
                     }
                 }
                 //
@@ -3262,6 +3263,13 @@ var Easyrtc = function() {
         if (peerConns[easyrtcid]) {
             emitOnStreamClosed(easyrtcid, stream);
             updateConfigurationInfo();
+            if( peerConns[easyrtcid] &&
+                peerConns[easyrtcid].pc ) {
+                 try {
+                    peerConns[easyrtcid].pc.removeStream(stream);
+                 } catch( err) {}
+            }
+           
         }
     }
 
@@ -5192,6 +5200,7 @@ var Easyrtc = function() {
     };
 };
 window.easyrtc = new Easyrtc();
+
 var easyrtc_constantStrings = {
   "unableToEnterRoom":"Unable to enter room {0} because {1}" ,
   "resolutionWarning": "Requested video size of {0}x{1} but got size of {2}x{3}",

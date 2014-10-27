@@ -2860,11 +2860,12 @@ var Easyrtc = function() {
             if (peerConns[otherUser].pc) {
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
                 for (i = 0; i < remoteStreams.length; i++) {
-                    emitOnStreamClosed(otherUser, remoteStreams[i]);
-                    try {
-                        remoteStreams[i].close();
-                    } catch (err) {
-
+                    if( !remoteStreams[i].ended ) {
+                        emitOnStreamClosed(otherUser, remoteStreams[i]);
+                        try {
+                            remoteStreams[i].close();
+                        } catch (err) {
+                        }
                     }
                 }
                 //
@@ -3079,6 +3080,13 @@ var Easyrtc = function() {
         if (peerConns[easyrtcid]) {
             emitOnStreamClosed(easyrtcid, stream);
             updateConfigurationInfo();
+            if( peerConns[easyrtcid] &&
+                peerConns[easyrtcid].pc ) {
+                 try {
+                    peerConns[easyrtcid].pc.removeStream(stream);
+                 } catch( err) {}
+            }
+           
         }
     }
 
