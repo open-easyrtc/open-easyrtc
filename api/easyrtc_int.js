@@ -4059,7 +4059,13 @@ var Easyrtc = function() {
             self.webSocket = preallocatedSocketIo;
         }
         else if (!self.webSocket) {
-            self.webSocket = io.connect(serverPath, connectionOptions);
+            try {
+               self.webSocket = io.connect(serverPath, connectionOptions);
+            } catch(socketErr) {
+               errorCallback( self.errCodes.SYSTEM_ERROR, 
+                     socketError.toString());
+               return;
+            }
             if (!self.webSocket) {
                 throw "io.connect failed";
             }
@@ -4093,7 +4099,7 @@ var Easyrtc = function() {
                     }
                     else {
                         /* socket server went down. this will generate a 'disconnect' event as well, so skip this event */
-                        console.warn("The connection to the EasyRTC socket server went down. It may come back by itself.");
+                        errorCallback(self.errCodes.CONNECT_ERR, self.getConstantString("noServer"));
                     }
                 }
                 else {
