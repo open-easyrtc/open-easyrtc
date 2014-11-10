@@ -224,6 +224,7 @@ var Easyrtc = function() {
     var autoInitUserMedia = true;
     var sdpLocalFilter = null,
             sdpRemoteFilter = null;
+    var iceCandidateFilter = null;
     
     var connectionOptions =  {
                 'connect timeout': 10000,
@@ -241,6 +242,25 @@ var Easyrtc = function() {
         sdpLocalFilter = localFilter;
         sdpRemoteFilter = remoteFilter;
     };
+
+   /**
+    * Sets a function which filters IceCandidate records being sent or received.
+    *
+    * Candidate records can be received while they are being generated locally (before being 
+    * sent to a peer), and after they are received by the peer. The filter receives two arguments, the candidate record and a boolean 
+    * flag that is true for a candidate being received from another peer,  
+    * and false for a candidate that was generated locally. The candidate record has the form:
+    *  {type: 'candidate', label: sdpMLineIndex, id: sdpMid, candidate: candidateString}
+    * The function should return one of the following: the input candidate record, a modified candidate record, or null (indicating that the
+    * candidate should be discarded).
+    * @param {Function} filter
+    * @param {String} isIncoming 
+    * @return an ice candidate record or null.
+    */
+   this.setIceCandidateFilter = function(filter) {
+      iceCandidateFilter = filter;
+   }
+
     /**
      * Controls whether a default local media stream should be acquired automatically during calls and accepts
      * if a list of streamNames is not supplied. The default is true, which mimicks the behaviour of earlier releases
@@ -3395,6 +3415,13 @@ var Easyrtc = function() {
                         id: event.candidate.sdpMid,
                         candidate: event.candidate.candidate
                     };
+
+                    if( iceCandidateFilter ) {
+                       candidateData = iceCandidateFilter(candidateData, false);
+                       if( !candidateData ) {
+                          return;
+                       }
+                    } 
                     //
                     // some candidates include ip addresses of turn servers. we'll want those 
                     // later so we can see if our actual connection uses a turn server.
@@ -4011,6 +4038,14 @@ var Easyrtc = function() {
 
         var processCandidateBody = function(caller, msgData) {
             var candidate = null;
+
+            if( iceCandidateFilter ) {
+               msgData = iceCandidateFilter(msgData, true);
+               if( !msgData ) {
+                  return;
+               }
+            } 
+
             if (window.mozRTCIceCandidate) {
                 candidate = new mozRTCIceCandidate({
                     sdpMLineIndex: msgData.label,
