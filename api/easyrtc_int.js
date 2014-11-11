@@ -1346,7 +1346,14 @@ var Easyrtc = function() {
         }
     }
 
-
+    /**
+      * Allow an externally created mediastream (ie, created by another 
+      * library) to be used within easyrtc. Tracking when it closes
+      * must be done by the supplying party.
+      */
+    this.register3rdPartyLocalMediaStream = function(stream, streamName) {
+       return registerLocalMediaStreamByName(stream, streamName);
+    };
     //
     // look up a stream's name from the stream.id
     //
