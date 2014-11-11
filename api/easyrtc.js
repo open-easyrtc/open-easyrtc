@@ -1737,40 +1737,76 @@ var Easyrtc = function() {
             self.clearMediaStream(videoObject);
         }
     };
+
+
     /**
      * This function builds a new named local media stream from a set of existing audio and video tracks from other media streams.
      * @param {String} streamName is the name of the new media stream.
      * @param {Array} audioTracks is an array of MediaStreamTracks
      * @param {Array} videoTracks is an array of MediaStreamTracks
-     * @returns {void}
+     * @returns {MediaStream} the track created.
      * @example
      *    easyrtc.buildLocalMediaStream("myComposedStream",
      *             easyrtc.getLocalStream("camera1").getVideoTracks(),
      *             easyrtc.getLocalStream("camera2").getAudioTracks());
      */
     this.buildLocalMediaStream = function(streamName, audioTracks, videoTracks) {
-        var fullTrackList = [];
         var i;
         if (typeof streamName !== 'string') {
-            easyrtc.showError(this.errCodes.DEVELOPER_ERR, "easyrtc.buildLocalMediaStream not supplied a stream name");
-            return;
+            easyrtc.showError(this.errCodes.DEVELOPER_ERR, 
+               "easyrtc.buildLocalMediaStream not supplied a stream name");
+            return null;
         }
+
+         var streamToClone = null;
+         for(var key in namedLocalMediaStreams ) {
+            if( namedLocalMediaStreams.hasOwnProperty(key)) {
+              streamToClone = namedLocalMediaStreams[key];
+              if(streamToClone) break;
+            }
+         }
+         if( !streamToClone ) {
+            for(key in peerConns) {
+                var remoteStreams = peerConns[key].pc.getRemoteStreams();
+                if( remoteStreams && remoteStreams.length > 1 ) {
+                    streamToClone = remoteStreams[0];
+                }
+            }
+         }
+         if( !streamToClone ){
+            self.showError(self.errCodes.DEVELOPER_ERR, 
+             "Attempt to create a mediastream without one to clone from");
+            return null;
+         }
+
+         //
+         // clone whatever mediastream we found, and remove any of it's 
+         // tracks.
+         //
+         var mediaClone = streamToClone.clone();
+         var i;
+         var oldTracks = mediaClone.getTracks();
 
         if (audioTracks) {
             for (i = 0; i < audioTracks.length; i++) {
-                fullTrackList.push(audioTracks[i]);
+                mediaClone.addTrack(audioTracks[i].clone());
             }
         }
 
         if (videoTracks) {
             for (i = 0; i < videoTracks.length; i++) {
-                fullTrackList.push(videoTracks[i]);
+                mediaClone.addTrack(videoTracks[i].clone());
             }
         }
 
-        var stream = new MediaStream(fullTrackList);
-        registerLocalMediaStreamByName(stream, streamName);
+        for( i = 0; i < oldTracks.length; i++ ) {
+            mediaClone.removeTrack(oldTracks[i]);
+        }
+
+        registerLocalMediaStreamByName(mediaClone, streamName);
+        return mediaClone;
     };
+
     /* @private*/
     /** Load Easyrtc Stylesheet.
      *   Easyrtc Stylesheet define easyrtcMirror class and some basic css class for using easyrtc.js.
