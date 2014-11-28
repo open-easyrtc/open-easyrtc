@@ -4612,6 +4612,7 @@ var Easyrtc = function() {
                     self.roomEntryListener(false, roomName);
                 }
                 delete self.roomJoin[roomName];
+                delete lastLoggedInList[roomName];
                 continue;
             }
 
