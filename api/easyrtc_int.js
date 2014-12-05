@@ -1,5 +1,5 @@
 /** @class
- *@version 1.0.12
+ *@version 1.0.12 beta
  *<p>
  * Provides client side support for the EasyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
@@ -3060,7 +3060,6 @@ var Easyrtc = function() {
         if( !streamName) {
             streamName = "default";
         }
-        console.log("adding stream with id " + streamName + " to call(" + easyrtcId + ")");
         var stream = getLocalMediaStreamByName(streamName);
         if (!stream) {
             console.log("attempt to add nonexistent stream " + streamName);
@@ -3070,18 +3069,8 @@ var Easyrtc = function() {
         }
         else {
             var pc = peerConns[easyrtcId].pc;
+            peerConns[easyrtcId].enableNegotiateListener = true;
             pc.addStream(stream);
-            pc.createOffer(function(sdp) {
-                if (sdpLocalFilter) {
-                    sdp.sdp = sdpLocalFilter(sdp.sdp);
-                }
-                pc.setLocalDescription(sdp, function() {
-                    self.sendPeerMessage(easyrtcId, "__addedMediaStream", {sdp: sdp});
-                }, function() {
-                });
-            }, function(errorObj) {
-                console.log("unexpected error in creating offer");
-            });
             if( receiptHandler ) {
                 peerConns[easyrtcId].streamsAddedAcks[streamName] = receiptHandler;
             }
@@ -3093,26 +3082,68 @@ var Easyrtc = function() {
     //
     this.setPeerListener(function(easyrtcid, msgType, msgData) {
         if (!peerConns[easyrtcid] || !peerConns[easyrtcid].pc) {
-            easyrtc.showError(self.errCodes.DEVELOPER_ERR, "Attempt to add additional stream before establising the base call.");
+            easyrtc.showError(self.errCodes.DEVELOPER_ERR, 
+                  "Attempt to add additional stream before establising the base call.");
         }
         else {
             var sdp = msgData.sdp;
             var pc = peerConns[easyrtcid].pc;
-            if (sdpRemoteFilter) {
-                sdp.sdp = sdpRemoteFilter(sdp.sdp);
+
+            var setLocalAndSendMessage1 = function(sessionDescription) {
+                var sendAnswer = function() {
+                   if (self.debugPrinter) {
+                       self.debugPrinter("sending answer");
+                   }
+                   function onSignalSuccess() {
+                   }
+   
+                   function onSignalFailure(errorCode, errorText) {
+                       delete peerConns[easyrtcid];
+                       self.showError(errorCode, errorText);
+                   }
+   
+                   sendSignalling(easyrtcid, "answer", sessionDescription,
+                           onSignalSuccess, onSignalFailure);
+                   peerConns[easyrtcid].connectionAccepted = true;
+                   sendQueuedCandidates(easyrtcid, onSignalSuccess, onSignalFailure);
+               };
+
+               if (sdpLocalFilter) {
+                   sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
+               }
+               pc.setLocalDescription(sessionDescription, sendAnswer, function(message) {
+                   self.showError(self.errCodes.INTERNAL_ERR, "setLocalDescription: " + msgData);
+               });
+            };
+
+            var invokeCreateAnswer = function() {
+               pc.createAnswer(setLocalAndSendMessage1,
+                    function(message) {
+                        self.showError(self.errCodes.INTERNAL_ERR, "create-answer: " + message);
+                    },
+                    receivedMediaContraints);
+               self.sendPeerMessage(easyrtcid, "__gotAddedMediaStream", {sdp: sdp});
+            };
+
+            if (self.debugPrinter) {
+                self.debugPrinter("about to call setRemoteDescription in doAnswer");
             }
-            pc.setRemoteDescription(new RTCSessionDescription(sdp));
-            pc.createAnswer(function(sdp) {
-                if (sdpLocalFilter) {
-                    sdp.sdp = sdpLocalFilter(sdp.sdp);
+            try {
+
+                if (sdpRemoteFilter) {
+                    sd.sdp = sdpRemoteFilter(sd.sdp);
                 }
-                pc.setLocalDescription(sdp, function() {
-                    self.sendPeerMessage(easyrtcid, "__gotAddedMediaStream", {sdp: sdp});
-                }, function() {
+                pc.setRemoteDescription(new RTCSessionDescription(sdp), 
+                   invokeCreateAnswer, function(message) {
+                    self.showError(self.errCodes.INTERNAL_ERR, "set-remote-description: " + message);
                 });
-            }, function(errorObj) {
-                console.log("unexpected error creating answer");
-            });
+            } catch (srdError) {
+                console.log("set remote description failed");
+                if (self.debugPrinter) {
+                    self.debugPrinter("saw exception in setRemoteDescription");
+                }
+                self.showError(self.errCodes.INTERNAL_ERR, "setRemoteDescription failed: " + srdError.message);
+            }
         }
     }, "__addedMediaStream");
     this.setPeerListener(function(easyrtcid, msgType, msgData) {
@@ -3201,6 +3232,21 @@ var Easyrtc = function() {
             //
             if (dataEnabled && typeof pc.createDataChannel === 'undefined') {
                 dataEnabled = false;
+            }
+            pc.onnegotiationneeded = function(event) {
+                if( peerConns[otherUser].enableNegotiateListener ) {
+                    pc.createOffer(function(sdp) {
+                        if (sdpLocalFilter) {
+                            sdp.sdp = sdpLocalFilter(sdp.sdp);
+                        }
+                        pc.setLocalDescription(sdp, function() {
+                            self.sendPeerMessage(otherUser, "__addedMediaStream", {sdp: sdp});
+                        }, function() {
+                        });
+                    }, function(errorObj) {
+                        console.log("unexpected error in creating offer");
+                    });
+                }
             }
 
             pc.onconnection = function() {
