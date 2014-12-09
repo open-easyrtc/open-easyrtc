@@ -3266,7 +3266,7 @@ var Easyrtc = function() {
     this.setPeerListener(function(easyrtcid, msgType, msgData) {
         if (!peerConns[easyrtcid] || !peerConns[easyrtcid].pc) {
             easyrtc.showError(self.errCodes.DEVELOPER_ERR, 
-                  "Attempt to add additional stream before establising the base call.");
+                  "Attempt to add additional stream before establishing the base call.");
         }
         else {
             var sdp = msgData.sdp;
@@ -3314,7 +3314,7 @@ var Easyrtc = function() {
             try {
 
                 if (sdpRemoteFilter) {
-                    sd.sdp = sdpRemoteFilter(sd.sdp);
+                    sdp.sdp = sdpRemoteFilter(sdp.sdp);
                 }
                 pc.setRemoteDescription(new RTCSessionDescription(sdp), 
                    invokeCreateAnswer, function(message) {
