@@ -1508,7 +1508,7 @@ var Easyrtc = function() {
         var mediaMap = {};
         var streamName;
         for (streamName in namedLocalMediaStreams) {
-            mediaMap[streamName] = namedLocalMediaStreams[streamName].id || "anonymous";
+            mediaMap[streamName] = namedLocalMediaStreams[streamName].id || "default";
         }
         return mediaMap;
     }
@@ -1545,7 +1545,7 @@ var Easyrtc = function() {
         var mediaIds;
         var streamName;
         if (!webrtcstreamId) {
-            webrtcstreamId = "anonymous";
+            webrtcstreamId = "default";
         }
         if (peerConns[easyrtcId]) {
             streamName = peerConns[easyrtcId].remoteStreamIdToName[webrtcstreamId];
@@ -1564,6 +1564,23 @@ var Easyrtc = function() {
                         mediaIds[streamName] === webrtcstreamId) {
                     return streamName;
                 }
+            }
+            //
+            // a stream from chrome to firefox will be missing it's id/label.
+            // there is no correct solution. 
+            //
+            if( isFirefox ) {
+               // if there is a stream called default, return it in preference
+               if( mediaIds["default"] ) {
+                   return "default"; 
+               }
+               //
+               // otherwise return the first name we find. If there is more than
+               // one, complain to Mozilla.
+               //
+               for( var anyName in mediaIds ) {
+                   return anyName;
+               }
             }
         }
         return undefined;
@@ -1586,7 +1603,7 @@ var Easyrtc = function() {
         if (!stream) {
             return;
         }
-        var streamId = stream.id || "anonymous";
+        var streamId = stream.id || "default";
         if (namedLocalMediaStreams[streamName]) {
 
 
@@ -3480,7 +3497,7 @@ var Easyrtc = function() {
                             remoteId = remoteStreams[i].id;
                         }
                         else {
-                            remoteId = "anonymous";
+                            remoteId = "default";
                         }
 
                         if (!keyToMatch || remoteId === keyToMatch) {
@@ -3552,11 +3569,11 @@ var Easyrtc = function() {
                         updateConfiguration();
                     }
                 }
-                var remoteName = getNameOfRemoteStream(otherUser, event.stream.id || "anonymous");
+                var remoteName = getNameOfRemoteStream(otherUser, event.stream.id || "default");
                 if (!remoteName) {
                     remoteName = "default";
                 }
-                peerConns[otherUser].remoteStreamIdToName[event.stream.id || "anonymous"] = remoteName;
+                peerConns[otherUser].remoteStreamIdToName[event.stream.id || "default"] = remoteName;
                 peerConns[otherUser].liveRemoteStreams[remoteName] = true;
                 event.stream.streamName = remoteName;
                 if (self.streamAcceptor) {
@@ -3572,7 +3589,7 @@ var Easyrtc = function() {
                 if (self.debugPrinter) {
                     self.debugPrinter("saw remove on remote media stream");
                 }
-                onRemoveStreamHelper(otherUser, event.stream, event.stream.id || "anonymous");
+                onRemoveStreamHelper(otherUser, event.stream, event.stream.id || "default");
             };
             peerConns[otherUser] = newPeerConn;
         } catch (e) {
@@ -3879,7 +3896,7 @@ var Easyrtc = function() {
             id = stream.id;
         }
         else {
-            id = "anonymous";
+            id = "default";
         }
         streamName = peerConns[easyrtcid].remoteStreamIdToName[id] || "default";
         if (peerConns[easyrtcid].liveRemoteStreams[streamName] &&
