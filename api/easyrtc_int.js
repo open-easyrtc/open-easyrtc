@@ -2417,8 +2417,12 @@ var Easyrtc = function() {
                 }
             }
         }
+        lastLoggedInList = {};
         self.emitEvent("roomOccupant", {});
+        self.roomData = {};
+        self.roomJoin = {};
         self.loggingOut = false;
+        self.myEasyrtcid = null;
         self.disconnecting = false;
         oldConfig = {};
     }
