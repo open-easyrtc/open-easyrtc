@@ -4169,7 +4169,7 @@ var Easyrtc = function() {
                 });
             }
             pc = peerConns[caller].pc;
-            pc.addIceCandidate(candidate);
+            pc.addIceCandidate(candidate, function () {}, function () {});
             if (msgData.candidate.indexOf("typ relay") > 0) {
                 var ipAddress = msgData.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/i)[1];
                 self._turnServers[ipAddress] = true;
