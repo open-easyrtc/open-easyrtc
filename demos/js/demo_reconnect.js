@@ -31,25 +31,43 @@ function initApp() {
     console.log("Initializing.");
     easyrtc.enableVideo(false);
     easyrtc.enableAudio(false);
+    connect();
+}
+
+function connect() {
     easyrtc.connect("easyrtc.reconnect", loginSuccess, loginFailure);
 }
 
-easyrtc.enableDebug(false);
-easyrtc.setDisconnectListener(initApp);
+function disconnect() {
+    easyrtc.disconnect();
+}
+
+easyrtc.enableDebug(true);
+
+easyrtc.setDisconnectListener(function() {
+   easyrtc.showError("xx", "saw disconnect");
+});
 
 
 function sendDummy() {
-    easyrtc.sendDataWS(null, {msgType: "xxx", burp: "burp"});
+    easyrtc.getRoomList( 
+      function() { 
+         easyrtc.showError("xx", "got fresh roomlist");
+      }, 
+      function(){ 
+         easyrtc.showError("xx", "failed on fresh roomlist");
+      });
 }
 
 function loginSuccess(easyrtcid) {
     document.getElementById("stateLabel").innerHTML = " connected as " + easyrtcid;
-    console.log("logged in");
+    easyrtc.showError("xx", "login success");
 }
 
 
 function loginFailure(errorCode, message) {
     document.getElementById("stateLabel").innerHTML = "disconnected";
+    easyrtc.showError("xx", "login failure");
 }
 
 
