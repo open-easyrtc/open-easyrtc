@@ -749,9 +749,9 @@ var Easyrtc = function() {
     /**
      * This function gets the statistics for a particular peer connection.
      * @param {String} peerId
-     * @param {String} callback gets a map of {userDefinedKey: value}. If there is no peer connection to peerId, then this will
+     * @param {Function} callback gets the peerid and a map of {userDefinedKey: value}. If there is no peer connection to peerId, then the map will
      *  have a value of {connected:false}. 
-     * @param {String} filter has is a map of maps of the form {reportNum:{googleKey: userDefinedKey}}
+     * @param {Object} filter depends on whether Chrome or Firefox is used. See the default filters for guidance.
      * It is still experimental.
      */
     this.getPeerStatistics = function(peerId, callback, filter) {
@@ -764,17 +764,20 @@ var Easyrtc = function() {
     };
     this.getFirefoxPeerStatistics = function(peerId, callback, filter) {
 
+
         if (!peerConns[peerId]) {
             callback(peerId, {"connected": false});
         }
         else if (peerConns[peerId].pc.getStats) {
             peerConns[peerId].pc.getStats(null, function(stats) {
                 var items = {};
+                var candidates = {};
+                var activeId = null;
                 var srcKey;
                 //
-                // the stats objects has a group of entries. Each entry is either an rtp entry
-                // or a candidate entry. the candidate entries don't tend to have interesting information
-                // in them so we filter them out.
+                // the stats objects has a group of entries. Each entry is either an rtcp, rtp entry
+                // or a candidate entry. 
+                //
                 stats.forEach(function(entry) {
                     var majorKey;
                     var subKey;
@@ -788,14 +791,27 @@ var Easyrtc = function() {
                         else {
                             return;
                         }
-
                         for (subKey in entry) {
                             if (entry.hasOwnProperty(subKey)) {
                                 items[majorKey + "." + subKey] = entry[subKey];
                             }
                         }
                     }
+                    else {
+                        if( entry.hasOwnProperty("ipAddress") && entry.hasOwnProperty("id")) {
+                            candidates[entry.id] = entry.ipAddress;
+                        }
+                        else if( entry.hasOwnProperty("selected") && 
+                                 entry.hasOwnProperty("remoteCandidateId") && 
+                                 entry.selected ) {
+                            activeId =  entry.remoteCandidateId;
+                        } 
+                    }
                 });
+
+                if( activeId ) {
+                    items["firefoxActiveConnection"] = candidates[activeId];
+                }
                 if (!filter) {
                     callback(peerId, items);
                 }
@@ -967,21 +983,25 @@ var Easyrtc = function() {
         {
             "googCodecName": "audioCodec",
             "googTypingNoiseState": "typingNoise",
-            "packetsSent": "audioPacketsSent"
+            "packetsSent": "audioPacketsSent",
+            "bytesSent": "audioBytesSent"
         },
         {
             "googCodecName": "videoCodec",
             "googFrameRateSent": "outFrameRate",
-            "packetsSent": "videoPacketsSent"
+            "packetsSent": "videoPacketsSent",
+            "bytesSent": "videoBytesSent"
         },
         {
             "packetsLost": "videoPacketsLost",
             "packetsReceived": "videoPacketsReceived",
+            "bytesReceived": "videoBytesReceived",
             "googFrameRateOutput": "frameRateOut"
         },
         {
             "packetsLost": "audioPacketsLost",
             "packetsReceived": "audioPacketsReceived",
+            "bytesReceived": "audioBytesReceived",
             "audioOutputLevel": "audioOutputLevel"
         },
         {
@@ -993,10 +1013,17 @@ var Easyrtc = function() {
         }
     ];
     this.firefoxStatsFilter = {
+        "outboundrtp_audio.bytesSent": "audioBytesSent",
+        "outboundrtp_video.bytesSent": "videoBytesSent",
+        "inboundrtp_video.bytesReceived": "videoBytesReceived",
+        "inboundrtp_audio.bytesReceived": "audioBytesReceived",
         "outboundrtp_audio.packetsSent": "audioPacketsSent",
         "outboundrtp_video.packetsSent": "videoPacketsSent",
         "inboundrtp_video.packetsReceived": "videoPacketsReceived",
-        "inboundrtp_audio.packetsReceived": "audioPacketsReceived"
+        "inboundrtp_audio.packetsReceived": "audioPacketsReceived",
+        "inboundrtp_video.packetsLost": "videoPacketsLost",
+        "inboundrtp_audio.packetsLost": "audioPacketsLost",
+        "firefoxActiveConnection": "activeConnection"
     };
     this.standardStatsFilter = isFirefox ? self.firefoxStatsFilter : self.chromeStatsFilter;
     /** Provide a set of application defined fields that will be part of this instances

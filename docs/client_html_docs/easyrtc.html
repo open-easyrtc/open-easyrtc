@@ -184,7 +184,8 @@
 <dd>
     
     <div class="description">
-        Error codes that the EasyRTC will use in the errorCode field of error object passed to error handler set by easyrtc.setOnError. The error codes are short printable strings.
+        Error codes that the EasyRTC will use in the errorCode field of error object passed
+ to error handler set by easyrtc.setOnError. The error codes are short printable strings.
     </div>
     
     
@@ -370,7 +371,10 @@
 <dd>
     
     <div class="description">
-        The height of the local media stream video in pixels. This field is set an indeterminate periodof time after easyrtc.initMediaSource succeeds. Note: in actuality, the dimensions of a video streamchange dynamically in response to external factors, you should check the videoWidth and videoHeight attributesof your video objects before you use them for pixel specific operations.
+        The height of the local media stream video in pixels. This field is set an indeterminate period
+of time after easyrtc.initMediaSource succeeds. Note: in actuality, the dimensions of a video stream
+change dynamically in response to external factors, you should check the videoWidth and videoHeight attributes
+of your video objects before you use them for pixel specific operations.
     </div>
     
     
@@ -417,7 +421,10 @@
 <dd>
     
     <div class="description">
-        The width of the local media stream video in pixels. This field is set an indeterminate periodof time after easyrtc.initMediaSource succeeds.  Note: in actuality, the dimensions of a video streamchange dynamically in response to external factors, you should check the videoWidth and videoHeight attributesof your video objects before you use them for pixel specific operations.
+        The width of the local media stream video in pixels. This field is set an indeterminate period
+of time after easyrtc.initMediaSource succeeds.  Note: in actuality, the dimensions of a video stream
+change dynamically in response to external factors, you should check the videoWidth and videoHeight attributes
+of your video objects before you use them for pixel specific operations.
     </div>
     
     
@@ -511,7 +518,8 @@
 <dd>
     
     <div class="description">
-        The rooms the user is in. This only applies to room oriented applications and is set at the sametime a token is received.
+        The rooms the user is in. This only applies to room oriented applications and is set at the same
+time a token is received.
     </div>
     
     
@@ -652,7 +660,8 @@
 <dd>
     
     <div class="description">
-        Connects to the EasyRTC signaling server. You must connect before trying tocall other users.
+        Connects to the EasyRTC signaling server. You must connect before trying to
+call other users.
     </div>
     
     
@@ -689,7 +698,14 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>  easyrtc.connect("mychat_app",                  function(easyrtcid, roomOwner){                      if( roomOwner){ console.log("I'm the room owner"); }                      console.log("my id is " + easyrtcid);                  },                  function(errorText){                      console.log("failed to connect ", erFrText);                  });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.connect("mychat_app",
+                function(easyrtcid, roomOwner){
+                    if( roomOwner){ console.log("I'm the room owner"); }
+                    console.log("my id is " + easyrtcid);
+                },
+                function(errorText){
+                    console.log("failed to connect ", erFrText);
+                });</code></pre>
 
     
 </dd>
@@ -712,7 +728,8 @@
     
     
     <div class="description">
-        Adds an event listener for a particular type of event.Currently the only eventName supported is "roomOccupant".
+        Adds an event listener for a particular type of event.
+Currently the only eventName supported is "roomOccupant".
     </div>
     
 
@@ -775,7 +792,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -785,7 +802,9 @@
             
             
             
-            <td class="description last">the function that expects the event. The eventListener gets called with the eventName as it's first argument, and the eventdata as it's second argument.</td>
+            <td class="description last">the function that expects the event. 
+The eventListener gets called with the eventName as it's first argument, and the event
+data as it's second argument.</td>
         </tr>
 	
 	
@@ -947,7 +966,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -957,7 +976,9 @@
             
             
             
-            <td class="description last">is a function that gets called when the other side sends a message  that the stream has been received. The receiptHandler gets called with an easyrtcid and a stream name. This  argument is optional.</td>
+            <td class="description last">is a function that gets called when the other side sends a message
+  that the stream has been received. The receiptHandler gets called with an easyrtcid and a stream name. This
+  argument is optional.</td>
         </tr>
 	
 	
@@ -1007,7 +1028,7 @@
         
             
 <dt>
-    <h3 class="name" id="buildLocalMediaStream"><span class="type-signature"></span>buildLocalMediaStream<span class="signature">(streamName, audioTracks, videoTracks)</span><span class="type-signature"> &rarr; {void}</span></h3>
+    <h3 class="name" id="buildLocalMediaStream"><span class="type-signature"></span>buildLocalMediaStream<span class="signature">(streamName, audioTracks, videoTracks)</span><span class="type-signature"> &rarr; {MediaStream}</span></h3>
     
     
 </dt>
@@ -1157,6 +1178,10 @@
     <h5>Returns:</h5>
     
             
+<div class="param-desc">
+    the track created.
+</div>
+
 
 
 <dl>
@@ -1165,7 +1190,7 @@
 	</dt>
 	<dd>
 		
-<span class="param-type">void</span>
+<span class="param-type">MediaStream</span>
 
 
 	</dd>
@@ -1176,7 +1201,9 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.buildLocalMediaStream("myComposedStream",            easyrtc.getLocalStream("camera1").getVideoTracks(),            easyrtc.getLocalStream("camera2").getAudioTracks());</code></pre>
+    <pre class="prettyprint"><code>easyrtc.buildLocalMediaStream("myComposedStream",
+         easyrtc.getLocalStream("camera1").getVideoTracks(),
+         easyrtc.getLocalStream("camera2").getAudioTracks());</code></pre>
 
     
 </dd>
@@ -1255,7 +1282,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -1278,7 +1305,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -1301,7 +1328,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -1381,7 +1408,21 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.call( otherEasyrtcid,       function(easyrtcid, mediaType){          console.log("Got mediaType " + mediaType + " from " + easyrtc.idToName(easyrtcid));       },       function(errorCode, errMessage){          console.log("call to  " + easyrtc.idToName(otherEasyrtcid) + " failed:" + errMessage);       },       function(wasAccepted, easyrtcid){           if( wasAccepted ){              console.log("call accepted by " + easyrtc.idToName(easyrtcid));           }           else{               console.log("call rejected" + easyrtc.idToName(easyrtcid));           }       });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.call( otherEasyrtcid,
+    function(easyrtcid, mediaType){
+       console.log("Got mediaType " + mediaType + " from " + easyrtc.idToName(easyrtcid));
+    },
+    function(errorCode, errMessage){
+       console.log("call to  " + easyrtc.idToName(otherEasyrtcid) + " failed:" + errMessage);
+    },
+    function(wasAccepted, easyrtcid){
+        if( wasAccepted ){
+           console.log("call accepted by " + easyrtc.idToName(easyrtcid));
+        }
+        else{
+            console.log("call rejected" + easyrtc.idToName(easyrtcid));
+        }
+    });</code></pre>
 
     
 </dd>
@@ -1516,7 +1557,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    console.log( easyrtc.cleanId('&hello'));</code></pre>
+    <pre class="prettyprint"><code>console.log( easyrtc.cleanId('&hello'));</code></pre>
 
     
 </dd>
@@ -1629,7 +1670,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.clearMediaStream( document.getElementById('selfVideo'));</code></pre>
+    <pre class="prettyprint"><code>easyrtc.clearMediaStream( document.getElementById('selfVideo'));</code></pre>
 
     
 </dd>
@@ -1645,7 +1686,8 @@
     
     
     <div class="description">
-        Close the local media stream. You usually need to close the existing media streamof a camera before reacquring it at a different resolution.
+        Close the local media stream. You usually need to close the existing media stream
+of a camera before reacquring it at a different resolution.
     </div>
     
 
@@ -1941,7 +1983,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.disconnect();</code></pre>
+    <pre class="prettyprint"><code>easyrtc.disconnect();</code></pre>
 
     
 </dd>
@@ -2054,7 +2096,8 @@
     
             
 <div class="param-desc">
-    true if data channels work and are ready to be used  between the two peers.
+    true if data channels work and are ready to be used
+  between the two peers.
 </div>
 
 
@@ -2087,7 +2130,8 @@
     
     
     <div class="description">
-        By default, the easyApp routine sticks a "close" button on top of each callervideo object that it manages. Call this function(before calling easyApp) to disable that particular feature.
+        By default, the easyApp routine sticks a "close" button on top of each caller
+video object that it manages. Call this function(before calling easyApp) to disable that particular feature.
     </div>
     
 
@@ -2136,7 +2180,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.dontAddCloseButtons();</code></pre>
+    <pre class="prettyprint"><code>easyrtc.dontAddCloseButtons();</code></pre>
 
     
 </dd>
@@ -2152,7 +2196,12 @@
     
     
     <div class="description">
-        Provides a layer on top of the easyrtc.initMediaSource and easyrtc.connect, assign the local media stream tothe video object identified by monitorVideoId, assign remote video streams tothe video objects identified by videoIds, and then call onReady. One of it'sside effects is to add hangup buttons to the remote video objects, buttonsthat only appear when you hover over them with the mouse cursor. This method will also add theeasyrtcMirror class to the monitor video object so that it behaves like a mirror.
+        Provides a layer on top of the easyrtc.initMediaSource and easyrtc.connect, assign the local media stream to
+the video object identified by monitorVideoId, assign remote video streams to
+the video objects identified by videoIds, and then call onReady. One of it's
+side effects is to add hangup buttons to the remote video objects, buttons
+that only appear when you hover over them with the mouse cursor. This method will also add the
+easyrtcMirror class to the monitor video object so that it behaves like a mirror.
     </div>
     
 
@@ -2261,7 +2310,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -2284,7 +2333,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -2341,7 +2390,13 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.easyApp('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],             function(easyrtcId){                 console.log("successfully connected, I am " + easyrtcId);             },             function(errorCode, errorText){                 console.log(errorText);             );</code></pre>
+    <pre class="prettyprint"><code>easyrtc.easyApp('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],
+         function(easyrtcId){
+             console.log("successfully connected, I am " + easyrtcId);
+         },
+         function(errorCode, errorText){
+             console.log(errorText);
+         );</code></pre>
 
     
 </dd>
@@ -2357,7 +2412,8 @@
     
     
     <div class="description">
-        Emits an event, or in otherwords, calls all the eventListeners for a particular event.
+        Emits an event, or in otherwords, calls all the eventListeners for a 
+particular event.
     </div>
     
 
@@ -2585,7 +2641,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>     easyrtc.enableAudio(false);</code></pre>
+    <pre class="prettyprint"><code>easyrtc.enableAudio(false);</code></pre>
 
     
 </dd>
@@ -2601,7 +2657,8 @@
     
     
     <div class="description">
-        Control whether the client requests audio from a peer during a call.Must be called before the call to have an effect.
+        Control whether the client requests audio from a peer during a call.
+Must be called before the call to have an effect.
     </div>
     
 
@@ -2704,7 +2761,9 @@
     
     
     <div class="description">
-        This function is used to enable and disable the local camera. If you disable thecamera, video objects display it will "freeze" until the camera is re-enabled. *By default, a camera is enabled.
+        This function is used to enable and disable the local camera. If you disable the
+camera, video objects display it will "freeze" until the camera is re-enabled. *
+By default, a camera is enabled.
     </div>
     
 
@@ -2835,7 +2894,8 @@
     
     
     <div class="description">
-        Sets whether WebRTC data channels are used to send inter-client messages.This is only the messages that applications explicitly send to other applications, not the WebRTC signaling messages.
+        Sets whether WebRTC data channels are used to send inter-client messages.
+This is only the messages that applications explicitly send to other applications, not the WebRTC signaling messages.
     </div>
     
 
@@ -2932,7 +2992,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.enableDataChannels(true);</code></pre>
+    <pre class="prettyprint"><code>easyrtc.enableDataChannels(true);</code></pre>
 
     
 </dd>
@@ -2948,7 +3008,10 @@
     
     
     <div class="description">
-        Enable or disable logging to the console.Note: if you want to control the printing of debug messages, override the   easyrtc.debugPrinter variable with a function that takes a message string as it's argument.   This is exactly what easyrtc.enableDebug does when it's enable argument is true.
+        Enable or disable logging to the console.
+Note: if you want to control the printing of debug messages, override the
+   easyrtc.debugPrinter variable with a function that takes a message string as it's argument.
+   This is exactly what easyrtc.enableDebug does when it's enable argument is true.
     </div>
     
 
@@ -3045,7 +3108,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.enableDebug(true);</code></pre>
+    <pre class="prettyprint"><code>easyrtc.enableDebug(true);</code></pre>
 
     
 </dd>
@@ -3061,7 +3124,9 @@
     
     
     <div class="description">
-        This function is used to enable and disable the local microphone. If you disablethe microphone, sounds stops being transmitted to your peers. By default, the microphoneis enabled.
+        This function is used to enable and disable the local microphone. If you disable
+the microphone, sounds stops being transmitted to your peers. By default, the microphone
+is enabled.
     </div>
     
 
@@ -3289,7 +3354,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>     easyrtc.enableVideo(false);</code></pre>
+    <pre class="prettyprint"><code>easyrtc.enableVideo(false);</code></pre>
 
     
 </dd>
@@ -3305,7 +3370,8 @@
     
     
     <div class="description">
-        Control whether the client requests video from a peer during a call.Must be called before the call to have an effect.
+        Control whether the client requests video from a peer during a call.
+Must be called before the call to have an effect.
     </div>
     
 
@@ -3408,7 +3474,9 @@
     
     
     <div class="description">
-        This function performs a printf like formatting. It actually takes an unlimitednumber of arguments, the declared arguments arg1, arg2, arg3 are present just fordocumentation purposes.
+        This function performs a printf like formatting. It actually takes an unlimited
+number of arguments, the declared arguments arg1, arg2, arg3 are present just for
+documentation purposes.
     </div>
     
 
@@ -3607,7 +3675,8 @@
     
     
     <div class="description">
-        Get server defined fields associated with the current application. Only validafter a connection has been made.
+        Get server defined fields associated with the current application. Only valid
+after a connection has been made.
     </div>
     
 
@@ -3756,7 +3825,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   ("You have " + easyrtc.getConnectionCount() + " peer connections");</code></pre>
+    <pre class="prettyprint"><code>("You have " + easyrtc.getConnectionCount() + " peer connections");</code></pre>
 
     
 </dd>
@@ -3772,7 +3841,8 @@
     
     
     <div class="description">
-        Get server defined fields associated with the connection. Only validafter a connection has been made.
+        Get server defined fields associated with the connection. Only valid
+after a connection has been made.
     </div>
     
 
@@ -3854,7 +3924,8 @@
     
     
     <div class="description">
-        Check if the client has a peer-2-peer connection to another user.The return values are text strings so you can use them in debugging output.
+        Check if the client has a peer-2-peer connection to another user.
+The return values are text strings so you can use them in debugging output.
     </div>
     
 
@@ -3973,7 +4044,11 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    if( easyrtc.getConnectStatus(otherEasyrtcid) == easyrtc.NOT_CONNECTED ){        easyrtc.call(otherEasyrtcid,                 function(){ console.log("success"); },                 function(){ console.log("failure"); });    }</code></pre>
+    <pre class="prettyprint"><code>if( easyrtc.getConnectStatus(otherEasyrtcid) == easyrtc.NOT_CONNECTED ){
+    easyrtc.call(otherEasyrtcid,
+             function(){ console.log("success"); },
+             function(){ console.log("failure"); });
+}</code></pre>
 
     
 </dd>
@@ -3989,7 +4064,8 @@
     
     
     <div class="description">
-        Request fresh ice config information from the server.This should be done periodically by long running applications.
+        Request fresh ice config information from the server.
+This should be done periodically by long running applications.
     </div>
     
 
@@ -4029,7 +4105,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -4175,7 +4251,10 @@
     
     
     <div class="description">
-        Returns a media stream for your local camera and microphone. It can be called only after easyrtc.initMediaSource has succeeded. It returns a stream that can be used as an argument to easyrtc.setVideoObjectSrc. Returns null if there is no local media stream acquired yet.
+        Returns a media stream for your local camera and microphone.
+ It can be called only after easyrtc.initMediaSource has succeeded.
+ It returns a stream that can be used as an argument to easyrtc.setVideoObjectSrc.
+ Returns null if there is no local media stream acquired yet.
     </div>
     
 
@@ -4242,7 +4321,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());</code></pre>
 
     
 </dd>
@@ -4321,7 +4400,7 @@
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">function</span>
 
 
             
@@ -4331,7 +4410,8 @@
             
             
             
-            <td class="description last">gets a map of {userDefinedKey: value}. If there is no peer connection to peerId, then this will have a value of {connected:false}.</td>
+            <td class="description last">gets the peerid and a map of {userDefinedKey: value}. If there is no peer connection to peerId, then the map will
+ have a value of {connected:false}.</td>
         </tr>
 	
 	
@@ -4344,7 +4424,7 @@
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">Object</span>
 
 
             
@@ -4354,7 +4434,8 @@
             
             
             
-            <td class="description last">has is a map of maps of the form {reportNum:{googleKey: userDefinedKey}}It is still experimental.</td>
+            <td class="description last">depends on whether Chrome or Firefox is used. See the default filters for guidance.
+It is still experimental.</td>
         </tr>
 	
 	
@@ -4412,7 +4493,8 @@
     
     
     <div class="description">
-        Return the media stream shared by a particular peer. This is needed when youadd a stream in the middle of a call.
+        Return the media stream shared by a particular peer. This is needed when you
+add a stream in the middle of a call.
     </div>
     
 
@@ -4894,7 +4976,8 @@
     
     
     <div class="description">
-        Get server defined fields associated with a particular room. Only validafter a connection has been made.
+        Get server defined fields associated with a particular room. Only valid
+after a connection has been made.
     </div>
     
 
@@ -4991,7 +5074,8 @@
     
             
 <div class="param-desc">
-    A dictionary containing entries of the form {key:{'fieldName':key, 'fieldValue':value1}} or undefinedif you are not connected to the room.
+    A dictionary containing entries of the form {key:{'fieldName':key, 'fieldValue':value1}} or undefined
+if you are not connected to the room.
 </div>
 
 
@@ -5024,7 +5108,8 @@
     
     
     <div class="description">
-        Sends the server a request for the list of rooms the user can see.You must have already be connected to use this function.
+        Sends the server a request for the list of rooms the user can see.
+You must have already be connected to use this function.
     </div>
     
 
@@ -5064,7 +5149,7 @@
             <td class="type">
             
                 
-<span class="param-type">function(Object)</span>
+<span class="param-type">function</span>
 
 
             
@@ -5074,7 +5159,8 @@
             
             
             
-            <td class="description last">on success, this function is called with a map of the form  { roomName:{"roomName":String, "numberClients": Number}}.The roomName appears as both the key to the map, and as the value of the "roomName" field.</td>
+            <td class="description last">on success, this function is called with a map of the form  { roomName:{"roomName":String, "numberClients": Number}}.
+The roomName appears as both the key to the map, and as the value of the "roomName" field.</td>
         </tr>
 	
 	
@@ -5087,7 +5173,7 @@
             <td class="type">
             
                 
-<span class="param-type">function(String, String)</span>
+<span class="param-type">function</span>
 
 
             
@@ -5144,7 +5230,16 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.getRoomList(       function(roomList){          for(roomName in roomList){             console.log("saw room " + roomName);          }        },        function(errorCode, errorText){           easyrtc.showError(errorCode, errorText);        }   );</code></pre>
+    <pre class="prettyprint"><code>easyrtc.getRoomList(
+    function(roomList){
+       for(roomName in roomList){
+          console.log("saw room " + roomName);
+       }
+     },
+     function(errorCode, errorText){
+        easyrtc.showError(errorCode, errorText);
+     }
+);</code></pre>
 
     
 </dd>
@@ -5274,7 +5369,11 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    var occupants = easyrtc.getRoomOccupants("default");    var i;    for( i = 0; i < occupants.length; i++ ) {        console.log( occupants[i] + " is in the room");    }</code></pre>
+    <pre class="prettyprint"><code>var occupants = easyrtc.getRoomOccupants("default");
+var i;
+for( i = 0; i < occupants.length; i++ ) {
+    console.log( occupants[i] + " is in the room");
+}</code></pre>
 
     
 </dd>
@@ -5290,7 +5389,8 @@
     
     
     <div class="description">
-        Returns a map of easyrtcid's of peers in a particular room. You should only test elements in the map to see if they arenull; their actual values are not guaranteed to be the same in different releases.
+        Returns a map of easyrtcid's of peers in a particular room. You should only test elements in the map to see if they are
+null; their actual values are not guaranteed to be the same in different releases.
     </div>
     
 
@@ -5404,7 +5504,9 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>     if( easyrtc.getRoomOccupantsAsMap("default")[some_easyrtcid]) {         console.log("yep, " + some_easyrtcid + " is in the room");     }</code></pre>
+    <pre class="prettyprint"><code>if( easyrtc.getRoomOccupantsAsMap("default")[some_easyrtcid]) {
+    console.log("yep, " + some_easyrtcid + " is in the room");
+}</code></pre>
 
     
 </dd>
@@ -5502,7 +5604,8 @@
     
     
     <div class="description">
-        Returns the last ice config supplied by the EasyRTC server. This function is not normally used, it is providedfor people who want to try filtering ice server configuration on the client.
+        Returns the last ice config supplied by the EasyRTC server. This function is not normally used, it is provided
+for people who want to try filtering ice server configuration on the client.
     </div>
     
 
@@ -5702,7 +5805,10 @@
     
     
     <div class="description">
-        Fetch the collection of session fields as a map. The map has the structure: {key1: {"fieldName": key1, "fieldValue": value1}, ...,  key2: {"fieldName": key2, "fieldValue": value2} }
+        Fetch the collection of session fields as a map. The map has the structure:
+ {key1: {"fieldName": key1, "fieldValue": value1}, ...,
+  key2: {"fieldName": key2, "fieldValue": value2}
+ }
     </div>
     
 
@@ -5820,7 +5926,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -5830,7 +5936,9 @@
             
             
             
-            <td class="description last">receives list of {facing:String, label:String, id:String, kind:"video"}Note: the label string always seems to be the empty string if you aren't using https.Note: not supported by Firefox.</td>
+            <td class="description last">receives list of {facing:String, label:String, id:String, kind:"video"}
+Note: the label string always seems to be the empty string if you aren't using https.
+Note: not supported by Firefox.</td>
         </tr>
 	
 	
@@ -5877,7 +5985,12 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>  easyrtc.getVideoSourceList( function(list) {              var i;              for( i = 0; i < list.length; i++ ) {                  console.log("label=" + list[i].label + ", id= " + list[i].id);              }         });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.getVideoSourceList( function(list) {
+            var i;
+            for( i = 0; i < list.length; i++ ) {
+                console.log("label=" + list[i].label + ", id= " + list[i].id);
+            }
+       });</code></pre>
 
     
 </dd>
@@ -5990,7 +6103,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.hangup(someEasyrtcid);</code></pre>
+    <pre class="prettyprint"><code>easyrtc.hangup(someEasyrtcid);</code></pre>
 
     
 </dd>
@@ -6055,7 +6168,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.hangupAll();</code></pre>
+    <pre class="prettyprint"><code>easyrtc.hangupAll();</code></pre>
 
     
 </dd>
@@ -6377,7 +6490,8 @@
     
     
     <div class="description">
-        Convert an easyrtcid to a user name. This is useful for labeling buttons and messagesregarding peers.
+        Convert an easyrtcid to a user name. This is useful for labeling buttons and messages
+regarding peers.
     </div>
     
 
@@ -6474,7 +6588,8 @@
     
             
 <div class="param-desc">
-    the username associated with the easyrtcid, or the easyrtcid if there isno associated username.
+    the username associated with the easyrtcid, or the easyrtcid if there is
+no associated username.
 </div>
 
 
@@ -6496,7 +6611,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   console.log(easyrtcid + " is actually " + easyrtc.idToName(easyrtcid));</code></pre>
+    <pre class="prettyprint"><code>console.log(easyrtcid + " is actually " + easyrtc.idToName(easyrtcid));</code></pre>
 
     
 </dd>
@@ -6512,7 +6627,11 @@
     
     
     <div class="description">
-        Initializes your access to a local camera and microphone. Failure could be caused a browser that didn't support WebRTC, or by the usernot granting permission.If you are going to call easyrtc.enableAudio or easyrtc.enableVideo, you need to do it beforecalling easyrtc.initMediaSource.
+        Initializes your access to a local camera and microphone.
+ Failure could be caused a browser that didn't support WebRTC, or by the user
+not granting permission.
+If you are going to call easyrtc.enableAudio or easyrtc.enableVideo, you need to do it before
+calling easyrtc.initMediaSource.
     </div>
     
 
@@ -6552,7 +6671,7 @@
             <td class="type">
             
                 
-<span class="param-type">function(Object)</span>
+<span class="param-type">function</span>
 
 
             
@@ -6575,7 +6694,7 @@
             <td class="type">
             
                 
-<span class="param-type">function(String,String)</span>
+<span class="param-type">function</span>
 
 
             
@@ -6655,7 +6774,13 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>      easyrtc.initMediaSource(         function(mediastream){             easyrtc.setVideoObjectSrc( document.getElementById("mirrorVideo"), mediastream);         },         function(errorCode, errorText){              easyrtc.showError(errorCode, errorText);         });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.initMediaSource(
+   function(mediastream){
+       easyrtc.setVideoObjectSrc( document.getElementById("mirrorVideo"), mediastream);
+   },
+   function(errorCode, errorText){
+        easyrtc.showError(errorCode, errorText);
+   });</code></pre>
 
     
 </dd>
@@ -6790,7 +6915,10 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   var name = document.getElementById('nameField').value;   if( !easyrtc.isNameValid(name)){       console.error("Bad user name");   }</code></pre>
+    <pre class="prettyprint"><code>var name = document.getElementById('nameField').value;
+if( !easyrtc.isNameValid(name)){
+    console.error("Bad user name");
+}</code></pre>
 
     
 </dd>
@@ -6806,7 +6934,9 @@
     
     
     <div class="description">
-        Returns true if the ipAddress parameter was the address of a turn server. This is done by checking against informationcollected during peer to peer calls. Don't expect it to work before the first call, or to identify turn servers that aren'tin the ice config.
+        Returns true if the ipAddress parameter was the address of a turn server. This is done by checking against information
+collected during peer to peer calls. Don't expect it to work before the first call, or to identify turn servers that aren't
+in the ice config.
     </div>
     
 
@@ -6931,7 +7061,9 @@
     
     
     <div class="description">
-        This method allows you to join a single room. It may be called multiple times to be inmultiple rooms simultaneously. It may be called before or after connecting to the server.Note: the successCB and failureDB will only be called if you are already connected to the server.
+        This method allows you to join a single room. It may be called multiple times to be in
+multiple rooms simultaneously. It may be called before or after connecting to the server.
+Note: the successCB and failureDB will only be called if you are already connected to the server.
     </div>
     
 
@@ -7017,7 +7149,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -7040,7 +7172,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -7108,7 +7240,8 @@
     
     
     <div class="description">
-        This function allows you to leave a single room. Note: the successCB and failureDB arguments are optional and will only be called if you are already connected to the server.
+        This function allows you to leave a single room. Note: the successCB and failureDB
+ arguments are optional and will only be called if you are already connected to the server.
     </div>
     
 
@@ -7171,7 +7304,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -7194,7 +7327,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -7251,7 +7384,9 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.leaveRoom("freds_room");   easyrtc.leaveRoom("freds_room", function(roomName){ console.log("left the room")},                      function(errorCode, errorText, roomName){ console.log("left the room")});</code></pre>
+    <pre class="prettyprint"><code>easyrtc.leaveRoom("freds_room");
+easyrtc.leaveRoom("freds_room", function(roomName){ console.log("left the room")},
+                   function(errorCode, errorText, roomName){ console.log("left the room")});</code></pre>
 
     
 </dd>
@@ -7267,7 +7402,9 @@
     
     
     <div class="description">
-        Load Easyrtc Stylesheet.  Easyrtc Stylesheet define easyrtcMirror class and some basic css class for using easyrtc.js.  That way, developers can override it or use it's own css file minified css or package.
+        Load Easyrtc Stylesheet.
+  Easyrtc Stylesheet define easyrtcMirror class and some basic css class for using easyrtc.js.
+  That way, developers can override it or use it's own css file minified css or package.
     </div>
     
 
@@ -7316,7 +7453,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>      easyrtc.loadStylesheet();</code></pre>
+    <pre class="prettyprint"><code>easyrtc.loadStylesheet();</code></pre>
 
     
 </dd>
@@ -7475,8 +7612,71 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.makeLocalStreamFromRemoteStream(sourcePeer, "default", "forwardedStream");   easyrtc.call(nextPeer, callSuccessCB, callFailureCB, wasAcceptedCB, ["forwardedStream"]);</code></pre>
+    <pre class="prettyprint"><code>easyrtc.makeLocalStreamFromRemoteStream(sourcePeer, "default", "forwardedStream");
+easyrtc.call(nextPeer, callSuccessCB, callFailureCB, wasAcceptedCB, ["forwardedStream"]);</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="register3rdPartyLocalMediaStream"><span class="type-signature"></span>register3rdPartyLocalMediaStream<span class="signature">()</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Allow an externally created mediastream (ie, created by another 
+library) to be used within easyrtc. Tracking when it closes
+must be done by the supplying party.
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
     
 </dd>
 
@@ -7554,7 +7754,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -7672,7 +7872,8 @@
             
             
             
-            <td class="description last">a string containing the easyrtcId of the other user.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
+            <td class="description last">a string containing the easyrtcId of the other user.
+Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
         </tr>
 	
 	
@@ -7731,7 +7932,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -7741,7 +7942,8 @@
             
             
             
-            <td class="description last">a function which receives acknowledgments. May only be invoked in the websocket case.</td>
+            <td class="description last">a function which receives acknowledgments. May only be invoked in
+ the websocket case.</td>
         </tr>
 	
 	
@@ -7788,7 +7990,9 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.sendData(someEasyrtcid, "roomData",  {room:499, bldgNum:'asd'},      function ackHandler(msgType, msgData);   );</code></pre>
+    <pre class="prettyprint"><code>easyrtc.sendData(someEasyrtcid, "roomData",  {room:499, bldgNum:'asd'},
+   function ackHandler(msgType, msgData);
+);</code></pre>
 
     
 </dd>
@@ -7804,7 +8008,10 @@
     
     
     <div class="description">
-        Sends data to another user using previously established data channel. This method willfail if no data channel has been established yet. Unlike the easyrtc.sendWS method,you can't send a dictionary, convert dictionaries to strings using JSON.stringify first.What data types you can send, and how large a data type depends on your browser.
+        Sends data to another user using previously established data channel. This method will
+fail if no data channel has been established yet. Unlike the easyrtc.sendWS method,
+you can't send a dictionary, convert dictionaries to strings using JSON.stringify first.
+What data types you can send, and how large a data type depends on your browser.
     </div>
     
 
@@ -7947,7 +8154,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.sendDataP2P(someEasyrtcid, "roomData", {room:499, bldgNum:'asd'});</code></pre>
+    <pre class="prettyprint"><code>easyrtc.sendDataP2P(someEasyrtcid, "roomData", {room:499, bldgNum:'asd'});</code></pre>
 
     
 </dd>
@@ -7963,7 +8170,8 @@
     
     
     <div class="description">
-        Sends data to another user using websockets. The easyrtc.sendServerMessage or easyrtc.sendPeerMessage methodsare wrappers for this method; application code should use them instead.
+        Sends data to another user using websockets. The easyrtc.sendServerMessage or easyrtc.sendPeerMessage methods
+are wrappers for this method; application code should use them instead.
     </div>
     
 
@@ -8013,7 +8221,8 @@
             
             
             
-            <td class="description last">either a string containing the easyrtcId of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
+            <td class="description last">either a string containing the easyrtcId of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.
+Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
         </tr>
 	
 	
@@ -8072,7 +8281,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -8082,7 +8291,10 @@
             
             
             
-            <td class="description last">by default, the ackhandler handles acknowledgments from the server that your message was delivered to it's destination.However, application logic in the server can over-ride this. If you leave this null, a stub ackHandler will be used. The ackHandlergets passed a message with the same msgType as your outgoing message, or a message type of "error" in which casemsgData will contain a errorCode and errorText fields.</td>
+            <td class="description last">by default, the ackhandler handles acknowledgments from the server that your message was delivered to it's destination.
+However, application logic in the server can over-ride this. If you leave this null, a stub ackHandler will be used. The ackHandler
+gets passed a message with the same msgType as your outgoing message, or a message type of "error" in which case
+msgData will contain a errorCode and errorText fields.</td>
         </tr>
 	
 	
@@ -8129,7 +8341,11 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.sendDataWS(someEasyrtcid, "setPostalAddress", {room:499, bldgNum:'asd'},     function(ackMsg){         console.log("saw the following acknowledgment " + JSON.stringify(ackMsg));     }   );</code></pre>
+    <pre class="prettyprint"><code>easyrtc.sendDataWS(someEasyrtcid, "setPostalAddress", {room:499, bldgNum:'asd'},
+  function(ackMsg){
+      console.log("saw the following acknowledgment " + JSON.stringify(ackMsg));
+  }
+);</code></pre>
 
     
 </dd>
@@ -8195,7 +8411,8 @@
             
             
             
-            <td class="description last">either a string containing the easyrtcId of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
+            <td class="description last">either a string containing the easyrtcId of the other user, or an object containing some subset of the following fields: targetEasyrtcid, targetGroup, targetRoom.
+Specifying multiple fields restricts the scope of the destination (operates as a logical AND, not a logical OR).</td>
         </tr>
 	
 	
@@ -8254,7 +8471,7 @@
             <td class="type">
             
                 
-<span class="param-type">function(String, Object)</span>
+<span class="param-type">function</span>
 
 
             
@@ -8277,7 +8494,7 @@
             <td class="type">
             
                 
-<span class="param-type">function(String, String)</span>
+<span class="param-type">function</span>
 
 
             
@@ -8334,7 +8551,13 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.sendPeerMessage(otherUser, 'offer_candy', {candy_name:'mars'},            function(msgType, msgBody ){               console.log("message was sent");            },            function(errorCode, errorText){               console.log("error was " + errorText);            });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.sendPeerMessage(otherUser, 'offer_candy', {candy_name:'mars'},
+        function(msgType, msgBody ){
+           console.log("message was sent");
+        },
+        function(errorCode, errorText){
+           console.log("error was " + errorText);
+        });</code></pre>
 
     
 </dd>
@@ -8436,7 +8659,7 @@
             <td class="type">
             
                 
-<span class="param-type">function(String, Object)</span>
+<span class="param-type">function</span>
 
 
             
@@ -8459,7 +8682,7 @@
             <td class="type">
             
                 
-<span class="param-type">function(String, String)</span>
+<span class="param-type">function</span>
 
 
             
@@ -8516,7 +8739,13 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.sendServerMessage('get_candy', {candy_name:'mars'},            function(msgType, msgData ){               console.log("got candy count of " + msgData.barCount);            },            function(errorCode, errorText){               console.log("error was " + errorText);            });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.sendServerMessage('get_candy', {candy_name:'mars'},
+        function(msgType, msgData ){
+           console.log("got candy count of " + msgData.barCount);
+        },
+        function(errorCode, errorText){
+           console.log("error was " + errorText);
+        });</code></pre>
 
     
 </dd>
@@ -8572,7 +8801,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -8582,7 +8811,10 @@
             
             
             
-            <td class="description last">takes the arguments (callerEasyrtcid, acceptor).     The acceptCheck callback is passed an easyrtcid and an aceptor function. The acceptor function should be called with eithera true value (accept the call) or false value( reject the call) as it's first argument, and optionally,an array of local media streamNames as a second argument.</td>
+            <td class="description last">takes the arguments (callerEasyrtcid, acceptor).     
+The acceptCheck callback is passed an easyrtcid and an aceptor function. The acceptor function should be called with either
+a true value (accept the call) or false value( reject the call) as it's first argument, and optionally,
+an array of local media streamNames as a second argument.</td>
         </tr>
 	
 	
@@ -8629,9 +8861,19 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>     easyrtc.setAcceptChecker( function(easyrtcid, acceptor){          if( easyrtc.idToName(easyrtcid) === 'Fred' ){             acceptor(true);          }          else if( easyrtc.idToName(easyrtcid) === 'Barney' ){             setTimeout( function(){ 
-     acceptor(true, ['myOtherCam']); // myOtherCam presumed to a streamName
-     }, 10000);          }          else{             acceptor(false);          }     });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setAcceptChecker( function(easyrtcid, acceptor){
+     if( easyrtc.idToName(easyrtcid) === 'Fred' ){
+        acceptor(true);
+     }
+     else if( easyrtc.idToName(easyrtcid) === 'Barney' ){
+        setTimeout( function(){ 
+acceptor(true, ['myOtherCam']); // myOtherCam presumed to a streamName
+}, 10000);
+     }
+     else{
+        acceptor(false);
+     }
+});</code></pre>
 
     
 </dd>
@@ -8647,7 +8889,9 @@
     
     
     <div class="description">
-        Set the application name. Applications can only communicate with other applicationsthat share the same API Key and application name. There is no predefined set of applicationnames. Maximum length is
+        Set the application name. Applications can only communicate with other applications
+that share the same API Key and application name. There is no predefined set of application
+names. Maximum length is
     </div>
     
 
@@ -8744,7 +8988,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.setApplicationName('simpleAudioVideo');</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setApplicationName('simpleAudioVideo');</code></pre>
 
     
 </dd>
@@ -8760,7 +9004,10 @@
     
     
     <div class="description">
-        Controls whether a default local media stream should be acquired automatically during calls and acceptsif a list of streamNames is not supplied. The default is true, which mimicks the behaviour of earlier releasesthat didn't support multiple streams. This function should be called before easyrtc.call or before entering an accept  callback.
+        Controls whether a default local media stream should be acquired automatically during calls and accepts
+if a list of streamNames is not supplied. The default is true, which mimicks the behaviour of earlier releases
+that didn't support multiple streams. This function should be called before easyrtc.call or before entering an 
+accept  callback.
     </div>
     
 
@@ -8868,7 +9115,8 @@
     
     
     <div class="description">
-        Sets the callCancelled callback. This will be called when a remote userinitiates a call to you, but does a "hangup" before you have a chance to get his video stream.
+        Sets the callCancelled callback. This will be called when a remote user
+initiates a call to you, but does a "hangup" before you have a chance to get his video stream.
     </div>
     
 
@@ -8908,7 +9156,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -8918,7 +9166,9 @@
             
             
             
-            <td class="description last">takes an easyrtcid as an argument and a boolean that indicates whether the call was explicitly cancelled remotely (true), or actually accepted by the user attempting a call to the same party.</td>
+            <td class="description last">takes an easyrtcid as an argument and a boolean that indicates whether
+ the call was explicitly cancelled remotely (true), or actually accepted by the user attempting a call to
+ the same party.</td>
         </tr>
 	
 	
@@ -8965,7 +9215,14 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.setCallCancelled( function(easyrtcid, explicitlyCancelled){       if( explicitlyCancelled ){           console.log(easyrtc.idToName(easyrtcid) + " stopped trying to reach you");        }        else{           console.log("Implicitly called "  + easyrtc.idToName(easyrtcid));        }    });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setCallCancelled( function(easyrtcid, explicitlyCancelled){
+   if( explicitlyCancelled ){
+       console.log(easyrtc.idToName(easyrtcid) + " stopped trying to reach you");
+    }
+    else{
+       console.log("Implicitly called "  + easyrtc.idToName(easyrtcid));
+    }
+});</code></pre>
 
     
 </dd>
@@ -8981,7 +9238,8 @@
     
     
     <div class="description">
-        This function sets the name of the cookie that client side library will look forand transmit back to the server as it's easyrtcsid in the first message.
+        This function sets the name of the cookie that client side library will look for
+and transmit back to the server as it's easyrtcsid in the first message.
     </div>
     
 
@@ -9197,7 +9455,8 @@
     
     
     <div class="description">
-        Sets a callback that is called when a previously open data channel closes.The callback will be called with an easyrtcid as it's sole argument.
+        Sets a callback that is called when a previously open data channel closes.
+The callback will be called with an easyrtcid as it's sole argument.
     </div>
     
 
@@ -9237,7 +9496,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -9294,7 +9553,9 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.setDataChannelCloseListener( function(easyrtcid){           ("No longer connected to " + easyrtc.idToName(easyrtcid));   });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setDataChannelCloseListener( function(easyrtcid){
+        ("No longer connected to " + easyrtc.idToName(easyrtcid));
+});</code></pre>
 
     
 </dd>
@@ -9310,7 +9571,8 @@
     
     
     <div class="description">
-        Sets a callback that is called when a data channel is open and ready to send data.The callback will be called with an easyrtcid as it's sole argument.
+        Sets a callback that is called when a data channel is open and ready to send data.
+The callback will be called with an easyrtcid as it's sole argument.
     </div>
     
 
@@ -9350,7 +9612,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -9407,7 +9669,9 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.setDataChannelOpenListener( function(easyrtcid){        easyrtc.sendDataP2P(easyrtcid, "greeting", "hello");   });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setDataChannelOpenListener( function(easyrtcid){
+     easyrtc.sendDataP2P(easyrtcid, "greeting", "hello");
+});</code></pre>
 
     
 </dd>
@@ -9463,7 +9727,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -9520,8 +9784,159 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.setDisconnectListener(function(){       easyrtc.showError("SYSTEM-ERROR", "Lost our connection to the socket server");   });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setDisconnectListener(function(){
+    easyrtc.showError("SYSTEM-ERROR", "Lost our connection to the socket server");
+});</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="setIceCandidateFilter"><span class="type-signature"></span>setIceCandidateFilter<span class="signature">(filter, isIncoming)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sets a function which filters IceCandidate records being sent or received.
+
+Candidate records can be received while they are being generated locally (before being 
+sent to a peer), and after they are received by the peer. The filter receives two arguments, the candidate record and a boolean 
+flag that is true for a candidate being received from another peer,  
+and false for a candidate that was generated locally. The candidate record has the form:
+ {type: 'candidate', label: sdpMLineIndex, id: sdpMid, candidate: candidateString}
+The function should return one of the following: the input candidate record, a modified candidate record, or null (indicating that the
+candidate should be discarded).
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>filter</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>isIncoming</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    an ice candidate record or null.
+</div>
+
+
+
+        
+    
     
 </dd>
 
@@ -9536,7 +9951,8 @@
     
     
     <div class="description">
-        Sets the ice server configuration that will be used in subsequent calls. You only need this function if you are filteringthe ice server configuration on the client or if you are using TURN certificates that have a very short lifespan.
+        Sets the ice server configuration that will be used in subsequent calls. You only need this function if you are filtering
+the ice server configuration on the client or if you are using TURN certificates that have a very short lifespan.
     </div>
     
 
@@ -9633,7 +10049,18 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.setIceUsedInCalls( {"iceServers": [     {			"url": "stun:stun.sipgate.net"		},     {        "url": "stun:217.10.68.152"     },     {        "url": "stun:stun.sipgate.net:10000"     }     ]});     easyrtc.call(...);</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setIceUsedInCalls( {"iceServers": [
+ {
+			"url": "stun:stun.sipgate.net"
+		},
+ {
+    "url": "stun:217.10.68.152"
+ },
+ {
+    "url": "stun:stun.sipgate.net:10000"
+ }
+ ]});
+ easyrtc.call(...);</code></pre>
 
     
 </dd>
@@ -9649,7 +10076,9 @@
     
     
     <div class="description">
-        Sets a callback to receive notification of a media stream closing. The usual use of this is to clear the source of your video object so you aren't left with the last frame of the video displayed on it.
+        Sets a callback to receive notification of a media stream closing. The usual
+ use of this is to clear the source of your video object so you aren't left with
+ the last frame of the video displayed on it.
     </div>
     
 
@@ -9689,7 +10118,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -9746,7 +10175,10 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.setOnStreamClosed( function(easyrtcid, stream, streamName){        easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), "");        ( easyrtc.idToName(easyrtcid) + " closed stream " + stream.id + " " + streamName);    });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setOnStreamClosed( function(easyrtcid, stream, streamName){
+    easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), "");
+    ( easyrtc.idToName(easyrtcid) + " closed stream " + stream.id + " " + streamName);
+});</code></pre>
 
     
 </dd>
@@ -9762,7 +10194,11 @@
     
     
     <div class="description">
-        Sets a listener for data sent from another client (either peer to peer or via websockets).If no msgType or source is provided, the listener applies to all events that aren't otherwise handled.If a msgType but no source is provided, the listener applies to all messages of that msgType that aren't otherwise handled.If a msgType and a source is provided, the listener applies to only message of the specified type coming from the specified peer.The most specific case takes priority over the more general.
+        Sets a listener for data sent from another client (either peer to peer or via websockets).
+If no msgType or source is provided, the listener applies to all events that aren't otherwise handled.
+If a msgType but no source is provided, the listener applies to all messages of that msgType that aren't otherwise handled.
+If a msgType and a source is provided, the listener applies to only message of the specified type coming from the specified peer.
+The most specific case takes priority over the more general.
     </div>
     
 
@@ -9802,7 +10238,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -9812,7 +10248,9 @@
             
             
             
-            <td class="description last">has the signature (easyrtcid, msgType, msgData, targeting).  msgType is a string. targeting is null if the message was received using WebRTC data channels, otherwise it  is an object that contains one or more of the following string valued elements {targetEasyrtcid, targetGroup, targetRoom}.</td>
+            <td class="description last">has the signature (easyrtcid, msgType, msgData, targeting).
+  msgType is a string. targeting is null if the message was received using WebRTC data channels, otherwise it
+  is an object that contains one or more of the following string valued elements {targetEasyrtcid, targetGroup, targetRoom}.</td>
         </tr>
 	
 	
@@ -9905,7 +10343,18 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting){        console.log("From " + easyrtc.idToName(easyrtcid) +            " sent the following data " + JSON.stringify(msgData));    });    easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting){        console.log("From " + easyrtc.idToName(easyrtcid) +            " sent the following data " + JSON.stringify(msgData));    }, 'food', 'dkdjdekj44--');    easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting){        console.log("From " + easyrtcid +            " sent the following data " + JSON.stringify(msgData));    }, 'drink');</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting){
+    console.log("From " + easyrtc.idToName(easyrtcid) +
+        " sent the following data " + JSON.stringify(msgData));
+});
+easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting){
+    console.log("From " + easyrtc.idToName(easyrtcid) +
+        " sent the following data " + JSON.stringify(msgData));
+}, 'food', 'dkdjdekj44--');
+easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting){
+    console.log("From " + easyrtcid +
+        " sent the following data " + JSON.stringify(msgData));
+}, 'drink');</code></pre>
 
     
 </dd>
@@ -9921,7 +10370,9 @@
     
     
     <div class="description">
-        Provide a set of application defined fields that will be part of this instancesconfiguration information. This data will get sent to other peers via the websocketpath.
+        Provide a set of application defined fields that will be part of this instances
+configuration information. This data will get sent to other peers via the websocket
+path.
     </div>
     
 
@@ -10064,7 +10515,12 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>  easyrtc.setRoomApiField("trekkieRoom",  "favorite_alien", "Mr Spock");  easyrtc.setRoomOccupantListener( function(roomName, list){     for( var i in list ){        console.log("easyrtcid=" + i + " favorite alien is " + list[i].apiFields.favorite_alien);     }  });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setRoomApiField("trekkieRoom",  "favorite_alien", "Mr Spock");
+easyrtc.setRoomOccupantListener( function(roomName, list){
+   for( var i in list ){
+      console.log("easyrtcid=" + i + " favorite alien is " + list[i].apiFields.favorite_alien);
+   }
+});</code></pre>
 
     
 </dd>
@@ -10080,7 +10536,12 @@
     
     
     <div class="description">
-        This function requests that screen capturing be used to provide the local media sourcerather than a webcam. If you have multiple screens, they are composited side by side.Note: this functionality is not supported by Firefox, has to be called before calling initMediaSource (or easyApp), we don't currently supply a way to turn it off (once it's on), only works if the website is hosted SSL (https), and the image quality is rather poor going across a network because it tries to transmit so much data. In short, screen sharingthrough WebRTC isn't worth using at this point, but it is provided here so people can try it out.
+        This function requests that screen capturing be used to provide the local media source
+rather than a webcam. If you have multiple screens, they are composited side by side.
+Note: this functionality is not supported by Firefox, has to be called before calling initMediaSource (or easyApp), we don't currently supply a way to 
+turn it off (once it's on), only works if the website is hosted SSL (https), and the image quality is rather 
+poor going across a network because it tries to transmit so much data. In short, screen sharing
+through WebRTC isn't worth using at this point, but it is provided here so people can try it out.
     </div>
     
 
@@ -10129,7 +10590,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.setScreenCapture();</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setScreenCapture();</code></pre>
 
     
 </dd>
@@ -10145,7 +10606,9 @@
     
     
     <div class="description">
-        Sets functions which filter sdp records before calling setLocalDescription or setRemoteDescription.This is advanced functionality which can break things, easily. See the easyrtc_rates.js file for afilter builder.
+        Sets functions which filter sdp records before calling setLocalDescription or setRemoteDescription.
+This is advanced functionality which can break things, easily. See the easyrtc_rates.js file for a
+filter builder.
     </div>
     
 
@@ -10185,7 +10648,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -10208,7 +10671,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -10316,7 +10779,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -10373,7 +10836,9 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.setServerListener( function(msgType, msgData, targeting){        ("The Server sent the following message " + JSON.stringify(msgData));    });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setServerListener( function(msgType, msgData, targeting){
+    ("The Server sent the following message " + JSON.stringify(msgData));
+});</code></pre>
 
     
 </dd>
@@ -10389,7 +10854,12 @@
     
     
     <div class="description">
-        Sets the url of the Socket server.The node.js server is great as a socket server, but it doesn't haveall the hooks you'd like in a general web server, like PHP or Pythonplug-ins. By setting the serverPath your application can get it's regularpages from a regular web server, but the EasyRTC library can still reach thesocket server.
+        Sets the url of the Socket server.
+The node.js server is great as a socket server, but it doesn't have
+all the hooks you'd like in a general web server, like PHP or Python
+plug-ins. By setting the serverPath your application can get it's regular
+pages from a regular web server, but the EasyRTC library can still reach the
+socket server.
     </div>
     
 
@@ -10462,7 +10932,8 @@
             
             
             
-            <td class="description last">an optional dictionary of options for socket.io's connect method. The default is {'connect timeout': 10000,'force new connection': true }</td>
+            <td class="description last">an optional dictionary of options for socket.io's connect method. 
+The default is {'connect timeout': 10000,'force new connection': true }</td>
         </tr>
 	
 	
@@ -10509,7 +10980,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>    easyrtc.setSocketUrl(":8080", options);</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setSocketUrl(":8080", options);</code></pre>
 
     
 </dd>
@@ -10525,7 +10996,8 @@
     
     
     <div class="description">
-        easyrtc.setStreamAcceptor sets a callback to receive media streams from other peers, independentof where the call was initiated (caller or callee).
+        easyrtc.setStreamAcceptor sets a callback to receive media streams from other peers, independent
+of where the call was initiated (caller or callee).
     </div>
     
 
@@ -10565,7 +11037,7 @@
             <td class="type">
             
                 
-<span class="param-type">Function</span>
+<span class="param-type">function</span>
 
 
             
@@ -10622,7 +11094,10 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code> easyrtc.setStreamAcceptor(function(easyrtcid, stream, streamName){    document.getElementById('callerName').innerHTML = easyrtc.idToName(easyrtcid);    easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), stream); });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setStreamAcceptor(function(easyrtcid, stream, streamName){
+   document.getElementById('callerName').innerHTML = easyrtc.idToName(easyrtcid);
+   easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), stream);
+});</code></pre>
 
     
 </dd>
@@ -10865,7 +11340,8 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   if( !easyrtc.setUsername("JohnSmith") ){       console.error("bad user name);</code></pre>
+    <pre class="prettyprint"><code>if( !easyrtc.setUsername("JohnSmith") ){
+    console.error("bad user name);</code></pre>
 
     
 </dd>
@@ -10946,7 +11422,10 @@
     
     
     
-        <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>No longer supported by Google.Sets the bandwidth for sending video data.Setting the rate too low will cause connection attempts to fail. 40 is probably good lower limit.The default is 50. A value of zero will remove bandwidth limits.</li><ul></dd>
+        <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>No longer supported by Google.
+Sets the bandwidth for sending video data.
+Setting the rate too low will cause connection attempts to fail. 40 is probably good lower limit.
+The default is 50. A value of zero will remove bandwidth limits.</li><ul></dd>
     
     
     
@@ -10976,7 +11455,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.setVideoBandwidth( 40);</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setVideoBandwidth( 40);</code></pre>
 
     
 </dd>
@@ -10992,7 +11471,9 @@
     
     
     <div class="description">
-        This function is used to set the dimensions of the local camera, usually to get HD. If called, it must be called before calling easyrtc.initMediaSource (explicitly or implicitly). assuming it is supported. If you don't pass any parameters, it will default to 720p dimensions.
+        This function is used to set the dimensions of the local camera, usually to get HD.
+ If called, it must be called before calling easyrtc.initMediaSource (explicitly or implicitly).
+ assuming it is supported. If you don't pass any parameters, it will default to 720p dimensions.
     </div>
     
 
@@ -11135,9 +11616,9 @@
     
         <h5>Examples</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.setVideoDims(1280,720);</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setVideoDims(1280,720);</code></pre>
 
-    <pre class="prettyprint"><code>   easyrtc.setVideoDims();</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setVideoDims();</code></pre>
 
     
 </dd>
@@ -11153,7 +11634,14 @@
     
     
     <div class="description">
-        Sets a video or audio object from a media stream. Chrome uses the src attribute and expects a URL, while firefox uses the mozSrcObject and expects a stream. This procedure hides that from you. If the media stream is from a local webcam, you may want to add the easyrtcMirror class to the video object so it looks like a proper mirror. The easyrtcMirror class is defined in this.css. Which is could be added using the same path of easyrtc.js file to an HTML file
+        Sets a video or audio object from a media stream.
+ Chrome uses the src attribute and expects a URL, while firefox
+ uses the mozSrcObject and expects a stream. This procedure hides
+ that from you.
+ If the media stream is from a local webcam, you may want to add the
+ easyrtcMirror class to the video object so it looks like a proper mirror.
+ The easyrtcMirror class is defined in this.css.
+ Which is could be added using the same path of easyrtc.js file to an HTML file
     </div>
     
 
@@ -11276,7 +11764,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());</code></pre>
 
     
 </dd>
@@ -11292,7 +11780,8 @@
     
     
     <div class="description">
-        Specify particular video source. Call this before you call easyrtc.initMediaSource().Note: this function isn't supported by Firefox.
+        Specify particular video source. Call this before you call easyrtc.initMediaSource().
+Note: this function isn't supported by Firefox.
     </div>
     
 
@@ -11389,7 +11878,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code> easyrtc.setVideoSrc( videoSrcId);</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setVideoSrc( videoSrcId);</code></pre>
 
     
 </dd>
@@ -11405,7 +11894,11 @@
     
     
     <div class="description">
-        Default error reporting function. The default implementation displays error messages in a programmatically created div with the id easyrtcErrorDialog. The div has title component with a class name of easyrtcErrorDialog_title. The error messages get added to a container with the id easyrtcErrorDialog_body. Each error message is a text node inside a div with a class of easyrtcErrorDialog_element. There is an "okay" button with the className of easyrtcErrorDialog_okayButton.
+        Default error reporting function. The default implementation displays error messages
+ in a programmatically created div with the id easyrtcErrorDialog. The div has title
+ component with a class name of easyrtcErrorDialog_title. The error messages get added to a
+ container with the id easyrtcErrorDialog_body. Each error message is a text node inside a div
+ with a class of easyrtcErrorDialog_element. There is an "okay" button with the className of easyrtcErrorDialog_okayButton.
     </div>
     
 
@@ -11525,7 +12018,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>     easyrtc.showError("BAD_NAME", "Invalid username");</code></pre>
+    <pre class="prettyprint"><code>easyrtc.showError("BAD_NAME", "Invalid username");</code></pre>
 
     
 </dd>
@@ -11541,7 +12034,8 @@
     
     
     <div class="description">
-        Determines whether the current browser supports the new data channels.EasyRTC will not open up connections with the old data channels.
+        Determines whether the current browser supports the new data channels.
+EasyRTC will not open up connections with the old data channels.
     </div>
     
 
@@ -11903,7 +12397,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>   easyrtc.updatePresence('dnd', 'sleeping');</code></pre>
+    <pre class="prettyprint"><code>easyrtc.updatePresence('dnd', 'sleeping');</code></pre>
 
     
 </dd>
@@ -12072,7 +12566,10 @@
     
     
     <div class="description">
-        Supply a socket.io connection that will be used instead of allocating a new socket.The expected usage is that you allocate a websocket, assign options to it, calleasyrtc.useThisSocketConnection, followed by easyrtc.connect or easyrtc.easyApp. Easyrtc will not attempt toclose sockets that were supplied with easyrtc.useThisSocketConnection.
+        Supply a socket.io connection that will be used instead of allocating a new socket.
+The expected usage is that you allocate a websocket, assign options to it, call
+easyrtc.useThisSocketConnection, followed by easyrtc.connect or easyrtc.easyApp. Easyrtc will not attempt to
+close sockets that were supplied with easyrtc.useThisSocketConnection.
     </div>
     
 
@@ -12188,7 +12685,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Oct 10 2014 15:12:19 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Mon Dec 22 2014 21:27:19 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>
