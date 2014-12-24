@@ -799,7 +799,8 @@ var Easyrtc = function() {
                     }
                     else {
                         if( entry.hasOwnProperty("ipAddress") && entry.hasOwnProperty("id")) {
-                            candidates[entry.id] = entry.ipAddress;
+                            candidates[entry.id] = entry.ipAddress + ":" + 
+                                  entry.portNumber;
                         }
                         else if( entry.hasOwnProperty("selected") && 
                                  entry.hasOwnProperty("remoteCandidateId") && 
@@ -810,7 +811,7 @@ var Easyrtc = function() {
                 });
 
                 if( activeId ) {
-                    items["firefoxActiveConnection"] = candidates[activeId];
+                    items["firefoxRemoteAddress"] = candidates[activeId];
                 }
                 if (!filter) {
                     callback(peerId, items);
@@ -1023,7 +1024,7 @@ var Easyrtc = function() {
         "inboundrtp_audio.packetsReceived": "audioPacketsReceived",
         "inboundrtp_video.packetsLost": "videoPacketsLost",
         "inboundrtp_audio.packetsLost": "audioPacketsLost",
-        "firefoxActiveConnection": "activeConnection"
+        "firefoxRemoteAddress": "remoteAddress"
     };
     this.standardStatsFilter = isFirefox ? self.firefoxStatsFilter : self.chromeStatsFilter;
     /** Provide a set of application defined fields that will be part of this instances
