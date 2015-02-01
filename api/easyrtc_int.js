@@ -2152,8 +2152,11 @@ var Easyrtc = function() {
      *
      */
     this.setUsername = function(username) {
-
-        if (self.isNameValid(username)) {
+        if( self.myEasyrtcid ) {
+            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "easyrtc.setUsername called after authentication");
+            return false;
+        }
+        else if (self.isNameValid(username)) {
             self.username = username;
             return true;
         }
