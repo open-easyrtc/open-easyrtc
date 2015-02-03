@@ -270,6 +270,41 @@ var Easyrtc = function() {
     this.enableVideoReceive = function(value) {
         receivedMediaContraints.mandatory.OfferToReceiveVideo = value;
     };
+
+    function getSourceList(callback, sourceType) {
+        if (MediaStreamTrack.getSources) {
+            MediaStreamTrack.getSources(function(sources) {
+                var results = [];
+                for (var i = 0; i < sources.length; i++) {
+                    var source = sources[i];
+                    if (source.kind == sourceType) {
+                        results.push(source);
+                    }
+                }
+                callback(results);
+            });
+        }
+        else {
+            callback([]);
+        }
+    }
+
+    /**
+     * Gets a list of the available audio sources (ie, cameras)
+     * @param {Function} callback receives list of {label:String, id:String, kind:"audio"}
+     * Note: the label string always seems to be the empty string if you aren't using https.
+     * Note: not supported by Firefox. 
+     * @example  easyrtc.getAudioSourceList( function(list) {
+     *               var i;
+     *               for( i = 0; i < list.length; i++ ) {
+     *                   console.log("label=" + list[i].label + ", id= " + list[i].id);
+     *               }
+     *          });
+     */
+    this.getAudioSourceList = function(callback){
+       getSourceList(callback, "audio");
+    }
+
     /**
      * Gets a list of the available video sources (ie, cameras)
      * @param {Function} callback receives list of {facing:String, label:String, id:String, kind:"video"}
@@ -283,22 +318,9 @@ var Easyrtc = function() {
      *          });
      */
     this.getVideoSourceList = function(callback) {
-        if (MediaStreamTrack.getSources) {
-            MediaStreamTrack.getSources(function(sources) {
-                var results = [];
-                for (var i = 0; i < sources.length; i++) {
-                    var source = sources[i];
-                    if (source.kind === "video") {
-                        results.push(source);
-                    }
-                }
-                callback(results);
-            });
-        }
-        else {
-            callback([]);
-        }
-    };
+       getSourceList(callback, "video");
+    }
+
     /** @private */
     var audioEnabled = true;
     /** @private */
@@ -2152,8 +2174,11 @@ var Easyrtc = function() {
      *
      */
     this.setUsername = function(username) {
-
-        if (self.isNameValid(username)) {
+        if( self.myEasyrtcid ) {
+            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "easyrtc.setUsername called after authentication");
+            return false;
+        }
+        else if (self.isNameValid(username)) {
             self.username = username;
             return true;
         }
