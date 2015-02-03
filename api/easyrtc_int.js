@@ -3845,6 +3845,16 @@ var Easyrtc = function() {
         }
         return false;
     }
+
+    /**
+      * Checks to see if a particular peer is present in any room.
+      * If it isn't, we assume it's logged out. 
+      * @param easyrtcid the easyrtcId of the peer.
+      */
+    this.isPeerInAnyRoom = function(easyrtcId) {
+         return isPeerInAnyRoom(easyrtcId);
+    }
+
     //
     //
     //
@@ -4880,9 +4890,27 @@ var Easyrtc = function() {
         var videoIdsP = videoIds;
         var refreshPane = 0;
         var onCall = null, onHangup = null;
+
         if (!videoIdsP) {
             videoIdsP = [];
         }
+
+        easyrtc.addEventListener("roomOccupants", 
+            function(eventName, eventData) {
+                for (i = 0; i < numPEOPLE; i++) {
+                    var video = getIthVideo(i);
+                    if (!videoIsFree(video)) {
+		        if( !easyrtc.isPeerInAnyRoom(video.dataset.caller)){
+                           if( onHangup ) {
+                               onHangup(i, easyrtc.dataset.caller);
+                           }
+                           easyrtc.dataset.caller = null;
+                        }
+                    }
+                }
+                console.log("saw event data", eventData);
+            }
+        );
 
         function videoIsFree(obj) {
             return (obj.dataset.caller === "" || obj.dataset.caller === null || obj.dataset.caller === undefined);
@@ -4923,6 +4951,7 @@ var Easyrtc = function() {
         self.setOnHangup = function(cb) {
             onHangup = cb;
         };
+
         function getIthVideo(i) {
             if (videoIdsP[i]) {
                 return document.getElementById(videoIdsP[i]);
@@ -4940,6 +4969,7 @@ var Easyrtc = function() {
             var vid = getIthVideo(i);
             return vid.dataset.caller;
         };
+
         self.getSlotOfCaller = function(easyrtcid) {
             var i;
             for (i = 0; i < numPEOPLE; i++) {
