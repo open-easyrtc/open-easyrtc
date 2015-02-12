@@ -39,6 +39,7 @@ one). This was a fix for issue#107.
 to report that the other peer received the offered stream.
   - JS Client - Changes to when the mediaIds (the mapping from stream names 
 to stream labels) are propagated via setRoomApiFields.
+  - JS Client - Added success/failure callbacks to addIceCandidate (and to setRemoteScriptions where missing).
 
 Fixes:
   - JS Client - Fixed EasyApp so that it doesn't continue to reserve a video slot for a peer that has left the server before the peer connection was completed.
