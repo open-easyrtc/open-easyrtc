@@ -18,6 +18,7 @@ other frameworks).
 solution to the problem of Firefox not labelling media streams, 
 it is only a crude work around that will work if your Firefox session only has one local media stream.
   - JS Client - Added iframeless screen capture code to the labs directory.
+  - JS Client - Added getAudioSourceList method as a complement to getVideoSourceList.
 
 Changes:
   - JS Client - Changed setUsername so that it complains if you call it 
