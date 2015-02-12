@@ -228,7 +228,8 @@ var Easyrtc = function() {
         INTERNAL_ERR: "INTERNAL_ERR",
         PEER_GONE: "PEER_GONE", // peer doesn't exist
         ALREADY_CONNECTED: "ALREADY_CONNECTED",
-        "BAD_CREDENTIAL": "BAD_CREDENTIAL"
+        BAD_CREDENTIAL: "BAD_CREDENTIAL",
+        ICECANDIDATE_ERR: "ICECANDIDATE_ERROR"
     };
     this.apiVersion = "1.0.12";
     /** Most basic message acknowledgment object */
@@ -3229,7 +3230,10 @@ var Easyrtc = function() {
                 sdp.sdp = sdpRemoteFilter(sdp.sdp);
             }
             var pc = peerConns[easyrtcid].pc;
-            pc.setRemoteDescription(new RTCSessionDescription(sdp));
+            pc.setRemoteDescription(new RTCSessionDescription(sdp), function(){}, 
+                    function(message) {
+                       self.showError(self.errCodes.INTERNAL_ERR, "set-remote-description: " + message);
+                    });
         }
 
     }, "__gotAddedMediaStream");
@@ -4049,7 +4053,14 @@ var Easyrtc = function() {
                 });
             }
             pc = peerConns[caller].pc;
-            pc.addIceCandidate(candidate);
+
+            function iceAddSuccess() {}
+            function iceAddFailure(domError) {
+                easyrtc.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice candidate (" + domError.name + "): " + 
+                    JSON.stringify(candidate));
+            }
+            pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
+
             if (msgData.candidate.indexOf("typ relay") > 0) {
                 var ipAddress = msgData.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/i)[1];
                 self._turnServers[ipAddress] = true;
@@ -4193,7 +4204,9 @@ var Easyrtc = function() {
                         }
                         pc.connectDataConnection(5001, 5002); // these are like ids for data channels
                     }
-                });
+                }, function(message){
+                     console.log("setRemoteDescription failed ", message);
+                 });
             } catch (smdException) {
                 console.log("setRemoteDescription failed ", smdException);
             }
@@ -4908,7 +4921,6 @@ var Easyrtc = function() {
                         }
                     }
                 }
-                console.log("saw event data", eventData);
             }
         );
 
