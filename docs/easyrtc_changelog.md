@@ -1,6 +1,62 @@
 EasyRTC: Change Log
 ===================
 
+v1.0.13
+New Features:
+  - JS Client - New function isPeerInAnyRoom() tells you whether a particular
+ peer is still in any room. This is actually exposing an internal function.
+  - JS Client - New function getNameOfRemoteStream() maps a remote stream 
+   to the name it was assigned by the peer.
+  - JS Client - New function setIceCandidateFilter() provides a hook to filter
+   ice candidates on the fly. In theory, this should make it easier to test 
+   turn servers, just filter out the candidates that don't reference the 
+   turn server ip address.
+  - JS Client - New function register3rdPartyLocalMediaStreams is used to 
+register local media streams that were created external to EasyRTC (ie, by
+other frameworks).
+  - JS Client - Stream names are now faked on Firefox. This is not a real 
+solution to the problem of Firefox not labelling media streams, 
+it is only a crude work around that will work if your Firefox session only has one local media stream.
+  - JS Client - Added iframeless screen capture code to the labs directory.
+  - JS Client - Added getAudioSourceList method as a complement to getVideoSourceList.
+
+Changes:
+  - JS Client - Changed setUsername so that it complains if you call it 
+after authenticating.  This was done to make it more clear about when it was legal to call it.
+  - JS Client - Added code to clear room data and your own easyrtcid on disconnecting from a server.  This was done to reduce confusion for applications that disconnected and reconnected.
+  - JS Client - Updated the getPeerStatistics support for Firefox to take advantages of new fields that Firefox offers.
+  - JS Client - Added *BytesSend and *BytesReceived fields to the peer statistics filters to support the ability to report bps rates.
+  - JS Client - Added some support for the event "negotiationneeded". This 
+should be transparent to developers. With thanks to Christophe Eyrignoux.
+  - JS Client - Added code to remove information about a room after it has 
+been exited.
+  - JS Client - Added a connection options parameter to setSocketUrl. The 
+default connection options now include a connect timeout of 10 seconds and
+a directive to always allocated a new connection (rather than reusing an old
+one). This was a fix for issue#107.
+  - JS Client - Added some extra controls to the demo_audio_video demo.
+  - JS Client - Added an extra callback parameter to the addStreamToCall method
+to report that the other peer received the offered stream.
+  - JS Client - Changes to when the mediaIds (the mapping from stream names 
+to stream labels) are propagated via setRoomApiFields.
+  - JS Client - Added success/failure callbacks to addIceCandidate (and to setRemoteScriptions where missing).
+
+Fixes:
+  - JS Client - Fixed EasyApp so that it doesn't continue to reserve a video slot for a peer that has left the server before the peer connection was completed.
+  - JS Client - Fixed a typo in setting the SDP filters.
+  - JS Client - Fixed a problem that prevented the composition of new media streams (issue #110).
+  - JS Client - Fixes for problems in closing remote media streams.
+  - JS Client - Fixed a problem encountered when processing WebRTC answers (with thanks to Fabian Bernhard).
+  - JS Client - Added a bugfix to the filesharing demo, supplied by vendredi67.
+  - JS Client - Fixed a bug in the JSocs for setAcceptChecker.
+  - JS Client - Added aggregating timers to compress a bunch of roomOccupant
+ events that occur in a short span into a single event so that UI don't need to
+ update as frequently as they would otherwise.
+  - JS Client - If you call getPeerStatistics for a peer that isn't associated
+with a peer connection, you'll get a more useful object being passed to
+your callback now.
+
+
 v1.0.12
 -------
 

@@ -29,13 +29,13 @@ var otherEasyrtcid = null;
 
 
 function disable(domId) {
-    console.log("about to try disabling "  +domId);
+    console.log("about to try disabling " + domId);
     document.getElementById(domId).disabled = "disabled";
 }
 
 
 function enable(domId) {
-    console.log("about to try enabling "  +domId);
+    console.log("about to try enabling " + domId);
     document.getElementById(domId).disabled = "";
 }
 
@@ -61,7 +61,7 @@ function addMediaStreamToDiv(divId, stream, streamName)
     var video = document.createElement("video");
     video.width = 320;
     video.height = 240;
-    video.style.verticalAlign= "middle";
+    video.style.verticalAlign = "middle";
     container.appendChild(video);
     document.getElementById(divId).appendChild(container);
     video.autoplay = true;
@@ -80,8 +80,6 @@ function createLocalVideo(stream, streamName) {
         labelBlock.parentNode.parentNode.removeChild(labelBlock.parentNode);
     }
     labelBlock.appendChild(closeButton);
-
-    console.log("created local video, stream.streamName = " + stream.streamName);
 }
 
 function addSrcButton(buttonLabel, videoId) {
@@ -91,10 +89,8 @@ function addSrcButton(buttonLabel, videoId) {
         easyrtc.initMediaSource(
                 function(stream) {
                     createLocalVideo(stream, buttonLabel);
-                    if( otherEasyrtcid) {
-                        easyrtc.addStreamToCall(otherEasyrtcid, buttonLabel, function(easyrtcid, streamName){
-                            easyrtc.showError("Informational", "other party " + easyrtcid + " acknowledges receiving " + streamName);
-                        });
+                    if (otherEasyrtcid) {
+                        easyrtc.addStreamToCall(otherEasyrtcid, buttonLabel);
                     }
                 },
                 function(errCode, errText) {
@@ -108,38 +104,37 @@ function connect() {
     easyrtc.setRoomOccupantListener(convertListToButtons);
     easyrtc.connect("easyrtc.multistream", loginSuccess, loginFailure);
     easyrtc.setAutoInitUserMedia(false);
+
     easyrtc.getVideoSourceList(function(videoSrcList) {
         for (var i = 0; i < videoSrcList.length; i++) {
-             var videoEle = videoSrcList[i];
-            var videoLabel = (videoSrcList[i].label &&videoSrcList[i].label.length > 0)?
-			(videoSrcList[i].label):("src_" + i);
+            var videoEle = videoSrcList[i];
+            var videoLabel = (videoSrcList[i].label && videoSrcList[i].label.length > 0) ?
+                    (videoSrcList[i].label) : ("src_" + i);
             addSrcButton(videoLabel, videoSrcList[i].id);
         }
-        //
-        // add an extra button for screen sharing
-        //
-        var screenShareButton = createLabelledButton("Screen capture/share");
-        var numScreens = 0;
-        if (!chrome.desktopCapture) {
-            screenShareButton.disabled = true;
-        }
-        else {
-            screenShareButton.onclick = function() {
-                numScreens++;
-                var streamName = "screen" + numScreens;
-                easyrtc.initScreenCapture(
-                        function(stream) {
-                            createLocalVideo(stream, streamName);
-                            if( otherEasyrtcid) {
-                                easyrtc.addStreamToCall(otherEasyrtcid, "screen");
-                            }
-                        },
-                        function(errCode, errText) {
-                            easyrtc.showError(errCode, errText);
-                        }, streamName);
-            };
-        }
     });
+    //
+    // add an extra button for screen sharing
+    //
+    var screenShareButton = createLabelledButton("Desktop capture/share");
+    var numScreens = 0;
+
+    screenShareButton.onclick = function() {
+        numScreens++;
+        var streamName = "screen" + numScreens;
+        easyrtc.initDesktopStream(
+                function(stream) {
+                    createLocalVideo(stream, streamName);
+                    if (otherEasyrtcid) {
+                        easyrtc.addStreamToCall(otherEasyrtcid, streamName);
+                    }
+                },
+                function(errCode, errText) {
+                    easyrtc.showError(errCode, errText);
+                },
+                streamName);
+    };
+
 }
 
 
@@ -225,8 +220,10 @@ function disconnect() {
 easyrtc.setStreamAcceptor(function(easyrtcid, stream, streamName) {
     var labelBlock = addMediaStreamToDiv("remoteVideos", stream, streamName);
     labelBlock.parentNode.id = "remoteBlock" + easyrtcid + streamName;
+
     console.log("accepted incoming stream with name " + stream.streamName);
     console.log("checking incoming " + easyrtc.getNameOfRemoteStream(easyrtcid, stream));
+
 });
 
 
@@ -253,3 +250,16 @@ easyrtc.setAcceptChecker(function(easyrtcid, callback) {
     }
     callback(true, easyrtc.getLocalMediaIds());
 });
+
+var mypluginId = "tawk-desktop-capture/bemabaogbdfpbkkganibcmhbgjogabfj";
+
+setTimeout(
+     function() {
+         document.getElementById("pluginstatus").innerHTML = easyrtc.isDesktopCaptureInstalled()
+             ?"Desktop capture ready"
+             :"Desktop capture not installed";
+     }, 3000);
+
+document.getElementById("installPluginButton").onclick = function() {
+chrome.webstore.install();
+};

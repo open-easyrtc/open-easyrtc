@@ -1,5 +1,5 @@
 /** @class
- *@version 1.0.12
+ *@version 1.0.13
  *<p>
  * Provides support file and data transfer support to easyrtc.
  * </p>
@@ -267,7 +267,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
                 return;
             }
             else {
-                curFile = filesBeingSent.pop();
+                curFile = filesBeingSent.shift();
                 progressListener({status: "started_file", name: curFile.name});
                 curFileSize = curFile.size;
                 positionAcked = 0;
@@ -338,13 +338,13 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         haveFilesWaiting = false;
         if (filesWaiting.length > 0) {
             setTimeout(function() {
-                var fileset = filesWaiting.pop();
+                var fileset = filesWaiting.shift();
                 sendFilesOffer(fileset.files, fileset.areBinary);
             }, 240);
         }
     }
-    
-    
+
+
     function sendFilesOffer(files, areBinary) {
         if (haveFilesWaiting) {
             filesWaiting.push({files: files, areBinary: areBinary});
