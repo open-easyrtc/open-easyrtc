@@ -1,5 +1,5 @@
 /** @class
- *@version 1.0.12 beta
+ *@version 1.0.13
  *<p>
  * Provides client side support for the EasyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
@@ -228,9 +228,10 @@ var Easyrtc = function() {
         INTERNAL_ERR: "INTERNAL_ERR",
         PEER_GONE: "PEER_GONE", // peer doesn't exist
         ALREADY_CONNECTED: "ALREADY_CONNECTED",
-        "BAD_CREDENTIAL": "BAD_CREDENTIAL"
+        BAD_CREDENTIAL: "BAD_CREDENTIAL",
+        ICECANDIDATE_ERR: "ICECANDIDATE_ERROR"
     };
-    this.apiVersion = "1.0.12";
+    this.apiVersion = "1.0.13";
     /** Most basic message acknowledgment object */
     this.ackMessage = {msgType: "ack"};
     /** Regular expression pattern for user ids. This will need modification to support non US character sets */
@@ -270,6 +271,41 @@ var Easyrtc = function() {
     this.enableVideoReceive = function(value) {
         receivedMediaContraints.mandatory.OfferToReceiveVideo = value;
     };
+
+    function getSourceList(callback, sourceType) {
+        if (MediaStreamTrack.getSources) {
+            MediaStreamTrack.getSources(function(sources) {
+                var results = [];
+                for (var i = 0; i < sources.length; i++) {
+                    var source = sources[i];
+                    if (source.kind == sourceType) {
+                        results.push(source);
+                    }
+                }
+                callback(results);
+            });
+        }
+        else {
+            callback([]);
+        }
+    }
+
+    /**
+     * Gets a list of the available audio sources (ie, cameras)
+     * @param {Function} callback receives list of {label:String, id:String, kind:"audio"}
+     * Note: the label string always seems to be the empty string if you aren't using https.
+     * Note: not supported by Firefox. 
+     * @example  easyrtc.getAudioSourceList( function(list) {
+     *               var i;
+     *               for( i = 0; i < list.length; i++ ) {
+     *                   console.log("label=" + list[i].label + ", id= " + list[i].id);
+     *               }
+     *          });
+     */
+    this.getAudioSourceList = function(callback){
+       getSourceList(callback, "audio");
+    }
+
     /**
      * Gets a list of the available video sources (ie, cameras)
      * @param {Function} callback receives list of {facing:String, label:String, id:String, kind:"video"}
@@ -283,22 +319,9 @@ var Easyrtc = function() {
      *          });
      */
     this.getVideoSourceList = function(callback) {
-        if (MediaStreamTrack.getSources) {
-            MediaStreamTrack.getSources(function(sources) {
-                var results = [];
-                for (var i = 0; i < sources.length; i++) {
-                    var source = sources[i];
-                    if (source.kind === "video") {
-                        results.push(source);
-                    }
-                }
-                callback(results);
-            });
-        }
-        else {
-            callback([]);
-        }
-    };
+       getSourceList(callback, "video");
+    }
+
     /** @private */
     var audioEnabled = true;
     /** @private */
@@ -749,9 +772,9 @@ var Easyrtc = function() {
     /**
      * This function gets the statistics for a particular peer connection.
      * @param {String} peerId
-     * @param {String} callback gets a map of {userDefinedKey: value}. If there is no peer connection to peerId, then this will
+     * @param {Function} callback gets the peerid and a map of {userDefinedKey: value}. If there is no peer connection to peerId, then the map will
      *  have a value of {connected:false}. 
-     * @param {String} filter has is a map of maps of the form {reportNum:{googleKey: userDefinedKey}}
+     * @param {Object} filter depends on whether Chrome or Firefox is used. See the default filters for guidance.
      * It is still experimental.
      */
     this.getPeerStatistics = function(peerId, callback, filter) {
@@ -764,17 +787,20 @@ var Easyrtc = function() {
     };
     this.getFirefoxPeerStatistics = function(peerId, callback, filter) {
 
+
         if (!peerConns[peerId]) {
             callback(peerId, {"connected": false});
         }
         else if (peerConns[peerId].pc.getStats) {
             peerConns[peerId].pc.getStats(null, function(stats) {
                 var items = {};
+                var candidates = {};
+                var activeId = null;
                 var srcKey;
                 //
-                // the stats objects has a group of entries. Each entry is either an rtp entry
-                // or a candidate entry. the candidate entries don't tend to have interesting information
-                // in them so we filter them out.
+                // the stats objects has a group of entries. Each entry is either an rtcp, rtp entry
+                // or a candidate entry. 
+                //
                 stats.forEach(function(entry) {
                     var majorKey;
                     var subKey;
@@ -788,14 +814,28 @@ var Easyrtc = function() {
                         else {
                             return;
                         }
-
                         for (subKey in entry) {
                             if (entry.hasOwnProperty(subKey)) {
                                 items[majorKey + "." + subKey] = entry[subKey];
                             }
                         }
                     }
+                    else {
+                        if( entry.hasOwnProperty("ipAddress") && entry.hasOwnProperty("id")) {
+                            candidates[entry.id] = entry.ipAddress + ":" + 
+                                  entry.portNumber;
+                        }
+                        else if( entry.hasOwnProperty("selected") && 
+                                 entry.hasOwnProperty("remoteCandidateId") && 
+                                 entry.selected ) {
+                            activeId =  entry.remoteCandidateId;
+                        } 
+                    }
                 });
+
+                if( activeId ) {
+                    items["firefoxRemoteAddress"] = candidates[activeId];
+                }
                 if (!filter) {
                     callback(peerId, items);
                 }
@@ -967,21 +1007,25 @@ var Easyrtc = function() {
         {
             "googCodecName": "audioCodec",
             "googTypingNoiseState": "typingNoise",
-            "packetsSent": "audioPacketsSent"
+            "packetsSent": "audioPacketsSent",
+            "bytesSent": "audioBytesSent"
         },
         {
             "googCodecName": "videoCodec",
             "googFrameRateSent": "outFrameRate",
-            "packetsSent": "videoPacketsSent"
+            "packetsSent": "videoPacketsSent",
+            "bytesSent": "videoBytesSent"
         },
         {
             "packetsLost": "videoPacketsLost",
             "packetsReceived": "videoPacketsReceived",
+            "bytesReceived": "videoBytesReceived",
             "googFrameRateOutput": "frameRateOut"
         },
         {
             "packetsLost": "audioPacketsLost",
             "packetsReceived": "audioPacketsReceived",
+            "bytesReceived": "audioBytesReceived",
             "audioOutputLevel": "audioOutputLevel"
         },
         {
@@ -993,10 +1037,17 @@ var Easyrtc = function() {
         }
     ];
     this.firefoxStatsFilter = {
+        "outboundrtp_audio.bytesSent": "audioBytesSent",
+        "outboundrtp_video.bytesSent": "videoBytesSent",
+        "inboundrtp_video.bytesReceived": "videoBytesReceived",
+        "inboundrtp_audio.bytesReceived": "audioBytesReceived",
         "outboundrtp_audio.packetsSent": "audioPacketsSent",
         "outboundrtp_video.packetsSent": "videoPacketsSent",
         "inboundrtp_video.packetsReceived": "videoPacketsReceived",
-        "inboundrtp_audio.packetsReceived": "audioPacketsReceived"
+        "inboundrtp_audio.packetsReceived": "audioPacketsReceived",
+        "inboundrtp_video.packetsLost": "videoPacketsLost",
+        "inboundrtp_audio.packetsLost": "audioPacketsLost",
+        "firefoxRemoteAddress": "remoteAddress"
     };
     this.standardStatsFilter = isFirefox ? self.firefoxStatsFilter : self.chromeStatsFilter;
     /** Provide a set of application defined fields that will be part of this instances
@@ -2124,8 +2175,11 @@ var Easyrtc = function() {
      *
      */
     this.setUsername = function(username) {
-
-        if (self.isNameValid(username)) {
+        if( self.myEasyrtcid ) {
+            easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "easyrtc.setUsername called after authentication");
+            return false;
+        }
+        else if (self.isNameValid(username)) {
             self.username = username;
             return true;
         }
@@ -3176,7 +3230,10 @@ var Easyrtc = function() {
                 sdp.sdp = sdpRemoteFilter(sdp.sdp);
             }
             var pc = peerConns[easyrtcid].pc;
-            pc.setRemoteDescription(new RTCSessionDescription(sdp));
+            pc.setRemoteDescription(new RTCSessionDescription(sdp), function(){}, 
+                    function(message) {
+                       self.showError(self.errCodes.INTERNAL_ERR, "set-remote-description: " + message);
+                    });
         }
 
     }, "__gotAddedMediaStream");
@@ -3792,6 +3849,16 @@ var Easyrtc = function() {
         }
         return false;
     }
+
+    /**
+      * Checks to see if a particular peer is present in any room.
+      * If it isn't, we assume it's logged out. 
+      * @param easyrtcid the easyrtcId of the peer.
+      */
+    this.isPeerInAnyRoom = function(easyrtcId) {
+         return isPeerInAnyRoom(easyrtcId);
+    }
+
     //
     //
     //
@@ -3986,7 +4053,14 @@ var Easyrtc = function() {
                 });
             }
             pc = peerConns[caller].pc;
-            pc.addIceCandidate(candidate);
+
+            function iceAddSuccess() {}
+            function iceAddFailure(domError) {
+                easyrtc.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice candidate (" + domError.name + "): " + 
+                    JSON.stringify(candidate));
+            }
+            pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
+
             if (msgData.candidate.indexOf("typ relay") > 0) {
                 var ipAddress = msgData.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/i)[1];
                 self._turnServers[ipAddress] = true;
@@ -4130,7 +4204,9 @@ var Easyrtc = function() {
                         }
                         pc.connectDataConnection(5001, 5002); // these are like ids for data channels
                     }
-                });
+                }, function(message){
+                     console.log("setRemoteDescription failed ", message);
+                 });
             } catch (smdException) {
                 console.log("setRemoteDescription failed ", smdException);
             }
@@ -4827,9 +4903,26 @@ var Easyrtc = function() {
         var videoIdsP = videoIds;
         var refreshPane = 0;
         var onCall = null, onHangup = null;
+
         if (!videoIdsP) {
             videoIdsP = [];
         }
+
+        easyrtc.addEventListener("roomOccupants", 
+            function(eventName, eventData) {
+                for (i = 0; i < numPEOPLE; i++) {
+                    var video = getIthVideo(i);
+                    if (!videoIsFree(video)) {
+		        if( !easyrtc.isPeerInAnyRoom(video.dataset.caller)){
+                           if( onHangup ) {
+                               onHangup(i, easyrtc.dataset.caller);
+                           }
+                           easyrtc.dataset.caller = null;
+                        }
+                    }
+                }
+            }
+        );
 
         function videoIsFree(obj) {
             return (obj.dataset.caller === "" || obj.dataset.caller === null || obj.dataset.caller === undefined);
@@ -4870,6 +4963,7 @@ var Easyrtc = function() {
         self.setOnHangup = function(cb) {
             onHangup = cb;
         };
+
         function getIthVideo(i) {
             if (videoIdsP[i]) {
                 return document.getElementById(videoIdsP[i]);
@@ -4887,6 +4981,7 @@ var Easyrtc = function() {
             var vid = getIthVideo(i);
             return vid.dataset.caller;
         };
+
         self.getSlotOfCaller = function(easyrtcid) {
             var i;
             for (i = 0; i < numPEOPLE; i++) {
