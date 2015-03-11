@@ -5073,6 +5073,7 @@ var Easyrtc = function() {
         var videoIdsP = videoIds;
         var refreshPane = 0;
         var onCall = null, onHangup = null;
+        var videoToEasyrtcId = {};
 
         if (!videoIdsP) {
             videoIdsP = [];
@@ -5083,11 +5084,11 @@ var Easyrtc = function() {
                 for (i = 0; i < numPEOPLE; i++) {
                     var video = getIthVideo(i);
                     if (!videoIsFree(video)) {
-		        if( !easyrtc.isPeerInAnyRoom(video.dataset.caller)){
+		        if( !easyrtc.isPeerInAnyRoom(videoToEasyrtcId[video.id])){
                            if( onHangup ) {
-                               onHangup(i, easyrtc.dataset.caller);
+                               onHangup(i, videoToEasyrtcId[video.id]);
                            }
-                           easyrtc.dataset.caller = null;
+                           videoToEasyrtcId[video.id] = null;
                         }
                     }
                 }
@@ -5096,7 +5097,9 @@ var Easyrtc = function() {
         );
 
         function videoIsFree(obj) {
-            return (obj.dataset.caller === "" || obj.dataset.caller === null || obj.dataset.caller === undefined);
+            return (videoToEasyrtcId[obj.id] === "" || 
+                    videoToEasyrtcId[obj.id] === null || 
+                    videoToEasyrtcId[obj.id] === undefined);
         }
 
         if (!_validateVideoIds(monitorVideoId, videoIdsP)) {
@@ -5150,7 +5153,7 @@ var Easyrtc = function() {
                 return null;
             }
             var vid = getIthVideo(i);
-            return vid.dataset.caller;
+            return videoToEasyrtcId[vid.id];
         };
 
         self.getSlotOfCaller = function(easyrtcid) {
@@ -5171,9 +5174,9 @@ var Easyrtc = function() {
             var i;
             for (i = 0; i < numPEOPLE; i++) {
                 var video = getIthVideo(i);
-                if (video.dataset.caller === caller) {
+                if (videoToEasyrtcId[video.id] === caller) {
                     hideVideo(video);
-                    video.dataset.caller = "";
+                    videoToEasyrtcId[video.id] = "";
                     if (onHangup) {
                         onHangup(caller, i);
                     }
@@ -5218,7 +5221,7 @@ var Easyrtc = function() {
             }
             for (i = 0; i < numPEOPLE; i++) {
                 video = getIthVideo(i);
-                if (video.dataset.caller === caller) {
+                if (videoToEasyrtcId[video.id] === caller) {
                     showVideo(video, stream);
                     if (onCall) {
                         onCall(caller, i);
@@ -5229,8 +5232,8 @@ var Easyrtc = function() {
 
             for (i = 0; i < numPEOPLE; i++) {
                 video = getIthVideo(i);
-                if (!video.dataset.caller || videoIsFree(video)) {
-                    video.dataset.caller = caller;
+                if (!videoToEasyrtcId[video.id] || videoIsFree(video)) {
+                    videoToEasyrtcId[video.id] = caller;
                     if (onCall) {
                         onCall(caller, i);
                     }
@@ -5243,13 +5246,13 @@ var Easyrtc = function() {
 //
             video = getIthVideo(0);
             if (video) {
-                self.hangup(video.dataset.caller);
+                self.hangup(videoToEasyrtcId[video.id]);
                 showVideo(video, stream);
                 if (onCall) {
                     onCall(caller, 0);
                 }
             }
-            video.dataset.caller = caller;
+            videoToEasyrtcId[video.id] = caller;
         });
         (function() {
             var addControls, parentDiv, closeButton, i;
@@ -5257,14 +5260,14 @@ var Easyrtc = function() {
 
                 addControls = function(video) {
                     parentDiv = video.parentNode;
-                    video.dataset.caller = "";
+                    videoToEasyrtcId[video.id] = "";
                     closeButton = document.createElement("div");
                     closeButton.className = "easyrtc_closeButton";
                     closeButton.onclick = function() {
-                        if (video.dataset.caller) {
-                            self.hangup(video.dataset.caller);
+                        if (videoToEasyrtcId[video.id]) {
+                            self.hangup(videoToEasyrtcId[video.id]);
                             hideVideo(video);
-                            video.dataset.caller = "";
+                            videoToEasyrtcId[video.id] = "";
                         }
                     };
                     parentDiv.appendChild(closeButton);
