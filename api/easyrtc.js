@@ -4126,7 +4126,7 @@ var Easyrtc = function() {
     //
     function processOccupantList(roomName, occupantList) {
         var myInfo = null;
-        self.reducedList = {};
+        var reducedList = {};
         var id;
         for (id in occupantList) {
             if (occupantList.hasOwnProperty(id)) {
@@ -4134,7 +4134,7 @@ var Easyrtc = function() {
                     myInfo = occupantList[id];
                 }
                 else {
-                    self.reducedList[id] = occupantList[id];
+                    reducedList[id] = occupantList[id];
                 }
             }
         }
@@ -4142,17 +4142,19 @@ var Easyrtc = function() {
         // processLostPeers detects peers that have gone away and performs
         // house keeping accordingly.
         //
-        processLostPeers(self.reducedList);
+        processLostPeers(reducedList);
         //
         //
-        //
-        addAggregatingTimer("roomOccupants&" + roomName, function(){
-            if (roomOccupantListener) {
-                roomOccupantListener(roomName, self.reducedList, myInfo);
-            }
-            self.emitEvent("roomOccupants", {roomName:roomName, occupants:lastLoggedInList});
-        }, 100);
-
+        addAggregatingTimer("roomOccupants&" + roomName, 
+         function(roomName, reducedList, myInfo){
+           return function() {
+              if (roomOccupantListener) {
+                  roomOccupantListener(roomName, reducedList, myInfo);
+              }
+              self.emitEvent("roomOccupants", 
+                 {roomName:roomName, occupants:reducedList, self:myInfo});
+           }
+        }(roomName, reducedList, myInfo), 100);
     }
 
     function sendQueuedCandidates(peer, onSignalSuccess, onSignalFailure) {
