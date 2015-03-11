@@ -1,5 +1,5 @@
 /** @class
- *@version 1.0.13
+ *@version 1.0.12 beta
  *<p>
  * Provides client side support for the EasyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
@@ -228,10 +228,9 @@ var Easyrtc = function() {
         INTERNAL_ERR: "INTERNAL_ERR",
         PEER_GONE: "PEER_GONE", // peer doesn't exist
         ALREADY_CONNECTED: "ALREADY_CONNECTED",
-        BAD_CREDENTIAL: "BAD_CREDENTIAL",
-        ICECANDIDATE_ERR: "ICECANDIDATE_ERROR"
+        "BAD_CREDENTIAL": "BAD_CREDENTIAL"
     };
-    this.apiVersion = "1.0.13";
+    this.apiVersion = "1.0.12";
     /** Most basic message acknowledgment object */
     this.ackMessage = {msgType: "ack"};
     /** Regular expression pattern for user ids. This will need modification to support non US character sets */
@@ -3230,10 +3229,7 @@ var Easyrtc = function() {
                 sdp.sdp = sdpRemoteFilter(sdp.sdp);
             }
             var pc = peerConns[easyrtcid].pc;
-            pc.setRemoteDescription(new RTCSessionDescription(sdp), function(){}, 
-                    function(message) {
-                       self.showError(self.errCodes.INTERNAL_ERR, "set-remote-description: " + message);
-                    });
+            pc.setRemoteDescription(new RTCSessionDescription(sdp));
         }
 
     }, "__gotAddedMediaStream");
@@ -4053,14 +4049,7 @@ var Easyrtc = function() {
                 });
             }
             pc = peerConns[caller].pc;
-
-            function iceAddSuccess() {}
-            function iceAddFailure(domError) {
-                easyrtc.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice candidate (" + domError.name + "): " + 
-                    JSON.stringify(candidate));
-            }
-            pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
-
+            pc.addIceCandidate(candidate);
             if (msgData.candidate.indexOf("typ relay") > 0) {
                 var ipAddress = msgData.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/i)[1];
                 self._turnServers[ipAddress] = true;
@@ -4204,9 +4193,7 @@ var Easyrtc = function() {
                         }
                         pc.connectDataConnection(5001, 5002); // these are like ids for data channels
                     }
-                }, function(message){
-                     console.log("setRemoteDescription failed ", message);
-                 });
+                });
             } catch (smdException) {
                 console.log("setRemoteDescription failed ", smdException);
             }
@@ -4903,6 +4890,7 @@ var Easyrtc = function() {
         var videoIdsP = videoIds;
         var refreshPane = 0;
         var onCall = null, onHangup = null;
+        var videoToEasyrtcId = {};
 
         if (!videoIdsP) {
             videoIdsP = [];
@@ -4913,19 +4901,22 @@ var Easyrtc = function() {
                 for (i = 0; i < numPEOPLE; i++) {
                     var video = getIthVideo(i);
                     if (!videoIsFree(video)) {
-		        if( !easyrtc.isPeerInAnyRoom(video.dataset.caller)){
+		        if( !easyrtc.isPeerInAnyRoom(videoToEasyrtcId[video.id])){
                            if( onHangup ) {
-                               onHangup(i, easyrtc.dataset.caller);
+                               onHangup(i, videoToEasyrtcId[video.id]);
                            }
-                           easyrtc.dataset.caller = null;
+                           videoToEasyrtcId[video.id] = null;
                         }
                     }
                 }
+                console.log("saw event data", eventData);
             }
         );
 
         function videoIsFree(obj) {
-            return (obj.dataset.caller === "" || obj.dataset.caller === null || obj.dataset.caller === undefined);
+            return (videoToEasyrtcId[obj.id] === "" || 
+                    videoToEasyrtcId[obj.id] === null || 
+                    videoToEasyrtcId[obj.id] === undefined);
         }
 
         if (!_validateVideoIds(monitorVideoId, videoIdsP)) {
@@ -4979,7 +4970,7 @@ var Easyrtc = function() {
                 return null;
             }
             var vid = getIthVideo(i);
-            return vid.dataset.caller;
+            return videoToEasyrtcId[vid.id];
         };
 
         self.getSlotOfCaller = function(easyrtcid) {
@@ -5000,9 +4991,9 @@ var Easyrtc = function() {
             var i;
             for (i = 0; i < numPEOPLE; i++) {
                 var video = getIthVideo(i);
-                if (video.dataset.caller === caller) {
+                if (videoToEasyrtcId[video.id] === caller) {
                     hideVideo(video);
-                    video.dataset.caller = "";
+                    videoToEasyrtcId[video.id] = "";
                     if (onHangup) {
                         onHangup(caller, i);
                     }
@@ -5047,7 +5038,7 @@ var Easyrtc = function() {
             }
             for (i = 0; i < numPEOPLE; i++) {
                 video = getIthVideo(i);
-                if (video.dataset.caller === caller) {
+                if (videoToEasyrtcId[video.id] === caller) {
                     showVideo(video, stream);
                     if (onCall) {
                         onCall(caller, i);
@@ -5058,8 +5049,8 @@ var Easyrtc = function() {
 
             for (i = 0; i < numPEOPLE; i++) {
                 video = getIthVideo(i);
-                if (!video.dataset.caller || videoIsFree(video)) {
-                    video.dataset.caller = caller;
+                if (!videoToEasyrtcId[video.id] || videoIsFree(video)) {
+                    videoToEasyrtcId[video.id] = caller;
                     if (onCall) {
                         onCall(caller, i);
                     }
@@ -5072,13 +5063,13 @@ var Easyrtc = function() {
 //
             video = getIthVideo(0);
             if (video) {
-                self.hangup(video.dataset.caller);
+                self.hangup(videoToEasyrtcId[video.id]);
                 showVideo(video, stream);
                 if (onCall) {
                     onCall(caller, 0);
                 }
             }
-            video.dataset.caller = caller;
+            videoToEasyrtcId[video.id] = caller;
         });
         (function() {
             var addControls, parentDiv, closeButton, i;
@@ -5086,14 +5077,14 @@ var Easyrtc = function() {
 
                 addControls = function(video) {
                     parentDiv = video.parentNode;
-                    video.dataset.caller = "";
+                    videoToEasyrtcId[video.id] = "";
                     closeButton = document.createElement("div");
                     closeButton.className = "easyrtc_closeButton";
                     closeButton.onclick = function() {
-                        if (video.dataset.caller) {
-                            self.hangup(video.dataset.caller);
+                        if (videoToEasyrtcId[video.id]) {
+                            self.hangup(videoToEasyrtcId[video.id]);
                             hideVideo(video);
-                            video.dataset.caller = "";
+                            videoToEasyrtcId[video.id] = "";
                         }
                     };
                     parentDiv.appendChild(closeButton);
