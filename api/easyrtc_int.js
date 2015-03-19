@@ -2961,7 +2961,7 @@ var Easyrtc = function() {
             }
             var sendOffer = function() {
 
-                sendSignalling(otherUser, "offer", sessionDescription, null, callFailureCB);
+                sendSignalling(otherUser, "offer", {sdp:sessionDescription.sdp,type:sessionDescription.type}, null, callFailureCB);
             };
             if (sdpLocalFilter) {
                 sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
@@ -3176,7 +3176,7 @@ var Easyrtc = function() {
                        self.showError(errorCode, errorText);
                    }
    
-                   sendSignalling(easyrtcid, "answer", sessionDescription,
+                   sendSignalling(easyrtcid, "answer", {sdp:sessionDescription.sdp, type:sessionDescription.type},
                            onSignalSuccess, onSignalFailure);
                    peerConns[easyrtcid].connectionAccepted = true;
                    sendQueuedCandidates(easyrtcid, onSignalSuccess, onSignalFailure);
@@ -3700,7 +3700,7 @@ var Easyrtc = function() {
                     self.showError(errorCode, errorText);
                 }
 
-                sendSignalling(caller, "answer", sessionDescription,
+                sendSignalling(caller, "answer", {sdp:sessionDescription.sdp, type:sessionDescription.type},
                         onSignalSuccess, onSignalFailure);
                 peerConns[caller].connectionAccepted = true;
                 sendQueuedCandidates(caller, onSignalSuccess, onSignalFailure);
