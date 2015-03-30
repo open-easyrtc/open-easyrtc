@@ -5248,7 +5248,7 @@ var Easyrtc = function() {
             self.showError("Developer error", "Your HTML has not included the socket.io.js library");
         }
 
-        if (!preallocatedSocketIo && socketIsConnected(self.webSocket)){
+        if (!preallocatedSocketIo && isSocketConnected(self.webSocket)){
             console.error("Developer error: attempt to connect when already connected to socket server");
             return;
         }
