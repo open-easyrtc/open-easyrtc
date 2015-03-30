@@ -261,6 +261,17 @@ var Easyrtc = function() {
       iceCandidateFilter = filter;
    }
 
+   /**
+    * This function checks if a socket is actually connected.
+    * @param {Object} socket a socket.io socket.
+    * @return true if the socket exists and is connected, false otherwise.
+   */
+   function isSocketConnected(socket) {
+      return (socket && 
+             ( ( socket.socket && socket.socket.connected)
+               || socket.connected )); 
+   }
+
     /**
      * Controls whether a default local media stream should be acquired automatically during calls and accepts
      * if a list of streamNames is not supplied. The default is true, which mimicks the behaviour of earlier releases
@@ -4487,7 +4498,7 @@ var Easyrtc = function() {
                     //
                     // socket.io version 1 got rid of the socket member, moving everything up one level.
                     //
-                    if (self.webSocket.connected || (self.webSocket.socket && self.webSocket.socket.connected)) {
+                    if (isSocketConnected(self.webSocket)) {
                         self.showError(self.errCodes.SIGNAL_ERROR, self.getConstantString("miscSignalError"));
                     }
                     else {
@@ -4517,7 +4528,11 @@ var Easyrtc = function() {
                 errorCallback(self.errCodes.SIGNAL_ERROR, self.getConstantString("icf"));
             }
         }
-        if (preallocatedSocketIo && preallocatedSocketIo.socket.connected) {
+        //
+        // the following logic is to deal with the different structure of
+        // socket.io version 0.9 and version 1.*
+        //
+        if (isSocketConnected(preallocatedSocketIo)) {
             connectHandler(null);
         }
         else {
@@ -5416,7 +5431,7 @@ var Easyrtc = function() {
             self.showError("Developer error", "Your HTML has not included the socket.io.js library");
         }
 
-        if (!preallocatedSocketIo && self.webSocket) {
+        if (!preallocatedSocketIo && socketIsConnected(self.webSocket)){
             console.error("Developer error: attempt to connect when already connected to socket server");
             return;
         }
