@@ -41,14 +41,7 @@ function connect() {
   easyrtc.enableVideo(document.getElementById("shareVideo").checked);
   easyrtc.enableDataChannels(true);
   easyrtc.setRoomOccupantListener( convertListToButtons);    
-  easyrtc.initMediaSource(
-		  function(){        // success callback
-			  var selfVideo = document.getElementById("selfVideo");			
-			  easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());			 
-			  easyrtc.connect("easyrtc.audioVideo", loginSuccess, loginFailure);			  
-		  },
-		  loginFailure
-	);
+  easyrtc.connect("easyrtc.audioVideo", loginSuccess, loginFailure);			  
 } 
 
 
@@ -103,7 +96,9 @@ function performCall(otherEasyrtcid) {
     };
 
     var successCB = function() {
-        setUpMirror();
+        if( easyrtc.getLocalStream()) {
+            setUpMirror();
+        }
         enable('hangupButton');
     };
     var failureCB = function() {
