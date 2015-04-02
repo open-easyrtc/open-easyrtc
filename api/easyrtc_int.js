@@ -4670,6 +4670,10 @@ var Easyrtc = function() {
         if (!window.createIceServer) {
             return;
         }
+        if( !iceConfig || !iceConfig.iceServers || 
+             iceConfig.iceServers.length === undefined ) {
+           self.showError(self.errCodes.DEVELOPER_ERR, "iceConfig received from server didn't have an array called iceServers, ignoring it");
+        }
         for (i = 0; i < iceConfig.iceServers.length; i++) {
             item = iceConfig.iceServers[i];
             if (item.url.indexOf('turn:') === 0) {
@@ -4677,7 +4681,7 @@ var Easyrtc = function() {
                     fixedItem = createIceServer(item.url, item.username, item.credential);
                 }
                 else {
-                    self.showError("Developer error", "Iceserver entry doesn't have a username: " + JSON.stringify(item));
+                    self.showError(self.errCodes.DEVELOPER_ERR, "Iceserver entry doesn't have a username: " + JSON.stringify(item));
                 }
                 ipAddress = item.url.split(/[@:&]/g)[1];
                 self._turnServers[ipAddress] = true;
