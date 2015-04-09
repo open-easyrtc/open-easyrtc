@@ -4277,9 +4277,11 @@ var Easyrtc = function() {
                     self.debugPrinter("offer accept=" + wasAccepted);
                 }
                 delete offersPending[caller];
-                if (!self.supportsPeerConnections()) {
-                    callFailureCB(self.errCodes.CALL_ERR, self.getConstantString("noWebrtcSupport"));
-                    return;
+
+                if (wasAccepted && !self.supportsPeerConnections()) {
+                   easyrtc.showError(self.errCodes.CALL_ERR, 
+                         self.getConstantString("noWebrtcSupport"));
+                   wasAccepted = false;
                 }
 
                 if (wasAccepted) {
