@@ -477,7 +477,7 @@ var Easyrtc = function() {
      * Gets a list of the available audio sources (ie, cameras)
      * @param {Function} callback receives list of {label:String, id:String, kind:"audio"}
      * Note: the label string always seems to be the empty string if you aren't using https.
-     * Note: not supported by Firefox. 
+     * Note: not supported by Firefox.
      * @example  easyrtc.getAudioSourceList( function(list) {
      *               var i;
      *               for( i = 0; i < list.length; i++ ) {
@@ -493,7 +493,7 @@ var Easyrtc = function() {
      * Gets a list of the available video sources (ie, cameras)
      * @param {Function} callback receives list of {facing:String, label:String, id:String, kind:"video"}
      * Note: the label string always seems to be the empty string if you aren't using https.
-     * Note: not supported by Firefox. 
+     * Note: not supported by Firefox.
      * @example  easyrtc.getVideoSourceList( function(list) {
      *               var i;
      *               for( i = 0; i < list.length; i++ ) {
@@ -956,7 +956,7 @@ var Easyrtc = function() {
      * This function gets the statistics for a particular peer connection.
      * @param {String} peerId
      * @param {Function} callback gets the peerid and a map of {userDefinedKey: value}. If there is no peer connection to peerId, then the map will
-     *  have a value of {connected:false}. 
+     *  have a value of {connected:false}.
      * @param {Object} filter depends on whether Chrome or Firefox is used. See the default filters for guidance.
      * It is still experimental.
      */
@@ -982,7 +982,7 @@ var Easyrtc = function() {
                 var srcKey;
                 //
                 // the stats objects has a group of entries. Each entry is either an rtcp, rtp entry
-                // or a candidate entry. 
+                // or a candidate entry.
                 //
                 stats.forEach(function(entry) {
                     var majorKey;
@@ -1005,14 +1005,14 @@ var Easyrtc = function() {
                     }
                     else {
                         if( entry.hasOwnProperty("ipAddress") && entry.hasOwnProperty("id")) {
-                            candidates[entry.id] = entry.ipAddress + ":" + 
+                            candidates[entry.id] = entry.ipAddress + ":" +
                                   entry.portNumber;
                         }
-                        else if( entry.hasOwnProperty("selected") && 
-                                 entry.hasOwnProperty("remoteCandidateId") && 
+                        else if( entry.hasOwnProperty("selected") &&
+                                 entry.hasOwnProperty("remoteCandidateId") &&
                                  entry.selected ) {
                             activeId =  entry.remoteCandidateId;
-                        } 
+                        }
                     }
                 });
 
@@ -3413,7 +3413,7 @@ var Easyrtc = function() {
                 sdp.sdp = sdpRemoteFilter(sdp.sdp);
             }
             var pc = peerConns[easyrtcid].pc;
-            pc.setRemoteDescription(new RTCSessionDescription(sdp), function(){}, 
+            pc.setRemoteDescription(new RTCSessionDescription(sdp), function(){},
                     function(message) {
                        self.showError(self.errCodes.INTERNAL_ERR, "set-remote-description: " + message);
                     });
@@ -4035,7 +4035,7 @@ var Easyrtc = function() {
 
     /**
       * Checks to see if a particular peer is present in any room.
-      * If it isn't, we assume it's logged out. 
+      * If it isn't, we assume it's logged out.
       * @param easyrtcid the easyrtcId of the peer.
       */
     this.isPeerInAnyRoom = function(easyrtcId) {
@@ -4238,7 +4238,7 @@ var Easyrtc = function() {
             pc = peerConns[caller].pc;
             function iceAddSuccess() {}
             function iceAddFailure(domError) {
-                easyrtc.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice candidate (" + domError.name + "): " + 
+                easyrtc.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice candidate (" + domError.name + "): " +
                     JSON.stringify(candidate));
             }
             pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
@@ -4274,12 +4274,14 @@ var Easyrtc = function() {
                     self.debugPrinter("offer accept=" + wasAccepted);
                 }
                 delete offersPending[caller];
-                if (!self.supportsPeerConnections()) {
-                    callFailureCB(self.errCodes.CALL_ERR, self.getConstantString("noWebrtcSupport"));
-                    return;
-                }
 
                 if (wasAccepted) {
+
+                    if (!self.supportsPeerConnections()) {
+                        easyrtc.showError(self.errCodes.CALL_ERR, self.getConstantString("noWebrtcSupport"));
+                        return;
+                    }
+
                     doAnswer(caller, msgData, streamNames);
                     flushCachedCandidates(caller);
                 }
@@ -5090,7 +5092,7 @@ var Easyrtc = function() {
             videoIdsP = [];
         }
 
-        easyrtc.addEventListener("roomOccupants", 
+        easyrtc.addEventListener("roomOccupants",
             function(eventName, eventData) {
                 for (i = 0; i < numPEOPLE; i++) {
                     var video = getIthVideo(i);
@@ -5463,5 +5465,5 @@ var easyrtc_constantStrings = {
   "statsNotSupported":"call statistics not supported by this browser, try Chrome.",
    "noWebrtcSupport":"Your browser doesn't appear to support WebRTC.",
    "gumFailed":"Failed to get access to local media. Error code was {0}.",
-   "requireAudioOrVideo":"At least one of audio and video must be provided"   
+   "requireAudioOrVideo":"At least one of audio and video must be provided"
 };
