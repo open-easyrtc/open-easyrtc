@@ -182,7 +182,7 @@ if (!window.createIceServer) {
         return {'url': url, 'credential': credential, 'username': username};
     };
 }/** @class
- *@version 1.0.12 beta
+ *@version 1.0.13
  *<p>
  * Provides client side support for the EasyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
@@ -271,7 +271,6 @@ var Easyrtc = function() {
              ( ( socket.socket && socket.socket.connected)
                || socket.connected )); 
    }
-
     /**
      * Controls whether a default local media stream should be acquired automatically during calls and accepts
      * if a list of streamNames is not supplied. The default is true, which mimicks the behaviour of earlier releases
@@ -422,9 +421,10 @@ var Easyrtc = function() {
         INTERNAL_ERR: "INTERNAL_ERR",
         PEER_GONE: "PEER_GONE", // peer doesn't exist
         ALREADY_CONNECTED: "ALREADY_CONNECTED",
-        "BAD_CREDENTIAL": "BAD_CREDENTIAL"
+        BAD_CREDENTIAL: "BAD_CREDENTIAL",
+        ICECANDIDATE_ERR: "ICECANDIDATE_ERROR"
     };
-    this.apiVersion = "1.0.12";
+    this.apiVersion = "1.0.13";
     /** Most basic message acknowledgment object */
     this.ackMessage = {msgType: "ack"};
     /** Regular expression pattern for user ids. This will need modification to support non US character sets */
@@ -3156,6 +3156,7 @@ var Easyrtc = function() {
             var sendOffer = function() {
 
                 sendSignalling(otherUser, "offer", {sdp:sessionDescription.sdp,type:sessionDescription.type}, null, callFailureCB);
+
             };
             if (sdpLocalFilter) {
                 sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
@@ -3370,7 +3371,7 @@ var Easyrtc = function() {
                        self.showError(errorCode, errorText);
                    }
    
-                   sendSignalling(easyrtcid, "answer", {sdp:sessionDescription.sdp, type:sessionDescription.type},
+                                      sendSignalling(easyrtcid, "answer", {sdp:sessionDescription.sdp, type:sessionDescription.type},
                            onSignalSuccess, onSignalFailure);
                    peerConns[easyrtcid].connectionAccepted = true;
                    sendQueuedCandidates(easyrtcid, onSignalSuccess, onSignalFailure);
@@ -3423,7 +3424,10 @@ var Easyrtc = function() {
                 sdp.sdp = sdpRemoteFilter(sdp.sdp);
             }
             var pc = peerConns[easyrtcid].pc;
-            pc.setRemoteDescription(new RTCSessionDescription(sdp));
+            pc.setRemoteDescription(new RTCSessionDescription(sdp), function(){}, 
+                    function(message) {
+                       self.showError(self.errCodes.INTERNAL_ERR, "set-remote-description: " + message);
+                    });
         }
 
     }, "__gotAddedMediaStream");
@@ -3894,7 +3898,7 @@ var Easyrtc = function() {
                     self.showError(errorCode, errorText);
                 }
 
-                sendSignalling(caller, "answer", {sdp:sessionDescription.sdp, type:sessionDescription.type},
+                sendSignalling(caller, "answer",  {sdp:sessionDescription.sdp, type:sessionDescription.type},
                         onSignalSuccess, onSignalFailure);
                 peerConns[caller].connectionAccepted = true;
                 sendQueuedCandidates(caller, onSignalSuccess, onSignalFailure);
@@ -4166,6 +4170,7 @@ var Easyrtc = function() {
                  {roomName:roomName, occupants:reducedList, self:myInfo});
            }
         }(roomName, reducedList, myInfo), 100);
+
     }
 
     function sendQueuedCandidates(peer, onSignalSuccess, onSignalFailure) {
@@ -4245,7 +4250,14 @@ var Easyrtc = function() {
                 });
             }
             pc = peerConns[caller].pc;
-            pc.addIceCandidate(candidate);
+
+            function iceAddSuccess() {}
+            function iceAddFailure(domError) {
+                easyrtc.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice candidate (" + domError.name + "): " + 
+                    JSON.stringify(candidate));
+            }
+            pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
+
             if (msgData.candidate.indexOf("typ relay") > 0) {
                 var ipAddress = msgData.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/i)[1];
                 self._turnServers[ipAddress] = true;
@@ -4277,7 +4289,6 @@ var Easyrtc = function() {
                     self.debugPrinter("offer accept=" + wasAccepted);
                 }
                 delete offersPending[caller];
-
                 if (wasAccepted && !self.supportsPeerConnections()) {
                    easyrtc.showError(self.errCodes.CALL_ERR, 
                          self.getConstantString("noWebrtcSupport"));
@@ -4391,7 +4402,9 @@ var Easyrtc = function() {
                         }
                         pc.connectDataConnection(5001, 5002); // these are like ids for data channels
                     }
-                });
+                }, function(message){
+                     console.log("setRemoteDescription failed ", message);
+                 });
             } catch (smdException) {
                 console.log("setRemoteDescription failed ", smdException);
             }
@@ -4854,8 +4867,8 @@ var Easyrtc = function() {
         var item, fixedItem, username, ipAddress;
         if (!window.createIceServer) {
             return;
-        }
-        if( !iceConfig || !iceConfig.iceServers || 
+        }      
+	    if( !iceConfig || !iceConfig.iceServers || 
              iceConfig.iceServers.length === undefined ) {
            self.showError(self.errCodes.DEVELOPER_ERR, "iceConfig received from server didn't have an array called iceServers, ignoring it");
         }
@@ -4866,7 +4879,7 @@ var Easyrtc = function() {
                     fixedItem = createIceServer(item.url, item.username, item.credential);
                 }
                 else {
-                    self.showError(self.errCodes.DEVELOPER_ERR, "Iceserver entry doesn't have a username: " + JSON.stringify(item));
+ 					self.showError(self.errCodes.DEVELOPER_ERR, "Iceserver entry doesn't have a username: " + JSON.stringify(item));
                 }
                 ipAddress = item.url.split(/[@:&]/g)[1];
                 self._turnServers[ipAddress] = true;
@@ -5092,7 +5105,7 @@ var Easyrtc = function() {
      * @private
      */
     function easyAppBody(monitorVideoId, videoIds) {
-        var numPEOPLE = videoIds.length;
+      var numPEOPLE = videoIds.length;
         var videoIdsP = videoIds;
         var refreshPane = 0;
         var onCall = null, onHangup = null;
