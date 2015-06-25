@@ -1,5 +1,5 @@
 /** @class
- *@version 1.0.13
+ *@version 1.0.12 beta
  *<p>
  * Provides client side support for the EasyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
@@ -78,16 +78,6 @@ var Easyrtc = function() {
       iceCandidateFilter = filter;
    }
 
-   /**
-    * This function checks if a socket is actually connected.
-    * @param {Object} socket a socket.io socket.
-    * @return true if the socket exists and is connected, false otherwise.
-   */
-   function isSocketConnected(socket) {
-      return (socket && 
-             ( ( socket.socket && socket.socket.connected)
-               || socket.connected )); 
-   }
     /**
      * Controls whether a default local media stream should be acquired automatically during calls and accepts
      * if a list of streamNames is not supplied. The default is true, which mimicks the behaviour of earlier releases
@@ -241,7 +231,7 @@ var Easyrtc = function() {
         BAD_CREDENTIAL: "BAD_CREDENTIAL",
         ICECANDIDATE_ERR: "ICECANDIDATE_ERROR"
     };
-    this.apiVersion = "1.0.13";
+    this.apiVersion = "1.0.12";
     /** Most basic message acknowledgment object */
     this.ackMessage = {msgType: "ack"};
     /** Regular expression pattern for user ids. This will need modification to support non US character sets */
@@ -2972,8 +2962,7 @@ var Easyrtc = function() {
             }
             var sendOffer = function() {
 
-                sendSignalling(otherUser, "offer", {sdp:sessionDescription.sdp,type:sessionDescription.type}, null, callFailureCB);
-
+                sendSignalling(otherUser, "offer", sessionDescription, null, callFailureCB);
             };
             if (sdpLocalFilter) {
                 sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
@@ -3188,7 +3177,7 @@ var Easyrtc = function() {
                        self.showError(errorCode, errorText);
                    }
    
-                                      sendSignalling(easyrtcid, "answer", {sdp:sessionDescription.sdp, type:sessionDescription.type},
+                   sendSignalling(easyrtcid, "answer", sessionDescription,
                            onSignalSuccess, onSignalFailure);
                    peerConns[easyrtcid].connectionAccepted = true;
                    sendQueuedCandidates(easyrtcid, onSignalSuccess, onSignalFailure);
@@ -3715,7 +3704,7 @@ var Easyrtc = function() {
                     self.showError(errorCode, errorText);
                 }
 
-                sendSignalling(caller, "answer",  {sdp:sessionDescription.sdp, type:sessionDescription.type},
+                sendSignalling(caller, "answer", sessionDescription,
                         onSignalSuccess, onSignalFailure);
                 peerConns[caller].connectionAccepted = true;
                 sendQueuedCandidates(caller, onSignalSuccess, onSignalFailure);
@@ -3958,7 +3947,7 @@ var Easyrtc = function() {
     //
     function processOccupantList(roomName, occupantList) {
         var myInfo = null;
-        var reducedList = {};
+        self.reducedList = {};
         var id;
         for (id in occupantList) {
             if (occupantList.hasOwnProperty(id)) {
@@ -3966,7 +3955,7 @@ var Easyrtc = function() {
                     myInfo = occupantList[id];
                 }
                 else {
-                    reducedList[id] = occupantList[id];
+                    self.reducedList[id] = occupantList[id];
                 }
             }
         }
@@ -3974,19 +3963,16 @@ var Easyrtc = function() {
         // processLostPeers detects peers that have gone away and performs
         // house keeping accordingly.
         //
-        processLostPeers(reducedList);
+        processLostPeers(self.reducedList);
         //
         //
-        addAggregatingTimer("roomOccupants&" + roomName, 
-         function(roomName, reducedList, myInfo){
-           return function() {
-              if (roomOccupantListener) {
-                  roomOccupantListener(roomName, reducedList, myInfo);
-              }
-              self.emitEvent("roomOccupants", 
-                 {roomName:roomName, occupants:reducedList, self:myInfo});
-           }
-        }(roomName, reducedList, myInfo), 100);
+        //
+        addAggregatingTimer("roomOccupants&" + roomName, function(){
+            if (roomOccupantListener) {
+                roomOccupantListener(roomName, self.reducedList, myInfo);
+            }
+            self.emitEvent("roomOccupants", {roomName:roomName, occupants:lastLoggedInList});
+        }, 100);
 
     }
 
@@ -4106,10 +4092,9 @@ var Easyrtc = function() {
                     self.debugPrinter("offer accept=" + wasAccepted);
                 }
                 delete offersPending[caller];
-                if (wasAccepted && !self.supportsPeerConnections()) {
-                   easyrtc.showError(self.errCodes.CALL_ERR, 
-                         self.getConstantString("noWebrtcSupport"));
-                   wasAccepted = false;
+                if (!self.supportsPeerConnections()) {
+                    callFailureCB(self.errCodes.CALL_ERR, self.getConstantString("noWebrtcSupport"));
+                    return;
                 }
 
                 if (wasAccepted) {
@@ -4330,7 +4315,7 @@ var Easyrtc = function() {
                     //
                     // socket.io version 1 got rid of the socket member, moving everything up one level.
                     //
-                    if (isSocketConnected(self.webSocket)) {
+                    if (self.webSocket.connected || (self.webSocket.socket && self.webSocket.socket.connected)) {
                         self.showError(self.errCodes.SIGNAL_ERROR, self.getConstantString("miscSignalError"));
                     }
                     else {
@@ -4360,11 +4345,7 @@ var Easyrtc = function() {
                 errorCallback(self.errCodes.SIGNAL_ERROR, self.getConstantString("icf"));
             }
         }
-        //
-        // the following logic is to deal with the different structure of
-        // socket.io version 0.9 and version 1.*
-        //
-        if (isSocketConnected(preallocatedSocketIo)) {
+        if (preallocatedSocketIo && preallocatedSocketIo.socket.connected) {
             connectHandler(null);
         }
         else {
@@ -4608,7 +4589,14 @@ var Easyrtc = function() {
                         if (!lastLoggedInList[roomName]) {
                             lastLoggedInList[roomName] = [];
                         }
-                        lastLoggedInList[roomName][id] = stuffToAdd[id];
+                        if( !lastLoggedInList[roomName][id] ) {
+                           lastLoggedInList[roomName][id] = stuffToAdd[id];
+                        }
+                        for( k in stuffToAdd[id] ) {
+                           if( k == "roomApiField" || k == "presence") {
+                              lastLoggedInList[roomName][id][k] = stuffToAdd[id][k];
+                           }
+                        }
                     }
                 }
                 stuffToRemove = roomData[roomName].clientListDelta.removeClient;
@@ -4684,10 +4672,6 @@ var Easyrtc = function() {
         var item, fixedItem, username, ipAddress;
         if (!window.createIceServer) {
             return;
-        }      
-	    if( !iceConfig || !iceConfig.iceServers || 
-             iceConfig.iceServers.length === undefined ) {
-           self.showError(self.errCodes.DEVELOPER_ERR, "iceConfig received from server didn't have an array called iceServers, ignoring it");
         }
         for (i = 0; i < iceConfig.iceServers.length; i++) {
             item = iceConfig.iceServers[i];
@@ -4696,7 +4680,7 @@ var Easyrtc = function() {
                     fixedItem = createIceServer(item.url, item.username, item.credential);
                 }
                 else {
- 					self.showError(self.errCodes.DEVELOPER_ERR, "Iceserver entry doesn't have a username: " + JSON.stringify(item));
+                    self.showError("Developer error", "Iceserver entry doesn't have a username: " + JSON.stringify(item));
                 }
                 ipAddress = item.url.split(/[@:&]/g)[1];
                 self._turnServers[ipAddress] = true;
@@ -4922,11 +4906,10 @@ var Easyrtc = function() {
      * @private
      */
     function easyAppBody(monitorVideoId, videoIds) {
-      var numPEOPLE = videoIds.length;
+        var numPEOPLE = videoIds.length;
         var videoIdsP = videoIds;
         var refreshPane = 0;
         var onCall = null, onHangup = null;
-        var videoToEasyrtcId = {};
 
         if (!videoIdsP) {
             videoIdsP = [];
@@ -4937,22 +4920,19 @@ var Easyrtc = function() {
                 for (i = 0; i < numPEOPLE; i++) {
                     var video = getIthVideo(i);
                     if (!videoIsFree(video)) {
-		        if( !easyrtc.isPeerInAnyRoom(videoToEasyrtcId[video.id])){
+		        if( !easyrtc.isPeerInAnyRoom(video.dataset.caller)){
                            if( onHangup ) {
-                               onHangup(i, videoToEasyrtcId[video.id]);
+                               onHangup(i, easyrtc.dataset.caller);
                            }
-                           videoToEasyrtcId[video.id] = null;
+                           easyrtc.dataset.caller = null;
                         }
                     }
                 }
-                console.log("saw event data", eventData);
             }
         );
 
         function videoIsFree(obj) {
-            return (videoToEasyrtcId[obj.id] === "" || 
-                    videoToEasyrtcId[obj.id] === null || 
-                    videoToEasyrtcId[obj.id] === undefined);
+            return (obj.dataset.caller === "" || obj.dataset.caller === null || obj.dataset.caller === undefined);
         }
 
         if (!_validateVideoIds(monitorVideoId, videoIdsP)) {
@@ -5006,7 +4986,7 @@ var Easyrtc = function() {
                 return null;
             }
             var vid = getIthVideo(i);
-            return videoToEasyrtcId[vid.id];
+            return vid.dataset.caller;
         };
 
         self.getSlotOfCaller = function(easyrtcid) {
@@ -5027,9 +5007,9 @@ var Easyrtc = function() {
             var i;
             for (i = 0; i < numPEOPLE; i++) {
                 var video = getIthVideo(i);
-                if (videoToEasyrtcId[video.id] === caller) {
+                if (video.dataset.caller === caller) {
                     hideVideo(video);
-                    videoToEasyrtcId[video.id] = "";
+                    video.dataset.caller = "";
                     if (onHangup) {
                         onHangup(caller, i);
                     }
@@ -5074,7 +5054,7 @@ var Easyrtc = function() {
             }
             for (i = 0; i < numPEOPLE; i++) {
                 video = getIthVideo(i);
-                if (videoToEasyrtcId[video.id] === caller) {
+                if (video.dataset.caller === caller) {
                     showVideo(video, stream);
                     if (onCall) {
                         onCall(caller, i);
@@ -5085,8 +5065,8 @@ var Easyrtc = function() {
 
             for (i = 0; i < numPEOPLE; i++) {
                 video = getIthVideo(i);
-                if (!videoToEasyrtcId[video.id] || videoIsFree(video)) {
-                    videoToEasyrtcId[video.id] = caller;
+                if (!video.dataset.caller || videoIsFree(video)) {
+                    video.dataset.caller = caller;
                     if (onCall) {
                         onCall(caller, i);
                     }
@@ -5099,13 +5079,13 @@ var Easyrtc = function() {
 //
             video = getIthVideo(0);
             if (video) {
-                self.hangup(videoToEasyrtcId[video.id]);
+                self.hangup(video.dataset.caller);
                 showVideo(video, stream);
                 if (onCall) {
                     onCall(caller, 0);
                 }
             }
-            videoToEasyrtcId[video.id] = caller;
+            video.dataset.caller = caller;
         });
         (function() {
             var addControls, parentDiv, closeButton, i;
@@ -5113,14 +5093,14 @@ var Easyrtc = function() {
 
                 addControls = function(video) {
                     parentDiv = video.parentNode;
-                    videoToEasyrtcId[video.id] = "";
+                    video.dataset.caller = "";
                     closeButton = document.createElement("div");
                     closeButton.className = "easyrtc_closeButton";
                     closeButton.onclick = function() {
-                        if (videoToEasyrtcId[video.id]) {
-                            self.hangup(videoToEasyrtcId[video.id]);
+                        if (video.dataset.caller) {
+                            self.hangup(video.dataset.caller);
                             hideVideo(video);
-                            videoToEasyrtcId[video.id] = "";
+                            video.dataset.caller = "";
                         }
                     };
                     parentDiv.appendChild(closeButton);
@@ -5267,7 +5247,7 @@ var Easyrtc = function() {
             self.showError("Developer error", "Your HTML has not included the socket.io.js library");
         }
 
-        if (!preallocatedSocketIo && isSocketConnected(self.webSocket)){
+        if (!preallocatedSocketIo && self.webSocket) {
             console.error("Developer error: attempt to connect when already connected to socket server");
             return;
         }
