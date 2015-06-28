@@ -4776,7 +4776,7 @@ var Easyrtc = function() {
                            lastLoggedInList[roomName][id] = stuffToAdd[id];
                         }
                         for( k in stuffToAdd[id] ) {
-                           if( k == "roomApiField" || k == "presence") {
+                           if( k == "apiField" || k == "presence") {
                               lastLoggedInList[roomName][id][k] = stuffToAdd[id][k];
                            }
                         }
