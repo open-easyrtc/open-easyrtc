@@ -4910,9 +4910,19 @@ var Easyrtc = function() {
         var videoIdsP = videoIds;
         var refreshPane = 0;
         var onCall = null, onHangup = null;
-
+        var videoIdToCallerMap = {};
         if (!videoIdsP) {
             videoIdsP = [];
+        }
+
+        function getCallerOfVideo(videoObject)
+        {
+            return videoIdToCallerMap[videoObject.id];
+        }
+
+        function setCallerOfVideo(videoObject, callerEasyrtcId)
+        {
+            videoIdToCallerMap[videoObject.id] = callerEasyrtcId;
         }
 
         easyrtc.addEventListener("roomOccupants", 
@@ -4920,11 +4930,11 @@ var Easyrtc = function() {
                 for (i = 0; i < numPEOPLE; i++) {
                     var video = getIthVideo(i);
                     if (!videoIsFree(video)) {
-		        if( !easyrtc.isPeerInAnyRoom(video.dataset.caller)){
+		        if( !easyrtc.isPeerInAnyRoom(getCallerOfVideo(video))){
                            if( onHangup ) {
-                               onHangup(i, easyrtc.dataset.caller);
+                               onHangup(i, getCallerOfVideo(video));
                            }
-                           easyrtc.dataset.caller = null;
+                           setCallerOfVideo(video, null);
                         }
                     }
                 }
@@ -4932,7 +4942,8 @@ var Easyrtc = function() {
         );
 
         function videoIsFree(obj) {
-            return (obj.dataset.caller === "" || obj.dataset.caller === null || obj.dataset.caller === undefined);
+            var caller = getCallerOfVideo(obj);
+            return (caller === "" || caller === null || caller === undefined);
         }
 
         if (!_validateVideoIds(monitorVideoId, videoIdsP)) {
@@ -4986,7 +4997,7 @@ var Easyrtc = function() {
                 return null;
             }
             var vid = getIthVideo(i);
-            return vid.dataset.caller;
+            return getCallerOfVideo(vid);
         };
 
         self.getSlotOfCaller = function(easyrtcid) {
@@ -5007,9 +5018,9 @@ var Easyrtc = function() {
             var i;
             for (i = 0; i < numPEOPLE; i++) {
                 var video = getIthVideo(i);
-                if (video.dataset.caller === caller) {
+                if (getCallerOfVideo(video) === caller) {
                     hideVideo(video);
-                    video.dataset.caller = "";
+                    setCallerOfVideo(video, "");
                     if (onHangup) {
                         onHangup(caller, i);
                     }
@@ -5054,7 +5065,7 @@ var Easyrtc = function() {
             }
             for (i = 0; i < numPEOPLE; i++) {
                 video = getIthVideo(i);
-                if (video.dataset.caller === caller) {
+                if (getCallerOfVideo(video) === caller) {
                     showVideo(video, stream);
                     if (onCall) {
                         onCall(caller, i);
@@ -5065,8 +5076,8 @@ var Easyrtc = function() {
 
             for (i = 0; i < numPEOPLE; i++) {
                 video = getIthVideo(i);
-                if (!video.dataset.caller || videoIsFree(video)) {
-                    video.dataset.caller = caller;
+                if (videoIsFree(video)) {
+                    setCallerOfVideo(video, caller);
                     if (onCall) {
                         onCall(caller, i);
                     }
@@ -5079,13 +5090,13 @@ var Easyrtc = function() {
 //
             video = getIthVideo(0);
             if (video) {
-                self.hangup(video.dataset.caller);
+                self.hangup(getCallerOfVideo(video));
                 showVideo(video, stream);
                 if (onCall) {
                     onCall(caller, 0);
                 }
             }
-            video.dataset.caller = caller;
+            setCallerOfVideo(video, caller);
         });
         (function() {
             var addControls, parentDiv, closeButton, i;
@@ -5093,14 +5104,14 @@ var Easyrtc = function() {
 
                 addControls = function(video) {
                     parentDiv = video.parentNode;
-                    video.dataset.caller = "";
+                    setCallerOfVideo(video, "");
                     closeButton = document.createElement("div");
                     closeButton.className = "easyrtc_closeButton";
                     closeButton.onclick = function() {
-                        if (video.dataset.caller) {
-                            self.hangup(video.dataset.caller);
+                        if (getCallerOfVideo(video)) {
+                            self.hangup(getCallerOfVideo(video));
                             hideVideo(video);
-                            video.dataset.caller = "";
+                            seCallerOfVideo(video, "");
                         }
                     };
                     parentDiv.appendChild(closeButton);
