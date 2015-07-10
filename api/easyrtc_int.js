@@ -106,6 +106,20 @@ var Easyrtc = function() {
         }
         return formatted;
     };
+
+
+    /**
+     * This function checks if a socket is actually connected.
+     * @param {Object} socket a socket.io socket.
+     * @return true if the socket exists and is connected, false otherwise.
+    */
+    function isSocketConnected(socket) {
+       return (socket && 
+              ( ( socket.socket && socket.socket.connected)
+                || socket.connected )); 
+    }
+
+
     /** @private */
     var haveAudioVideo = {audio: false, video: false};
 //
@@ -4092,12 +4106,12 @@ var Easyrtc = function() {
                     self.debugPrinter("offer accept=" + wasAccepted);
                 }
                 delete offersPending[caller];
-                if (!self.supportsPeerConnections()) {
-                    callFailureCB(self.errCodes.CALL_ERR, self.getConstantString("noWebrtcSupport"));
-                    return;
-                }
 
                 if (wasAccepted) {
+                    if (!self.supportsPeerConnections()) {
+                        callFailureCB(self.errCodes.CALL_ERR, self.getConstantString("noWebrtcSupport"));
+                        return;
+                    }
                     doAnswer(caller, msgData, streamNames);
                     flushCachedCandidates(caller);
                 }
@@ -4315,7 +4329,7 @@ var Easyrtc = function() {
                     //
                     // socket.io version 1 got rid of the socket member, moving everything up one level.
                     //
-                    if (self.webSocket.connected || (self.webSocket.socket && self.webSocket.socket.connected)) {
+                    if (isSocketConnected(self.webSocket)) {
                         self.showError(self.errCodes.SIGNAL_ERROR, self.getConstantString("miscSignalError"));
                     }
                     else {
@@ -4345,7 +4359,7 @@ var Easyrtc = function() {
                 errorCallback(self.errCodes.SIGNAL_ERROR, self.getConstantString("icf"));
             }
         }
-        if (preallocatedSocketIo && preallocatedSocketIo.socket.connected) {
+        if (isSocketConnected(preallocatedSocketIo)) {
             connectHandler(null);
         }
         else {
@@ -4673,6 +4687,12 @@ var Easyrtc = function() {
         if (!window.createIceServer) {
             return;
         }
+       if( !iceConfig || !iceConfig.iceServers || 
+              iceConfig.iceServers.length === undefined ) {
+            self.showError(self.errCodes.DEVELOPER_ERR, "iceConfig received from server didn't have an array called iceServers, ignoring it");
+              iceConfig = { iceServers:[]};
+         }
+
         for (i = 0; i < iceConfig.iceServers.length; i++) {
             item = iceConfig.iceServers[i];
             if (item.url.indexOf('turn:') === 0) {
@@ -4680,7 +4700,7 @@ var Easyrtc = function() {
                     fixedItem = createIceServer(item.url, item.username, item.credential);
                 }
                 else {
-                    self.showError("Developer error", "Iceserver entry doesn't have a username: " + JSON.stringify(item));
+                    self.showError(self.errCodes.DEVELOPER_ERR, "Iceserver entry doesn't have a username: " + JSON.stringify(item));
                 }
                 ipAddress = item.url.split(/[@:&]/g)[1];
                 self._turnServers[ipAddress] = true;
@@ -5255,7 +5275,7 @@ var Easyrtc = function() {
     this.connect = function(applicationName, successCallback, errorCallback) {
 
         if (!window.io) {
-            self.showError("Developer error", "Your HTML has not included the socket.io.js library");
+            self.showError(self.errCodes.DEVELOPER_ERR, "Your HTML has not included the socket.io.js library");
         }
 
         if (!preallocatedSocketIo && self.webSocket) {

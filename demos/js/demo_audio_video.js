@@ -123,26 +123,6 @@ function loginFailure(errorCode, message) {
     easyrtc.showError(errorCode, message);
 }
 
-function allocateVideo() {
-   function videoError(errorCode, errText){
-           console.log("saw error " + errText);
-   }
-   function initMediaSourceSuccess() {
-      if( easyrtc.nativeVideoHeight <= 2 &&  easyrtc.nativeVideoHeight <= 2 ){
-         videoError("gum", "Camera not available");
-      }
-      else {
-         easyrtc.setVideoObjectSrc(callerVideo, easyrtc.getLocalStream());
-      }
-   }
-   easyrtc.initMediaSource(
-       initMediaSourceSuccess,
-       function (errorCode, errText) {
-           console.log("saw error " + errText);
-       },
-   null);              
-}
-
 function disconnect() {
   easyrtc.disconnect();			  
   document.getElementById("iam").innerHTML = "logged out";
