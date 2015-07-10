@@ -4748,6 +4748,7 @@ var Easyrtc = function() {
     function processRoomData(roomData) {
         self.roomData = roomData;
         var roomName;
+        var k;
         var stuffToRemove;
         var stuffToAdd;
         var id, removeId;
@@ -5130,7 +5131,7 @@ var Easyrtc = function() {
 
         easyrtc.addEventListener("roomOccupants", 
             function(eventName, eventData) {
-                int i;
+                var i;
                 for (i = 0; i < numPEOPLE; i++) {
                     var video = getIthVideo(i);
                     if (!videoIsFree(video)) {
