@@ -4947,6 +4947,7 @@ var Easyrtc = function() {
 
         easyrtc.addEventListener("roomOccupants", 
             function(eventName, eventData) {
+                int i;
                 for (i = 0; i < numPEOPLE; i++) {
                     var video = getIthVideo(i);
                     if (!videoIsFree(video)) {
