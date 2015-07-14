@@ -2,12 +2,12 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
-        <title>EasyRTC Demo: Audio and Video</title>
+        <title>EasyRTC Demo: Simple Video+Audio</title>
         <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
 
         <!--hide-->
         <link rel="stylesheet" type="text/css" href="css/landing.css" />
-
+        <link rel="stylesheet" type="text/css" href="css/demo_audio_video_simple.css" />
         <!-- Prettify Code -->
         <script type="text/javascript" src="js/prettify/prettify.js"></script>
         <script type="text/javascript" src="js/prettify/loadAndFilter.js"></script>
@@ -18,98 +18,42 @@
         <!-- Assumes global locations for socket.io.js and easyrtc.js -->
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
-        <script type="text/javascript" src="js/demo_audio_video.js"></script>
+        <script type="text/javascript" src="js/demo_audio_video_simple.js"></script>
 
-        <!--hide-->
-        <!-- Styles used within the demo -->
-        <style type="text/css">
-            #demoContainer {
-                position:relative;
-            }
-            #connectControls {
-                float:left;
-                width:250px;
-                text-align:center;
-                border: 2px solid black;
-            }
-            #otherClients {
-                height:200px;
-                overflow-y:scroll;
-            }
-            #selfVideo {
-                height:225px;
-                width:300px;
-                float:left;
-                border:1px solid gray;
-                margin-left:10px;
-            }
-            #callerVideo {
-                height:225px;
-                width:300px;
-                border:1px solid gray;
-                margin-left:10px;
-            }
-            #acceptCallBox {
-                display:none;
-                z-index:2;
-                position:absolute;
-                top:100px;
-                left:400px;
-                border:red solid 2px;
-                background-color:pink;
-                padding:15px;
-            }
-        </style>
-        <!--show-->
     </head>
-    <body>
-         <!--hide-->
+    <body onload="connect();">
+        <!--hide-->
         <div id="container">
-
             <div id="header">
                 <a href="index.html"><img id="logo_easyrtc" src="images/easyrtc_logo.png" alt="EasyRTC" style="" /></a>
             </div>
             <div id="menu"><a class="menu_link" href="index.html"><div class="menu_item">Local Demos</div></a><a class="menu_link" href="https://github.com/priologic/easyrtc/tree/master/docs"><div class="menu_item">Documentation</div></a><a class="menu_link" href="https://groups.google.com/forum/#!forum/easyrtc"><div class="menu_item">Support: Discussion Group</div></a><a class="menu_link" href="http://www.easyrtc.com/"><div class="menu_item">EasyRTC.com</div></a></div>
             <div id="main">
-
-                <!--hide-->
                 <!-- Main Content -->
-                <h1>EasyRTC Demo: Audio and Video</h1>
+                <h1>EasyRTC Demo: Simple Video+Audio</h1>
 
-                <p>The application provides an audio-video chat where sharing of audio and video can be controlled individually before connection.</p>
+                <p>The application provides a simple audio-video chat using the easyrtc.easyApp method.</p>
 
-                <p>To use it, press the Connect button.
-                    You should see buttons representing other people using this demo.
-                    Click one of those buttons to initiate a chat.</p>
+                <p>Connection is handled using an onload statement in the body. Requests are automatically accepted.<p>
+
+                <p>To hang-up on a call, hover your mouse over the upper right of the video, and click on the 'X' which appears at the top right of other person's video object.</p>
 
                 <hr />
                 <h2>The Demo</h2>
                 <!--show-->
                 <div id="demoContainer">
                     <div id="connectControls">
-                        <input type="checkbox" checked="checked" id="shareAudio" />Share audio
-                        <input type="checkbox" checked="checked" id="shareVideo" />Share video<br />
-                        <input type="checkbox" checked="checked" id="expectAudio" />Expect audio
-                        <input type="checkbox" checked="checked" id="expectVideo" />Expect video<br />
-
-                        <input type="checkbox" id="useFreshIce" onclick="easyrtc.setUseFreshIceEachPeerConnection(this.value);"/>Fresh Ice<br />
-                        <button id="connectButton" onclick="connect()">Connect</button>
-                        <button  onclick="allocateVideo()">Allocate video</button>
-                        <button id="disconnectButton" onclick="disconnect()">Disconnect</button>
-                        <button id="hangupButton" disabled="disabled" onclick="hangup()">Hangup</button>
                         <div id="iam">Not yet connected...</div>
                         <br />
                         <strong>Connected users:</strong>
                         <div id="otherClients"></div>
                     </div>
-
                     <div id="videos">
-                        <video autoplay="autoplay" id="selfVideo"  class="easyrtcMirror" muted="muted" volume="0"></video>
+                        <video autoplay="autoplay" class="easyrtcMirror" id="selfVideo" muted="muted" volume="0" ></video>
+                        <div style="position:relative;float:left;">
                         <video autoplay="autoplay" id="callerVideo"></video>
-                        <div id="acceptCallBox"> <!-- Should be initially hidden using CSS -->
-                            <div id="acceptCallLabel"></div>
-                            <button id="callAcceptButton" >Accept</button> <button id="callRejectButton">Reject</button>
                         </div>
+                        <!-- each caller video needs to be in it's own div so it's close button can be positioned correctly -->
                     </div>
                 </div>
                 <!--hide-->
@@ -118,22 +62,29 @@
 
                 <h2>The Code</h2>
                 <h3>HTML</h3>
-                <pre  id="prettyHTML" class="prettyprint linenums:1">
+                <pre   id="prettyHtml" class="prettyprint linenums:1">
+
                 </pre>
+
+                <h3>CSS</h3>
+                <p>In order to show the 'X' in the upper right corner, the callerVideo video tag must be in a div with relative positioning.:</p>
+                <pre id="prettyCSS" class="prettyprint linenums:1">
+                </pre>
+
                 <h3>JavaScript</h3>
-                <p>The contents of demo_audio_video.js:</p>
+                <p>The contents of demo_audio_video_simple.js:</p>
                 <pre  id="prettyJS" class="prettyprint linenums:1">
                 </pre>
 
 
                 <!-- Runs the SyntaxHighlighter -->
                 <script type="text/javascript">
-                    loadAndFilter(window.location.href, "prettyHTML",2 );
+                    loadAndFilter(window.location.href, "prettyHtml",2 );
                     loadAndFilter(getHelperPath("js"), "prettyJS", 2);
+                    loadAndFilter(getHelperPath("css"), "prettyCSS", 2);
                 </script>
 
                 <!-- End Main Content -->
-
             </div>
             <div id="footer">
                 <a href="http://www.priologic.com/?from=landing"><img id="logo_priologic" src="images/priologic_logo_white.png" height="40" width="150" alt="Created By Priologic Software Inc." /></a>

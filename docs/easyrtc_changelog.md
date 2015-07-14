@@ -3,11 +3,12 @@ EasyRTC: Change Log
 
 v1.0.14
 Fixes: 
-   - Added muting to the multstream demos so they didn't squawk.
-   - Fix a bug in ProcessOccupantList that caused all rooms to appear to have the same occupant.
-   - Removed the dataset attribute usage in easyapp. It was causing problems in the multiroom demo.
-   - Fixed a bug in processRoomData that was clobbering apifields when the presence changed.
-   - Fixed the disconnect button in the demo_audio_video.html demo.
+   - JS Client - Added muting to the multstream demos so they didn't squawk.
+   - JS Client - Fix a bug in ProcessOccupantList that caused all rooms to appear to have the same occupant.
+   - JS Client - Removed the dataset attribute usage in easyapp. It was causing problems in the multiroom demo.
+   - JS Client - Fixed a bug in processRoomData that was clobbering apifields when the presence changed.
+   - JS Client - Fixed the disconnect button in the demo_audio_video.html demo.
+   - JS Client - Various code quality fixes
 
 v1.0.13
 New Features:
