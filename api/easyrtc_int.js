@@ -5114,7 +5114,7 @@ var Easyrtc = function() {
                         if (getCallerOfVideo(video)) {
                             self.hangup(getCallerOfVideo(video));
                             hideVideo(video);
-                            seCallerOfVideo(video, "");
+                            setCallerOfVideo(video, "");
                         }
                     };
                     parentDiv.appendChild(closeButton);
