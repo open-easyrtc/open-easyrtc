@@ -189,7 +189,7 @@ if (!window.createIceServer) {
  * for more details.</p>
  *
  *<p>
- *copyright Copyright (c) 2014, Priologic Software Inc.
+ *copyright Copyright (c) 2015, Priologic Software Inc.
  *All rights reserved.</p>
  *
  *<p>
