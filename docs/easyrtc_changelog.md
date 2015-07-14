@@ -1,8 +1,14 @@
 EasyRTC: Change Log
 ===================
 
+v1.0.15-beta
+------------
+
 v1.0.14
+-------
+
 Fixes: 
+
    - JS Client - Added muting to the multstream demos so they didn't squawk.
    - JS Client - Fix a bug in ProcessOccupantList that caused all rooms to appear to have the same occupant.
    - JS Client - Removed the dataset attribute usage in easyapp. It was causing problems in the multiroom demo.
@@ -11,7 +17,10 @@ Fixes:
    - JS Client - Various code quality fixes
 
 v1.0.13
+-------
+
 New Features:
+
   - JS Client - New function isPeerInAnyRoom() tells you whether a particular
  peer is still in any room. This is actually exposing an internal function.
   - JS Client - New function getNameOfRemoteStream() maps a remote stream 
@@ -30,6 +39,7 @@ it is only a crude work around that will work if your Firefox session only has o
   - JS Client - Added getAudioSourceList method as a complement to getVideoSourceList.
 
 Changes:
+
   - JS Client - Changed setUsername so that it complains if you call it 
 after authenticating.  This was done to make it more clear about when it was legal to call it.
   - JS Client - Added code to clear room data and your own easyrtcid on disconnecting from a server.  This was done to reduce confusion for applications that disconnected and reconnected.
@@ -51,6 +61,7 @@ to stream labels) are propagated via setRoomApiFields.
   - JS Client - Added success/failure callbacks to addIceCandidate (and to setRemoteScriptions where missing).
 
 Fixes:
+
   - JS Client - Fixed EasyApp so that it doesn't continue to reserve a video slot for a peer that has left the server before the peer connection was completed.
   - JS Client - Fixed a typo in setting the SDP filters.
   - JS Client - Fixed a problem that prevented the composition of new media streams (issue #110).
