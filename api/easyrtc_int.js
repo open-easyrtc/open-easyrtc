@@ -1,5 +1,5 @@
 /** @class
- *@version 1.0.14
+ *@version 1.0.15-beta
  *<p>
  * Provides client side support for the EasyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
@@ -243,7 +243,7 @@ var Easyrtc = function() {
         BAD_CREDENTIAL: "BAD_CREDENTIAL",
         ICECANDIDATE_ERR: "ICECANDIDATE_ERROR"
     };
-    this.apiVersion = "1.0.14";
+    this.apiVersion = "1.0.15-beta";
     /** Most basic message acknowledgment object */
     this.ackMessage = {msgType: "ack"};
     /** Regular expression pattern for user ids. This will need modification to support non US character sets */
