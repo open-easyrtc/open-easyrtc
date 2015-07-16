@@ -5118,7 +5118,7 @@ var Easyrtc = function() {
                     if (!videoIsFree(video)) {
 		        if( !easyrtc.isPeerInAnyRoom(getCallerOfVideo(video))){
                            if( onHangup ) {
-                               onHangup(i, getCallerOfVideo(video));
+                               onHangup(getCallerOfVideo(video), i);
                            }
                            setCallerOfVideo(video, null);
                         }
