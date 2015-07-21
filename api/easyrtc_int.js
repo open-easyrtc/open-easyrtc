@@ -61,6 +61,25 @@ var Easyrtc = function() {
     };
 
    /**
+    * Sets a function to warn about the peer connection closing.
+    *  @param {Function} handler: a function that gets an easyrtcid as an argument.
+    */
+   this.setPeerClosedListener = function( handler ) {
+      this.onPeerClosed = handler;
+   }
+
+   /**
+    * Sets a function to receive warnings about the peer connection
+    * failing. The peer connection may recover by itself.
+    *  @param {Function} failingHandler: a function that gets an easyrtcid as an argument.
+    *  @param {Function} recoverdHandler: a function that gets an easyrtcid as an argument.
+    */
+   this.setPeerFailingListener = function( failingHandler, recoveredHandler ) {
+      this.onPeerFailing = failingHandler;
+      this.onPeerRecovered = recoveredHandler;
+   }
+
+   /**
     * Sets a function which filters IceCandidate records being sent or received.
     *
     * Candidate records can be received while they are being generated locally (before being 
@@ -335,9 +354,9 @@ var Easyrtc = function() {
     };
 
     /** @private */
-    var audioEnabled = true;
+    self.audioEnabled = true;
     /** @private */
-    var videoEnabled = true;
+    self.videoEnabled = true;
     /** @private */
     var dataChannelName = "dc";
     /** @private */
@@ -571,7 +590,7 @@ var Easyrtc = function() {
                 audio: false
             };
         }
-        else if (!videoEnabled) {
+        else if (!self.videoEnabled) {
             constraints.video = false;
         }
         else {
@@ -595,7 +614,7 @@ var Easyrtc = function() {
                 constraints.video = true;
             }
         }
-        constraints.audio = audioEnabled;
+        constraints.audio = self.audioEnabled;
         return constraints;
     };
     /** Set the application name. Applications can only communicate with other applications
@@ -1320,7 +1339,7 @@ var Easyrtc = function() {
      *      easyrtc.enableAudio(false);
      */
     this.enableAudio = function(enabled) {
-        audioEnabled = enabled;
+        self.audioEnabled = enabled;
     };
     /**
      *Sets whether video is transmitted by the local user in any subsequent calls.
@@ -1329,7 +1348,7 @@ var Easyrtc = function() {
      *      easyrtc.enableVideo(false);
      */
     this.enableVideo = function(enabled) {
-        videoEnabled = enabled;
+        self.videoEnabled = enabled;
     };
     /**
      * Sets whether WebRTC data channels are used to send inter-client messages.
@@ -1806,8 +1825,8 @@ var Easyrtc = function() {
         }
 
         haveAudioVideo = {
-            audio: audioEnabled,
-            video: videoEnabled
+            audio: self.audioEnabled,
+            video: self.videoEnabled
         };
         if (!errorCallback) {
             errorCallback = function(errorCode, errorText) {
@@ -1923,7 +1942,7 @@ var Easyrtc = function() {
             };
             updateConfigurationInfo();
         };
-        if (!audioEnabled && !videoEnabled) {
+        if (!self.audioEnabled && !self.videoEnabled) {
             onUserMediaError(self.getConstantString("requireAudioOrVideo"));
             return;
         }
@@ -1946,7 +1965,7 @@ var Easyrtc = function() {
             }
         }
 
-        if (videoEnabled || audioEnabled) {
+        if (self.videoEnabled || self.audioEnabled) {
             //
             // getUserMedia sometimes fails the first time I call it. I suspect it's a page loading
             // issue. So I'm going to try adding a 3 second delay to allow things to settle down first.
@@ -2181,6 +2200,7 @@ var Easyrtc = function() {
      * @example
      *    if( !easyrtc.setUsername("JohnSmith") ){
      *        console.error("bad user name);
+     *    }
      *
      */
     this.setUsername = function(username) {
@@ -2880,8 +2900,8 @@ var Easyrtc = function() {
 
         if (self.debugPrinter) {
             self.debugPrinter("initiating peer to peer call to " + otherUser +
-                    " audio=" + audioEnabled +
-                    " video=" + videoEnabled +
+                    " audio=" + self.audioEnabled +
+                    " video=" + self.videoEnabled +
                     " data=" + dataEnabled);
         }
 
@@ -2897,7 +2917,7 @@ var Easyrtc = function() {
         //
         if (!streamNames && autoInitUserMedia) {
             var stream = self.getLocalStream();
-            if (!stream && (audioEnabled || videoEnabled)) {
+            if (!stream && (self.audioEnabled || self.videoEnabled)) {
                 self.initMediaSource(function() {
                     self.call(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB);
                 }, callFailureCB);
@@ -3326,6 +3346,45 @@ var Easyrtc = function() {
                 }
             };
 
+            pc.oniceconnectionstatechange = function(ev) {
+                var connState = ev.currentTarget.iceConnectionState;
+                switch( connState) {
+                   case "connected":
+                       if (peerConns[otherUser].callSuccessCB) {
+                            peerConns[otherUser].callSuccessCB(otherUser,
+                               "connection");
+                       }
+                       break;
+                   case "failed":
+                       if (failureCB) {
+                            failureCB(self.errCodes.NOVIABLEICE, "No usable STUN/TURN path");
+                       }
+                       delete peerConns[otherUser];
+                       break; 
+                   case "disconnected":
+                      if( easyrtc.onPeerFailing ) {
+                          easyrtc.onPeerFailing(otherUser);
+                          peerConns[otherUser].failing = Date.now();
+                      }
+                      break; 
+
+                   case "closed":
+                      if( easyrtc.onPeerClosed ) {
+                          easyrtc.onPeerClosed(otherUser);
+                      }
+                      break;
+                }
+
+                if (connState === 'connected' || connState === 'completed') {
+                   if (peerConns[otherUser].failing && easyrtc.onPeerRecovered) {
+                        easyrtc.onPeerRecovered(otherUser, peerConns[otherUser].failing, Date.now());
+                    }
+
+                    delete peerConns[otherUser].failing;
+                }
+            }
+           
+
             pc.onconnection = function() {
                 if (self.debugPrinter) {
                     self.debugPrinter("onconnection called prematurely");
@@ -3442,7 +3501,7 @@ var Easyrtc = function() {
                             peerConns[otherUser].callSuccessCB(otherUser, "audiovideo");
                         }
                     }
-                    if (audioEnabled || videoEnabled) {
+                    if (self.audioEnabled || self.videoEnabled) {
                         updateConfiguration();
                     }
                 }
@@ -3489,7 +3548,7 @@ var Easyrtc = function() {
                 }
             }
         }
-        else if (autoInitUserMedia && (videoEnabled || audioEnabled)) {
+        else if (autoInitUserMedia && (self.videoEnabled || self.audioEnabled)) {
             stream = self.getLocalStream();
             pc.addStream(stream);
         }
@@ -3650,7 +3709,7 @@ var Easyrtc = function() {
     var doAnswer = function(caller, msgData, streamNames) {
         if (!streamNames && autoInitUserMedia) {
             var localStream = self.getLocalStream();
-            if (!localStream && (videoEnabled || audioEnabled)) {
+            if (!localStream && (self.videoEnabled || self.audioEnabled)) {
                 self.initMediaSource(
                         function() {
                             doAnswer(caller, msgData);
@@ -4863,378 +4922,6 @@ var Easyrtc = function() {
 // this flag controls whether the easyApp routine adds close buttons to the caller
 // video objects
 
-    /** @private */
-    var autoAddCloseButtons = true;
-    /** By default, the easyApp routine sticks a "close" button on top of each caller
-     * video object that it manages. Call this function(before calling easyApp) to disable that particular feature.
-     * @example
-     *    easyrtc.dontAddCloseButtons();
-     */
-    this.dontAddCloseButtons = function() {
-        autoAddCloseButtons = false;
-    };
-    /**
-     * Validates that the video ids correspond to dom objects.
-     * @param {String} monitorVideoId
-     * @param {Array} videoIds
-     * @returns {Boolean}
-     * @private
-     */
-    function _validateVideoIds(monitorVideoId, videoIds) {
-        var i;
-        // verify that video ids were not typos.
-        if (monitorVideoId && !document.getElementById(monitorVideoId)) {
-            self.showError(self.errCodes.DEVELOPER_ERR, "The monitor video id passed to easyApp was bad, saw " + monitorVideoId);
-            return false;
-        }
-
-        for (i in videoIds) {
-            if (!videoIds.hasOwnProperty(i)) {
-                continue;
-            }
-            var name = videoIds[i];
-            if (!document.getElementById(name)) {
-                self.showError(self.errCodes.DEVELOPER_ERR, "The caller video id '" + name + "' passed to easyApp was bad.");
-                return false;
-            }
-        }
-        return true;
-    }
-    /**
-     * This is a helper function for the easyApp method. It manages the assignment of video streams
-     * to video objects. It assumes
-     * @param {String} monitorVideoId is the id of the mirror video tag.
-     * @param {Array} videoIds is an array of ids of the caller video tags.
-     * @private
-     */
-    function easyAppBody(monitorVideoId, videoIds) {
-        var numPEOPLE = videoIds.length;
-        var videoIdsP = videoIds;
-        var refreshPane = 0;
-        var onCall = null, onHangup = null;
-        var videoIdToCallerMap = {};
-        if (!videoIdsP) {
-            videoIdsP = [];
-        }
-
-        function getCallerOfVideo(videoObject)
-        {
-            return videoIdToCallerMap[videoObject.id];
-        }
-
-        function setCallerOfVideo(videoObject, callerEasyrtcId)
-        {
-            videoIdToCallerMap[videoObject.id] = callerEasyrtcId;
-        }
-
-        easyrtc.addEventListener("roomOccupants", 
-            function(eventName, eventData) {
-                var i;
-                for (i = 0; i < numPEOPLE; i++) {
-                    var video = getIthVideo(i);
-                    if (!videoIsFree(video)) {
-		        if( !easyrtc.isPeerInAnyRoom(getCallerOfVideo(video))){
-                           if( onHangup ) {
-                               onHangup(getCallerOfVideo(video), i);
-                           }
-                           setCallerOfVideo(video, null);
-                        }
-                    }
-                }
-            }
-        );
-
-        function videoIsFree(obj) {
-            var caller = getCallerOfVideo(obj);
-            return (caller === "" || caller === null || caller === undefined);
-        }
-
-        if (!_validateVideoIds(monitorVideoId, videoIdsP)) {
-            throw "bad video element id";
-        }
-
-        if (monitorVideoId) {
-            document.getElementById(monitorVideoId).muted = "muted";
-        }
-
-        /** Sets an event handler that gets called when an incoming MediaStream is assigned 
-         * to a video object. The name is poorly chosen and reflects a simpler era when you could
-         * only have one media stream per peer connection.
-         * @param {Function} cb has the signature function(easyrtcid, slot){}
-         * @example
-         *   easyrtc.setOnCall( function(easyrtcid, slot){
-         *      console.log("call with " + easyrtcid + "established");
-         *   });
-         */
-        self.setOnCall = function(cb) {
-            onCall = cb;
-        };
-        /** Sets an event handler that gets called when a call is ended.
-         * it's only purpose (so far) is to support transitions on video elements.
-         x     * this function is only defined after easyrtc.easyApp is called.
-         * The slot is parameter is the index into the array of video ids.
-         * Note: if you call easyrtc.getConnectionCount() from inside your callback
-         * it's count will reflect the number of connections before the hangup started.
-         * @param {Function} cb has the signature function(easyrtcid, slot){}
-         * @example
-         *   easyrtc.setOnHangup( function(easyrtcid, slot){
-         *      console.log("call with " + easyrtcid + "ended");
-         *   });
-         */
-        self.setOnHangup = function(cb) {
-            onHangup = cb;
-        };
-
-        function getIthVideo(i) {
-            if (videoIdsP[i]) {
-                return document.getElementById(videoIdsP[i]);
-            }
-            else {
-                return null;
-            }
-        }
-
-
-        self.getIthCaller = function(i) {
-            if (i < 0 || i > videoIdsP.length) {
-                return null;
-            }
-            var vid = getIthVideo(i);
-            return getCallerOfVideo(vid);
-        };
-
-        self.getSlotOfCaller = function(easyrtcid) {
-            var i;
-            for (i = 0; i < numPEOPLE; i++) {
-                if (self.getIthCaller(i) === easyrtcid) {
-                    return i;
-                }
-            }
-            return -1; // caller not connected
-        };
-        function hideVideo(video) {
-            self.setVideoObjectSrc(video, "");
-            video.style.visibility = "hidden";
-        }
-
-        self.setOnStreamClosed(function(caller) {
-            var i;
-            for (i = 0; i < numPEOPLE; i++) {
-                var video = getIthVideo(i);
-                if (getCallerOfVideo(video) === caller) {
-                    hideVideo(video);
-                    setCallerOfVideo(video, "");
-                    if (onHangup) {
-                        onHangup(caller, i);
-                    }
-                }
-            }
-        });
-        //
-        // Only accept incoming calls if we have a free video object to display
-        // them in.
-        //
-        self.setAcceptChecker(function(caller, helper) {
-            var i;
-            for (i = 0; i < numPEOPLE; i++) {
-                var video = getIthVideo(i);
-                if (videoIsFree(video)) {
-                    helper(true);
-                    return;
-                }
-            }
-            helper(false);
-        });
-        self.setStreamAcceptor(function(caller, stream) {
-            var i;
-            if (self.debugPrinter) {
-                self.debugPrinter("stream acceptor called");
-            }
-            function showVideo(video, stream) {
-                self.setVideoObjectSrc(video, stream);
-                if (video.style.visibility) {
-                    video.style.visibility = 'visible';
-                }
-            }
-
-            var video;
-            if (refreshPane && videoIsFree(refreshPane)) {
-                showVideo(refreshPane, stream);
-                if (onCall) {
-                    onCall(caller, refreshPane);
-                }
-                refreshPane = null;
-                return;
-            }
-            for (i = 0; i < numPEOPLE; i++) {
-                video = getIthVideo(i);
-                if (getCallerOfVideo(video) === caller) {
-                    showVideo(video, stream);
-                    if (onCall) {
-                        onCall(caller, i);
-                    }
-                    return;
-                }
-            }
-
-            for (i = 0; i < numPEOPLE; i++) {
-                video = getIthVideo(i);
-                if (videoIsFree(video)) {
-                    setCallerOfVideo(video, caller);
-                    if (onCall) {
-                        onCall(caller, i);
-                    }
-                    showVideo(video, stream);
-                    return;
-                }
-            }
-//
-// no empty slots, so drop whatever caller we have in the first slot and use that one.
-//
-            video = getIthVideo(0);
-            if (video) {
-                self.hangup(getCallerOfVideo(video));
-                showVideo(video, stream);
-                if (onCall) {
-                    onCall(caller, 0);
-                }
-            }
-            setCallerOfVideo(video, caller);
-        });
-        (function() {
-            var addControls, parentDiv, closeButton, i;
-            if (autoAddCloseButtons) {
-
-                addControls = function(video) {
-                    parentDiv = video.parentNode;
-                    setCallerOfVideo(video, "");
-                    closeButton = document.createElement("div");
-                    closeButton.className = "easyrtc_closeButton";
-                    closeButton.onclick = function() {
-                        if (getCallerOfVideo(video)) {
-                            self.hangup(getCallerOfVideo(video));
-                            hideVideo(video);
-                            setCallerOfVideo(video, "");
-                        }
-                    };
-                    parentDiv.appendChild(closeButton);
-                };
-                for (i = 0; i < numPEOPLE; i++) {
-                    addControls(getIthVideo(i));
-                }
-            }
-        })();
-        var monitorVideo = null;
-        if (videoEnabled && monitorVideoId !== null) {
-            monitorVideo = document.getElementById(monitorVideoId);
-            if (!monitorVideo) {
-                console.error("Programmer error: no object called " + monitorVideoId);
-                return;
-            }
-            monitorVideo.muted = "muted";
-            monitorVideo.defaultMuted = true;
-        }
-    }
-    /**
-     * Provides a layer on top of the easyrtc.initMediaSource and easyrtc.connect, assign the local media stream to
-     * the video object identified by monitorVideoId, assign remote video streams to
-     * the video objects identified by videoIds, and then call onReady. One of it's
-     * side effects is to add hangup buttons to the remote video objects, buttons
-     * that only appear when you hover over them with the mouse cursor. This method will also add the
-     * easyrtcMirror class to the monitor video object so that it behaves like a mirror.
-     *  @param {String} applicationName - name of the application.
-     *  @param {String} monitorVideoId - the id of the video object used for monitoring the local stream.
-     *  @param {Array} videoIds - an array of video object ids (strings)
-     *  @param {Function} onReady - a callback function used on success. It is called with the easyrtcId this peer is known to the server as.
-     *  @param {Function} onFailure - a callback function used on failure (failed to get local media or a connection of the signaling server).
-     *  @example
-     *     easyrtc.easyApp('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],
-     *              function(easyrtcId){
-     *                  console.log("successfully connected, I am " + easyrtcId);
-     *              },
-     *              function(errorCode, errorText){
-     *                  console.log(errorText);
-     *              );
-     */
-    this.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, onFailure) {
-        var gotMediaCallback = null,
-                gotConnectionCallback = null;
-        easyAppBody(monitorVideoId, videoIds);
-        self.setGotMedia = function(gotMediaCB) {
-            gotMediaCallback = gotMediaCB;
-        };
-        /** Sets an event handler that gets called when a connection to the signaling
-         * server has or has not been made. Can only be called after calling easyrtc.easyApp.
-         * @param {Function} gotConnectionCB has the signature (gotConnection, errorText)
-         * @example
-         *    easyrtc.setGotConnection( function(gotConnection, errorText){
-         *        if( gotConnection ){
-         *            console.log("Successfully connected to signaling server");
-         *        }
-         *        else{
-         *            console.log("Failed to connect to signaling server because: " + errorText);
-         *        }
-         *    });
-         */
-        self.setGotConnection = function(gotConnectionCB) {
-            gotConnectionCallback = gotConnectionCB;
-        };
-        var nextInitializationStep;
-        nextInitializationStep = function(/* token */) {
-            if (gotConnectionCallback) {
-                gotConnectionCallback(true, "");
-            }
-            onReady(self.myEasyrtcid);
-        };
-        function postGetUserMedia() {
-            if (gotMediaCallback) {
-                gotMediaCallback(true, null);
-            }
-            if (monitorVideoId !== null) {
-                self.setVideoObjectSrc(document.getElementById(monitorVideoId), self.getLocalStream());
-            }
-            function connectError(errorCode, errorText) {
-                if (gotConnectionCallback) {
-                    gotConnectionCallback(false, errorText);
-                }
-                else if (onFailure) {
-                    onFailure(self.errCodes.CONNECT_ERR, errorText);
-                }
-                else {
-                    self.showError(self.errCodes.CONNECT_ERR, errorText);
-                }
-            }
-
-            self.connect(applicationName, nextInitializationStep, connectError);
-        }
-
-        var stream = getLocalMediaStreamByName(null);
-        if (stream) {
-            postGetUserMedia();
-        }
-        else {
-            self.initMediaSource(
-                    postGetUserMedia,
-                    function(errorCode, errorText) {
-                        if (gotMediaCallback) {
-                            gotMediaCallback(false, errorText);
-                        }
-                        else if (onFailure) {
-                            onFailure(self.errCodes.MEDIA_ERR, errorText);
-                        }
-                        else {
-                            self.showError(self.errCodes.MEDIA_ERR, errorText);
-                        }
-                    },
-                    null // default stream
-                    );
-        }
-    };
-    /**
-     *
-     * @deprecated now called easyrtc.easyApp.
-     */
-    this.initManaged = this.easyApp;
     var preallocatedSocketIo = null;
     /**
      * Supply a socket.io connection that will be used instead of allocating a new socket.
