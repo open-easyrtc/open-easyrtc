@@ -304,13 +304,13 @@
         //
         // try to restablish broken connections that weren't caused by a hangup
         //
-        easyrtc.setPeerClosedListener( function(easyrtcid)) {
+        easyrtc.setPeerClosedListener( function(easyrtcid) {
            setTimeout( function() {
-               if( easyrtc.getSlotOfCaller(easyrtcid) &&  >= 0 && easyrtc.isPeerInAnyRoom(easyrtcid)) {
+               if( easyrtc.getSlotOfCaller(easyrtcid)  >= 0 && easyrtc.isPeerInAnyRoom(easyrtcid)) {
                     easyrtc.call(easyrtcid, function(){}, function() {}, function(){});
                }
            }, 1000);
-        }
+        });
         /** Sets an event handler that gets called when a connection to the signaling
          * server has or has not been made. Can only be called after calling easyrtc.easyApp.
          * @param {Function} gotConnectionCB has the signature (gotConnection, errorText)
