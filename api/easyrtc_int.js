@@ -819,6 +819,7 @@ var Easyrtc = function() {
             self.getChromePeerStatistics(easyrtcid, callback, filter);
         }
     };
+
     this.getFirefoxPeerStatistics = function(peerId, callback, filter) {
 
 
@@ -891,6 +892,7 @@ var Easyrtc = function() {
             callback(peerId, {"statistics": self.getConstantString("statsNotSupported")});
         }
     };
+
     this.getChromePeerStatistics = function(peerId, callback, filter) {
 
         if (!peerConns[peerId]) {
@@ -919,7 +921,7 @@ var Easyrtc = function() {
                         names = parts[i].names();
                         for (j = 0; j < names.length; j++) {
                             itemKey = names[j];
-                            localStats[parts[i].id + "." + itemKey] = parts[i].local.stat(itemKey);
+                            localStats[parts[i].id + "." + itemKey] = parts[i].stat(itemKey);
                         }
                     }
                 }
@@ -935,14 +937,14 @@ var Easyrtc = function() {
                         }
 
                         //
-                        // a chrome-firefox connection results in several activeConnections.
+                        // a chrome-firefox connection results in several activeConnections. 
                         // we only want one, so we look for the one with the most data being received on it.
                         //
                         if (partNames[i].googRemoteAddress && partNames[i].googActiveConnection) {
-                            hasActive = parts[i].local.stat("googActiveConnection");
+                            hasActive = parts[i].stat("googActiveConnection");
                             if (hasActive === true || hasActive === "true") {
-                                curReceived = parseInt(parts[i].local.stat("bytesReceived")) +
-                                        parseInt(parts[i].local.stat("bytesSent"));
+                                curReceived = parseInt(parts[i].stat("bytesReceived")) +
+                                        parseInt(parts[i].stat("bytesSent"));
                                 if (curReceived > bestBytes) {
                                     bestI = i;
                                     bestBytes = curReceived;
@@ -960,8 +962,8 @@ var Easyrtc = function() {
                                 partNames[i] = {};
                             }
                             else {
-                                localAddress = parts[i].local.stat("googLocalAddress").split(":")[0];
-                                remoteAddress = parts[i].local.stat("googRemoteAddress").split(":")[0];
+                                localAddress = parts[i].stat("googLocalAddress").split(":")[0];
+                                remoteAddress = parts[i].stat("googRemoteAddress").split(":")[0];
                                 if (self.isTurnServer(localAddress)) {
                                     turnAddress = localAddress;
                                 }
@@ -991,11 +993,11 @@ var Easyrtc = function() {
                         if (partList.length === 1) {
                             for (j = 0; j < partList.length; j++) {
                                 part = partList[j];
-                                if (part.local) {
+                                if (part) {
                                     for (itemKey in itemKeys) {
                                         if (itemKeys.hasOwnProperty(itemKey)) {
                                             userKey = itemKeys[itemKey];
-                                            localStats[userKey] = part.local.stat(itemKey);
+                                            localStats[userKey] = part.stat(itemKey);
                                         }
                                     }
                                 }
@@ -1009,14 +1011,12 @@ var Easyrtc = function() {
                             }
                             for (j = 0; j < partList.length; j++) {
                                 part = partList[j];
-                                if (part.local) {
                                     for (itemKey in itemKeys) {
                                         if (itemKeys.hasOwnProperty(itemKey)) {
                                             userKey = itemKeys[itemKey];
-                                            localStats[userKey].push(part.local.stat(itemKey));
+                                            localStats[userKey].push(part.stat(itemKey));
                                         }
                                     }
-                                }
                             }
                         }
                     }
