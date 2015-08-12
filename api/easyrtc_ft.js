@@ -288,10 +288,17 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
 
         var nextLocation = filePosition + amountToRead;
         var blobSlice = curFile.slice(filePosition, nextLocation);
+
         var reader = new FileReader();
         reader.onloadend = function(evt) {
             if (evt.target.readyState === FileReader.DONE) { // DONE == 2
-                var binaryString = evt.target.result;
+                var binaryString = "";
+                var bytes = new Uint8Array(evt.target.result);
+                var length = bytes.byteLength;
+                for (var i = 0; i < length; i++) {
+                  binaryString += String.fromCharCode(bytes[i]);
+                }
+
                 var maxchar = 32, minchar = 32;
                 for (var pp = 0; pp < binaryString.length; pp++) {
                     var oneChar = binaryString.charCodeAt(pp);
@@ -324,7 +331,8 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
             }
         };
 
-        reader.readAsBinaryString(blobSlice);
+        reader.readAsArrayBuffer(blobSlice);
+
         filePosition = nextLocation;
 
         //  advance to the next file if we've read all of this file
