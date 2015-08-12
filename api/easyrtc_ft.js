@@ -291,12 +291,17 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         var reader = new FileReader();
         reader.onloadend = function(evt) {
             if (evt.target.readyState === FileReader.DONE) { // DONE == 2
-                var binaryString = evt.target.result;
-                var maxchar = 32, minchar = 32;
+//              
+//              Contribution by Harold Thetiot
+//                
+                var binaryString = "";
+                var bytes = new Uint8Array(evt.target.result);
+                var length = bytes.length;
+                for( var i = 0; i < length; i++ ) {
+                   binaryString += String.fromCharCode(bytes[i]);
+                }
                 for (var pp = 0; pp < binaryString.length; pp++) {
                     var oneChar = binaryString.charCodeAt(pp);
-                    maxchar = Math.max(maxchar, oneChar);
-                    minchar = Math.min(minchar, oneChar);
                 }
                 var maxPacketSize = 400; // size in bytes
                 for (var pos = 0; pos < binaryString.length; pos += maxPacketSize) {
@@ -324,7 +329,11 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
             }
         };
 
-        reader.readAsBinaryString(blobSlice);
+        // reader.readAsBinaryString(blobSlice);
+        //
+        // contribution by Harold Thetiot to support IE10
+        //
+        reader.readAsArrayBuffer(blobSlice);
         filePosition = nextLocation;
 
         //  advance to the next file if we've read all of this file
