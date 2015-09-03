@@ -118,10 +118,10 @@ Links for help and information
 * Our YouTube channel has live demo's:
   * [http://www.youtube.com/user/priologic](http://www.youtube.com/user/priologic)
 * Information on complimentary EasyRTC commercial products can be found here: 
-  * [iOS SDK](https://easyrtc.com/products/easyrtc-ios-sdk)
-  * [Android SDK](https://easyrtc.com/products/easyrtc-android-sdk)
-  * [Autonomous Vehicle Application Enablement Platform](http://www.skedans.com/)
-  * [Product and support pricing](https://easyrtc.com/pricing/)
+  * [iOS SDK - https://easyrtc.com/products/easyrtc-ios-sdk](https://easyrtc.com/products/easyrtc-ios-sdk)
+  * [Android SDK - https://easyrtc.com/products/easyrtc-android-sdk](https://easyrtc.com/products/easyrtc-android-sdk)
+  * [Autonomous Vehicle Application Enablement Platform - http://www.skedans.com/](http://www.skedans.com/)
+  * [Product and support pricing - https://easyrtc.com/pricing/](https://easyrtc.com/pricing/)
 
 License
 -------
