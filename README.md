@@ -110,14 +110,18 @@ Links for help and information
 * The EasyRTC website is at:
   * [http://www.easyrtc.com/](http://www.easyrtc.com/)
 * Use our support forum is at:
-  * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
+  * [https://easyrtc.com/forums/](https://easyrtc.com/forums/)
 * Live demo site:
   * [http://demo.easyrtc.com/](http://demo.easyrtc.com/)
 * Bugs and requests can be filed on our github page or on the forum:
   * [https://github.com/priologic/easyrtc/issues](https://github.com/priologic/easyrtc/issues)
 * Our YouTube channel has live demo's:
   * [http://www.youtube.com/user/priologic](http://www.youtube.com/user/priologic)
-
+* Information on complimentary EasyRTC commercial products can be found here: 
+  * [iOS SDK](https://easyrtc.com/products/easyrtc-ios-sdk)
+  * [Android SDK](https://easyrtc.com/products/easyrtc-android-sdk)
+  * [Autonomous Vehicle Application Enablement Platform](http://www.skedans.com/)
+  * [Product and support pricing](https://easyrtc.com/pricing/)
 
 License
 -------
