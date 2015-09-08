@@ -175,9 +175,21 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
     var curFile = null;
     var curFileSize;
     var filesAreBinary;
-    var maxChunkSize = 10 * 1024;
+    //
+    //  maxPacketSize is the size (before base64 encoding) that is sent in a 
+    //               single data channel message, in bytes.
+    //  maxChunkSize is the amount read from a file at a time, in bytes.
+    //  ackThreshold is the amount of data that can be sent before an ack is 
+    //               received from the party we're sending to, bytes.
+    //  maxChunkSize should be a multiple of maxPacketSize.
+    //  ackThreshold should be several times larger than maxChunkSize. For 
+    //               network paths that have greater latency, increase 
+    //               ackThreshold further.
+    // 
+    var maxPacketSize = 40*1024; // max bytes per packet, before base64 encoding
+    var maxChunkSize = maxPacketSize * 10; // max binary bytes read at a time.
     var waitingForAck = false;
-    var ackThreshold = 100 * 1024; // send is allowed to be 150KB ahead of receiver
+    var ackThreshold = maxChunkSize * 4; // send is allowed to be 400KB ahead of receiver
     var filesWaiting = [];
     var haveFilesWaiting = false;
 
@@ -303,7 +315,6 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
                 for (var pp = 0; pp < binaryString.length; pp++) {
                     var oneChar = binaryString.charCodeAt(pp);
                 }
-                var maxPacketSize = 400; // size in bytes
                 for (var pos = 0; pos < binaryString.length; pos += maxPacketSize) {
                     var packetLen = Math.min(maxPacketSize, amountToRead - pos);
                     var packetData = binaryString.substring(pos, pos + packetLen);
