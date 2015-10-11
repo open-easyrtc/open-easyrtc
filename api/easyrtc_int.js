@@ -3371,7 +3371,7 @@ var Easyrtc = function() {
 
                     for (i = 0; i < remoteStreams.length; i++) {
                         var remoteId;
-                        if (remoteStreams[i].hasOwnProperty("id")) {
+                        if (remoteStreams[i].id) {
                             remoteId = remoteStreams[i].id;
                         }
                         else {
@@ -3770,7 +3770,7 @@ var Easyrtc = function() {
         }
         var streamName;
         var id;
-        if (stream.hasOwnProperty("id")) {
+        if (stream.id) {
             id = stream.id;
         }
         else {
