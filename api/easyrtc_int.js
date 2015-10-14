@@ -876,7 +876,7 @@ var Easyrtc = function() {
                         }
                     }
                     else {
-                        if( entry.hasOwnProperty("ipAddress") && entry.hasOwnProperty("id")) {
+                        if( entry.hasOwnProperty("ipAddress") && entry.id) {
                             candidates[entry.id] = entry.ipAddress + ":" +
                                   entry.portNumber;
                         }
@@ -3500,7 +3500,7 @@ var Easyrtc = function() {
 
                     for (i = 0; i < remoteStreams.length; i++) {
                         var remoteId;
-                        if (remoteStreams[i].hasOwnProperty("id")) {
+                        if (remoteStreams[i].id) {
                             remoteId = remoteStreams[i].id;
                         }
                         else {
@@ -3970,7 +3970,7 @@ var Easyrtc = function() {
         }
         var streamName;
         var id;
-        if (stream.hasOwnProperty("id")) {
+        if (stream.id) {
             id = stream.id;
         }
         else {
