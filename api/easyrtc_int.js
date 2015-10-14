@@ -48,6 +48,26 @@ var Easyrtc = function() {
                 'force new connection': true
             };
 
+    //
+    // this function replaces the deprecated MediaStream.stop method
+    //
+    function stopStream(stream) {
+       var i;
+       var tracks;
+       tracks = stream.getAudioTracks();
+       for( i = 0; i < tracks.length; i++ ) {
+           try {
+             tracks[i].stop();
+           } catch(err){}
+       }  
+       tracks = stream.getVideoTracks();
+       for( i = 0; i < tracks.length; i++ ) {
+           try {
+             tracks[i].stop();
+           } catch(err){}
+       }  
+    }
+
     /**
      * Sets functions which filter sdp records before calling setLocalDescription or setRemoteDescription.
      * This is advanced functionality which can break things, easily. See the easyrtc_rates.js file for a
@@ -1529,7 +1549,7 @@ var Easyrtc = function() {
                 }
             }
             try {
-                namedLocalMediaStreams[streamName].stop();
+                stopStream(namedLocalMediaStreams[streamName]);
             } catch (err) {
                 // not worth reporting an error at this location
                 // since we didn't want the media stream anyhow.
@@ -3077,10 +3097,10 @@ var Easyrtc = function() {
             if (peerConns[otherUser].pc) {
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
                 for (i = 0; i < remoteStreams.length; i++) {
-                    if( !remoteStreams[i].ended ) {
+                    if( remoteStreams[i].active ) {
                         emitOnStreamClosed(otherUser, remoteStreams[i]);
                         try {
-                            remoteStreams[i].close();
+                            stopStream(remoteStreams[i]);
                         } catch (err) {
                         }
                     }
@@ -3313,7 +3333,7 @@ var Easyrtc = function() {
             var stream = peerConns[easyrtcid].getRemoteStreamByName(msgData.streamName);
             if (stream) {
                 onRemoveStreamHelper(easyrtcid, stream, msgData.streamName);
-                stream.ended = true;
+                stopStream(stream);
             }
         }
 
@@ -3982,7 +4002,7 @@ var Easyrtc = function() {
                     for (i = 0; i < remoteStreams.length; i++) {
                         emitOnStreamClosed(caller, remoteStreams[i]);
                         try {
-                            remoteStreams[i].stop();
+                            stopStream(remoteStreams[i]);
                         } catch (err) {
                         }
                     }
