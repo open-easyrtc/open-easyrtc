@@ -17,6 +17,7 @@ Changes:
  - JS Client - Accommodate deprecated MediaStream.stop events
  - Server - Various code quality fixes
  - Server - Added additional debug level logging of incoming and outgoing socket messages. Added wrapper for socketCallbacks to permit additional logging for returning socket messages.
+ - Demos - Updated links to point to new EasyRTC forums, located at https://easyrtc.com/forums/ (issue #167)
 
 Fixes:
 
@@ -24,6 +25,7 @@ Fixes:
  - JS Client - The onhangup method was being called with the wrong order of arguments when a roomOccupants message indicated that somebody had left.
  - JS Client - Changed mediastream.hasOwnProperty(id) to mediastream.id. Thanks to contribution by Harold Thétiot. (issue #163, #165)
  - Server - Fixed onCreateRoom events so they properly fire (issue #162)
+
 
 v1.0.14
 -------
@@ -36,6 +38,7 @@ Fixes:
  - JS Client - Various code quality fixes
  - Demos - Added muting to the multstream demos so they didn't squawk.
  - Demos - Fixed the disconnect button in the demo_audio_video.html demo.
+
 
 v1.0.13
 -------

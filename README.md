@@ -110,7 +110,7 @@ Links for help and information
 * The EasyRTC website is at:
   * [http://www.easyrtc.com/](http://www.easyrtc.com/)
 * Use our support forum is at:
-  * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
+  * [https://easyrtc.com/forums/](https://easyrtc.com/forums/)
 * Live demo site:
   * [http://demo.easyrtc.com/](http://demo.easyrtc.com/)
 * Bugs and requests can be filed on our github page or on the forum:
