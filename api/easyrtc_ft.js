@@ -388,7 +388,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
 
 /**
  * Enable datachannel based file receiving. The received blobs get passed to the statusCB in the 'eof' typed message.
- * @param {Function(otherGuy,fileNameList, wasAccepted} acceptRejectCB - this function is called when another peer
+ * @param {Function(otherGuy,fileNameList, wasAccepted)} acceptRejectCB - this function is called when another peer
  * (otherGuy) offers to send you a list of files. this function should call it's wasAccepted function with true to
  * allow those files to be sent, or false to disallow them.
  * @param {Function} blobAcceptor - this function is called three arguments arguments: the suppliers easyrtcid, a blob and a filename. It is responsible for
