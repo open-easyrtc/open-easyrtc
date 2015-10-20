@@ -59,13 +59,13 @@ var Easyrtc = function() {
            try {
              tracks[i].stop();
            } catch(err){}
-       }  
+       }
        tracks = stream.getVideoTracks();
        for( i = 0; i < tracks.length; i++ ) {
            try {
              tracks[i].stop();
            } catch(err){}
-       }  
+       }
     }
 
     /**
@@ -86,18 +86,18 @@ var Easyrtc = function() {
     */
    this.setPeerClosedListener = function( handler ) {
       this.onPeerClosed = handler;
-   }
+   };
 
    /**
     * Sets a function to receive warnings about the peer connection
     * failing. The peer connection may recover by itself.
     *  @param {Function} failingHandler: a function that gets an easyrtcid as an argument.
-    *  @param {Function} recoverdHandler: a function that gets an easyrtcid as an argument.
+    *  @param {Function} recoveredHandler: a function that gets an easyrtcid as an argument.
     */
    this.setPeerFailingListener = function( failingHandler, recoveredHandler ) {
       this.onPeerFailing = failingHandler;
       this.onPeerRecovered = recoveredHandler;
-   }
+   };
 
    /**
     * Sets a function which filters IceCandidate records being sent or received.
@@ -118,7 +118,7 @@ var Easyrtc = function() {
     /**
      * Controls whether a default local media stream should be acquired automatically during calls and accepts
      * if a list of streamNames is not supplied. The default is true, which mimics the behaviour of earlier releases
-     * that didn't support multiple streams. This function should be called before easyrtc.call or before entering an 
+     * that didn't support multiple streams. This function should be called before easyrtc.call or before entering an
      * accept  callback.
      * @param {Boolean} flag true to allocate a default local media stream.
      */
@@ -151,9 +151,9 @@ var Easyrtc = function() {
      * @return true if the socket exists and is connected, false otherwise.
     */
     function isSocketConnected(socket) {
-       return (socket && 
+       return (socket &&
               ( ( socket.socket && socket.socket.connected)
-                || socket.connected )); 
+                || socket.connected ));
     }
 
 
@@ -827,7 +827,7 @@ var Easyrtc = function() {
      * This function gets the statistics for a particular peer connection.
      * @param {String} easyrtcid
      * @param {Function} callback gets the easyrtcid for the peer and a map of {userDefinedKey: value}. If there is no peer connection to easyrtcid, then the map will
-     *  have a value of {connected:false}. 
+     *  have a value of {connected:false}.
      * @param {Object} filter depends on whether Chrome or Firefox is used. See the default filters for guidance.
      * It is still experimental.
      */
@@ -957,7 +957,7 @@ var Easyrtc = function() {
                         }
 
                         //
-                        // a chrome-firefox connection results in several activeConnections. 
+                        // a chrome-firefox connection results in several activeConnections.
                         // we only want one, so we look for the one with the most data being received on it.
                         //
                         if (partNames[i].googRemoteAddress && partNames[i].googActiveConnection) {
@@ -1360,12 +1360,12 @@ var Easyrtc = function() {
     };
 
     /** Sets the maximum length in bytes of P2P messages that can be sent.
-     * @param {Integer} maxLength maximum length to set
+     * @param {Number} maxLength maximum length to set
      * @example
      *     easyrtc.setMaxP2PMessageLength(10000);
      */
-    this.setMaxP2PMessageLength = function(limit) {
-        this.maxP2PMessageLength = limit;
+    this.setMaxP2PMessageLength = function(maxLength) {
+        this.maxP2PMessageLength = maxLength;
     };
 
     /** Sets whether audio is transmitted by the local user in any subsequent calls.
@@ -2023,7 +2023,7 @@ var Easyrtc = function() {
     };
     /**
      * Sets the callback used to decide whether to accept or reject an incoming call.
-     * @param {Function} acceptCheck takes the arguments (callerEasyrtcid, acceptor).     
+     * @param {Function} acceptCheck takes the arguments (callerEasyrtcid, acceptor).
      * The acceptCheck callback is passed an easyrtcid and an acceptor function. The acceptor function should be called with either
      * a true value (accept the call) or false value( reject the call) as it's first argument, and optionally,
      * an array of local media streamNames as a second argument.
@@ -2377,8 +2377,8 @@ var Easyrtc = function() {
      * @example
      *     easyrtc.setIceUsedInCalls( {"iceServers": [
      *      {
-     *			"url": "stun:stun.sipgate.net"
-     *		},
+     *         "url": "stun:stun.sipgate.net"
+     *      },
      *      {
      *         "url": "stun:217.10.68.152"
      *      },
@@ -2645,7 +2645,7 @@ var Easyrtc = function() {
 
         endMessage = {
             transfer: 'end',
-            transferId: transferId,
+            transferId: transferId
         };
 
         peerConns[destUser].dataChannelS.send(JSON.stringify(startMessage));
@@ -3431,13 +3431,13 @@ var Easyrtc = function() {
                             failureCB(self.errCodes.NOVIABLEICE, "No usable STUN/TURN path");
                        }
                        delete peerConns[otherUser];
-                       break; 
+                       break;
                    case "disconnected":
                       if( easyrtc.onPeerFailing ) {
                           easyrtc.onPeerFailing(otherUser);
                           peerConns[otherUser].failing = Date.now();
                       }
-                      break; 
+                      break;
 
                    case "closed":
                       if( easyrtc.onPeerClosed ) {
@@ -3453,8 +3453,8 @@ var Easyrtc = function() {
 
                     delete peerConns[otherUser].failing;
                 }
-            }
-           
+            };
+
 
             pc.onconnection = function() {
                 if (self.debugPrinter) {
@@ -4147,7 +4147,7 @@ var Easyrtc = function() {
     function processOccupantList(roomName, occupantList) {
         var myInfo = null;
         var reducedList = {};
-        
+
         var id;
         for (id in occupantList) {
             if (occupantList.hasOwnProperty(id)) {
@@ -4871,7 +4871,7 @@ var Easyrtc = function() {
         if (!window.createIceServer) {
             return;
         }
-       if( !iceConfig || !iceConfig.iceServers || 
+       if( !iceConfig || !iceConfig.iceServers ||
               typeof iceConfig.iceServers.length === "undefined" ) {
             self.showError(self.errCodes.DEVELOPER_ERR, "iceConfig received from server didn't have an array called iceServers, ignoring it");
               iceConfig = { iceServers:[]};
