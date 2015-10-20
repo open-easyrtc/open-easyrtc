@@ -6,7 +6,7 @@ v1.0.15
 
 New Features:
 
- - JS Client - Support for IE10 file shared. Thanks to contribution by Harold Thétiot. (issue #155)
+ - JS Client - Support for IE10 file sharing. Thanks to contribution by Harold Thétiot. (issue #155)
  - Server - Added new server option "logMessagesEnable" which enables the logging of incoming and outgoing messages. In order to make this work, wrappers were added around the various log statements.
 
 Changes:
