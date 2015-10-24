@@ -123,10 +123,11 @@ Links for help and information
   * [Autonomous Vehicle Application Enablement Platform - http://www.skedans.com/](http://www.skedans.com/)
   * [Product and support pricing - https://easyrtc.com/pricing/](https://easyrtc.com/pricing/)
 
+
 License
 -------
 
-Copyright (c) 2014, Priologic Software Inc.
+Copyright (c) 2015, Priologic Software Inc.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

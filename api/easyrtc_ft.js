@@ -1,10 +1,10 @@
 /** @class
- *@version 1.0.14
+ *@version 1.0.15
  *<p>
  * Provides support file and data transfer support to easyrtc.
  * </p>
  *<p>
- *copyright Copyright (c) 2014, Priologic Software Inc.
+ *copyright Copyright (c) 2015, Priologic Software Inc.
  *All rights reserved.</p>
  *
  *<p>
@@ -175,9 +175,21 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
     var curFile = null;
     var curFileSize;
     var filesAreBinary;
-    var maxChunkSize = 10 * 1024;
+    //
+    //  maxPacketSize is the size (before base64 encoding) that is sent in a 
+    //               single data channel message, in bytes.
+    //  maxChunkSize is the amount read from a file at a time, in bytes.
+    //  ackThreshold is the amount of data that can be sent before an ack is 
+    //               received from the party we're sending to, bytes.
+    //  maxChunkSize should be a multiple of maxPacketSize.
+    //  ackThreshold should be several times larger than maxChunkSize. For 
+    //               network paths that have greater latency, increase 
+    //               ackThreshold further.
+    // 
+    var maxPacketSize = 40*1024; // max bytes per packet, before base64 encoding
+    var maxChunkSize = maxPacketSize * 10; // max binary bytes read at a time.
     var waitingForAck = false;
-    var ackThreshold = 100 * 1024; // send is allowed to be 150KB ahead of receiver
+    var ackThreshold = maxChunkSize * 4; // send is allowed to be 400KB ahead of receiver
     var filesWaiting = [];
     var haveFilesWaiting = false;
 
@@ -288,17 +300,23 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
 
         var nextLocation = filePosition + amountToRead;
         var blobSlice = curFile.slice(filePosition, nextLocation);
+
         var reader = new FileReader();
         reader.onloadend = function(evt) {
             if (evt.target.readyState === FileReader.DONE) { // DONE == 2
-                var binaryString = evt.target.result;
-                var maxchar = 32, minchar = 32;
+//              
+//              Contribution by Harold Thetiot
+//                
+                var binaryString = "";
+                var bytes = new Uint8Array(evt.target.result);
+                var length = bytes.length;
+                for( var i = 0; i < length; i++ ) {
+                   binaryString += String.fromCharCode(bytes[i]);
+                }
+                
                 for (var pp = 0; pp < binaryString.length; pp++) {
                     var oneChar = binaryString.charCodeAt(pp);
-                    maxchar = Math.max(maxchar, oneChar);
-                    minchar = Math.min(minchar, oneChar);
                 }
-                var maxPacketSize = 400; // size in bytes
                 for (var pos = 0; pos < binaryString.length; pos += maxPacketSize) {
                     var packetLen = Math.min(maxPacketSize, amountToRead - pos);
                     var packetData = binaryString.substring(pos, pos + packetLen);
@@ -324,7 +342,11 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
             }
         };
 
-        reader.readAsBinaryString(blobSlice);
+        // reader.readAsBinaryString(blobSlice);
+        //
+        // contribution by Harold Thetiot to support IE10
+        //
+        reader.readAsArrayBuffer(blobSlice);
         filePosition = nextLocation;
 
         //  advance to the next file if we've read all of this file
@@ -368,7 +390,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
 
 /**
  * Enable datachannel based file receiving. The received blobs get passed to the statusCB in the 'eof' typed message.
- * @param {Function(otherGuy,fileNameList, wasAccepted} acceptRejectCB - this function is called when another peer
+ * @param {Function(otherGuy,fileNameList, wasAccepted)} acceptRejectCB - this function is called when another peer
  * (otherGuy) offers to send you a list of files. this function should call it's wasAccepted function with true to
  * allow those files to be sent, or false to disallow them.
  * @param {Function} blobAcceptor - this function is called three arguments arguments: the suppliers easyrtcid, a blob and a filename. It is responsible for

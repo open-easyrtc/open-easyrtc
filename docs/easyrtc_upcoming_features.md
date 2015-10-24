@@ -46,4 +46,4 @@ Any Features You Would Like?
 
 Please feel free to post on our discussion forum:
 
- * [https://groups.google.com/forum/#!forum/easyrtc](https://groups.google.com/forum/#!forum/easyrtc)
+ * [https://easyrtc.com/forums/](https://easyrtc.com/forums/)

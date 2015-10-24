@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>JSDoc: Source: easyrtc_default_event_listeners.js</title>
-    
+
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
@@ -16,21 +16,22 @@
 <body>
 
 <div id="main">
-    
+
     <h1 class="page-title">Source: easyrtc_default_event_listeners.js</h1>
+
     
-    
+
 
 
     
     <section>
         <article>
-            <pre class="prettyprint source"><code>/**
+            <pre class="prettyprint source linenums"><code>/**
  * Event listeners used by EasyRTC. Many of these can be overridden using server options.
  * 
  * @module      easyrtc_default_event_listeners
  * @author      Priologic Software, info@easyrtc.com
- * @copyright   Copyright 2014 Priologic Software. All rights reserved.
+ * @copyright   Copyright 2015 Priologic Software. All rights reserved.
  * @license     BSD v2, see LICENSE file in module root folder.
  */
 
@@ -88,6 +89,16 @@ eventListener.onConnection = function(socket, easyrtcid, next){
 
     // Initially upon a connection, we are only concerned with receiving an easyrtcAuth message
     socket.on("easyrtcAuth", function(msg, socketCallback) {
+
+        if (pub.getOption("logMessagesEnable")) {
+            try {
+                pub.util.logDebug("["+easyrtcid+"] Incoming socket.io message: ["+JSON.stringify(msg)+"]");
+            }
+            catch(err) {
+                pub.util.logDebug("["+easyrtcid+"] Incoming socket.io message");
+            }
+        }
+
         pub.events.emit("easyrtcAuth", socket, easyrtcid, msg, socketCallback, function(err, newConnectionObj){
             if(err){
                 pub.util.logError("["+easyrtcid+"] Unhandled easyrtcCmd listener error.", err);
@@ -154,12 +165,14 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
     pub.util.logDebug("["+easyrtcid+"] Running func 'onEasyrtcAuth'");
 
     var appObj, connectionObj, sessionObj;  // prepare variables to house the application, connection, and session objects
+
     var tokenMsg = {
         msgType: "token",
         msgData:{}
     };
 
-    var newAppName = (_.isObject(msg.msgData) &&_.isString(msg.msgData.applicationName)) ? msg.msgData.applicationName : pub.getOption("appDefaultName");
+    var appName;
+    var newAppName = (_.isObject(msg.msgData) &amp;&amp;_.isString(msg.msgData.applicationName)) ? msg.msgData.applicationName : pub.getOption("appDefaultName");
 
     // Ensure socketCallback is present
     if(!_.isFunction(socketCallback)) {
@@ -171,7 +184,7 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
     // Only accept authenticate message
     if(!_.isObject(msg) || !_.isString(msg.msgType) || msg.msgType != "authenticate") {
         pub.util.logWarning("["+easyrtcid+"] EasyRTC Auth message received without msgType of 'authenticate'. Disconnecting socket.", msg);
-        socketCallback(pub.util.getErrorMsg("LOGIN_BAD_AUTH"));
+        pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("LOGIN_BAD_AUTH"), appObj);
         try{socket.disconnect();}catch(e){}
         return;
     }
@@ -179,10 +192,10 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
     // Check msg structure.
     if(!_.isObject(msg.msgData)
         || !_.isString(msg.msgData.apiVersion)
-        || (msg.msgData.roomJoin !== undefined && !_.isObject(msg.msgData.roomJoin))
+        || (msg.msgData.roomJoin !== undefined &amp;&amp; !_.isObject(msg.msgData.roomJoin))
     ) {
         pub.util.logWarning("["+easyrtcid+"] EasyRTC Auth message received with improper msgData. Disconnecting socket.", msg);
-        socketCallback(pub.util.getErrorMsg("LOGIN_BAD_STRUCTURE"));
+        pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("LOGIN_BAD_STRUCTURE"), appObj);
         try{socket.disconnect();}catch(e){}
         return;
     }
@@ -197,7 +210,7 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
             // If message structure is invalid, send error, disconnect socket, and write to log
             if (!isMsgValid) {
                 try{
-                    socketCallback(pub.util.getErrorMsg(msgErrorCode));
+                    pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg(msgErrorCode), appObj);
                     socket.disconnect();
                 }catch(e){}
                 pub.util.logWarning("["+easyrtcid+"] EasyRTC Auth message received with invalid message format [" + msgErrorCode + "]. Disconnecting socket.", msg);
@@ -219,7 +232,7 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
             pub.events.emit("authenticate", socket, easyrtcid, newAppName, username, credential, msg, function(err){
                 if (err) {
                     try{
-                        socketCallback(pub.util.getErrorMsg("LOGIN_BAD_AUTH"));
+                        pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("LOGIN_BAD_AUTH"), appObj);
                         socket.disconnect();
                         pub.util.logInfo("["+newAppName+"]["+easyrtcid+"] Authentication denied. Socket disconnected.", err);
                     }catch(e){}
@@ -244,7 +257,7 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
                 if(pub.getOption("appAutoCreateEnable")) {
                     pub.createApp(newAppName, null, asyncCallback);
                 } else {
-                    socketCallback(pub.util.getErrorMsg("LOGIN_APP_AUTH_FAIL"));
+                    pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("LOGIN_APP_AUTH_FAIL"), appObj);
                     socket.disconnect();
                     pub.util.logWarning("[" + easyrtcid + "] Authentication failed. Requested application not found [" + newAppName + "]. Socket disconnected.");
                 }
@@ -254,6 +267,7 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
         function(newAppObj, asyncCallback) {
             // Now that we have an app, we can use it
             appObj = newAppObj;
+            appName = appObj.getAppName();
 
             appObj.isConnected(easyrtcid, asyncCallback);
         },
@@ -261,7 +275,7 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
         function(isConnected, asyncCallback) {
             // If socket has previously connected, disconnect them.
             if (isConnected){
-                socketCallback(pub.util.getErrorMsg("LOGIN_APP_AUTH_FAIL"));
+                pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("LOGIN_APP_AUTH_FAIL"), appObj);
                 socket.disconnect();
                 pub.util.logWarning("[" + easyrtcid + "] Authentication failed. Already connected. Socket disconnected.");
                 return;
@@ -351,7 +365,7 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
 
         function(asyncCallback) {
             // Join a room. If no rooms are defined than join the default room
-            if (_.isObject(msg.msgData.roomJoin) && !_.isEmpty(msg.msgData.roomJoin)) {
+            if (_.isObject(msg.msgData.roomJoin) &amp;&amp; !_.isEmpty(msg.msgData.roomJoin)) {
                 async.each(Object.keys(msg.msgData.roomJoin), function(currentRoomName, roomCallback) {
 
                     appObj.isRoom(currentRoomName, function(err, isRoom){
@@ -362,7 +376,7 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
 
                         // Set roomParameter map. This may be used by custom listeners.
                         var currentRoomParameter;
-                        if (msg.msgData.roomJoin[currentRoomName] && _.isObject(msg.msgData.roomJoin[currentRoomName].roomParameter)){
+                        if (msg.msgData.roomJoin[currentRoomName] &amp;&amp; _.isObject(msg.msgData.roomJoin[currentRoomName].roomParameter)){
                             currentRoomParameter = msg.msgData.roomJoin[currentRoomName].roomParameter;
                         }
 
@@ -383,7 +397,7 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
                         else {
                             // Can't join room and we are not allowed to create it. Error Out.
                             try{
-                                socketCallback(pub.util.getErrorMsg("LOGIN_BAD_ROOM"));
+                                pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("LOGIN_BAD_ROOM"), appObj);
                                 socket.disconnect();
                             }catch(e){}
                             pub.util.logInfo("[" + easyrtcid + "] Authentication failed. Requested room name does not exist [" + currentRoomName + "].");
@@ -410,19 +424,37 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
         function(asyncCallback) {
             // Add new listeners
             socket.on("easyrtcCmd", function(msg, socketCallback){
+                if (pub.getOption("logMessagesEnable")) {
+                    try {
+                        pub.util.logDebug("["+appName+"]["+easyrtcid+"] Incoming socket.io message: ["+JSON.stringify(msg)+"]");
+                    }
+                    catch(err) {
+                        pub.util.logDebug("["+appName+"]["+easyrtcid+"] Incoming socket.io message");
+                    }
+                }
+
                 pub.events.emit("easyrtcCmd", connectionObj, msg, socketCallback, function(err){
-                    if(err){pub.util.logError("["+easyrtcid+"] Unhandled easyrtcCmd listener error.", err);}
+                    if(err){pub.util.logError("["+appName+"]["+easyrtcid+"] Unhandled easyrtcCmd listener error.", err);}
                 });
 
             });
             socket.on("easyrtcMsg", function(msg, socketCallback){
+                if (pub.getOption("logMessagesEnable")) {
+                    try {
+                        pub.util.logDebug("["+appName+"]["+easyrtcid+"] Incoming socket.io message: ["+JSON.stringify(msg)+"]");
+                    }
+                    catch(err) {
+                        pub.util.logDebug("["+appName+"]["+easyrtcid+"] Incoming socket.io message");
+                    }
+                }
+
                 pub.events.emit("easyrtcMsg", connectionObj, msg, socketCallback, function(err){
-                    if(err){pub.util.logError("["+easyrtcid+"] Unhandled easyrtcMsg listener error.", err);}
+                    if(err){pub.util.logError("["+appName+"]["+easyrtcid+"] Unhandled easyrtcMsg listener error.", err);}
                 });
             });
             socket.on("disconnect", function(){
                 pub.events.emit("disconnect", connectionObj, function(err){
-                    if(err){pub.util.logError("["+easyrtcid+"] Unhandled disconnect listener error.", err);}
+                    if(err){pub.util.logError("["+appName+"]["+easyrtcid+"] Unhandled disconnect listener error.", err);}
                 });
             });
             asyncCallback(null);
@@ -449,7 +481,7 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
     function (err) {
         if (err){
             try{
-                socketCallback(pub.util.getErrorMsg("LOGIN_GEN_FAIL"));
+                pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("LOGIN_GEN_FAIL"), appObj);
                 socket.disconnect();
                 pub.util.logError("["+easyrtcid+"] General authentication error. Socket disconnected.", err);
             }catch(e){}
@@ -469,6 +501,11 @@ eventListener.onEasyrtcAuth = function(socket, easyrtcid, msg, socketCallback, c
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onEasyrtcCmd = function(connectionObj, msg, socketCallback, next){
+    var appName = connectionObj.getAppName();
+    var appObj = connectionObj.getApp();
+    var easyrtcid = connectionObj.getEasyrtcid();
+
+
     pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC command received with msgType [" + msg.msgType + "]");
     if (!_.isFunction(next)) {
         next = pub.util.nextToNowhere;
@@ -489,7 +526,7 @@ eventListener.onEasyrtcCmd = function(connectionObj, msg, socketCallback, next){
             // If message structure is invalid, send error, and write to log
             if (!isMsgValid) {
                 try{
-                    socketCallback(pub.util.getErrorMsg(msgErrorCode));
+                    pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg(msgErrorCode), appObj);
                 }catch(e){}
                 pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC Auth message received with invalid message format [" + msgErrorCode + "]. Disconnecting socket.", msg);
                 return;
@@ -501,7 +538,7 @@ eventListener.onEasyrtcCmd = function(connectionObj, msg, socketCallback, next){
             switch(msg.msgType) {
                 case "setUserCfg":
                     pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] WebRTC setUserCfg command received. This feature is not yet complete.");
-                    socketCallback({msgType:'ack'});
+                    pub.util.sendSocketCallbackAck(easyrtcid, socketCallback, appObj);
                     next(null);
                     break;
 
@@ -539,18 +576,18 @@ eventListener.onEasyrtcCmd = function(connectionObj, msg, socketCallback, next){
 
                     connectionObj.getApp().connection(msg.targetEasyrtcid, function(err,targetConnectionObj){
                         if (err){
-                            socketCallback(pub.util.getErrorMsg("MSG_REJECT_TARGET_EASYRTCID"));
+                            pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_TARGET_EASYRTCID"), appObj);
                             pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Could not send WebRTC signal to client [" + msg.targetEasyrtcid + "]. They may no longer be online.");
                             return;
                         }
                         pub.events.emit("emitEasyrtcCmd", targetConnectionObj, msg.msgType, outgoingMsg, null, next);
-                        socketCallback({msgType:'ack'});
+                        pub.util.sendSocketCallbackAck(easyrtcid, socketCallback, appObj);
                         next(null);
                     });
                     break;
 
                 default:
-                    socketCallback(pub.util.getErrorMsg("MSG_REJECT_BAD_TYPE"));
+                    pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_BAD_TYPE"), appObj);
                     pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Received easyrtcCmd message with unhandled msgType.", msg);
                     next(null);
             }
@@ -559,7 +596,7 @@ eventListener.onEasyrtcCmd = function(connectionObj, msg, socketCallback, next){
     function(err) {
         if (err) {
             try {
-                socketCallback(pub.util.getErrorMsg("MSG_REJECT_GEN_FAIL"));
+                pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_GEN_FAIL"), appObj);
                 pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Received easyrtcCmd message with general error.", msg);
             } catch(e){}
         }
@@ -576,6 +613,10 @@ eventListener.onEasyrtcCmd = function(connectionObj, msg, socketCallback, next){
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
+    var easyrtcid = connectionObj.getEasyrtcid();
+    var appObj = connectionObj.getApp();
+
+
     pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC message received of type [" + msg.msgType + "]");
 
     if (!_.isFunction(next)) {
@@ -596,7 +637,7 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
         function(isMsgValid, msgErrorCode, asyncCallback) {
             // If message structure is invalid, send error, and write to log
             if (!isMsgValid) {
-                socketCallback(pub.util.getErrorMsg(msgErrorCode));
+                pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg(msgErrorCode), appObj);
                 pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC message received with invalid message format [" + msgErrorCode + "].", msg);
                 return;
             }
@@ -605,8 +646,8 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
         function(asyncCallback) {
 
             // test targetEasyrtcid (if defined). Will prevent client from sending to themselves
-            if (msg.targetEasyrtcid  !== undefined && msg.targetEasyrtcid == connectionObj.getEasyrtcid()) {
-                socketCallback(pub.util.getErrorMsg("MSG_REJECT_TARGET_EASYRTCID"));
+            if (msg.targetEasyrtcid  !== undefined &amp;&amp; msg.targetEasyrtcid == connectionObj.getEasyrtcid()) {
+                pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_TARGET_EASYRTCID"), appObj);
                 pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC message received with improper targetEasyrtcid", msg);
                 return;
             }
@@ -636,7 +677,7 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
                         if (msg.targetRoom) {
                             targetConnectionObj.isInRoom(msg.targetRoom, function(err, isAllowed){
                                 if (err || !isAllowed) {
-                                    socketCallback(pub.util.getErrorMsg("MSG_REJECT_TARGET_ROOM"));
+                                    pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_TARGET_ROOM"), appObj);
                                     pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC message received with improper target room", msg);
                                     return;
                                 }
@@ -654,7 +695,7 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
                         if (msg.targetGroup) {
                             targetConnectionObj.isInGroup(msg.targetGroup, function(err, isAllowed){
                                 if (err || !isAllowed) {
-                                    socketCallback(pub.util.getErrorMsg("MSG_REJECT_TARGET_GROUP"));
+                                    pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_TARGET_GROUP"), appObj);
                                     pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC message received with improper target group", msg);
                                     return;
                                 }
@@ -674,11 +715,10 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
                 ],
                 function (err) {
                     if (err) {
-                        socketCallback(pub.util.getErrorMsg("MSG_REJECT_GEN_FAIL"));
+                        pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_GEN_FAIL"), appObj);
                         pub.util.logError("["+connectionObj.getEasyrtcid()+"] General message error. Message ignored.", err);
                     } else {
-                        socketCallback({msgType:'ack'});
-                    }
+                        pub.util.sendSocketCallbackAck(easyrtcid, socketCallback, appObj);                    }
                 });
             }
 
@@ -737,11 +777,10 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
                 ],
                 function(err) {
                     if (err) {
-                        socketCallback(pub.util.getErrorMsg("MSG_REJECT_TARGET_ROOM"));
+                        pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_TARGET_ROOM"), appObj);
                     }
                     else {
-                        socketCallback({msgType:'ack'});
-                    }
+                        pub.util.sendSocketCallbackAck(easyrtcid, socketCallback, appObj);                    }
                 });
 
             }
@@ -789,10 +828,10 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
                 ],
                 function(err) {
                     if (err) {
-                        socketCallback(pub.util.getErrorMsg("MSG_REJECT_TARGET_GROUP"));
+                        pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_TARGET_GROUP"), appObj);
                     }
                     else {
-                        socketCallback({msgType:'ack'});
+                        pub.util.sendSocketCallbackAck(easyrtcid, socketCallback, appObj);
                     }
                 });
 
@@ -805,7 +844,7 @@ eventListener.onEasyrtcMsg = function(connectionObj, msg, socketCallback, next){
     ],
     function(err) {
         if (err) {
-            socketCallback(pub.util.getErrorMsg("MSG_REJECT_GEN_FAIL"));
+            pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_GEN_FAIL"), appObj);
             pub.util.logError("["+connectionObj.getEasyrtcid()+"] General message error. Message ignored.", err);
         }
     });
@@ -829,13 +868,16 @@ eventListener.onEmitEasyrtcCmd = function(connectionObj, msgType, msg, socketCal
         return;
     }
 
+    var easyrtcid = connectionObj.getEasyrtcid();
+    var appName = connectionObj.getAppName();
+
     pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onEmitEasyrtcCmd' with msgType ["+msgType+"]");
     if (!msg) {
         msg = {};
     }
     if(!_.isFunction(socketCallback)) {
         socketCallback = function(returnMsg) {
-            if (_.isObject(returnMsg) && _.isString(returnMsg.msgType) && returnMsg.msgType == "ack"){
+            if (_.isObject(returnMsg) &amp;&amp; _.isString(returnMsg.msgType) &amp;&amp; returnMsg.msgType == "ack"){
                 // pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC message: unhandled Ack return message.");
             }
             else {
@@ -849,6 +891,16 @@ eventListener.onEmitEasyrtcCmd = function(connectionObj, msgType, msg, socketCal
     msg.serverTime  = Date.now();
 
     connectionObj.socket.emit( "easyrtcCmd", msg, socketCallback);
+
+    if (pub.getOption("logMessagesEnable")) {
+        try {
+            pub.util.logDebug("["+appName+"]["+easyrtcid+"] Sending socket.io message: ["+JSON.stringify(msg)+"]");
+        }
+        catch(err) {
+            pub.util.logDebug("["+appName+"]["+easyrtcid+"] Sending socket.io message");
+        }
+    }
+
     next(null);
 };
 
@@ -865,14 +917,23 @@ eventListener.onEmitEasyrtcCmd = function(connectionObj, msgType, msg, socketCal
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onEmitEasyrtcMsg = function(connectionObj, msgType, msg, socketCallback, next){
+    if (!_.isObject(connectionObj)){
+        next(new pub.util.ConnectionError("Connection object invalid. Client may have disconnected."));
+        return;
+    }
+
+    var easyrtcid = connectionObj.getEasyrtcid();
+    var appName = connectionObj.getAppName();
+
     pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onEmitEasyrtcMsg' with msgType ["+msgType+"]");
+
 
     if (!msg) {
         msg = {};
     }
     if(!_.isFunction(socketCallback)) {
         socketCallback = function(returnMsg) {
-            if (_.isObject(returnMsg) && _.isString(returnMsg.msgType) && returnMsg.msgType == "ack"){
+            if (_.isObject(returnMsg) &amp;&amp; _.isString(returnMsg.msgType) &amp;&amp; returnMsg.msgType == "ack"){
                 // pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC message: unhandled Ack return message.");
             }
             else {
@@ -885,6 +946,15 @@ eventListener.onEmitEasyrtcMsg = function(connectionObj, msgType, msg, socketCal
     msg.serverTime  = Date.now();
 
     connectionObj.socket.emit( "easyrtcMsg", msg, socketCallback);
+
+    if (pub.getOption("logMessagesEnable")) {
+        try {
+            pub.util.logDebug("["+appName+"]["+easyrtcid+"] Sending socket.io message: ["+JSON.stringify(msg)+"]");
+        }
+        catch(err) {
+            pub.util.logDebug("["+appName+"]["+easyrtcid+"] Sending socket.io message");
+        }
+    }
 
     next(null);
 };
@@ -921,6 +991,9 @@ eventListener.onEmitError = function(connectionObj, errorCode, socketCallback, n
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onEmitReturnAck = function(connectionObj, socketCallback, next){
+    var easyrtcid = connectionObj.getEasyrtcid();
+    var appObj = connectionObj.getApp();
+
     pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onEmitReturnAck'");
     if(!_.isFunction(socketCallback)) {
         pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC: unable to return ack to socket.");
@@ -935,7 +1008,7 @@ eventListener.onEmitReturnAck = function(connectionObj, socketCallback, next){
         msgData:{}
     };
 
-    socketCallback(msg);
+    pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, msg, appObj);
 
     next(null);
 };
@@ -950,6 +1023,9 @@ eventListener.onEmitReturnAck = function(connectionObj, socketCallback, next){
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onEmitReturnError = function(connectionObj, socketCallback, errorCode, next){
+    var easyrtcid = connectionObj.getEasyrtcid();
+    var appObj = connectionObj.getApp();
+
     pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onEmitReturnError'");
     if(!_.isFunction(socketCallback)) {
         pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC: unable to return error to socket. Error code was [" + errorCode + "]");
@@ -963,7 +1039,7 @@ eventListener.onEmitReturnError = function(connectionObj, socketCallback, errorC
 
     var msg = pub.util.getErrorMsg(errorCode);
 
-    socketCallback(msg);
+    pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, msg, appObj);
 
     next(null);
 };
@@ -979,14 +1055,15 @@ eventListener.onEmitReturnError = function(connectionObj, socketCallback, errorC
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onEmitReturnToken = function(connectionObj, socketCallback, next){
+    var easyrtcid = connectionObj.getEasyrtcid();
+    var appObj = connectionObj.getApp();
+
     pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onSendToken'");
 
     var tokenMsg = {
         msgType: "token",
         msgData:{}
     };
-
-    var appObj = connectionObj.getApp();
 
     // Ensure socketCallback is present
     if(!_.isFunction(socketCallback)) {
@@ -1013,6 +1090,8 @@ eventListener.onEmitReturnToken = function(connectionObj, socketCallback, next){
             tokenMsg.msgData.easyrtcid          = connectionObj.getEasyrtcid();
             tokenMsg.msgData.iceConfig          = {iceServers: iceServers};
             tokenMsg.msgData.serverTime         = Date.now();
+
+            easyrtcid = tokenMsg.msgData.easyrtcid;
 
             // Get Application fields
             appObj.getFields(true, asyncCallback);
@@ -1050,12 +1129,12 @@ eventListener.onEmitReturnToken = function(connectionObj, socketCallback, next){
 
         function(fieldObj, asyncCallback) {
             // Set session field (if present)
-            if (fieldObj && !_.isEmpty(fieldObj)){
+            if (fieldObj &amp;&amp; !_.isEmpty(fieldObj)){
                 tokenMsg.msgData.sessionData.field = fieldObj;
             }
 
             // Emit token back to socket (SUCCESS!)
-            socketCallback(tokenMsg);
+            pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, tokenMsg, appObj);
 
             asyncCallback(null);
         }
@@ -1119,11 +1198,11 @@ eventListener.onLog = function(level, logText, logFields, next) {
         consoleText += " - " + "EasyRTC: " + logText;
     }
 
-    if (logFields != undefined && logFields != null) {
-        if (pub.getOption("logErrorStackEnable") && pub.util.isError(logFields)) {
+    if (logFields != undefined &amp;&amp; logFields != null) {
+        if (pub.getOption("logErrorStackEnable") &amp;&amp; pub.util.isError(logFields)) {
             console.log(consoleText, ((pub.getOption("logColorEnable"))? "\nStack Trace:\n------------\n".bold + logFields.stack.magenta + "\n------------".bold : "\nStack Trace:\n------------\n" + logFields.stack + "\n------------"));
         }
-        else if (pub.getOption("logWarningStackEnable") && pub.util.isWarning(logFields)) {
+        else if (pub.getOption("logWarningStackEnable") &amp;&amp; pub.util.isWarning(logFields)) {
             console.log(consoleText, ((pub.getOption("logColorEnable"))? "\nStack Trace:\n------------\n".bold + logFields.stack.cyan + "\n------------".bold : "\nStack Trace:\n------------\n" + logFields.stack + "\n------------"));
         }
         else {
@@ -1145,6 +1224,9 @@ eventListener.onLog = function(level, logText, logFields, next) {
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onMsgTypeRoomJoin = function(connectionObj, rooms, socketCallback, next){
+    var easyrtcid = connectionObj.getEasyrtcid();
+    var appObj = connectionObj.getApp();
+
     pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeRoomJoin'");
     if(!_.isFunction(socketCallback)) {
         pub.util.logWarning("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] EasyRTC info: unhandled socket message callback.");
@@ -1167,14 +1249,12 @@ eventListener.onMsgTypeRoomJoin = function(connectionObj, rooms, socketCallback,
         }
     }
 
-    var appObj = connectionObj.getApp();
-
     async.each(Object.keys(rooms), function(currentRoomName, roomCallback) {
         appObj.isRoom(currentRoomName, function(err, isRoom){
 
             // Set roomParameter map. This may be used by custom listeners.
             var currentRoomParameter;
-            if (rooms[currentRoomName] && _.isObject(rooms[currentRoomName].roomParameter)){
+            if (rooms[currentRoomName] &amp;&amp; _.isObject(rooms[currentRoomName].roomParameter)){
                 currentRoomParameter = rooms[currentRoomName].roomParameter;
             }
 
@@ -1182,7 +1262,7 @@ eventListener.onMsgTypeRoomJoin = function(connectionObj, rooms, socketCallback,
                 pub.events.emit("roomJoin", connectionObj, currentRoomName, currentRoomParameter, roomCallback);
             }
             else if (appObj.getOption("roomAutoCreateEnable")) {
-                appObj.createRoom(currentRoomName, null, function(err, roomObj){
+                pub.events.emit("roomCreate", appObj, connectionObj, currentRoomName, currentRoomParameter, function(err, roomObj){
                     if (err) {
                         roomCallback(err);
                         return;
@@ -1197,18 +1277,18 @@ eventListener.onMsgTypeRoomJoin = function(connectionObj, rooms, socketCallback,
         });
     }, function(err, newRoomObj) {
         if (err) {
-            socketCallback(pub.util.getErrorMsg("MSG_REJECT_BAD_ROOM"));
+            pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_BAD_ROOM"), appObj);
             next(null); // Error has been handled
             return;
         }
 
         connectionObj.generateRoomClientList("join", rooms, function(err, roomData){
             if (err) {
-                socketCallback(pub.util.getErrorMsg("MSG_REJECT_BAD_ROOM"));
+                pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_BAD_ROOM"), appObj);
                 next(null); // Error has been handled
             }
             else {
-                socketCallback({"msgType":"roomData", "msgData":{"roomData":roomData}});
+                pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, {"msgType":"roomData", "msgData":{"roomData":roomData}}, appObj);
             }
         });
     });
@@ -1224,6 +1304,9 @@ eventListener.onMsgTypeRoomJoin = function(connectionObj, rooms, socketCallback,
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onMsgTypeRoomLeave = function(connectionObj, rooms, socketCallback, next){
+    var easyrtcid = connectionObj.getEasyrtcid();
+    var appObj = connectionObj.getApp();
+
     pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeRoomLeave' with rooms: ",rooms);
     if(!_.isFunction(socketCallback)) {
         socketCallback = function(returnMsg) {
@@ -1251,7 +1334,7 @@ eventListener.onMsgTypeRoomLeave = function(connectionObj, rooms, socketCallback
                 "roomStatus":   "leave"
             };
         }
-        socketCallback({"msgType":"roomData", "msgData":{"roomData":roomData}});
+        pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, {"msgType":"roomData", "msgData":{"roomData":roomData}}, appObj);
         next(null);
     });
 };
@@ -1265,6 +1348,9 @@ eventListener.onMsgTypeRoomLeave = function(connectionObj, rooms, socketCallback
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onMsgTypeGetIceConfig = function(connectionObj, socketCallback, next){
+    var easyrtcid = connectionObj.getEasyrtcid();
+    var appObj = connectionObj.getApp();
+
     pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeGetIceConfig'");
 
     if(!_.isFunction(socketCallback)) {
@@ -1279,10 +1365,10 @@ eventListener.onMsgTypeGetIceConfig = function(connectionObj, socketCallback, ne
 
     connectionObj.events.emit("getIceConfig", connectionObj, function(err, iceConfigObj){
         if (err) {
-            socketCallback(pub.util.getErrorMsg("MSG_REJECT_GEN_FAIL"));
+            pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_GEN_FAIL"), appObj);
         }
         else {
-            socketCallback({"msgType":"iceConfig", "msgData":{"iceConfig":{"iceServers":iceConfigObj}}});
+            pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, {"msgType":"iceConfig", "msgData":{"iceConfig":{"iceServers":iceConfigObj}}}, appObj);
         }
         next(null);
     });
@@ -1297,6 +1383,9 @@ eventListener.onMsgTypeGetIceConfig = function(connectionObj, socketCallback, ne
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onMsgTypeGetRoomList = function(connectionObj, socketCallback, next){
+    var easyrtcid = connectionObj.getEasyrtcid();
+    var appObj = connectionObj.getApp();
+
     pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeGetRoomList'");
 
     if(!_.isFunction(socketCallback)) {
@@ -1312,10 +1401,10 @@ eventListener.onMsgTypeGetRoomList = function(connectionObj, socketCallback, nex
     connectionObj.generateRoomList(
         function(err, roomList) {
             if(err) {
-                socketCallback(pub.util.getErrorMsg("MSG_REJECT_NO_ROOM_LIST"));
+                pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_NO_ROOM_LIST"), appObj);
             }
             else {
-                socketCallback({"msgType":"roomList", "msgData":{"roomList":roomList}});
+                pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, {"msgType":"roomList", "msgData":{"roomList":roomList}}, appObj);
             }
             next(null);
         }
@@ -1332,6 +1421,9 @@ eventListener.onMsgTypeGetRoomList = function(connectionObj, socketCallback, nex
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onMsgTypeSetPresence = function(connectionObj, presenceObj, socketCallback, next){
+    var easyrtcid = connectionObj.getEasyrtcid();
+    var appObj = connectionObj.getApp();
+
     pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeSetPresence' with setPresence: ",presenceObj);
     if(!_.isFunction(socketCallback)) {
         socketCallback = function(returnMsg) {
@@ -1347,18 +1439,15 @@ eventListener.onMsgTypeSetPresence = function(connectionObj, presenceObj, socket
         presenceObj,
         function(err){
             if (err) {
-                socketCallback(pub.util.getErrorMsg("MSG_REJECT_PRESENCE"));
+                pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_PRESENCE"), appObj);
             }
             else {
                 connectionObj.emitRoomDataDelta(false, function(err, roomDataObj){
                     if (err) {
-                        socketCallback(pub.util.getErrorMsg("MSG_REJECT_PRESENCE"));
+                        pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_PRESENCE"), appObj);
                     }
                     else {
-                        socketCallback({
-                            "msgType":"roomData",
-                            "msgData":{"roomData":roomDataObj}
-                        });
+                        pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, {"msgType":"roomData", "msgData":{"roomData":roomDataObj}}, appObj);
                     }
                 });
             }
@@ -1377,6 +1466,9 @@ eventListener.onMsgTypeSetPresence = function(connectionObj, presenceObj, socket
  * @param       {nextCallback} next     A success callback of form next(err).
  */
 eventListener.onMsgTypeSetRoomApiField = function(connectionObj, roomApiFieldObj, socketCallback, next){
+    var easyrtcid = connectionObj.getEasyrtcid();
+    var appObj = connectionObj.getApp();
+
     pub.util.logDebug("["+connectionObj.getAppName()+"]["+connectionObj.getEasyrtcid()+"] Running func 'onMsgTypeSetRoomApiField' with apiFieldObj: ",roomApiFieldObj);
     if(!_.isFunction(socketCallback)) {
         socketCallback = function(returnMsg) {
@@ -1390,26 +1482,26 @@ eventListener.onMsgTypeSetRoomApiField = function(connectionObj, roomApiFieldObj
 
     connectionObj.room(roomApiFieldObj.roomName, function(err, connectionRoomObj){
         if (err) {
-            socketCallback(pub.util.getErrorMsg("MSG_REJECT_BAD_ROOM"));
+            pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_BAD_ROOM"), appObj);
             next(null);
             return;
         }
         connectionRoomObj.setApiField(roomApiFieldObj.field, function(err){
             if (err) {
-                socketCallback(pub.util.getErrorMsg("MSG_REJECT_BAD_FIELD"));
+                pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_BAD_FIELD"), appObj);
                 next(null);
                 return;
             }
             connectionRoomObj.emitRoomDataDelta(false, function(err, roomDataDelta){
                 if (err) {
-                    socketCallback(pub.util.getErrorMsg("MSG_REJECT_GEN_FAIL"));
+                    pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, pub.util.getErrorMsg("MSG_REJECT_GEN_FAIL"), appObj);
                     next(null);
                     return;
                 }
 
                 var msg = {"msgType":"roomData", "msgData": {"roomData": {}}};
                 msg.msgData.roomData[roomApiFieldObj.roomName] = roomDataDelta;
-                socketCallback(msg);
+                pub.util.sendSocketCallbackMsg(easyrtcid, socketCallback, msg, appObj);
             });
         });
     });
@@ -1440,7 +1532,7 @@ eventListener.onGetIceConfig = function(connectionObj, callback){
  * @param       {Function} callback     Callback of form (err, roomObj)
  */
 eventListener.onRoomCreate = function(appObj, creatorConnectionObj, roomName, roomOptions, callback){
-    pub.util.logDebug("["+appObj.getAppName()+"]" + (creatorConnectionObj?"["+creatorConnectionObj.getEasyrtcid()+"]":"") +  " Running func 'onRoomCreate'");
+    pub.util.logDebug("["+appObj.getAppName()+"]" + (creatorConnectionObj?"["+creatorConnectionObj.getEasyrtcid()+"]":"") +  " Room ["+ roomName +"] Running func 'onRoomCreate'");
     appObj.createRoom(roomName, roomOptions, callback);
 };
 
@@ -1533,11 +1625,11 @@ eventListener.onStartup = function(next){
             if (pub.getOption("demosEnable")) {
                 pub.util.logDebug("Setting up demos to be accessed from '" + pub.getOption("demosPublicFolder") + "/'");
                 pub.httpApp.get(pub.getOption("demosPublicFolder") + "/*", function(req, res) {
-                    res.sendfile(
+                    (res.sendFile||res.sendfile).call(res,
                         "./demos/" + (req.params[0] ? req.params[0] : "index.html"),
                         {root:__dirname + "/../"},
                         function(err) {
-                            try{if (err && err.status && res && !res._headerSent) {
+                            try{if (err &amp;&amp; err.status &amp;&amp; res &amp;&amp; !res._headerSent) {
                                 res.status(404);
                                 var body =    "&lt;html>&lt;head>&lt;title>File Not Found&lt;/title>&lt;/head>&lt;body>&lt;h1>File Not Found&lt;/h1>&lt;/body>&lt;/html>";
                                 res.setHeader("Content-Type", "text/html");
@@ -1554,19 +1646,19 @@ eventListener.onStartup = function(next){
             if (pub.getOption("apiEnable")) {
                 // Set the EasyRTC API files
                 pub.util.logDebug("Setting up API files to be accessed from '" + pub.getOption("apiPublicFolder") + "/'");
-                pub.httpApp.get(pub.getOption("apiPublicFolder") + "/easyrtc.js",                  function(req, res) {pub.util.sendSessionCookie(req, res); res.sendfile("api/easyrtc.js",                   {root:__dirname + "/../"});});
-                pub.httpApp.get(pub.getOption("apiPublicFolder") + "/easyrtc_ft.js",               function(req, res) {pub.util.sendSessionCookie(req, res); res.sendfile("api/easyrtc_ft.js",                {root:__dirname + "/../"});});
-                pub.httpApp.get(pub.getOption("apiPublicFolder") + "/easyrtc.css",                 function(req, res) {pub.util.sendSessionCookie(req, res); res.sendfile("api/easyrtc.css",                  {root:__dirname + "/../"});});
-                pub.httpApp.get(pub.getOption("apiPublicFolder") + "/easyrtc.min.js",              function(req, res) {pub.util.sendSessionCookie(req, res); res.sendfile("open_source/api/easyrtc.min.js",   {root:__dirname + "/../"});});
-                pub.httpApp.get(pub.getOption("apiPublicFolder") + "/easyrtc_ft.min.js",           function(req, res) {pub.util.sendSessionCookie(req, res); res.sendfile("api/easyrtc_ft.min.js",            {root:__dirname + "/../"});});
-                pub.httpApp.get(pub.getOption("apiPublicFolder") + "/easyrtc.min.css",             function(req, res) {pub.util.sendSessionCookie(req, res); res.sendfile("open_source/api/easyrtc.min.css",  {root:__dirname + "/../"});});
+                pub.httpApp.get(pub.getOption("apiPublicFolder") + "/easyrtc.js",                  function(req, res) {pub.util.sendSessionCookie(req, res); (res.sendFile||res.sendfile).call(res,"api/easyrtc.js",                   {root:__dirname + "/../"});});
+                pub.httpApp.get(pub.getOption("apiPublicFolder") + "/easyrtc_ft.js",               function(req, res) {pub.util.sendSessionCookie(req, res); (res.sendFile||res.sendfile).call(res,"api/easyrtc_ft.js",                {root:__dirname + "/../"});});
+                pub.httpApp.get(pub.getOption("apiPublicFolder") + "/easyrtc.css",                 function(req, res) {pub.util.sendSessionCookie(req, res); (res.sendFile||res.sendfile).call(res,"api/easyrtc.css",                  {root:__dirname + "/../"});});
+                pub.httpApp.get(pub.getOption("apiPublicFolder") + "/easyrtc.min.js",              function(req, res) {pub.util.sendSessionCookie(req, res); (res.sendFile||res.sendfile).call(res,"open_source/api/easyrtc.min.js",   {root:__dirname + "/../"});});
+                pub.httpApp.get(pub.getOption("apiPublicFolder") + "/easyrtc_ft.min.js",           function(req, res) {pub.util.sendSessionCookie(req, res); (res.sendFile||res.sendfile).call(res,"api/easyrtc_ft.min.js",            {root:__dirname + "/../"});});
+                pub.httpApp.get(pub.getOption("apiPublicFolder") + "/easyrtc.min.css",             function(req, res) {pub.util.sendSessionCookie(req, res); (res.sendFile||res.sendfile).call(res,"open_source/api/easyrtc.min.css",  {root:__dirname + "/../"});});
                 pub.httpApp.get(pub.getOption("apiPublicFolder") + "/img/*", function(req, res) {
                     pub.util.sendSessionCookie(req, res); 
-                    res.sendfile(
+                    (res.sendFile||res.sendfile).call(res,
                         "./api/img/" + (req.params[0] ? req.params[0] : "index.html"),
                         {root:__dirname + "/../"},
                         function(err) {
-                            try{if (err && err.status && res && !res._headerSent) {
+                            try{if (err &amp;&amp; err.status &amp;&amp; res &amp;&amp; !res._headerSent) {
                                 res.status(404);
                                 var body =    "&lt;html>&lt;head>&lt;title>File Not Found&lt;/title>&lt;/head>&lt;body>&lt;h1>File Not Found&lt;/h1>&lt;/body>&lt;/html>";
                                 res.setHeader("Content-Type", "text/html");
@@ -1576,13 +1668,31 @@ eventListener.onStartup = function(next){
                         }
                     );
                 });
+                if(pub.getOption("apiLabsEnable")){
+                    pub.httpApp.get(pub.getOption("apiPublicFolder") + "/labs/*", function(req, res) {
+                        pub.util.sendSessionCookie(req, res);
+                        (res.sendFile||res.sendfile).call(res,
+                                "./api/labs/" + (req.params[0] ? req.params[0] : "index.html"),
+                            {root:__dirname + "/../"},
+                            function(err) {
+                                try{if (err &amp;&amp; err.status &amp;&amp; res &amp;&amp; !res._headerSent) {
+                                    res.status(404);
+                                    var body =    "&lt;html>&lt;head>&lt;title>File Not Found&lt;/title>&lt;/head>&lt;body>&lt;h1>File Not Found&lt;/h1>&lt;/body>&lt;/html>";
+                                    res.setHeader("Content-Type", "text/html");
+                                    res.setHeader("Content-Length", body.length);
+                                    res.end(body);
+                                }}catch(e){}
+                            }
+                        );
+                    });
+                }
             }
 
-            if (pub.getOption("apiEnable") && pub.getOption("apiOldLocationEnable")) {
+            if (pub.getOption("apiEnable") &amp;&amp; pub.getOption("apiOldLocationEnable")) {
                 pub.util.logWarning("Enabling listening for API files in older depreciated location.");
                 // Transition - Old locations of EasyRTC API files
-                pub.httpApp.get("/js/easyrtc.js",                   function(req, res) {res.sendfile("api/easyrtc.js",              {root:__dirname + "/../"});});
-                pub.httpApp.get("/css/easyrtc.css",                 function(req, res) {res.sendfile("api/easyrtc.css",             {root:__dirname + "/../"});});
+                pub.httpApp.get("/js/easyrtc.js",                   function(req, res) {(res.sendFile||res.sendfile).call(res,"api/easyrtc.js",              {root:__dirname + "/../"});});
+                pub.httpApp.get("/css/easyrtc.css",                 function(req, res) {(res.sendFile||res.sendfile).call(res,"api/easyrtc.css",             {root:__dirname + "/../"});});
             }
             callback(null);
         },
@@ -1633,15 +1743,16 @@ eventListener.onStartup = function(next){
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li><li><a href="module-easyrtc_public_obj.html">easyrtc_public_obj</a></li></ul><h3>Classes</h3><ul><li><a href="module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li><li><a href="module-easyrtc_public_obj-pub.html">pub</a></li><li><a href="module-easyrtc_public_obj-pub.events.html">events</a></li><li><a href="module-easyrtc_public_obj-pub.util.html">util</a></li><li><a href="pub.appObj.html">appObj</a></li><li><a href="pub.appObj.connectionObj.html">connectionObj</a></li><li><a href="pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li><li><a href="pub.appObj.roomObj.html">roomObj</a></li><li><a href="pub.appObj.sessionObj.html">sessionObj</a></li></ul><h3>Global</h3><ul></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li><li><a href="module-easyrtc_public_obj.html">easyrtc_public_obj</a></li></ul><h3>Classes</h3><ul><li><a href="module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li><li><a href="module-easyrtc_public_obj-pub.html">pub</a></li><li><a href="module-easyrtc_public_obj-pub.events.html">events</a></li><li><a href="module-easyrtc_public_obj-pub.util.html">util</a></li><li><a href="pub.appObj.html">appObj</a></li><li><a href="pub.appObj.connectionObj.html">connectionObj</a></li><li><a href="pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li><li><a href="pub.appObj.roomObj.html">roomObj</a></li><li><a href="pub.appObj.sessionObj.html">sessionObj</a></li></ul>
 </nav>
 
-<br clear="both">
+<br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Tue May 20 2014 14:10:40 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Tue Oct 20 2015 10:53:18 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
 </body>
 </html>
