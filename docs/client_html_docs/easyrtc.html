@@ -177,6 +177,53 @@
         
             
 <dt>
+    <h3 class="name" id="cookieId"><span class="type-signature"></span>cookieId<span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Default cookieId name
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h3 class="name" id="errCodes"><span class="type-signature"></span>errCodes<span class="type-signature"> :Object</span></h3>
     
     
@@ -225,11 +272,15 @@
         
             
 <dt>
-    <h3 class="name" id="initManaged"><span class="type-signature"></span>initManaged<span class="type-signature"></span></h3>
+    <h3 class="name" id="IS_CONNECTED"><span class="type-signature"></span>IS_CONNECTED<span class="type-signature"></span></h3>
     
     
 </dt>
 <dd>
+    
+    <div class="description">
+        Value returned by easyrtc.getConnectStatus if the other user is connected to us.
+    </div>
     
     
     
@@ -242,8 +293,6 @@
 
     
     
-    
-        <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>now called easyrtc.easyApp.</li><ul></dd>
     
     
     
@@ -270,14 +319,63 @@
         
             
 <dt>
-    <h3 class="name" id="IS_CONNECTED"><span class="type-signature"></span>IS_CONNECTED<span class="type-signature"></span></h3>
+    <h3 class="name" id="loggingOut"><span class="type-signature"></span>loggingOut<span class="type-signature"></span></h3>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        Value returned by easyrtc.getConnectStatus if the other user is connected to us.
+        Flag to indicate that user is currently logging out
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="maxP2PMessageLength"><span class="type-signature"></span>maxP2PMessageLength<span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        This constant determines how long (in bytes) a message can be before being split in chunks of that size.
+This is because there is a limitation of the length of the message you can send on the
+data channel between browsers.
     </div>
     
     
@@ -653,7 +751,7 @@ time a token is received.
         
             
 <dt>
-    <h3 class="name" id="fields"><span class="type-signature">&lt;inner> </span>fields<span class="type-signature"></span></h3>
+    <h3 class="name" id="~fields"><span class="type-signature">&lt;inner> </span>fields<span class="type-signature"></span></h3>
     
     
 </dt>
@@ -698,14 +796,14 @@ call other users.
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>easyrtc.connect("mychat_app",
-                function(easyrtcid, roomOwner){
-                    if( roomOwner){ console.log("I'm the room owner"); }
-                    console.log("my id is " + easyrtcid);
-                },
-                function(errorText){
-                    console.log("failed to connect ", erFrText);
-                });</code></pre>
+    <pre class="prettyprint"><code>easyrtc.connect("my_chat_app",
+                  function(easyrtcid, roomOwner){
+                      if( roomOwner){ console.log("I'm the room owner"); }
+                      console.log("my id is " + easyrtcid);
+                  },
+                  function(errorText){
+                      console.log("failed to connect ", erFrText);
+                  });</code></pre>
 
     
 </dd>
@@ -802,7 +900,7 @@ Currently the only eventName supported is "roomOccupant".
             
             
             
-            <td class="description last">the function that expects the event. 
+            <td class="description last">the function that expects the event.
 The eventListener gets called with the eventName as it's first argument, and the event
 data as it's second argument.</td>
         </tr>
@@ -1202,8 +1300,8 @@ data as it's second argument.</td>
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.buildLocalMediaStream("myComposedStream",
-         easyrtc.getLocalStream("camera1").getVideoTracks(),
-         easyrtc.getLocalStream("camera2").getAudioTracks());</code></pre>
+            easyrtc.getLocalStream("camera1").getVideoTracks(),
+            easyrtc.getLocalStream("camera2").getAudioTracks());</code></pre>
 
     
 </dd>
@@ -1409,20 +1507,20 @@ data as it's second argument.</td>
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.call( otherEasyrtcid,
-    function(easyrtcid, mediaType){
-       console.log("Got mediaType " + mediaType + " from " + easyrtc.idToName(easyrtcid));
-    },
-    function(errorCode, errMessage){
-       console.log("call to  " + easyrtc.idToName(otherEasyrtcid) + " failed:" + errMessage);
-    },
-    function(wasAccepted, easyrtcid){
-        if( wasAccepted ){
-           console.log("call accepted by " + easyrtc.idToName(easyrtcid));
-        }
-        else{
-            console.log("call rejected" + easyrtc.idToName(easyrtcid));
-        }
-    });</code></pre>
+       function(easyrtcid, mediaType){
+          console.log("Got mediaType " + mediaType + " from " + easyrtc.idToName(easyrtcid));
+       },
+       function(errorCode, errMessage){
+          console.log("call to  " + easyrtc.idToName(otherEasyrtcid) + " failed:" + errMessage);
+       },
+       function(wasAccepted, easyrtcid){
+           if( wasAccepted ){
+              console.log("call accepted by " + easyrtc.idToName(easyrtcid));
+           }
+           else{
+               console.log("call rejected" + easyrtc.idToName(easyrtcid));
+           }
+       });</code></pre>
 
     
 </dd>
@@ -1687,7 +1785,7 @@ data as it's second argument.</td>
     
     <div class="description">
         Close the local media stream. You usually need to close the existing media stream
-of a camera before reacquring it at a different resolution.
+of a camera before reacquiring it at a different resolution.
     </div>
     
 
@@ -2122,288 +2220,6 @@ of a camera before reacquring it at a different resolution.
         
             
 <dt>
-    <h3 class="name" id="dontAddCloseButtons"><span class="type-signature"></span>dontAddCloseButtons<span class="signature">()</span><span class="type-signature"></span></h3>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        By default, the easyApp routine sticks a "close" button on top of each caller
-video object that it manages. Call this function(before calling easyApp) to disable that particular feature.
-    </div>
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-    
-    
-    
-    
-    
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>easyrtc.dontAddCloseButtons();</code></pre>
-
-    
-</dd>
-
-        
-            
-<dt>
-    <h3 class="name" id="easyApp"><span class="type-signature"></span>easyApp<span class="signature">(applicationName, monitorVideoId, videoIds, onReady, onFailure)</span><span class="type-signature"></span></h3>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Provides a layer on top of the easyrtc.initMediaSource and easyrtc.connect, assign the local media stream to
-the video object identified by monitorVideoId, assign remote video streams to
-the video objects identified by videoIds, and then call onReady. One of it's
-side effects is to add hangup buttons to the remote video objects, buttons
-that only appear when you hover over them with the mouse cursor. This method will also add the
-easyrtcMirror class to the monitor video object so that it behaves like a mirror.
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>applicationName</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">name of the application.</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>monitorVideoId</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">the id of the video object used for monitoring the local stream.</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>videoIds</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">an array of video object ids (strings)</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>onReady</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">a callback function used on success. It is called with the easyrtcId this peer is known to the server as.</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>onFailure</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">a callback function used on failure (failed to get local media or a connection of the signaling server).</td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-    
-    
-    
-    
-    
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>easyrtc.easyApp('multiChat', 'selfVideo', ['remote1', 'remote2', 'remote3'],
-         function(easyrtcId){
-             console.log("successfully connected, I am " + easyrtcId);
-         },
-         function(errorCode, errorText){
-             console.log(errorText);
-         );</code></pre>
-
-    
-</dd>
-
-        
-            
-<dt>
     <h3 class="name" id="emitEvent"><span class="type-signature"></span>emitEvent<span class="signature">(eventName, eventData)</span><span class="type-signature"></span></h3>
     
     
@@ -2412,7 +2228,7 @@ easyrtcMirror class to the monitor video object so that it behaves like a mirror
     
     
     <div class="description">
-        Emits an event, or in otherwords, calls all the eventListeners for a 
+        Emits an event, or in other words, calls all the eventListeners for a
 particular event.
     </div>
     
@@ -3858,11 +3674,11 @@ Note: not supported by Firefox.</td>
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.getAudioSourceList( function(list) {
-            var i;
-            for( i = 0; i < list.length; i++ ) {
-                console.log("label=" + list[i].label + ", id= " + list[i].id);
-            }
-       });</code></pre>
+              var i;
+              for( i = 0; i < list.length; i++ ) {
+                  console.log("label=" + list[i].label + ", id= " + list[i].id);
+              }
+         });</code></pre>
 
     
 </dd>
@@ -4165,10 +3981,10 @@ The return values are text strings so you can use them in debugging output.
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>if( easyrtc.getConnectStatus(otherEasyrtcid) == easyrtc.NOT_CONNECTED ){
-    easyrtc.call(otherEasyrtcid,
-             function(){ console.log("success"); },
-             function(){ console.log("failure"); });
-}</code></pre>
+        easyrtc.call(otherEasyrtcid,
+                 function(){ console.log("success"); },
+                 function(){ console.log("failure"); });
+    }</code></pre>
 
     
 </dd>
@@ -4449,7 +4265,7 @@ This should be done periodically by long running applications.
         
             
 <dt>
-    <h3 class="name" id="getPeerStatistics"><span class="type-signature"></span>getPeerStatistics<span class="signature">(peerId, callback, filter)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="getPeerStatistics"><span class="type-signature"></span>getPeerStatistics<span class="signature">(easyrtcid, callback, filter)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -4491,7 +4307,7 @@ This should be done periodically by long running applications.
 	
         <tr>
             
-                <td class="name"><code>peerId</code></td>
+                <td class="name"><code>easyrtcid</code></td>
             
             
             <td class="type">
@@ -4530,7 +4346,7 @@ This should be done periodically by long running applications.
             
             
             
-            <td class="description last">gets the peerid and a map of {userDefinedKey: value}. If there is no peer connection to peerId, then the map will
+            <td class="description last">gets the easyrtcid for the peer and a map of {userDefinedKey: value}. If there is no peer connection to easyrtcid, then the map will
  have a value of {connected:false}.</td>
         </tr>
 	
@@ -4605,7 +4421,7 @@ It is still experimental.</td>
         
             
 <dt>
-    <h3 class="name" id="getRemoteStream"><span class="type-signature"></span>getRemoteStream<span class="signature">(easyrtcid, remotestreamName)</span><span class="type-signature"> &rarr; {Object}</span></h3>
+    <h3 class="name" id="getRemoteStream"><span class="type-signature"></span>getRemoteStream<span class="signature">(easyrtcid, remoteStreamName)</span><span class="type-signature"> &rarr; {Object}</span></h3>
     
     
 </dt>
@@ -4671,7 +4487,7 @@ add a stream in the middle of a call.
 	
         <tr>
             
-                <td class="name"><code>remotestreamName</code></td>
+                <td class="name"><code>remoteStreamName</code></td>
             
             
             <td class="type">
@@ -5351,15 +5167,15 @@ The roomName appears as both the key to the map, and as the value of the "roomNa
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.getRoomList(
-    function(roomList){
-       for(roomName in roomList){
-          console.log("saw room " + roomName);
-       }
-     },
-     function(errorCode, errorText){
-        easyrtc.showError(errorCode, errorText);
-     }
-);</code></pre>
+       function(roomList){
+          for(roomName in roomList){
+             console.log("saw room " + roomName);
+          }
+        },
+        function(errorCode, errorText){
+           easyrtc.showError(errorCode, errorText);
+        }
+   );</code></pre>
 
     
 </dd>
@@ -5490,10 +5306,10 @@ The roomName appears as both the key to the map, and as the value of the "roomNa
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>var occupants = easyrtc.getRoomOccupants("default");
-var i;
-for( i = 0; i < occupants.length; i++ ) {
-    console.log( occupants[i] + " is in the room");
-}</code></pre>
+    var i;
+    for( i = 0; i < occupants.length; i++ ) {
+        console.log( occupants[i] + " is in the room");
+    }</code></pre>
 
     
 </dd>
@@ -5625,8 +5441,8 @@ null; their actual values are not guaranteed to be the same in different release
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>if( easyrtc.getRoomOccupantsAsMap("default")[some_easyrtcid]) {
-    console.log("yep, " + some_easyrtcid + " is in the room");
-}</code></pre>
+         console.log("yep, " + some_easyrtcid + " is in the room");
+     }</code></pre>
 
     
 </dd>
@@ -6106,11 +5922,11 @@ Note: not supported by Firefox.</td>
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.getVideoSourceList( function(list) {
-            var i;
-            for( i = 0; i < list.length; i++ ) {
-                console.log("label=" + list[i].label + ", id= " + list[i].id);
-            }
-       });</code></pre>
+              var i;
+              for( i = 0; i < list.length; i++ ) {
+                  console.log("label=" + list[i].label + ", id= " + list[i].id);
+              }
+         });</code></pre>
 
     
 </dd>
@@ -6895,12 +6711,12 @@ calling easyrtc.initMediaSource.
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.initMediaSource(
-   function(mediastream){
-       easyrtc.setVideoObjectSrc( document.getElementById("mirrorVideo"), mediastream);
-   },
-   function(errorCode, errorText){
-        easyrtc.showError(errorCode, errorText);
-   });</code></pre>
+         function(mediastream){
+             easyrtc.setVideoObjectSrc( document.getElementById("mirrorVideo"), mediastream);
+         },
+         function(errorCode, errorText){
+              easyrtc.showError(errorCode, errorText);
+         });</code></pre>
 
     
 </dd>
@@ -7036,9 +6852,9 @@ calling easyrtc.initMediaSource.
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>var name = document.getElementById('nameField').value;
-if( !easyrtc.isNameValid(name)){
-    console.error("Bad user name");
-}</code></pre>
+   if( !easyrtc.isNameValid(name)){
+       console.error("Bad user name");
+   }</code></pre>
 
     
 </dd>
@@ -7609,8 +7425,8 @@ Note: the successCB and failureDB will only be called if you are already connect
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.leaveRoom("freds_room");
-easyrtc.leaveRoom("freds_room", function(roomName){ console.log("left the room")},
-                   function(errorCode, errorText, roomName){ console.log("left the room")});</code></pre>
+   easyrtc.leaveRoom("freds_room", function(roomName){ console.log("left the room")},
+                      function(errorCode, errorText, roomName){ console.log("left the room")});</code></pre>
 
     
 </dd>
@@ -7685,7 +7501,7 @@ easyrtc.leaveRoom("freds_room", function(roomName){ console.log("left the room")
         
             
 <dt>
-    <h3 class="name" id="makeLocalStreamFromRemoteStream"><span class="type-signature"></span>makeLocalStreamFromRemoteStream<span class="signature">(easyrtcid, remotestreamName, localstreamName)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="makeLocalStreamFromRemoteStream"><span class="type-signature"></span>makeLocalStreamFromRemoteStream<span class="signature">(easyrtcid, remoteStreamName, localStreamName)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -7750,7 +7566,7 @@ easyrtc.leaveRoom("freds_room", function(roomName){ console.log("left the room")
 	
         <tr>
             
-                <td class="name"><code>remotestreamName</code></td>
+                <td class="name"><code>remoteStreamName</code></td>
             
             
             <td class="type">
@@ -7773,7 +7589,7 @@ easyrtc.leaveRoom("freds_room", function(roomName){ console.log("left the room")
 	
         <tr>
             
-                <td class="name"><code>localstreamName</code></td>
+                <td class="name"><code>localStreamName</code></td>
             
             
             <td class="type">
@@ -7837,7 +7653,7 @@ easyrtc.leaveRoom("freds_room", function(roomName){ console.log("left the room")
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.makeLocalStreamFromRemoteStream(sourcePeer, "default", "forwardedStream");
-easyrtc.call(nextPeer, callSuccessCB, callFailureCB, wasAcceptedCB, ["forwardedStream"]);</code></pre>
+   easyrtc.call(nextPeer, callSuccessCB, callFailureCB, wasAcceptedCB, ["forwardedStream"]);</code></pre>
 
     
 </dd>
@@ -7853,7 +7669,7 @@ easyrtc.call(nextPeer, callSuccessCB, callFailureCB, wasAcceptedCB, ["forwardedS
     
     
     <div class="description">
-        Allow an externally created mediastream (ie, created by another 
+        Allow an externally created mediastream (ie, created by another
 library) to be used within easyrtc. Tracking when it closes
 must be done by the supplying party.
     </div>
@@ -8215,8 +8031,8 @@ Specifying multiple fields restricts the scope of the destination (operates as a
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.sendData(someEasyrtcid, "roomData",  {room:499, bldgNum:'asd'},
-   function ackHandler(msgType, msgData);
-);</code></pre>
+      function ackHandler(msgType, msgData);
+   );</code></pre>
 
     
 </dd>
@@ -8566,10 +8382,10 @@ msgData will contain a errorCode and errorText fields.</td>
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.sendDataWS(someEasyrtcid, "setPostalAddress", {room:499, bldgNum:'asd'},
-  function(ackMsg){
-      console.log("saw the following acknowledgment " + JSON.stringify(ackMsg));
-  }
-);</code></pre>
+     function(ackMsg){
+         console.log("saw the following acknowledgment " + JSON.stringify(ackMsg));
+     }
+   );</code></pre>
 
     
 </dd>
@@ -8776,12 +8592,12 @@ Specifying multiple fields restricts the scope of the destination (operates as a
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.sendPeerMessage(otherUser, 'offer_candy', {candy_name:'mars'},
-        function(msgType, msgBody ){
-           console.log("message was sent");
-        },
-        function(errorCode, errorText){
-           console.log("error was " + errorText);
-        });</code></pre>
+            function(msgType, msgBody ){
+               console.log("message was sent");
+            },
+            function(errorCode, errorText){
+               console.log("error was " + errorText);
+            });</code></pre>
 
     
 </dd>
@@ -8964,12 +8780,12 @@ Specifying multiple fields restricts the scope of the destination (operates as a
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.sendServerMessage('get_candy', {candy_name:'mars'},
-        function(msgType, msgData ){
-           console.log("got candy count of " + msgData.barCount);
-        },
-        function(errorCode, errorText){
-           console.log("error was " + errorText);
-        });</code></pre>
+            function(msgType, msgData ){
+               console.log("got candy count of " + msgData.barCount);
+            },
+            function(errorCode, errorText){
+               console.log("error was " + errorText);
+            });</code></pre>
 
     
 </dd>
@@ -9035,8 +8851,8 @@ Specifying multiple fields restricts the scope of the destination (operates as a
             
             
             
-            <td class="description last">takes the arguments (callerEasyrtcid, acceptor).     
-The acceptCheck callback is passed an easyrtcid and an aceptor function. The acceptor function should be called with either
+            <td class="description last">takes the arguments (callerEasyrtcid, acceptor).
+The acceptCheck callback is passed an easyrtcid and an acceptor function. The acceptor function should be called with either
 a true value (accept the call) or false value( reject the call) as it's first argument, and optionally,
 an array of local media streamNames as a second argument.</td>
         </tr>
@@ -9086,18 +8902,18 @@ an array of local media streamNames as a second argument.</td>
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.setAcceptChecker( function(easyrtcid, acceptor){
-     if( easyrtc.idToName(easyrtcid) === 'Fred' ){
-        acceptor(true);
-     }
-     else if( easyrtc.idToName(easyrtcid) === 'Barney' ){
-        setTimeout( function(){ 
-acceptor(true, ['myOtherCam']); // myOtherCam presumed to a streamName
-}, 10000);
-     }
-     else{
-        acceptor(false);
-     }
-});</code></pre>
+          if( easyrtc.idToName(easyrtcid) === 'Fred' ){
+             acceptor(true);
+          }
+          else if( easyrtc.idToName(easyrtcid) === 'Barney' ){
+             setTimeout( function(){
+     acceptor(true, ['myOtherCam']); // myOtherCam presumed to a streamName
+     }, 10000);
+          }
+          else{
+             acceptor(false);
+          }
+     });</code></pre>
 
     
 </dd>
@@ -9229,8 +9045,8 @@ names. Maximum length is
     
     <div class="description">
         Controls whether a default local media stream should be acquired automatically during calls and accepts
-if a list of streamNames is not supplied. The default is true, which mimicks the behaviour of earlier releases
-that didn't support multiple streams. This function should be called before easyrtc.call or before entering an 
+if a list of streamNames is not supplied. The default is true, which mimics the behaviour of earlier releases
+that didn't support multiple streams. This function should be called before easyrtc.call or before entering an
 accept  callback.
     </div>
     
@@ -9440,13 +9256,13 @@ initiates a call to you, but does a "hangup" before you have a chance to get his
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.setCallCancelled( function(easyrtcid, explicitlyCancelled){
-   if( explicitlyCancelled ){
-       console.log(easyrtc.idToName(easyrtcid) + " stopped trying to reach you");
-    }
-    else{
-       console.log("Implicitly called "  + easyrtc.idToName(easyrtcid));
-    }
-});</code></pre>
+       if( explicitlyCancelled ){
+           console.log(easyrtc.idToName(easyrtcid) + " stopped trying to reach you");
+        }
+        else{
+           console.log("Implicitly called "  + easyrtc.idToName(easyrtcid));
+        }
+    });</code></pre>
 
     
 </dd>
@@ -9778,8 +9594,8 @@ The callback will be called with an easyrtcid as it's sole argument.
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.setDataChannelCloseListener( function(easyrtcid){
-        ("No longer connected to " + easyrtc.idToName(easyrtcid));
-});</code></pre>
+           ("No longer connected to " + easyrtc.idToName(easyrtcid));
+   });</code></pre>
 
     
 </dd>
@@ -9894,8 +9710,8 @@ The callback will be called with an easyrtcid as it's sole argument.
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.setDataChannelOpenListener( function(easyrtcid){
-     easyrtc.sendDataP2P(easyrtcid, "greeting", "hello");
-});</code></pre>
+        easyrtc.sendDataP2P(easyrtcid, "greeting", "hello");
+   });</code></pre>
 
     
 </dd>
@@ -10009,8 +9825,8 @@ The callback will be called with an easyrtcid as it's sole argument.
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.setDisconnectListener(function(){
-    easyrtc.showError("SYSTEM-ERROR", "Lost our connection to the socket server");
-});</code></pre>
+       easyrtc.showError("SYSTEM-ERROR", "Lost our connection to the socket server");
+   });</code></pre>
 
     
 </dd>
@@ -10018,7 +9834,7 @@ The callback will be called with an easyrtcid as it's sole argument.
         
             
 <dt>
-    <h3 class="name" id="setIceCandidateFilter"><span class="type-signature"></span>setIceCandidateFilter<span class="signature">(filter, isIncoming)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="setIceCandidateFilter"><span class="type-signature"></span>setIceCandidateFilter<span class="signature">(filter)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -10028,9 +9844,9 @@ The callback will be called with an easyrtcid as it's sole argument.
     <div class="description">
         Sets a function which filters IceCandidate records being sent or received.
 
-Candidate records can be received while they are being generated locally (before being 
-sent to a peer), and after they are received by the peer. The filter receives two arguments, the candidate record and a boolean 
-flag that is true for a candidate being received from another peer,  
+Candidate records can be received while they are being generated locally (before being
+sent to a peer), and after they are received by the peer. The filter receives two arguments, the candidate record and a boolean
+flag that is true for a candidate being received from another peer,
 and false for a candidate that was generated locally. The candidate record has the form:
  {type: 'candidate', label: sdpMLineIndex, id: sdpMid, candidate: candidateString}
 The function should return one of the following: the input candidate record, a modified candidate record, or null (indicating that the
@@ -10088,29 +9904,6 @@ candidate should be discarded).
         </tr>
 	
 	
-	
-        <tr>
-            
-                <td class="name"><code>isIncoming</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last"></td>
-        </tr>
-	
-	
 	</tbody>
 </table>
     
@@ -10150,16 +9943,6 @@ candidate should be discarded).
     
     
     
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    an ice candidate record or null.
-</div>
-
-
-
-        
     
     
 </dd>
@@ -10274,17 +10057,130 @@ the ice server configuration on the client or if you are using TURN certificates
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.setIceUsedInCalls( {"iceServers": [
- {
-			"url": "stun:stun.sipgate.net"
-		},
- {
-    "url": "stun:217.10.68.152"
- },
- {
-    "url": "stun:stun.sipgate.net:10000"
- }
- ]});
- easyrtc.call(...);</code></pre>
+     {
+        "url": "stun:stun.sipgate.net"
+     },
+     {
+        "url": "stun:217.10.68.152"
+     },
+     {
+        "url": "stun:stun.sipgate.net:10000"
+     }
+     ]});
+     easyrtc.call(...);</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="setMaxP2PMessageLength"><span class="type-signature"></span>setMaxP2PMessageLength<span class="signature">(maxLength)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sets the maximum length in bytes of P2P messages that can be sent.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>maxLength</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">maximum length to set</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>easyrtc.setMaxP2PMessageLength(10000);</code></pre>
 
     
 </dd>
@@ -10400,10 +10296,250 @@ the ice server configuration on the client or if you are using TURN certificates
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.setOnStreamClosed( function(easyrtcid, stream, streamName){
-    easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), "");
-    ( easyrtc.idToName(easyrtcid) + " closed stream " + stream.id + " " + streamName);
-});</code></pre>
+        easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), "");
+        ( easyrtc.idToName(easyrtcid) + " closed stream " + stream.id + " " + streamName);
+    });</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="setPeerClosedListener"><span class="type-signature"></span>setPeerClosedListener<span class="signature">(handler:)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sets a function to warn about the peer connection closing.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>handler:</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">a function that gets an easyrtcid as an argument.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="setPeerFailingListener"><span class="type-signature"></span>setPeerFailingListener<span class="signature">(failingHandler:, recoveredHandler:)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sets a function to receive warnings about the peer connection
+failing. The peer connection may recover by itself.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>failingHandler:</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">a function that gets an easyrtcid as an argument.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>recoveredHandler:</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">a function that gets an easyrtcid as an argument.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
     
 </dd>
 
@@ -10568,17 +10704,17 @@ The most specific case takes priority over the more general.
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting){
-    console.log("From " + easyrtc.idToName(easyrtcid) +
-        " sent the following data " + JSON.stringify(msgData));
-});
-easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting){
-    console.log("From " + easyrtc.idToName(easyrtcid) +
-        " sent the following data " + JSON.stringify(msgData));
-}, 'food', 'dkdjdekj44--');
-easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting){
-    console.log("From " + easyrtcid +
-        " sent the following data " + JSON.stringify(msgData));
-}, 'drink');</code></pre>
+        console.log("From " + easyrtc.idToName(easyrtcid) +
+            " sent the following data " + JSON.stringify(msgData));
+    });
+    easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting){
+        console.log("From " + easyrtc.idToName(easyrtcid) +
+            " sent the following data " + JSON.stringify(msgData));
+    }, 'food', 'dkdjdekj44--');
+    easyrtc.setPeerListener( function(easyrtcid, msgType, msgData, targeting){
+        console.log("From " + easyrtcid +
+            " sent the following data " + JSON.stringify(msgData));
+    }, 'drink');</code></pre>
 
     
 </dd>
@@ -10740,11 +10876,11 @@ path.
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.setRoomApiField("trekkieRoom",  "favorite_alien", "Mr Spock");
-easyrtc.setRoomOccupantListener( function(roomName, list){
-   for( var i in list ){
-      console.log("easyrtcid=" + i + " favorite alien is " + list[i].apiFields.favorite_alien);
-   }
-});</code></pre>
+  easyrtc.setRoomOccupantListener( function(roomName, list){
+     for( var i in list ){
+        console.log("easyrtcid=" + i + " favorite alien is " + list[i].apiFields.favorite_alien);
+     }
+  });</code></pre>
 
     
 </dd>
@@ -10762,8 +10898,8 @@ easyrtc.setRoomOccupantListener( function(roomName, list){
     <div class="description">
         This function requests that screen capturing be used to provide the local media source
 rather than a webcam. If you have multiple screens, they are composited side by side.
-Note: this functionality is not supported by Firefox, has to be called before calling initMediaSource (or easyApp), we don't currently supply a way to 
-turn it off (once it's on), only works if the website is hosted SSL (https), and the image quality is rather 
+Note: this functionality is not supported by Firefox, has to be called before calling initMediaSource (or easyApp), we don't currently supply a way to
+turn it off (once it's on), only works if the website is hosted SSL (https), and the image quality is rather
 poor going across a network because it tries to transmit so much data. In short, screen sharing
 through WebRTC isn't worth using at this point, but it is provided here so people can try it out.
     </div>
@@ -11061,8 +11197,8 @@ filter builder.
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.setServerListener( function(msgType, msgData, targeting){
-    ("The Server sent the following message " + JSON.stringify(msgData));
-});</code></pre>
+        ("The Server sent the following message " + JSON.stringify(msgData));
+    });</code></pre>
 
     
 </dd>
@@ -11156,7 +11292,7 @@ socket server.
             
             
             
-            <td class="description last">an optional dictionary of options for socket.io's connect method. 
+            <td class="description last">an optional dictionary of options for socket.io's connect method.
 The default is {'connect timeout': 10000,'force new connection': true }</td>
         </tr>
 	
@@ -11319,9 +11455,9 @@ of where the call was initiated (caller or callee).
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>easyrtc.setStreamAcceptor(function(easyrtcid, stream, streamName){
-   document.getElementById('callerName').innerHTML = easyrtc.idToName(easyrtcid);
-   easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), stream);
-});</code></pre>
+    document.getElementById('callerName').innerHTML = easyrtc.idToName(easyrtcid);
+    easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), stream);
+ });</code></pre>
 
     
 </dd>
@@ -11565,7 +11701,8 @@ of where the call was initiated (caller or callee).
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>if( !easyrtc.setUsername("JohnSmith") ){
-    console.error("bad user name);</code></pre>
+       console.error("bad user name);
+   }</code></pre>
 
     
 </dd>
@@ -12890,6 +13027,124 @@ close sockets that were supplied with easyrtc.useThisSocketConnection.
     
 </dd>
 
+        
+            
+<dt>
+    <h3 class="name" id="~isSocketConnected"><span class="type-signature">&lt;inner> </span>isSocketConnected<span class="signature">(socket)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        This function checks if a socket is actually connected.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>socket</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">a socket.io socket.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    true if the socket exists and is connected, false otherwise.
+</div>
+
+
+
+        
+    
+    
+</dd>
+
         </dl>
     
     
@@ -12909,7 +13164,7 @@ close sockets that were supplied with easyrtc.useThisSocketConnection.
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Tue Feb 03 2015 13:54:47 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Tue Oct 20 2015 11:05:23 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
