@@ -1,5 +1,5 @@
 //
-//Copyright (c) 2014, Priologic Software Inc.
+//Copyright (c) 2015, Priologic Software Inc.
 //All rights reserved.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -41,14 +41,7 @@ function connect() {
   easyrtc.enableVideo(document.getElementById("shareVideo").checked);
   easyrtc.enableDataChannels(true);
   easyrtc.setRoomOccupantListener( convertListToButtons);    
-  easyrtc.initMediaSource(
-		  function(){        // success callback
-			  var selfVideo = document.getElementById("selfVideo");			
-			  easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());			 
-			  easyrtc.connect("easyrtc.audioVideo", loginSuccess, loginFailure);			  
-		  },
-		  loginFailure
-	);
+  easyrtc.connect("easyrtc.audioVideo", loginSuccess, loginFailure);			  
 } 
 
 
@@ -103,7 +96,9 @@ function performCall(otherEasyrtcid) {
     };
 
     var successCB = function() {
-        setUpMirror();
+        if( easyrtc.getLocalStream()) {
+            setUpMirror();
+        }
         enable('hangupButton');
     };
     var failureCB = function() {
@@ -116,7 +111,7 @@ function performCall(otherEasyrtcid) {
 
 function loginSuccess(easyrtcid) {
     disable("connectButton");
-  //  enable("disconnectButton");
+    enable("disconnectButton");
     enable('otherClients');
     selfEasyrtcid = easyrtcid;
     document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyrtcid);
@@ -127,7 +122,6 @@ function loginSuccess(easyrtcid) {
 function loginFailure(errorCode, message) {
     easyrtc.showError(errorCode, message);
 }
-
 
 function disconnect() {
   easyrtc.disconnect();			  
