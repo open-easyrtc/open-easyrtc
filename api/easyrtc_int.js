@@ -54,6 +54,7 @@ var Easyrtc = function() {
     function stopStream(stream) {
        var i;
        var tracks;
+
        tracks = stream.getAudioTracks();
        for( i = 0; i < tracks.length; i++ ) {
            try {
@@ -66,6 +67,19 @@ var Easyrtc = function() {
              tracks[i].stop();
            } catch(err){}
        }
+
+       if (typeof stream.stop === 'function') {
+           try {
+             stream.stop();
+           } catch(err){}
+       }
+    }
+
+    //
+    // this function check the deprecated MediaStream.ended attribute and new .active
+    //
+    function isStreamActive(stream) {
+        return stream.active === true || stream.ended === false
     }
 
     /**
@@ -3097,12 +3111,9 @@ var Easyrtc = function() {
             if (peerConns[otherUser].pc) {
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
                 for (i = 0; i < remoteStreams.length; i++) {
-                    if( remoteStreams[i].active ) {
+                    if (isStreamActive(remoteStreams[i])) {
+                        stopStream(remoteStreams[i]);
                         emitOnStreamClosed(otherUser, remoteStreams[i]);
-                        try {
-                            stopStream(remoteStreams[i]);
-                        } catch (err) {
-                        }
                     }
                 }
                 //
