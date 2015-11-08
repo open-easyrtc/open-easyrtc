@@ -79,7 +79,7 @@ var Easyrtc = function() {
     // this function check the deprecated MediaStream.ended attribute and new .active
     //
     function isStreamActive(stream) {
-        return stream.active === true || stream.ended === false
+        return stream.active || !stream.ended;
     }
 
     /**
