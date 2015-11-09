@@ -3270,6 +3270,15 @@ var Easyrtc = function() {
                     receivedMediaConstraints);
         }, 100);
     }
+
+     //
+     // this function check the deprecated MediaStream.ended attribute 
+     // and new .active. Provided by hthetiot .
+     //
+     function isStreamActive(stream) {
+        return stream.active === true || stream.ended === false;
+    }
+
     function hangupBody(otherUser) {
         var i;
         if (self.debugPrinter) {
@@ -3280,7 +3289,7 @@ var Easyrtc = function() {
             if (peerConns[otherUser].pc) {
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
                 for (i = 0; i < remoteStreams.length; i++) {
-                    if( remoteStreams[i].active ) {
+                    if( isStreamActive(remoteStreams[i])) {
                         emitOnStreamClosed(otherUser, remoteStreams[i]);
                         try {
                             stopStream(remoteStreams[i]);
