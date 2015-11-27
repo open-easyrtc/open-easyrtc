@@ -198,9 +198,9 @@
                 sdp = maybePreferAudioReceiveCodec(insdp);
                 sdp = maybeSetAudioReceiveBitRate(sdp);
                 sdp = maybeSetVideoReceiveBitRate(sdp);
-                if( sdp != insdp ) {
-                    console.log("changed the sdp from \n" + insdp + "\nto\n" + sdp);
-                }
+                //if( sdp != insdp ) {
+                //    console.log("changed the sdp from \n" + insdp + "\nto\n" + sdp);
+                //}
                 return sdp;
             };
         }
@@ -214,9 +214,9 @@
                 sdp = maybeSetAudioSendBitRate(sdp);
                 sdp = maybeSetVideoSendBitRate(sdp);
                 sdp = maybeSetVideoSendInitialBitRate(sdp);
-                if( sdp != insdp ) {
-                    console.log("changed the sdp from \n" + insdp + "\nto\n" + sdp);
-                }
+                //if( sdp != insdp ) {
+                //    console.log("changed the sdp from \n" + insdp + "\nto\n" + sdp);
+                //}
                 return sdp;
             };
         }
