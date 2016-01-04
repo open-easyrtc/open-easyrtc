@@ -824,6 +824,21 @@ var Easyrtc = function() {
      */
     this.callCancelled = function(easyrtcid) {
     };
+
+
+    /** This function gets the raw RTCPeerConnection for a given easyrtcid
+      * @param {String} easyrtcid
+      * @param {RTCPeerConnection} for that easyrtcid, or null if no connection exists
+      * Submitted by Fabian Bernhard.
+      */
+    this.getPeerConnectionByUserId = function(userId) {
+	if (peerConns && peerConns[userId]) {
+		return peerConns[userId].pc;
+	}
+	return null;
+    };
+
+
     /**
      * This function gets the statistics for a particular peer connection.
      * @param {String} easyrtcid
