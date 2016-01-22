@@ -4893,7 +4893,7 @@ var Easyrtc = function() {
         self._turnServers = {};
         var i;
         var item, fixedItem, username, ipAddress;
-        if (!window.createIceServer) {
+        if (!window.createIceServers) {
             return;
         }
        if( !iceConfig || !iceConfig.iceServers ||
@@ -4906,7 +4906,7 @@ var Easyrtc = function() {
             item = iceConfig.iceServers[i];
             if (item.url.indexOf('turn:') === 0) {
                 if (item.username) {
-                    fixedItem = createIceServer(item.url, item.username, item.credential);
+                    fixedItem = createIceServers(item.url, item.username, item.credential);
                 }
                 else {
                     self.showError(self.errCodes.DEVELOPER_ERR, "TURN server entry doesn't have a username: " + JSON.stringify(item));
