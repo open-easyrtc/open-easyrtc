@@ -5453,34 +5453,13 @@ var Easyrtc = function() {
         self._turnServers = {};
         var i;
         var item, fixedItem, username, ipAddress;
-        if (!window.createIceServer) {
-            return;
-        }
        if( !iceConfig || !iceConfig.iceServers ||
               typeof iceConfig.iceServers.length === "undefined" ) {
             self.showError(self.errCodes.DEVELOPER_ERR, "iceConfig received from server didn't have an array called iceServers, ignoring it");
               iceConfig = { iceServers:[]};
          }
 
-        for (i = 0; i < iceConfig.iceServers.length; i++) {
-            item = iceConfig.iceServers[i];
-            if (item.url.indexOf('turn:') === 0) {
-                if (item.username) {
-                    fixedItem = createIceServer(item.url, item.username, item.credential);
-                }
-                else {
-                    self.showError(self.errCodes.DEVELOPER_ERR, "TURN server entry doesn't have a username: " + JSON.stringify(item));
-                }
-                ipAddress = item.url.split(/[@:&]/g)[1];
-                self._turnServers[ipAddress] = true;
-            }
-            else { // is stun server entry
-                fixedItem = item;
-            }
-            if (fixedItem) {
-                pc_config.iceServers.push(fixedItem);
-            }
-        }
+         pc_config = { iceServers: iceConfig.iceServers};
     }
 
     /**
