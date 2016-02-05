@@ -4900,6 +4900,31 @@ var Easyrtc = function() {
          }
 
          pc_config = { iceServers: iceConfig.iceServers};
+
+         //
+         // collect turn server ip addresses
+         //
+
+         function processUrl(url) {
+            if (url.indexOf('turn:') === 0) {
+                ipAddress = url.split(/[@:&]/g)[1];
+                self._turnServers[ipAddress] = true;
+            }
+        }
+         
+         for (i = 0; i < iceConfig.iceServers.length; i++) {
+            var item = iceConfig.iceServers[i];
+            if( item.urls && item.urls.length ) {
+               var j;
+               for( j = 0; j < item.urls.length; j++ ) {
+                  processUrl(item.urls[j]);
+               } 
+            }
+            else if( item.url ) {
+               processUrl(item.url);
+            }
+         }
+
     }
 
     /**
