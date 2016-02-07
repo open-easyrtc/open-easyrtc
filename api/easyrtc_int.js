@@ -306,13 +306,33 @@ var Easyrtc = function() {
             'OfferToReceiveVideo': true
         }
     };
+
+    if( isFirefox ) {
+       receivedMediaConstraints = {
+            'offerToReceiveAudio': true,
+            'offerToReceiveVideo': true
+       };
+    }
+    else {
+       receivedMediaConstraints = {
+           'mandatory': {
+               'OfferToReceiveAudio': true,
+               'OfferToReceiveVideo': true
+           }
+       };
+    }
     /**
      * Control whether the client requests audio from a peer during a call.
      * Must be called before the call to have an effect.
      * @param value - true to receive audio, false otherwise. The default is true.
      */
     this.enableAudioReceive = function(value) {
-        receivedMediaConstraints.mandatory.OfferToReceiveAudio = value;
+        if( isFirefox ) {
+            receivedMediaConstraints.offerToReceiveAudio = value;
+        }
+        else {
+            receivedMediaConstraints.mandatory.OfferToReceiveAudio = value;
+        }
     };
     /**
      * Control whether the client requests video from a peer during a call.
@@ -320,8 +340,14 @@ var Easyrtc = function() {
      * @param value - true to receive video, false otherwise. The default is true.
      */
     this.enableVideoReceive = function(value) {
-        receivedMediaConstraints.mandatory.OfferToReceiveVideo = value;
+        if( isFirefox ) {
+           receivedMediaConstraints.offerToReceiveVideo = value;
+        }
+        else {
+           receivedMediaConstraints.mandatory.OfferToReceiveVideo = value;
+        }
     };
+
 
     function getSourceList(callback, sourceType) {
         navigator.mediaDevices.enumerateDevices().then(
@@ -620,24 +646,42 @@ var Easyrtc = function() {
             constraints.video = false;
         }
         else {
-            constraints.video = {mandatory: {}, optional: []};
-            if (self._desiredVideoProperties.width) {
-                constraints.video.mandatory.maxWidth = self._desiredVideoProperties.width;
-                constraints.video.mandatory.minWidth = self._desiredVideoProperties.width;
+            if( isFirefox ) {
+                constraints.video = {}; 
+                if (self._desiredVideoProperties.width) {
+                    constraints.video.width = self._desiredVideoProperties.width;
+                }
+                if (self._desiredVideoProperties.height) {
+                    constraints.video.height = self._desiredVideoProperties.height;
+                }
+                if (self._desiredVideoProperties.frameRate) {
+                    constraints.video.frameRate = { max: self._desiredVideoProperties.frameRate};
+                }
+                if (self._desiredVideoProperties.videoSrcId) {
+                    constraints.video.optional.push({sourceId: self._desiredVideoProperties.videoSrcId});
+                }
             }
-            if (self._desiredVideoProperties.width) {
-                constraints.video.mandatory.maxHeight = self._desiredVideoProperties.height;
-                constraints.video.mandatory.minHeight = self._desiredVideoProperties.height;
-            }
-            if (self._desiredVideoProperties.frameRate) {
-                constraints.video.mandatory.maxFrameRate = self._desiredVideoProperties.frameRate;
-            }
-            if (self._desiredVideoProperties.videoSrcId) {
-                constraints.video.optional.push({sourceId: self._desiredVideoProperties.videoSrcId});
-            }
-            // hack for opera
-            if (constraints.video.mandatory.length === 0 && constraints.video.optional.length === 0) {
-                constraints.video = true;
+            else { // chrome and opera
+                constraints.video = {mandatory: {}, optional: []};
+                if (self._desiredVideoProperties.width) {
+                    constraints.video.mandatory.maxWidth = self._desiredVideoProperties.width;
+                    constraints.video.mandatory.minWidth = self._desiredVideoProperties.width;
+                }
+                if (self._desiredVideoProperties.height) {
+                    constraints.video.mandatory.maxHeight = self._desiredVideoProperties.height;
+                    constraints.video.mandatory.minHeight = self._desiredVideoProperties.height;
+                }
+                if (self._desiredVideoProperties.frameRate) {
+                    constraints.video.mandatory.maxFrameRate = self._desiredVideoProperties.frameRate;
+                }
+                if (self._desiredVideoProperties.videoSrcId) {
+                    // firefox doesn't respect this
+                    constraints.video.optional.push({sourceId: self._desiredVideoProperties.videoSrcId});
+                }
+                // hack for opera
+                if (constraints.video.mandatory.length === 0 && constraints.video.optional.length === 0) {
+                    constraints.video = true;
+                }
             }
         }
         constraints.audio = self.audioEnabled;
@@ -4906,7 +4950,7 @@ var Easyrtc = function() {
          //
 
          function processUrl(url) {
-            if (url.indexOf('turn:') === 0) {
+            if (url.indexOf('turn:') === 0 || url.indexOf('turns:') == 0) {
                 ipAddress = url.split(/[@:&]/g)[1];
                 self._turnServers[ipAddress] = true;
             }
