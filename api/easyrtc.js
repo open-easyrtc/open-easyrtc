@@ -3800,7 +3800,7 @@ var Easyrtc = function() {
             if (currentTime < firstCallTime + 1000) {
                 webrtcUtils.log("Trying getUserMedia a second time");
                 setTimeout(function() {
-                    window.getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
+                    getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
                 }, 3000);
             }
             else {
@@ -3819,7 +3819,7 @@ var Easyrtc = function() {
             setTimeout(function() {
                 try {
                     firstCallTime = getCurrentTime();
-                    window.getUserMedia(mode, onUserMediaSuccess, tryAgain);
+                    getUserMedia(mode, onUserMediaSuccess, tryAgain);
                 } catch (e) {
                     tryAgain(e);
                 }
