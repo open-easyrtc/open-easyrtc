@@ -757,7 +757,7 @@ var Easyrtc = function() {
      * @returns {Boolean} True getUserMedia is supported.
      */
     this.supportsGetUserMedia = function() {
-        return !!window.getUserMedia;
+        return !!getUserMedia;
     };
     /**
      * Determines if the local browser supports WebRTC Peer connections to the extent of being able to do video chats.
