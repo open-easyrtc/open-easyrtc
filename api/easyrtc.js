@@ -1,7 +1,6 @@
 //
 // the below code is a copy of the standard polyfill adapter.js
 //
-var getUserMedia = null;
 var attachMediaStream = null;
 var reattachMediaStream = null;
 var webrtcDetectedBrowser = null;
@@ -186,7 +185,7 @@ if (!window.createIceServer) {
         return {'url': url, 'credential': credential, 'username': username};
     };
 }/** @class
- *@version 1.0.15
+ *@version 1.0.16-beta
  *<p>
  * Provides client side support for the EasyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
@@ -247,6 +246,7 @@ var Easyrtc = function() {
     function stopStream(stream) {
        var i;
        var tracks;
+
        tracks = stream.getAudioTracks();
        for( i = 0; i < tracks.length; i++ ) {
            try {
@@ -259,6 +259,19 @@ var Easyrtc = function() {
              tracks[i].stop();
            } catch(err){}
        }
+
+       if (typeof stream.stop === 'function') {
+           try {
+             stream.stop();
+           } catch(err){}
+       }
+    }
+
+    //
+    // this function check the deprecated MediaStream.ended attribute and new .active
+    //
+    function isStreamActive(stream) {
+        return stream.active || !stream.ended;
     }
 
     /**
@@ -473,9 +486,10 @@ var Easyrtc = function() {
         PEER_GONE: "PEER_GONE", // peer doesn't exist
         ALREADY_CONNECTED: "ALREADY_CONNECTED",
         BAD_CREDENTIAL: "BAD_CREDENTIAL",
-        ICECANDIDATE_ERR: "ICECANDIDATE_ERROR"
+        ICECANDIDATE_ERR: "ICECANDIDATE_ERROR",
+        NOVIABLEICE: "NOVIABLEICE_ERROR",
     };
-    this.apiVersion = "1.0.15";
+    this.apiVersion = "1.0.16-beta";
     /** Most basic message acknowledgment object */
     this.ackMessage = {msgType: "ack"};
     /** Regular expression pattern for user ids. This will need modification to support non US character sets */
@@ -817,7 +831,7 @@ var Easyrtc = function() {
                 constraints.video.mandatory.maxWidth = self._desiredVideoProperties.width;
                 constraints.video.mandatory.minWidth = self._desiredVideoProperties.width;
             }
-            if (self._desiredVideoProperties.width) {
+            if (self._desiredVideoProperties.height) {
                 constraints.video.mandatory.maxHeight = self._desiredVideoProperties.height;
                 constraints.video.mandatory.minHeight = self._desiredVideoProperties.height;
             }
@@ -884,7 +898,7 @@ var Easyrtc = function() {
      * @returns {Boolean} True getUserMedia is supported.
      */
     this.supportsGetUserMedia = function() {
-        return !!getUserMedia;
+        return !!window.getUserMedia;
     };
     /**
      * Determines if the local browser supports WebRTC Peer connections to the extent of being able to do video chats.
@@ -1929,11 +1943,9 @@ var Easyrtc = function() {
          }
          if( !streamToClone ) {
             for(key in peerConns) {
-                if (peerConns.hasOwnProperty(key)) {
-                    var remoteStreams = peerConns[key].pc.getRemoteStreams();
-                    if( remoteStreams && remoteStreams.length > 1 ) {
-                        streamToClone = remoteStreams[0];
-                    }   
+                var remoteStreams = peerConns[key].pc.getRemoteStreams();
+                if( remoteStreams && remoteStreams.length > 0 ) {
+                    streamToClone = remoteStreams[0];
                 }
             }
          }
@@ -2200,7 +2212,7 @@ var Easyrtc = function() {
             if (currentTime < firstCallTime + 1000) {
                 console.log("Trying getUserMedia a second time");
                 setTimeout(function() {
-                    getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
+                    window.getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
                 }, 3000);
             }
             else {
@@ -2219,7 +2231,7 @@ var Easyrtc = function() {
             setTimeout(function() {
                 try {
                     firstCallTime = getCurrentTime();
-                    getUserMedia(mode, onUserMediaSuccess, tryAgain);
+                    window.getUserMedia(mode, onUserMediaSuccess, tryAgain);
                 } catch (e) {
                     tryAgain(e);
                 }
@@ -3221,7 +3233,7 @@ var Easyrtc = function() {
         // call B as a positive offer to B's offer.
         //
         if (offersPending[otherUser]) {
-            wasAcceptedCB(true);
+            wasAcceptedCB(true, otherUser);
             doAnswer(otherUser, offersPending[otherUser], streamNames);
             delete offersPending[otherUser];
             self.callCancelled(otherUser, false);
@@ -3309,12 +3321,9 @@ var Easyrtc = function() {
             if (peerConns[otherUser].pc) {
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
                 for (i = 0; i < remoteStreams.length; i++) {
-                    if( remoteStreams[i].active ) {
+                    if (isStreamActive(remoteStreams[i])) {
+                        stopStream(remoteStreams[i]);
                         emitOnStreamClosed(otherUser, remoteStreams[i]);
-                        try {
-                            stopStream(remoteStreams[i]);
-                        } catch (err) {
-                        }
                     }
                 }
                 //
@@ -3550,7 +3559,7 @@ var Easyrtc = function() {
         else {
             var stream = peerConns[easyrtcid].getRemoteStreamByName(msgData.streamName);
             if (stream) {
-                onRemoveStreamHelper(easyrtcid, stream, msgData.streamName);
+                onRemoveStreamHelper(easyrtcid, stream);
                 stopStream(stream);
             }
         }
@@ -3822,7 +3831,7 @@ var Easyrtc = function() {
                 if (self.debugPrinter) {
                     self.debugPrinter("saw remove on remote media stream");
                 }
-                onRemoveStreamHelper(otherUser, event.stream, event.stream.id || "default");
+                onRemoveStreamHelper(otherUser, event.stream);
             };
             peerConns[otherUser] = newPeerConn;
         } catch (e) {

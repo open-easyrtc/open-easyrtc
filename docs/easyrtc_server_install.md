@@ -163,6 +163,10 @@ Below is the initial server program which will run an EasyRTC server along with 
     var io      = require("socket.io");         // web socket external module
     var easyrtc = require("easyrtc");           // EasyRTC external module
 
+    // Setup and configure Express http server. Expect a subfolder called "static" to be the web root.
+    var httpApp = express();
+    httpApp.use(express.static(__dirname + "/static/"));
+
     // Start Express http server on port 8080
     var webServer = http.createServer(httpApp).listen(8080);
 

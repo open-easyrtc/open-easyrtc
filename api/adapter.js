@@ -1,7 +1,6 @@
 //
 // the below code is a copy of the standard polyfill adapter.js
 //
-var getUserMedia = null;
 var attachMediaStream = null;
 var reattachMediaStream = null;
 var webrtcDetectedBrowser = null;
