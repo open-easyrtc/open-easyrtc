@@ -4,6 +4,9 @@ var express = require("express");           // web framework external module
 var io      = require("socket.io");         // web socket external module
 var easyrtc = require("../");           // EasyRTC external module
 
+// Set process name
+process.title = "node-easyrtc";
+
 // Setup and configure Express http server. Expect a subfolder called "static" to be the web root.
 var httpApp = express();
 httpApp.use(express.static(__dirname + "/static/"));
