@@ -3344,7 +3344,7 @@ var Easyrtc = function() {
         else {
             var stream = peerConns[easyrtcid].getRemoteStreamByName(msgData.streamName);
             if (stream) {
-                onRemoveStreamHelper(easyrtcid, stream, msgData.streamName);
+                onRemoveStreamHelper(easyrtcid, stream);
                 stopStream(stream);
             }
         }
@@ -3608,7 +3608,7 @@ var Easyrtc = function() {
                 if (self.debugPrinter) {
                     self.debugPrinter("saw remove on remote media stream");
                 }
-                onRemoveStreamHelper(otherUser, event.stream, event.stream.id || "default");
+                onRemoveStreamHelper(otherUser, event.stream);
             };
             peerConns[otherUser] = newPeerConn;
         } catch (e) {
