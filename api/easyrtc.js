@@ -479,7 +479,8 @@ var Easyrtc = function() {
         PEER_GONE: "PEER_GONE", // peer doesn't exist
         ALREADY_CONNECTED: "ALREADY_CONNECTED",
         BAD_CREDENTIAL: "BAD_CREDENTIAL",
-        ICECANDIDATE_ERR: "ICECANDIDATE_ERROR"
+        ICECANDIDATE_ERR: "ICECANDIDATE_ERROR",
+        NOVIABLEICE: "NOVIABLEICE_ERROR",
     };
     this.apiVersion = "1.0.16-beta";
     /** Most basic message acknowledgment object */
