@@ -1924,7 +1924,7 @@ var Easyrtc = function() {
          if( !streamToClone ) {
             for(key in peerConns) {
                 var remoteStreams = peerConns[key].pc.getRemoteStreams();
-                if( remoteStreams && remoteStreams.length > 1 ) {
+                if( remoteStreams && remoteStreams.length > 0 ) {
                     streamToClone = remoteStreams[0];
                 }
             }
