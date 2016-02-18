@@ -705,7 +705,7 @@ var Easyrtc = function() {
      * @returns {Boolean} True getUserMedia is supported.
      */
     this.supportsGetUserMedia = function() {
-        return !!getUserMedia;
+        return !!window.getUserMedia;
     };
     /**
      * Determines if the local browser supports WebRTC Peer connections to the extent of being able to do video chats.
@@ -2006,7 +2006,7 @@ var Easyrtc = function() {
             if (currentTime < firstCallTime + 1000) {
                 console.log("Trying getUserMedia a second time");
                 setTimeout(function() {
-                    getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
+                    window.getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
                 }, 3000);
             }
             else {
@@ -2025,7 +2025,7 @@ var Easyrtc = function() {
             setTimeout(function() {
                 try {
                     firstCallTime = getCurrentTime();
-                    getUserMedia(mode, onUserMediaSuccess, tryAgain);
+                    window.getUserMedia(mode, onUserMediaSuccess, tryAgain);
                 } catch (e) {
                     tryAgain(e);
                 }
