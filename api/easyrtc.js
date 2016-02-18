@@ -824,7 +824,7 @@ var Easyrtc = function() {
                 constraints.video.mandatory.maxWidth = self._desiredVideoProperties.width;
                 constraints.video.mandatory.minWidth = self._desiredVideoProperties.width;
             }
-            if (self._desiredVideoProperties.width) {
+            if (self._desiredVideoProperties.height) {
                 constraints.video.mandatory.maxHeight = self._desiredVideoProperties.height;
                 constraints.video.mandatory.minHeight = self._desiredVideoProperties.height;
             }
