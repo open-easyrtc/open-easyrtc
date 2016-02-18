@@ -3024,7 +3024,7 @@ var Easyrtc = function() {
         // call B as a positive offer to B's offer.
         //
         if (offersPending[otherUser]) {
-            wasAcceptedCB(true);
+            wasAcceptedCB(true, otherUser);
             doAnswer(otherUser, offersPending[otherUser], streamNames);
             delete offersPending[otherUser];
             self.callCancelled(otherUser, false);
