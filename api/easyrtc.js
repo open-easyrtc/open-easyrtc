@@ -1757,9 +1757,7 @@ if (typeof module !== 'undefined') {
       //trace: not exposed on purpose.
     };
   });
-}
->>>>>>> beta_priologic
-/** @class
+}/** @class
  *@version 1.0.16-beta
  *<p>
  * Provides client side support for the EasyRTC framework.

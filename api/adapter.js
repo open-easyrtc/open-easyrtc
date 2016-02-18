@@ -1758,4 +1758,3 @@ if (typeof module !== 'undefined') {
     };
   });
 }
->>>>>>> beta_priologic
