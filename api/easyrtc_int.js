@@ -302,6 +302,7 @@ var Easyrtc = function() {
         BAD_CREDENTIAL: "BAD_CREDENTIAL",
         ICECANDIDATE_ERR: "ICECANDIDATE_ERROR",
         NOVIABLEICE: "NOVIABLEICE_ERROR",
+        SIGNAL_ERROR: "SIGNAL_ERROR"
     };
     this.apiVersion = "1.0.16-beta";
     /** Most basic message acknowledgment object */
