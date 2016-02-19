@@ -300,9 +300,9 @@ var Easyrtc = function() {
         PEER_GONE: "PEER_GONE", // peer doesn't exist
         ALREADY_CONNECTED: "ALREADY_CONNECTED",
         BAD_CREDENTIAL: "BAD_CREDENTIAL",
-        ICECANDIDATE_ERR: "ICECANDIDATE_ERROR",
-        NOVIABLEICE: "NOVIABLEICE_ERROR",
-        SIGNAL_ERROR: "SIGNAL_ERROR"
+        ICECANDIDATE_ERR: "ICECANDIDATE_ERR",
+        NOVIABLEICE: "NOVIABLEICE",
+        SIGNAL_ERR: "SIGNAL_ERR"
     };
     this.apiVersion = "1.0.16-beta";
     /** Most basic message acknowledgment object */
@@ -4638,7 +4638,7 @@ var Easyrtc = function() {
                     // socket.io version 1 got rid of the socket member, moving everything up one level.
                     //
                     if (isSocketConnected(self.webSocket)) {
-                        self.showError(self.errCodes.SIGNAL_ERROR, self.getConstantString("miscSignalError"));
+                        self.showError(self.errCodes.SIGNAL_ERR, self.getConstantString("miscSignalError"));
                     }
                     else {
                         /* socket server went down. this will generate a 'disconnect' event as well, so skip this event */
@@ -4664,7 +4664,7 @@ var Easyrtc = function() {
                 sendAuthenticate(successCallback, errorCallback);
             }
             else {
-                errorCallback(self.errCodes.SIGNAL_ERROR, self.getConstantString("icf"));
+                errorCallback(self.errCodes.SIGNAL_ERR, self.getConstantString("icf"));
             }
         }
         if (isSocketConnected(preallocatedSocketIo)) {
