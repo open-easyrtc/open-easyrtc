@@ -6098,7 +6098,7 @@ var Easyrtc = function() {
             pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
 
             if (msgData.candidate.indexOf("typ relay") > 0) {
-                var ipAddress = msgData.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/i)[1];
+                var ipAddress = msgData.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/i)[2];
                 self._turnServers[ipAddress] = true;
             }
         };
