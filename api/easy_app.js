@@ -133,7 +133,7 @@
 
 
         easyrtc.getIthCaller = function(i) {
-            if (i < 0 || i > videoIdsP.length) {
+            if (i < 0 || i >= videoIdsP.length) {
                 return null;
             }
             var vid = getIthVideo(i);
