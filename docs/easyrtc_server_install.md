@@ -131,6 +131,7 @@ Below is a small upstart script which can be saved as /etc/init/easyrtc.conf
 
     script
         # Note: To run as a non root user, use exec sudo -u USERNAME node /var/nodes/easyrtc/server.js
+        # If nodejs is installed using Ubuntu's nodejs package, change /usr/bin/node to /usr/bin/nodejs
         exec /usr/bin/node /var/nodes/easyrtc/server.js
     end script
 
