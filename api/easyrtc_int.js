@@ -484,7 +484,7 @@ var Easyrtc = function() {
      * multiple rooms simultaneously. It may be called before or after connecting to the server.
      * Note: the successCB and failureDB will only be called if you are already connected to the server.
      * @param {String} roomName the room to be joined.
-     * @param {String} roomParameters application specific parameters, can be null.
+     * @param {Object} roomParameters application specific parameters, can be null.
      * @param {Function} successCB called once, with a roomName as it's argument, once the room is joined.
      * @param {Function} failureCB called if the room can not be joined. The arguments of failureCB are errorCode, errorText, roomName.
      */
