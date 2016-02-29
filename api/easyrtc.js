@@ -6396,7 +6396,7 @@ var Easyrtc = function() {
     }
 
 
-    function buildDeltaRecord(added, deleted, modified) {
+    function buildDeltaRecord(added, deleted) {
         function objectNotEmpty(obj) {
             var i;
             for (i in obj) {
@@ -6447,7 +6447,7 @@ var Easyrtc = function() {
         for (i in oldVersion) {
             if (newVersion.hasOwnProperty(i)) {
                 if (typeof newVersion[i] === 'undefined') {
-                    deleted[i] = oldVersion[i];
+                    deleted = oldVersion[i];
                 }
             }
         }
