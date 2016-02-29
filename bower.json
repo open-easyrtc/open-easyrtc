@@ -1,0 +1,28 @@
+{
+  "name": "easyrtc",
+  "main": "api/easyrtc.js",
+  "version": "beta",
+  "homepage": "http://easyrtc.com/",
+  "authors": [
+    "Rod Apeldoorn <rod.apeldoorn@priologic.com>",
+    "Eric Davies <eric.davies@priologic.com>",
+    "Harold Thétiot <hthetiot@sylaps.com>"
+  ],
+  "description": "EasyRTC is a bundle of Open Source WebRTC joy! Our Javascript API hides the differences between Chrome and Firefox browsers and simplifies coding needed for working WebRTC apps. Signalling server using socket.io built on node.js. Tons of free code so you can build WebRTC apps in a few hours that just work. Demos include Instant messaging, Multiparty chatroom, Audio + Video, Screen sharing, Data channel Messaging and File sharing, and more.",
+  "moduleType": [
+    "globals"
+  ],
+  "license": "BSD 2",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "demos",
+    "dev",
+    "docs",
+    "lib",
+    "server_example"
+  ]
+}
