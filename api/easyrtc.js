@@ -6293,7 +6293,7 @@ var Easyrtc = function() {
                 clearQueuedMessages(caller);
                 break;
             case "error":
-                self.showError(msg.errorCode, msg.errorText);
+                self.showError(msgData.errorCode, msgData.errorText);
                 break;
             default:
                 console.error("received unknown message type from server, msgType is " + msgType);
