@@ -9,6 +9,9 @@
     "Harold Thétiot <hthetiot@sylaps.com>"
   ],
   "description": "EasyRTC is a bundle of Open Source WebRTC joy! Our Javascript API hides the differences between Chrome and Firefox browsers and simplifies coding needed for working WebRTC apps. Signalling server using socket.io built on node.js. Tons of free code so you can build WebRTC apps in a few hours that just work. Demos include Instant messaging, Multiparty chatroom, Audio + Video, Screen sharing, Data channel Messaging and File sharing, and more.",
+  "dependencies": {
+    "socket.io-client": "1.3.7"
+  },
   "moduleType": [
     "globals"
   ],
