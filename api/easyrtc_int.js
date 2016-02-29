@@ -4612,13 +4612,16 @@ var Easyrtc = function() {
         else if (!self.webSocket) {
             try {
                self.webSocket = io.connect(serverPath, connectionOptions);
+
+                if (!self.webSocket) {
+                    throw "io.connect failed";
+                }
+
             } catch(socketErr) {
-               errorCallback( self.errCodes.SYSTEM_ERROR, 
-                     socketErr.toString());
+                self.webSocket = 0;
+                errorCallback( self.errCodes.SYSTEM_ERROR, socketErr.toString());
+               
                return;
-            }
-            if (!self.webSocket) {
-                throw "io.connect failed";
             }
         }
         else {
