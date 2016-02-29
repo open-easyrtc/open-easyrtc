@@ -42,17 +42,23 @@
 /* global io */
 
 var Easyrtc = function() {
+    
     var self = this;
+    
+    // TODO remove and rely on Adapter
     var isFirefox = (webrtcDetectedBrowser === "firefox");
+
     var autoInitUserMedia = true;
-    var sdpLocalFilter = null,
-            sdpRemoteFilter = null;
+    var sdpLocalFilter = null;
+    var sdpRemoteFilter = null;
     var iceCandidateFilter = null;
+    
+    var iceConnectionStateChangeListener = null;
 
     var connectionOptions =  {
-                'connect timeout': 10000,
-                'force new connection': true
-            };
+        'connect timeout': 10000,
+        'force new connection': true
+    };  
 
     //
     // this function replaces the deprecated MediaStream.stop method
@@ -119,6 +125,8 @@ var Easyrtc = function() {
       this.onPeerRecovered = recoveredHandler;
    };
 
+
+
    /**
     * Sets a function which filters IceCandidate records being sent or received.
     *
@@ -134,6 +142,18 @@ var Easyrtc = function() {
    this.setIceCandidateFilter = function(filter) {
       iceCandidateFilter = filter;
    };
+    
+    /**
+     * Sets a function that listens on IceConnectionStateChange events.
+     *
+     * During ICE negotiation the peer connection fires the iceconnectionstatechange event. 
+     * It is sometimes useful for the application to learn about these changes, especially if the ICE connection fails.
+     * The function should accept two parameters: the easyrtc id of the peer and the iceconnectionstatechange event target.
+     * @param {Function} listener
+     */
+    this.setIceConnectionStateChangeListener = function(listener) {
+       iceConnectionStateChangeListener = listener;
+    }
 
     /**
      * Controls whether a default local media stream should be acquired automatically during calls and accepts
@@ -3526,6 +3546,10 @@ var Easyrtc = function() {
             };
 
             pc.oniceconnectionstatechange = function(ev) {
+                if (iceConnectionStateChangeListener) {
+                   iceConnectionStateChangeListener(otherUser, ev.target);
+                }
+
                 var connState = ev.currentTarget.iceConnectionState;
                 switch( connState) {
                    case "connected":
