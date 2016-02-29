@@ -6,7 +6,6 @@
 
         var audioSendBitrate = options.audioSendBitrate;
         var audioRecvBitrate = options.audioRecvBitrate;
-        var videoSendBitrate = options.videoSendBitrate;
         var videoRecvBitrate = options.videoRecvBitrate;
         var videoSendBitrate = options.videoSendBitrate;
         var videoSendInitialBitrate = options.videoSendInitialBitrate;
