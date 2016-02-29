@@ -426,17 +426,6 @@ If you don't want to share your audio or your video, you can disable their trans
 
 These calls determine the content of the local media stream initialized by easyrtc.initMediaSource, so you must call them before calling easyrtc.initMediaSource.
 
-### Setting The Video Bandwidth ###
-
-You can set the bandwidth used to send and receive each media stream's video track by
-calling easyrtc.setVideoBandwidth. The function takes a single integer argument, the desired bandwidth in kilobits per second.
-
-    easyrtc.setVideoBandwidth(45);
-
-The method should be called before initiating or accepting connections as it operates by modifying records used to establish peer connections.
-It will have no effect on media streams passed to a peer connection before it was invoked. Currently, this is only respected by Chrome, and we're told by Mozilla that Firefox won't like it.
-
-
 ### Ignoring Calls
 
 In the examples above, the callee always accepted connections from the caller.

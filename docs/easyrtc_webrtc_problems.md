@@ -54,8 +54,6 @@ Picture Quality
 
  - Video resolution can be in set using:
    -  easyrtc.setVideoDims(width, height);
- - In Chrome the bandwidth can be set using:
-   -  easyrtc.setVideoBandwidth(kbits-per-second);
  - Video camera hardware makes a big difference. When we upgraded from a 5yr old 720p camera to a new 1080p camera, the differences were remarkable. Even when just sending 640x480.
  - HOPE: Support for hardware encoding / decoding will allow higher resolution video.
  - HOPE: Support for adjusting bandwidth from within the JavaScript API.

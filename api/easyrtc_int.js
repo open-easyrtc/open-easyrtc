@@ -52,7 +52,7 @@ var Easyrtc = function() {
     var sdpLocalFilter = null;
     var sdpRemoteFilter = null;
     var iceCandidateFilter = null;
-    
+
     var iceConnectionStateChangeListener = null;
 
     var connectionOptions =  {
@@ -2209,17 +2209,7 @@ var Easyrtc = function() {
     this.setOnStreamClosed = function(onStreamClosed) {
         self.onStreamClosed = onStreamClosed;
     };
-    /** @deprecated No longer supported by Google.
-     * Sets the bandwidth for sending video data.
-     * Setting the rate too low will cause connection attempts to fail. 40 is probably good lower limit.
-     * The default is 50. A value of zero will remove bandwidth limits.
-     * @param {Number} kbitsPerSecond is rate in kilobits per second.
-     * @example
-     *    easyrtc.setVideoBandwidth( 40);
-     */
-    this.setVideoBandwidth = function(kbitsPerSecond) {
-        self.showError("easyrtc.setVideoBandwidth is deprecated, it no longer has an effect.");
-    };
+    
     /** Determines whether the current browser supports the new data channels.
      * EasyRTC will not open up connections with the old data channels.
      * @returns {Boolean}
