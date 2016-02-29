@@ -3786,6 +3786,7 @@ var Easyrtc = function() {
             };
             updateConfigurationInfo();
         };
+
         if (!self.audioEnabled && !self.videoEnabled) {
             onUserMediaError(self.getConstantString("requireAudioOrVideo"));
             return;
@@ -3808,27 +3809,20 @@ var Easyrtc = function() {
                 onUserMediaError(error);
             }
         }
-
-        if (self.videoEnabled || self.audioEnabled) {
-            //
-            // getUserMedia sometimes fails the first time I call it. I suspect it's a page loading
-            // issue. So I'm going to try adding a 3 second delay to allow things to settle down first.
-            // In addition, I'm going to try again after 3 seconds.
-            //
-
-
-            setTimeout(function() {
-                try {
-                    firstCallTime = getCurrentTime();
-                    getUserMedia(mode, onUserMediaSuccess, tryAgain);
-                } catch (e) {
-                    tryAgain(e);
-                }
-            }, 1000);
-        }
-        else {
-            onUserMediaSuccess(null);
-        }
+         
+        //
+        // getUserMedia sometimes fails the first time I call it. I suspect it's a page loading
+        // issue. So I'm going to try adding a 1 second delay to allow things to settle down first.
+        // In addition, I'm going to try again after 3 seconds.
+        //
+        setTimeout(function() {
+            try {
+                firstCallTime = getCurrentTime();
+                getUserMedia(mode, onUserMediaSuccess, tryAgain);
+            } catch (e) {
+                tryAgain(e);
+            }
+        }, 1000);
     };
     /**
      * Sets the callback used to decide whether to accept or reject an incoming call.
