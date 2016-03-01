@@ -27,11 +27,6 @@ var webrtcDetectedVersion = null;
 var webrtcMinimumVersion = null;
 var webrtcUtils = {
   log: function() {
-    // suppress console.log output when being included as a module.
-    if (typeof module !== 'undefined' ||
-        typeof require === 'function' && typeof define === 'function') {
-      return;
-    }
     console.log.apply(console, arguments);
   },
   extractVersion: function(uastring, expr, pos) {
@@ -1938,7 +1933,7 @@ var Easyrtc = function() {
             return easyrtc_constantStrings[key];
         }
         else {
-            console.warn("Could not find key='" + key + "' in easyrtc_constantStrings");
+            self.showError(self.errCodes.DEVELOPER_ERR, "Could not find key='" + key + "' in easyrtc_constantStrings");
             return key;
         }
     };
@@ -2103,6 +2098,7 @@ var Easyrtc = function() {
             receivedMediaConstraints.offerToReceiveAudio = value;
         }
         else {
+            receivedMediaConstraints.mandatory = receivedMediaConstraints.mandatory || {};
             receivedMediaConstraints.mandatory.OfferToReceiveAudio = value;
         }
     };
@@ -2117,7 +2113,8 @@ var Easyrtc = function() {
            receivedMediaConstraints.offerToReceiveVideo = value;
         }
         else {
-           receivedMediaConstraints.mandatory.OfferToReceiveVideo = value;
+            receivedMediaConstraints.mandatory = receivedMediaConstraints.mandatory || {};
+            receivedMediaConstraints.mandatory.OfferToReceiveVideo = value;
         }
     };
 
@@ -2931,15 +2928,16 @@ var Easyrtc = function() {
         }
     };
 
-    /** Default error reporting function. The default implementation displays error messages
-     *  in a programmatically created div with the id easyrtcErrorDialog. The div has title
-     *  component with a class name of easyrtcErrorDialog_title. The error messages get added to a
-     *  container with the id easyrtcErrorDialog_body. Each error message is a text node inside a div
-     *  with a class of easyrtcErrorDialog_element. There is an "okay" button with the className of easyrtcErrorDialog_okayButton.
-     *  @param {String} messageCode An error message code
-     *  @param {String} message the error message text without any markup.
-     *  @example
-     *      easyrtc.showError("BAD_NAME", "Invalid username");
+    /** 
+     * Default error reporting function. The default implementation displays error messages
+     * in a programmatically created div with the id easyrtcErrorDialog. The div has title
+     * component with a class name of easyrtcErrorDialog_title. The error messages get added to a
+     * container with the id easyrtcErrorDialog_body. Each error message is a text node inside a div
+     * with a class of easyrtcErrorDialog_element. There is an "okay" button with the className of easyrtcErrorDialog_okayButton.
+     * @param {String} messageCode An error message code
+     * @param {String} message the error message text without any markup.
+     * @example
+     *     easyrtc.showError("BAD_NAME", "Invalid username");
      */
     this.showError = function(messageCode, message) {
         self.onError({errorCode: messageCode, errorText: message});
@@ -4204,7 +4202,7 @@ var Easyrtc = function() {
         else {
             peerConnObj = peerConns[easyrtcid];
             if (!peerConnObj) {
-                console.error("Developer error: haveTracks called about a peer you don't have a connection to");
+                self.showError(self.errCodes.DEVELOPER_ERR, "haveTracks called about a peer you don't have a connection to");
                 return false;
             }
             stream = peerConnObj.getRemoteStreamByName(streamName);
@@ -4591,7 +4589,7 @@ var Easyrtc = function() {
      */
     this.sendPeerMessage = function(destination, msgType, msgData, successCB, failureCB) {
         if (!destination) {
-            console.error("Developer error, destination was null in sendPeerMessage");
+            self.showError(self.errCodes.DEVELOPER_ERR, "destination was null in sendPeerMessage");
         }
 
         if (self.debugPrinter) {
@@ -6583,7 +6581,7 @@ var Easyrtc = function() {
                 self.showError(msgData.errorCode, msgData.errorText);
                 break;
             default:
-                console.error("received unknown message type from server, msgType is " + msgType);
+                self.showError(self.errCodes.DEVELOPER_ERR, "received unknown message type from server, msgType is " + msgType);
                 return;
         }
 
@@ -6722,7 +6720,7 @@ var Easyrtc = function() {
      */
     this.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
         if (self.roomJoin[roomName]) {
-            console.error("Developer error: attempt to join room " + roomName + " which you are already in.");
+            self.showError(self.errCodes.DEVELOPER_ERR, "Attempt to join room " + roomName + " which you are already in.");
             return;
         }
 
@@ -7098,7 +7096,7 @@ var Easyrtc = function() {
         }
 
         if (!preallocatedSocketIo && self.webSocket) {
-            console.error("Developer error: attempt to connect when already connected to socket server");
+            self.showError(self.errCodes.DEVELOPER_ERR, "Attempt to connect when already connected to socket server");
             return;
         }
         pc_config = {};
@@ -7111,13 +7109,14 @@ var Easyrtc = function() {
             application: {},
             connection: {}
         };
+
         if (self.debugPrinter) {
             self.debugPrinter("attempt to connect to WebRTC signalling server with application name=" + applicationName);
         }
 
         if (errorCallback === null) {
             errorCallback = function(errorCode, errorText) {
-                console.error("easyrtc.connect: " + errorText);
+                self.showError(errorCode, errorText);
             };
         }
 
