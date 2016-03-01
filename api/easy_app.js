@@ -18,14 +18,12 @@
      * @private
      */
     function easyAppBody(monitorVideoId, videoIds) {
-        var numPEOPLE = videoIds.length;
-        var videoIdsP = videoIds;
-        var refreshPane = 0;
-        var onCall = null, onHangup = null;
-        var videoIdToCallerMap = {};
-        if (!videoIdsP) {
-            videoIdsP = [];
-        }
+
+        var videoIdsP = videoIds || [],
+            numPEOPLE = videoIds.length,
+            videoIdToCallerMap = {},
+            onCall = null, 
+            onHangup = null;
 
         /**
          * Validates that the video ids correspond to dom objects.
@@ -64,26 +62,30 @@
             videoIdToCallerMap[videoObject.id] = callerEasyrtcId;
         }
 
-        easyrtc.addEventListener("roomOccupants", 
-            function(eventName, eventData) {
-                var i;
-                for (i = 0; i < numPEOPLE; i++) {
-                    var video = getIthVideo(i);
-                    if (!videoIsFree(video)) {
-		        if( !easyrtc.isPeerInAnyRoom(getCallerOfVideo(video))){
-                           if( onHangup ) {
-                               onHangup(getCallerOfVideo(video), i);
-                           }
-                           setCallerOfVideo(video, null);
-                        }
-                    }
-                }
-            }
-        );
-
         function videoIsFree(obj) {
             var caller = getCallerOfVideo(obj);
             return (caller === "" || caller === null || caller === undefined);
+        }
+
+        function getIthVideo(i) {
+            if (videoIdsP[i]) {
+                return document.getElementById(videoIdsP[i]);
+            }
+            else {
+                return null;
+            }
+        }
+
+        function showVideo(video, stream) {
+            easyrtc.setVideoObjectSrc(video, stream);
+            if (video.style.visibility) {
+                video.style.visibility = 'visible';
+            }
+        }
+
+        function hideVideo(video) {
+            easyrtc.setVideoObjectSrc(video, "");
+            video.style.visibility = "hidden";
         }
 
         if (!validateVideoIds(monitorVideoId, videoIdsP)) {
@@ -93,6 +95,23 @@
         if (monitorVideoId) {
             document.getElementById(monitorVideoId).muted = "muted";
         }
+
+        easyrtc.addEventListener("roomOccupants", 
+            function(eventName, eventData) {
+                var i;
+                for (i = 0; i < numPEOPLE; i++) {
+                    var video = getIthVideo(i);
+                    if (!videoIsFree(video)) {
+                if( !easyrtc.isPeerInAnyRoom(getCallerOfVideo(video))){
+                           if( onHangup ) {
+                               onHangup(getCallerOfVideo(video), i);
+                           }
+                           setCallerOfVideo(video, null);
+                        }
+                    }
+                }
+            }
+        );
 
         /** Sets an event handler that gets called when an incoming MediaStream is assigned 
          * to a video object. The name is poorly chosen and reflects a simpler era when you could
@@ -106,6 +125,7 @@
         easyrtc.setOnCall = function(cb) {
             onCall = cb;
         };
+
         /** Sets an event handler that gets called when a call is ended.
          * it's only purpose (so far) is to support transitions on video elements.
          x     * this function is only defined after easyrtc.easyApp is called.
@@ -121,16 +141,6 @@
         easyrtc.setOnHangup = function(cb) {
             onHangup = cb;
         };
-
-        function getIthVideo(i) {
-            if (videoIdsP[i]) {
-                return document.getElementById(videoIdsP[i]);
-            }
-            else {
-                return null;
-            }
-        }
-
 
         easyrtc.getIthCaller = function(i) {
             if (i < 0 || i >= videoIdsP.length) {
@@ -149,10 +159,6 @@
             }
             return -1; // caller not connected
         };
-        function hideVideo(video) {
-            easyrtc.setVideoObjectSrc(video, "");
-            video.style.visibility = "hidden";
-        }
 
         easyrtc.setOnStreamClosed(function(caller) {
             var i;
@@ -167,6 +173,7 @@
                 }
             }
         });
+
         //
         // Only accept incoming calls if we have a free video object to display
         // them in.
@@ -182,27 +189,15 @@
             }
             helper(false);
         });
+
         easyrtc.setStreamAcceptor(function(caller, stream) {
             var i;
             if (easyrtc.debugPrinter) {
                 easyrtc.debugPrinter("stream acceptor called");
             }
-            function showVideo(video, stream) {
-                easyrtc.setVideoObjectSrc(video, stream);
-                if (video.style.visibility) {
-                    video.style.visibility = 'visible';
-                }
-            }
 
             var video;
-            if (refreshPane && videoIsFree(refreshPane)) {
-                showVideo(refreshPane, stream);
-                if (onCall) {
-                    onCall(caller, refreshPane);
-                }
-                refreshPane = null;
-                return;
-            }
+
             for (i = 0; i < numPEOPLE; i++) {
                 video = getIthVideo(i);
                 if (getCallerOfVideo(video) === caller) {
@@ -225,9 +220,9 @@
                     return;
                 }
             }
-//
-// no empty slots, so drop whatever caller we have in the first slot and use that one.
-//
+            //
+            // no empty slots, so drop whatever caller we have in the first slot and use that one.
+            //
             video = getIthVideo(0);
             if (video) {
                 easyrtc.hangup(getCallerOfVideo(video));
@@ -236,31 +231,33 @@
                     onCall(caller, 0);
                 }
             }
+
             setCallerOfVideo(video, caller);
         });
-        (function() {
-            var addControls, parentDiv, closeButton, i;
-            if (autoAddCloseButtons) {
 
-                addControls = function(video) {
-                    parentDiv = video.parentNode;
-                    setCallerOfVideo(video, "");
-                    closeButton = document.createElement("div");
-                    closeButton.className = "easyrtc_closeButton";
-                    closeButton.onclick = function() {
-                        if (getCallerOfVideo(video)) {
-                            easyrtc.hangup(getCallerOfVideo(video));
-                            hideVideo(video);
-                            setCallerOfVideo(video, "");
-                        }
-                    };
-                    parentDiv.appendChild(closeButton);
+        var addControls, parentDiv, closeButton, i;
+        if (autoAddCloseButtons) {
+
+            addControls = function(video) {
+                parentDiv = video.parentNode;
+                setCallerOfVideo(video, "");
+                closeButton = document.createElement("div");
+                closeButton.className = "easyrtc_closeButton";
+                closeButton.onclick = function() {
+                    if (getCallerOfVideo(video)) {
+                        easyrtc.hangup(getCallerOfVideo(video));
+                        hideVideo(video);
+                        setCallerOfVideo(video, "");
+                    }
                 };
-                for (i = 0; i < numPEOPLE; i++) {
-                    addControls(getIthVideo(i));
-                }
+                parentDiv.appendChild(closeButton);
+            };
+
+            for (i = 0; i < numPEOPLE; i++) {
+                addControls(getIthVideo(i));
             }
-        })();
+        }
+
         var monitorVideo = null;
         if (easyrtc.videoEnabled && monitorVideoId !== null) {
             monitorVideo = document.getElementById(monitorVideoId);
@@ -272,6 +269,7 @@
             monitorVideo.defaultMuted = true;
         }
     }
+
     /**
      * Provides a layer on top of the easyrtc.initMediaSource and easyrtc.connect, assign the local media stream to
      * the video object identified by monitorVideoId, assign remote video streams to
@@ -294,9 +292,12 @@
      *              });
      */
     easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, onFailure) {
+        
         var gotMediaCallback = null,
-                gotConnectionCallback = null;
+            gotConnectionCallback = null;
+
         easyAppBody(monitorVideoId, videoIds);
+
         easyrtc.setGotMedia = function(gotMediaCB) {
             gotMediaCallback = gotMediaCB;
         };
@@ -311,6 +312,7 @@
                }
            }, 1000);
         });
+
         /** Sets an event handler that gets called when a connection to the signaling
          * server has or has not been made. Can only be called after calling easyrtc.easyApp.
          * @param {Function} gotConnectionCB has the signature (gotConnection, errorText)
@@ -327,13 +329,14 @@
         easyrtc.setGotConnection = function(gotConnectionCB) {
             gotConnectionCallback = gotConnectionCB;
         };
-        var nextInitializationStep;
-        nextInitializationStep = function(/* token */) {
+        
+        function nextInitializationStep(/* token */) {
             if (gotConnectionCallback) {
                 gotConnectionCallback(true, "");
             }
             onReady(easyrtc.myEasyrtcid);
         };
+
         function postGetUserMedia() {
             if (gotMediaCallback) {
                 gotMediaCallback(true, null);
@@ -356,8 +359,6 @@
             easyrtc.connect(applicationName, nextInitializationStep, connectError);
         }
 
-        
-        
         var stream = easyrtc.getLocalStream(null);
         if (stream) {
             postGetUserMedia();
@@ -377,12 +378,7 @@
                         }
                     },
                     null // default stream
-                    );
+                );
         }
     };
-    /**
-     *
-     * @deprecated now called easyrtc.easyApp.
-     */
-    easyrtc.initManaged = easyrtc.easyApp;
 })();
