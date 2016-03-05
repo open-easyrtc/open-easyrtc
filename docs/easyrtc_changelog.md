@@ -1,6 +1,41 @@
 EasyRTC: Change Log
 ===================
 
+v1.0.16
+-------
+
+New Features:
+- Add getSourceList and getAudioSourceList #80
+- IceConnectionStateChangeListener #122
+
+Changes:
+- Update to socket.io 1.3.7 #209
+- Remove deprecated easyrtc.setVideoBandwidth #120
+
+Fixes:
+ - JS Client - WebRTC Version Detecting Fails When Simulating iPad In Chrome Dev Tools #90
+ - JS Client - FileTransfer support on IE10 #137 #135
+ - JS Client - Firefox and previous WebRTC impl does not call emitOnStreamClosed #173
+ - JS Client - Update getUserMediaConstraints() implementation #176
+ - JS Client - Possible bad userAgent RegExp in Adapter.js #177
+ - JS Client - wrong condition expression in buildLocalMediaStream #189
+ - JS Client - Missing argument for wasAcceptedCB #190
+ - JS Client - Too many arguments passed into onRemoveStreamHelper #192
+ - JS Client - Add missing error code SIGNAL_ERROR #193
+ - JS Client - Add missing error code NOVIABLEICE #193
+ - JS Client - Possible undefined getUserMedia #194
+ - JS Client - Update Adapter.js to fix easyrtc require-js and AMD support #195
+ - JS Client - joinRoom()'s roomParameters not a string #168
+ - JS Client - Invalid range condition in getIthCaller #202
+ - JS Client - Unnecessary if branch and flow in InitMediaSource #203
+ - JS Client - Possible Undefined socket.io method #209
+ - JS Client - bug for `deleted` in `findDeltas` #201
+ - JS Client -  JSHint on easyrtc_int.js #169
+ - Demos - Remove duplicate line #117
+ - Demos - Fixed css class for mirroring local video #153
+ - Doc - A mistake in documentation #188
+ - Server - error "attempt to connect when already connected to socket server" even if connection failed #98
+
 v1.0.15
 -------
 
