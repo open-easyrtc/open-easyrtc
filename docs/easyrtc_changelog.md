@@ -36,6 +36,8 @@ Fixes:
  - Doc - A mistake in documentation #188
  - Server - error "attempt to connect when already connected to socket server" even if connection failed #98
 
+ Thanks to contribution by @omochi for report and reviewing 1.0.16.
+
 v1.0.15
 -------
 
