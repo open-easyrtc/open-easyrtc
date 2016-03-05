@@ -4835,7 +4835,7 @@ var Easyrtc = function() {
         for (i in oldVersion) {
             if (newVersion.hasOwnProperty(i)) {
                 if (typeof newVersion[i] === 'undefined') {
-                    deleted = oldVersion[i];
+                    deleted[i] = oldVersion[i];
                 }
             }
         }
