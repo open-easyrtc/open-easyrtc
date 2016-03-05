@@ -748,7 +748,7 @@ easyrtc_ft.saveAs = (function() {
             return new FileSaver(blob, name);
         }
 
-        var FS_proto = FileSaver.prototype = saveAs;
+        var FS_proto = FileSaver.prototype;
 
         FS_proto.abort = function() {
             var filesaver = this;
