@@ -33,7 +33,7 @@
  *</p>
  */
 
-
+/* global easyrtc */ // easyrtc.js
 var easyrtc_ft = {};
 
 /**
@@ -54,6 +54,27 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
         droptarget = droptargetName;
     }
 
+    function addClass(target, classname) {
+        if (target.className) {
+            if (target.className.indexOf(classname, 0) >= 0) {
+                return;
+            }
+            else {
+                target.className = target.className + " " + classname;
+            }
+        }
+        else {
+            target.className = classname;
+        }
+        target.className = target.className.replace("  ", " ");
+    }
+
+    function removeClass(target, classname) {
+        if (!target.className) {
+            return;
+        }
+        target.className = target.className.replace(classname, "").replace("  ", " ");
+    }
 
     function ignore(e) {
         e.stopPropagation();
@@ -62,11 +83,14 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
     }
 
     function drageventcancel(e) {
-        if (e.preventDefault)
+        if (e.preventDefault) {
             e.preventDefault(); // required by FF + Safari
+        }
         e.dataTransfer.dropEffect = 'copy'; // tells the browser what drop effect is allowed here
         return false; // required by IE
     }
+
+    var dropCueClass = "easyrtcfiledrop";
 
     function dropHandler(e) {
         removeClass(droptarget, dropCueClass);
@@ -82,14 +106,10 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
         return ignore(e);
     }
 
-
-    var dropCueClass = "easyrtcfiledrop";
-
     function dragEnterHandler(e) {
         addClass(droptarget, dropCueClass);
         return drageventcancel(e);
     }
-
 
     function dragLeaveHandler(e) {
         removeClass(droptarget, dropCueClass);
@@ -126,28 +146,6 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
     droptarget.ondragenter = dragEnterHandler;
     droptarget.ondragleave = dragLeaveHandler;
     droptarget.ondragover = drageventcancel;
-
-    function addClass(target, classname) {
-        if (target.className) {
-            if (target.className.indexOf(classname, 0) >= 0) {
-                return;
-            }
-            else {
-                target.className = target.className + " " + classname;
-            }
-        }
-        else {
-            target.className = classname;
-        }
-        target.className = target.className.replace("  ", " ");
-    }
-
-    function removeClass(target, classname) {
-        if (!target.className) {
-            return;
-        }
-        target.className = target.className.replace(classname, "").replace("  ", " ");
-    }
 };
 
 /**
@@ -192,81 +190,35 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
     var ackThreshold = maxChunkSize * 4; // send is allowed to be 400KB ahead of receiver
     var filesWaiting = [];
     var haveFilesWaiting = false;
-
-    if (!progressListener) {
-        progressListener = function() {
-            return true;
-        };
-    }
-
-    var roomOccupantListener = function(eventType, eventData) {
-        var roomName;
-        var foundUser = false;
-        for (roomName in eventData) {
-            if (eventData[roomName][destUser]) {
-                foundUser = true;
-            }
-        }
-        if (!foundUser) {
-            easyrtc.removeEventListener("roomOccupant", roomOccupantListener);
-            if (filesBeingSent.length > 0 || filesOffered.length > 0) {
-                progressListener({status: "cancelled"});
-            }
-        }
-    };
-    easyrtc.addEventListener("roomOccupant", roomOccupantListener);
-    //
-    // if a file offer is rejected, we delete references to it.
-    //
-    function fileOfferRejected(sender, msgType, msgData, targeting) {
-        if (!msgData.seq)
-            return;
-        delete filesOffered[msgData.seq];
-        progressListener({status: "rejected"});
-        filesOffered.length = 0;
-        sendFilesWaiting();
-    }
-    //
-    // if a file offer is accepted, initiate sending of files.
-    //
-    function fileOfferAccepted(sender, msgType, msgData, targeting) {
-        if (!msgData.seq || !filesOffered[msgData.seq])
-            return;
-        var alreadySending = filesBeingSent.length > 0;
-        for (var i = 0; i < filesOffered[msgData.seq].length; i++) {
-            filesBeingSent.push(filesOffered[msgData.seq][i]);
-        }
-        delete filesOffered[msgData.seq];
-        if (!alreadySending) {
-            filePosition = 0;
-            sendChunk(); // this starts the file reading
-        }
-    }
-
-    function fileCancelReceived(sender, msgType, msgData, targeting) {
-        filesBeingSent.empty();
-        progressListener({status: "cancelled"});
-        filesOffered.length = 0;
-        filesBeingSent.length = 0;
-        sendStarted = false;
-        sendFilesWaiting();
-    }
-
-    function packageAckReceived(sender, msgType, msgData) {
-        positionAcked = msgData.positionAck;
-        if (waitingForAck && filePosition < positionAcked + ackThreshold) {
-            waitingForAck = false;
-            sendChunk();
-        }
-    }
-
-    easyrtc.setPeerListener(fileOfferRejected, "filesReject", destUser);
-    easyrtc.setPeerListener(fileOfferAccepted, "filesAccept", destUser);
-    easyrtc.setPeerListener(fileCancelReceived, "filesCancel", destUser);
-    easyrtc.setPeerListener(packageAckReceived, "filesAck", destUser);
-
-
     var outseq = 0;
+
+    function sendFilesOffer(files, areBinary) {
+        if (haveFilesWaiting) {
+            filesWaiting.push({files: files, areBinary: areBinary});
+        }
+        else {
+            haveFilesWaiting = true;
+            filesAreBinary = areBinary;
+            progressListener({status: "waiting"});
+            var fileNameList = [];
+            for (var i = 0; i < files.length; i++) {
+                fileNameList[i] = {name: files[i].name, size: files[i].size};
+            }
+            seq++;
+            filesOffered[seq] = files;
+            easyrtc.sendDataWS(destUser, "filesOffer", {seq: seq, fileNameList: fileNameList});
+        }
+    }
+
+    function sendFilesWaiting() {
+        haveFilesWaiting = false;
+        if (filesWaiting.length > 0) {
+            setTimeout(function() {
+                var fileset = filesWaiting.shift();
+                sendFilesOffer(fileset.files, fileset.areBinary);
+            }, 240);
+        }
+    }
 
     function sendChunk() {
         if (!curFile) {
@@ -304,9 +256,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         var reader = new FileReader();
         reader.onloadend = function(evt) {
             if (evt.target.readyState === FileReader.DONE) { // DONE == 2
-//              
-//              Contribution by Harold Thetiot
-//                
+                
                 var binaryString = "";
                 var bytes = new Uint8Array(evt.target.result);
                 var length = bytes.length;
@@ -356,34 +306,81 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         }
     }
 
-    function sendFilesWaiting() {
-        haveFilesWaiting = false;
-        if (filesWaiting.length > 0) {
-            setTimeout(function() {
-                var fileset = filesWaiting.shift();
-                sendFilesOffer(fileset.files, fileset.areBinary);
-            }, 240);
-        }
+    if (!progressListener) {
+        progressListener = function() {
+            return true;
+        };
     }
 
-
-    function sendFilesOffer(files, areBinary) {
-        if (haveFilesWaiting) {
-            filesWaiting.push({files: files, areBinary: areBinary});
-        }
-        else {
-            haveFilesWaiting = true;
-            filesAreBinary = areBinary;
-            progressListener({status: "waiting"});
-            var fileNameList = [];
-            for (var i = 0; i < files.length; i++) {
-                fileNameList[i] = {name: files[i].name, size: files[i].size};
+    var roomOccupantListener = function(eventType, eventData) {
+        var roomName;
+        var foundUser = false;
+        for (roomName in eventData) {
+            if (eventData[roomName][destUser]) {
+                foundUser = true;
             }
-            seq++;
-            filesOffered[seq] = files;
-            easyrtc.sendDataWS(destUser, "filesOffer", {seq: seq, fileNameList: fileNameList});
+        }
+        if (!foundUser) {
+            easyrtc.removeEventListener("roomOccupant", roomOccupantListener);
+            if (filesBeingSent.length > 0 || filesOffered.length > 0) {
+                progressListener({status: "cancelled"});
+            }
+        }
+    };
+    easyrtc.addEventListener("roomOccupant", roomOccupantListener);
+    //
+    // if a file offer is rejected, we delete references to it.
+    //
+    function fileOfferRejected(sender, msgType, msgData, targeting) {
+        if (!msgData.seq) {
+            return;
+        }
+
+        delete filesOffered[msgData.seq];
+        progressListener({status: "rejected"});
+        filesOffered.length = 0;
+        sendFilesWaiting();
+    }
+    //
+    // if a file offer is accepted, initiate sending of files.
+    //
+    function fileOfferAccepted(sender, msgType, msgData, targeting) {
+        if (!msgData.seq || !filesOffered[msgData.seq]){
+            return;
+        }
+        var alreadySending = filesBeingSent.length > 0;
+        for (var i = 0; i < filesOffered[msgData.seq].length; i++) {
+            filesBeingSent.push(filesOffered[msgData.seq][i]);
+        }
+        delete filesOffered[msgData.seq];
+        if (!alreadySending) {
+            filePosition = 0;
+            sendChunk(); // this starts the file reading
         }
     }
+
+    function fileCancelReceived(sender, msgType, msgData, targeting) {
+        filesBeingSent.empty();
+        progressListener({status: "cancelled"});
+        filesOffered.length = 0;
+        filesBeingSent.length = 0;
+        sendStarted = false;
+        sendFilesWaiting();
+    }
+
+    function packageAckReceived(sender, msgType, msgData) {
+        positionAcked = msgData.positionAck;
+        if (waitingForAck && filePosition < positionAcked + ackThreshold) {
+            waitingForAck = false;
+            sendChunk();
+        }
+    }
+
+    easyrtc.setPeerListener(fileOfferRejected, "filesReject", destUser);
+    easyrtc.setPeerListener(fileOfferAccepted, "filesAccept", destUser);
+    easyrtc.setPeerListener(fileCancelReceived, "filesCancel", destUser);
+    easyrtc.setPeerListener(packageAckReceived, "filesAck", destUser);
+
     return sendFilesOffer;
 };
 
@@ -423,26 +420,31 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
         var user;
         var foundUser;
         var roomName;
-        for (destUser in userStreams) {
-            foundUser = false;
-            for (roomName in eventData) {
-                if (eventData[roomName][destUser]) {
-                    foundUser = true;
+        for (var destUser in userStreams) {
+            if (userStreams.hasOwnProperty(destUser)) {                    
+                foundUser = false;
+                for (roomName in eventData) {
+                    if (eventData[roomName][destUser]) {
+                        foundUser = true;
+                    }
                 }
-            }
-            if (!foundUser) {
-                easyrtc.removeEventListener("roomOccupant", roomOccupantListener);
-                statusCB(destUser, {status: "done", reason: "cancelled"});
-                delete userStreams[destUser];
+                if (!foundUser) {
+                    easyrtc.removeEventListener("roomOccupant", roomOccupantListener);
+                    statusCB(destUser, {status: "done", reason: "cancelled"});
+                    delete userStreams[destUser];
+                }
             }
         }
     };
+
     easyrtc.addEventListener("roomOccupant", roomOccupantListener);
 
     function fileOfferHandler(otherGuy, msgType, msgData) {
+        
         if (!userStreams[otherGuy]) {
             userStreams[otherGuy] = {};
         }
+
         acceptRejectCB(otherGuy, msgData.fileNameList, function(wasAccepted) {
             var ackHandler = function(ackMesg) {
 
@@ -468,7 +470,6 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
             }
         });
     }
-
 
     function fileChunkHandler(otherGuy, msgType, msgData) {
         var i;
@@ -546,6 +547,7 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
  * @param {String} filename - the name of the file the blob should be written to.
  */
 easyrtc_ft.saveAs = (function() {
+
     /* FileSaver.js
      * A saveAs() FileSaver implementation.
      * 2013-01-23
@@ -560,39 +562,38 @@ easyrtc_ft.saveAs = (function() {
      plusplus: true */
 
     /*! @source http://purl.eligrey.com/github/FileSaver.js/blob/master/FileSaver.js */
+    var saveAs = window.saveAs || (navigator.msSaveOrOpenBlob && navigator.msSaveOrOpenBlob.bind(navigator)) || (function(view) {
+            
+        
 
-    var saveAs = window.saveAs
-            || (navigator.msSaveOrOpenBlob && navigator.msSaveOrOpenBlob.bind(navigator))
-            || (function(view) {
+        var doc = view.document,
+            // only get URL when necessary in case BlobBuilder.js hasn't overridden it yet
+            get_URL = function () {
+                return view.URL || view.webkitURL || view;
+            },
+            URL = view.URL || view.webkitURL || view,
+            save_link = doc.createElementNS("http://www.w3.org/1999/xhtml", "a"),
+            can_use_save_link = !view.externalHost && "download" in save_link,
+            click = function(node) {
+                var event = doc.createEvent("MouseEvents");
+                event.initMouseEvent(
+                    "click", true, false, view, 0, 0, 0, 0, 0,
+                    false, false, false, false, 0, null
+                );
+                node.dispatchEvent(event);
+            },
+            webkit_req_fs = view.webkitRequestFileSystem,
+            req_fs = view.requestFileSystem || webkit_req_fs || view.mozRequestFileSystem,
+            throw_outside = function(ex) {
+                (view.setImmediate || view.setTimeout)(function() {
+                    throw ex;
+                }, 0);
+            },
+            force_saveable_type = "application/octet-stream",
+            fs_min_size = 0,
+            deletion_queue = [];
 
-        var
-                doc = view.document
-                // only get URL when necessary in case BlobBuilder.js hasn't overridden it yet
-                , get_URL = function() {
-            return view.URL || view.webkitURL || view;
-        }
-        , URL = view.URL || view.webkitURL || view
-                , save_link = doc.createElementNS("http://www.w3.org/1999/xhtml", "a")
-                , can_use_save_link = !view.externalHost && "download" in save_link
-                , click = function(node) {
-            var event = doc.createEvent("MouseEvents");
-            event.initMouseEvent(
-                    "click", true, false, view, 0, 0, 0, 0, 0
-                    , false, false, false, false, 0, null
-                    );
-            node.dispatchEvent(event);
-        }
-        , webkit_req_fs = view.webkitRequestFileSystem
-                , req_fs = view.requestFileSystem || webkit_req_fs || view.mozRequestFileSystem
-                , throw_outside = function(ex) {
-            (view.setImmediate || view.setTimeout)(function() {
-                throw ex;
-            }, 0);
-        }
-        , force_saveable_type = "application/octet-stream"
-                , fs_min_size = 0
-                , deletion_queue = []
-                , process_deletion_queue = function() {
+        function process_deletion_queue() {
             var i = deletion_queue.length;
             while (i--) {
                 var file = deletion_queue[i];
@@ -604,7 +605,8 @@ easyrtc_ft.saveAs = (function() {
             }
             deletion_queue.length = 0; // clear queue
         }
-        , dispatch = function(filesaver, event_types, event) {
+
+        function dispatch(filesaver, event_types, event) {
             event_types = [].concat(event_types);
             var i = event_types.length;
             while (i--) {
@@ -618,53 +620,55 @@ easyrtc_ft.saveAs = (function() {
                 }
             }
         }
-        , FileSaver = function(blob, name) {
+
+        function FileSaver(blob, name) {
             // First try a.download, then web filesystem, then object URLs
-            var
-                    filesaver = this
-                    , type = blob.type
-                    , blob_changed = false
-                    , object_url
-                    , target_view
-                    , get_object_url = function() {
-                var object_url = get_URL().createObjectURL(blob);
-                deletion_queue.push(object_url);
-                return object_url;
-            }
-            , dispatch_all = function() {
-                dispatch(filesaver, "writestart progress write writeend".split(" "));
-            }
-            // on any filesys errors revert to saving with object URLs
-            , fs_error = function() {
-                // don't create more object URLs than needed
-                if (blob_changed || !object_url) {
-                    object_url = get_object_url(blob);
-                }
-                if (target_view) {
-                    target_view.location.href = object_url;
-                } else {
-                    window.open(object_url, "_blank");
-                }
-                filesaver.readyState = filesaver.DONE;
-                dispatch_all();
-            }
-            , abortable = function(func) {
-                return function() {
-                    if (filesaver.readyState !== filesaver.DONE) {
-                        return func.apply(this, arguments);
+            var filesaver = this, 
+                type = blob.type, 
+                blob_changed = false, 
+                object_url, 
+                target_view, 
+                get_object_url = function() {
+                    var object_url = get_URL().createObjectURL(blob);
+                    deletion_queue.push(object_url);
+                    return object_url;
+                }, 
+                dispatch_all = function() {
+                    dispatch(filesaver, "writestart progress write writeend".split(" "));
+                }, 
+                // on any filesys errors revert to saving with object URLs
+                fs_error = function() {
+                    // don't create more object URLs than needed
+                    if (blob_changed || !object_url) {
+                        object_url = get_object_url(blob);
                     }
-                    else {
-                        return null;
+                    if (target_view) {
+                        target_view.location.href = object_url;
+                    } else {
+                        window.open(object_url, "_blank");
                     }
-                };
-            }
-            , create_if_not_found = {create: true, exclusive: false}
-            , slice
-                    ;
+                    filesaver.readyState = filesaver.DONE;
+                    dispatch_all();
+                }, 
+                abortable = function(func) {
+                    return function() {
+                        if (filesaver.readyState !== filesaver.DONE) {
+                            return func.apply(this, arguments);
+                        }
+                        else {
+                            return null;
+                        }
+                    };
+                }, 
+                create_if_not_found = {create: true, exclusive: false}, 
+                slice;
+
             filesaver.readyState = filesaver.INIT;
+            
             if (!name) {
                 name = "download";
             }
+            
             if (can_use_save_link) {
                 object_url = get_object_url(blob);
                 save_link.href = object_url;
@@ -739,31 +743,34 @@ easyrtc_ft.saveAs = (function() {
                 }), fs_error);
             }), fs_error);
         }
-        , FS_proto = FileSaver.prototype
-                , saveAs = function(blob, name) {
+
+        function saveAs(blob, name) {
             return new FileSaver(blob, name);
         }
-        ;
+
+        var FS_proto = FileSaver.prototype = saveAs;
+
         FS_proto.abort = function() {
             var filesaver = this;
             filesaver.readyState = filesaver.DONE;
             dispatch(filesaver, "abort");
         };
+        
         FS_proto.readyState = FS_proto.INIT = 0;
         FS_proto.WRITING = 1;
         FS_proto.DONE = 2;
-
-        FS_proto.error =
-                FS_proto.onwritestart =
-                FS_proto.onprogress =
-                FS_proto.onwrite =
-                FS_proto.onabort =
-                FS_proto.onerror =
-                FS_proto.onwriteend =
-                null;
+        FS_proto.error = null;
+        FS_proto.onwritestart = null;
+        FS_proto.onprogress = null;
+        FS_proto.onwrite = null;
+        FS_proto.onabort = null;
+        FS_proto.onerror = null;
+        FS_proto.onwriteend = null;
 
         view.addEventListener("unload", process_deletion_queue, false);
+
         return saveAs;
+
     }(self));
 
     return saveAs;
