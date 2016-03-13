@@ -1747,7 +1747,6 @@ try {
 
 /* global getUserMedia, MediaStreamTrack, createIceServer, RTCIceCandidate, RTCPeerConnection, RTCSessionDescription */ // WebRTC
 /* global webrtcDetectedBrowser, webrtcDetectedVersion, attachMediaStream , webrtcUtils*/ // adapter.js
-/* global mozRTCSessionDescription, mozRTCIceCandidate */
 /* global easyrtc_constantStrings */ // easyrtc_lang_en.js
 /* global io */
 
@@ -3302,7 +3301,6 @@ var Easyrtc = function() {
         var roomName;
         if (namedLocalMediaStreams[streamName]) {
 
-
             for (id in peerConns) {
                 if (peerConns.hasOwnProperty(id)) {
                     try {
@@ -3312,13 +3310,10 @@ var Easyrtc = function() {
                     self.sendPeerMessage(id, "__closingMediaStream", {streamId: streamId, streamName: streamName});
                 }
             }
-            try {
-                stopStream(namedLocalMediaStreams[streamName]);
-            } catch (err) {
-                // not worth reporting an error at this location
-                // since we didn't want the media stream anyhow.
-            }
+            
+            stopStream(namedLocalMediaStreams[streamName]);    
             delete namedLocalMediaStreams[streamName];
+
             if (streamName !== "default") {
                 var mediaIds = buildMediaIds();
                 for (roomName in self.roomData) {
@@ -4971,37 +4966,39 @@ var Easyrtc = function() {
 
                 var connState = ev.currentTarget.iceConnectionState;
                 switch( connState) {
-                   case "connected":
-                       if (peerConns[otherUser].callSuccessCB) {
-                            peerConns[otherUser].callSuccessCB(otherUser,
-                               "connection");
-                       }
-                       break;
-                   case "failed":
-                       if (failureCB) {
+                    case "connected":
+                        if (peerConns[otherUser] && peerConns[otherUser].callSuccessCB) {
+                            peerConns[otherUser].callSuccessCB(otherUser, "connection");
+                        }
+                        break;
+                    case "failed":
+                        if (failureCB) {
                             failureCB(self.errCodes.NOVIABLEICE, "No usable STUN/TURN path");
-                       }
-                       delete peerConns[otherUser];
-                       break;
-                   case "disconnected":
-                      if( self.onPeerFailing ) {
-                          self.onPeerFailing(otherUser);
-                          peerConns[otherUser].failing = Date.now();
-                      }
-                      break;
+                        }
+                        delete peerConns[otherUser];
+                        break;
+                    case "disconnected":
+                        if(self.onPeerFailing) {
+                            self.onPeerFailing(otherUser);
+                        }
+                        if (peerConns[otherUser]) {
+                            peerConns[otherUser].failing = Date.now();
+                        }
+                        break;
 
-                   case "closed":
-                      if( self.onPeerClosed ) {
+                    case "closed":
+                        if( self.onPeerClosed ) {
                           self.onPeerClosed(otherUser);
-                      }
-                      break;
-                }
+                        }
+                        break;
 
-                if (connState === 'connected' || connState === 'completed') {
-                    if (peerConns[otherUser].failing && self.onPeerRecovered) {
-                        self.onPeerRecovered(otherUser, peerConns[otherUser].failing, Date.now());
-                    }
-                    delete peerConns[otherUser].failing;
+                    case "connected":
+                    case "completed":
+                        if (peerConns[otherUser].failing && self.onPeerRecovered) {
+                            self.onPeerRecovered(otherUser, peerConns[otherUser].failing, Date.now());
+                        }
+                        delete peerConns[otherUser].failing;
+                        break;
                 }
             };
 
@@ -5448,13 +5445,11 @@ var Easyrtc = function() {
                 self.showError(self.errCodes.INTERNAL_ERR, "setLocalDescription: " + message);
             });
         };
-        var sd = null;
-        if (window.mozRTCSessionDescription) {
-            sd = new mozRTCSessionDescription(msgData);
+        var sd = new RTCSessionDescription(msgData);
+        if (!sd) {
+            throw "Could not create the RTCSessionDescription";
         }
-        else {
-            sd = new RTCSessionDescription(msgData);
-        }
+
         if (self.debugPrinter) {
             self.debugPrinter("sdp ||  " + JSON.stringify(sd));
         }
@@ -5679,10 +5674,21 @@ var Easyrtc = function() {
     /** @private */
     //
     // this function check the deprecated MediaStream.ended attribute 
-    // and new .active. 
+    // and new .active. Also fallback .enable on track for Firefox.
     //
     function isStreamActive(stream) {
-        return stream.active === true || stream.ended === false;
+
+        var isActive;
+
+        if (stream.active === true || stream.ended === false)  {
+            isActive = true;
+        } else {
+            isActive = stream.getTracks().reduce(function (track) {
+                return track.enabled;
+            });
+        }
+
+        return isActive;
     }
 
     /** @private */
@@ -5703,15 +5709,14 @@ var Easyrtc = function() {
         }
         clearQueuedMessages(otherUser);
         if (peerConns[otherUser]) {
+
             if (peerConns[otherUser].pc) {
+                
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
                 for (i = 0; i < remoteStreams.length; i++) {
                     if( isStreamActive(remoteStreams[i])) {
                         emitOnStreamClosed(otherUser, remoteStreams[i]);
-                        try {
-                            stopStream(remoteStreams[i]);
-                        } catch (err) {
-                        }
+                        stopStream(remoteStreams[i]);
                     }
                 }
                 //
@@ -5720,13 +5725,18 @@ var Easyrtc = function() {
                 try {
                     peerConns[otherUser].pc.close();
                 } catch (err) {
+                    if (self.debugPrinter) {
+                        self.debugPrinter("peer close failed:" + err);
+                    }
                 }
             }
 
             peerConns[otherUser].cancelled = true;
             delete peerConns[otherUser];
+
             if (self.webSocket) {
                 sendSignalling(otherUser, "hangup", null, function() {
+
                 }, function(errorCode, errorText) {
                     if (self.debugPrinter) {
                         self.debugPrinter("hangup failed:" + errorText);
@@ -6357,18 +6367,10 @@ var Easyrtc = function() {
                }
             }
 
-            if (window.mozRTCIceCandidate) {
-                candidate = new mozRTCIceCandidate({
-                    sdpMLineIndex: msgData.label,
-                    candidate: msgData.candidate
-                });
-            }
-            else {
-                candidate = new RTCIceCandidate({
-                    sdpMLineIndex: msgData.label,
-                    candidate: msgData.candidate
-                });
-            }
+            candidate = new RTCIceCandidate({
+                sdpMLineIndex: msgData.label,
+                candidate: msgData.candidate
+            });
             pc = peerConns[caller].pc;
 
             function iceAddSuccess() {}
@@ -6494,13 +6496,7 @@ var Easyrtc = function() {
             // peerConns[caller].startedAV = true;
             sendQueuedCandidates(caller, onSignalSuccess, onSignalFailure);
             pc = peerConns[caller].pc;
-            var sd = null;
-            if (window.mozRTCSessionDescription) {
-                sd = new mozRTCSessionDescription(msgData);
-            }
-            else {
-                sd = new RTCSessionDescription(msgData);
-            }
+            var sd = new RTCSessionDescription(msgData);
             if (!sd) {
                 throw "Could not create the RTCSessionDescription";
             }
