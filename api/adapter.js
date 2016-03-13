@@ -10,11 +10,12 @@
 /* jshint browser: true, camelcase: true, curly: true, devel: true,
    eqeqeq: true, forin: false, globalstrict: true, node: true,
    quotmark: single, undef: true, unused: strict */
+   
 /* global mozRTCIceCandidate, mozRTCPeerConnection, Promise,
 mozRTCSessionDescription, webkitRTCPeerConnection, MediaStreamTrack,
 MediaStream, RTCIceGatherer, RTCIceTransport, RTCDtlsTransport,
-RTCRtpSender, RTCRtpReceiver*/
-/* exported trace,requestUserMedia */
+RTCRtpSender, RTCRtpReceiver, RTCSessionDescription*/
+/* exported trace */
 
 'use strict';
 
@@ -26,11 +27,6 @@ var webrtcDetectedVersion = null;
 var webrtcMinimumVersion = null;
 var webrtcUtils = {
   log: function() {
-    // suppress console.log output when being included as a module.
-    if (typeof module !== 'undefined' ||
-        typeof require === 'function' && typeof define === 'function') {
-      return;
-    }
     console.log.apply(console, arguments);
   },
   extractVersion: function(uastring, expr, pos) {
@@ -77,6 +73,14 @@ if (typeof window === 'object') {
   // Proxy existing globals
   getUserMedia = window.navigator && window.navigator.getUserMedia;
 }
+
+// Returns the result of getUserMedia as a Promise.
+function requestUserMedia(constraints) {
+  return new Promise(function(resolve, reject) {
+    getUserMedia(constraints, resolve, reject);
+  });
+}
+
 
 // Attach a media stream to an element.
 attachMediaStream = function(element, stream) {
@@ -1156,8 +1160,7 @@ if (typeof window === 'undefined' || !window.navigator) {
         function(description) {
       var self = this;
       if (description.type === 'offer') {
-        if (!this._pendingOffer) {
-        } else {
+        if (this._pendingOffer) {
           this.transceivers = this._pendingOffer;
           delete this._pendingOffer;
         }
@@ -1676,7 +1679,7 @@ if (typeof window === 'undefined' || !window.navigator) {
 }
 
 // Polyfill ontrack on browsers that don't yet have it
-if (typeof window === 'object' && !('ontrack' in window.RTCPeerConnection)) {
+if (typeof window === 'object' && window.RTCPeerConnection && !('ontrack' in window.RTCPeerConnection)) {
   Object.defineProperty(window.RTCPeerConnection.prototype, 'ontrack', {
     get: function() { return this._ontrack; },
     set: function(f) {
@@ -1698,13 +1701,6 @@ if (typeof window === 'object' && !('ontrack' in window.RTCPeerConnection)) {
   });
 }
 
-// Returns the result of getUserMedia as a Promise.
-function requestUserMedia(constraints) {
-  return new Promise(function(resolve, reject) {
-    getUserMedia(constraints, resolve, reject);
-  });
-}
-
 var webrtcTesting = {};
 try {
   Object.defineProperty(webrtcTesting, 'version', {
@@ -1713,48 +1709,3 @@ try {
     }
   });
 } catch (e) {}
-
-if (typeof module !== 'undefined') {
-  var RTCPeerConnection;
-  var RTCIceCandidate;
-  var RTCSessionDescription;
-  if (typeof window !== 'undefined') {
-    RTCPeerConnection = window.RTCPeerConnection;
-    RTCIceCandidate = window.RTCIceCandidate;
-    RTCSessionDescription = window.RTCSessionDescription;
-  }
-  module.exports = {
-    RTCPeerConnection: RTCPeerConnection,
-    RTCIceCandidate: RTCIceCandidate,
-    RTCSessionDescription: RTCSessionDescription,
-    getUserMedia: getUserMedia,
-    attachMediaStream: attachMediaStream,
-    reattachMediaStream: reattachMediaStream,
-    webrtcDetectedBrowser: webrtcDetectedBrowser,
-    webrtcDetectedVersion: webrtcDetectedVersion,
-    webrtcMinimumVersion: webrtcMinimumVersion,
-    webrtcTesting: webrtcTesting,
-    webrtcUtils: webrtcUtils
-    //requestUserMedia: not exposed on purpose.
-    //trace: not exposed on purpose.
-  };
-} else if ((typeof require === 'function') && (typeof define === 'function')) {
-  // Expose objects and functions when RequireJS is doing the loading.
-  define([], function() {
-    return {
-      RTCPeerConnection: window.RTCPeerConnection,
-      RTCIceCandidate: window.RTCIceCandidate,
-      RTCSessionDescription: window.RTCSessionDescription,
-      getUserMedia: getUserMedia,
-      attachMediaStream: attachMediaStream,
-      reattachMediaStream: reattachMediaStream,
-      webrtcDetectedBrowser: webrtcDetectedBrowser,
-      webrtcDetectedVersion: webrtcDetectedVersion,
-      webrtcMinimumVersion: webrtcMinimumVersion,
-      webrtcTesting: webrtcTesting,
-      webrtcUtils: webrtcUtils
-      //requestUserMedia: not exposed on purpose.
-      //trace: not exposed on purpose.
-    };
-  });
-}

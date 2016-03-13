@@ -131,6 +131,7 @@ Below is a small upstart script which can be saved as /etc/init/easyrtc.conf
 
     script
         # Note: To run as a non root user, use exec sudo -u USERNAME node /var/nodes/easyrtc/server.js
+        # If nodejs is installed using Ubuntu's nodejs package, change /usr/bin/node to /usr/bin/nodejs
         exec /usr/bin/node /var/nodes/easyrtc/server.js
     end script
 
@@ -162,6 +163,10 @@ Below is the initial server program which will run an EasyRTC server along with 
     var express = require("express");           // web framework external module
     var io      = require("socket.io");         // web socket external module
     var easyrtc = require("easyrtc");           // EasyRTC external module
+
+    // Setup and configure Express http server. Expect a subfolder called "static" to be the web root.
+    var httpApp = express();
+    httpApp.use(express.static(__dirname + "/static/"));
 
     // Start Express http server on port 8080
     var webServer = http.createServer(httpApp).listen(8080);
