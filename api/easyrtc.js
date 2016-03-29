@@ -2232,7 +2232,6 @@ var Easyrtc = function() {
 
     /**
      * Specify particular video source. Call this before you call easyrtc.initMediaSource().
-     * Note: this function isn't supported by Firefox.
      * @param {String} videoSrcId is a id value from one of the entries fetched by getVideoSourceList. null for default.
      * @example easyrtc.setVideoSource( videoSrcId);
      */
@@ -2246,7 +2245,6 @@ var Easyrtc = function() {
 
     /**
      * Specify particular video source. Call this before you call easyrtc.initMediaSource().
-     * Note: this function isn't supported by Firefox.
      * @param {String} audioSrcId is a id value from one of the entries fetched by getAudioSourceList. null for default.
      * @example easyrtc.setAudioSource( audioSrcId);
      */
