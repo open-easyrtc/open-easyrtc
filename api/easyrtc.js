@@ -246,7 +246,7 @@ if (typeof window === 'undefined' || !window.navigator) {
       });
     };
   }
-} else if (navigator.webkitGetUserMedia && window.webkitRTCPeerConnection) {
+} else if (navigator.webkitGetUserMedia && window.webkitRTCPeerConnection && !window.RTCPeerConnection) {
   webrtcUtils.log('This appears to be Chrome');
 
   webrtcDetectedBrowser = 'chrome';
@@ -4981,7 +4981,7 @@ var Easyrtc = function() {
                    iceConnectionStateChangeListener(otherUser, ev.target);
                 }
 
-                var connState = ev.currentTarget.iceConnectionState;
+                var connState = ev.currentTarget ? ev.currentTarget.iceConnectionState : 'unknown';
                 switch( connState) {
                     case "connected":
                         if (peerConns[otherUser] && peerConns[otherUser].callSuccessCB) {
