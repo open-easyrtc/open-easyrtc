@@ -3271,7 +3271,7 @@ var Easyrtc = function() {
                    iceConnectionStateChangeListener(otherUser, ev.target);
                 }
 
-                var connState = ev.currentTarget.iceConnectionState;
+                var connState = ev.currentTarget ? ev.currentTarget.iceConnectionState : 'unknown';
                 switch( connState) {
                     case "connected":
                         if (peerConns[otherUser] && peerConns[otherUser].callSuccessCB) {
