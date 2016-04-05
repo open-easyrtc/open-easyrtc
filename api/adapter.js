@@ -246,7 +246,7 @@ if (typeof window === 'undefined' || !window.navigator) {
       });
     };
   }
-} else if (navigator.webkitGetUserMedia && window.webkitRTCPeerConnection) {
+} else if (navigator.webkitGetUserMedia && window.webkitRTCPeerConnection && !window.RTCPeerConnection) {
   webrtcUtils.log('This appears to be Chrome');
 
   webrtcDetectedBrowser = 'chrome';

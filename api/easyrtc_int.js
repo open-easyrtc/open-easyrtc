@@ -433,13 +433,11 @@ var Easyrtc = function() {
 
     /**
      * Gets a list of the available audio sources (ie, cameras)
-     * @param {Function} callback receives list of {label:String, id:String, kind:"audio"}
-     * Note: the label string always seems to be the empty string if you aren't using https.
-     * Note: not supported by Firefox.
+     * @param {Function} callback receives list of {deviceId:String, groupId:String, label:String, kind:"audio"}
      * @example  easyrtc.getAudioSourceList( function(list) {
      *               var i;
      *               for( i = 0; i < list.length; i++ ) {
-     *                   console.log("label=" + list[i].label + ", id= " + list[i].id);
+     *                   console.log("label=" + list[i].label + ", id= " + list[i].deviceId);
      *               }
      *          });
      */
@@ -449,13 +447,11 @@ var Easyrtc = function() {
 
     /**
      * Gets a list of the available video sources (ie, cameras)
-     * @param {Function} callback receives list of {facing:String, label:String, id:String, kind:"video"}
-     * Note: the label string always seems to be the empty string if you aren't using https.
-     * Note: not supported by Firefox.
+     * @param {Function} callback receives list of {deviceId:String, groupId:String, label:String, kind:"video"}
      * @example  easyrtc.getVideoSourceList( function(list) {
      *               var i;
      *               for( i = 0; i < list.length; i++ ) {
-     *                   console.log("label=" + list[i].label + ", id= " + list[i].id);
+     *                   console.log("label=" + list[i].label + ", id= " + list[i].deviceId);
      *               }
      *          });
      */
@@ -520,28 +516,35 @@ var Easyrtc = function() {
     this.setCookieId = function(cookieId) {
         self.cookieId = cookieId;
     };
+
     /** @private */
     this._desiredVideoProperties = {}; // default camera
 
-
     /**
      * Specify particular video source. Call this before you call easyrtc.initMediaSource().
-     * Note: this function isn't supported by Firefox.
      * @param {String} videoSrcId is a id value from one of the entries fetched by getVideoSourceList. null for default.
-     * @example easyrtc.setVideoSrc( videoSrcId);
+     * @example easyrtc.setVideoSource( videoSrcId);
      */
     this.setVideoSource = function(videoSrcId) {
         self._desiredVideoProperties.videoSrcId = videoSrcId;
         delete self._desiredVideoProperties.screenCapture;
     };
+
+    /** @private */
+    this._desiredAudioProperties = {}; // default camera
+
     /**
-     * Temporary alias for easyrtc.setVideoSource
+     * Specify particular video source. Call this before you call easyrtc.initMediaSource().
+     * @param {String} audioSrcId is a id value from one of the entries fetched by getAudioSourceList. null for default.
+     * @example easyrtc.setAudioSource( audioSrcId);
      */
-    this.setVideoSrc = this.setVideoSource;
-    delete this._desiredVideoProperties.screenCapture;
+    this.setAudioSource = function(audioSrcId) {
+        self._desiredAudioProperties.audioSrcId = audioSrcId;
+    };
+
     /** This function is used to set the dimensions of the local camera, usually to get HD.
      *  If called, it must be called before calling easyrtc.initMediaSource (explicitly or implicitly).
-     *  assuming it is supported. If you don't pass any parameters, it will default to 720p dimensions.
+     *  assuming it is supported. If you don't pass any parameters, it will use default camera dimensions.
      * @param {Number} width in pixels
      * @param {Number} height in pixels
      * @param {number} frameRate is optional
@@ -551,10 +554,6 @@ var Easyrtc = function() {
      *    easyrtc.setVideoDims();
      */
     this.setVideoDims = function(width, height, frameRate) {
-        if (!width) {
-            width = 1280;
-            height = 720;
-        }
         self._desiredVideoProperties.width = width;
         self._desiredVideoProperties.height = height;
         if (frameRate !== undefined) {
@@ -621,7 +620,7 @@ var Easyrtc = function() {
                     constraints.video.frameRate = { max: self._desiredVideoProperties.frameRate};
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
-                    constraints.video.optional.push({sourceId: self._desiredVideoProperties.videoSrcId});
+                    constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
                 }
             }
             else { // chrome and opera
@@ -638,7 +637,7 @@ var Easyrtc = function() {
                     constraints.video.mandatory.maxFrameRate = self._desiredVideoProperties.frameRate;
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
-                    // firefox doesn't respect this
+                    constraints.video.optional = constraints.video.optional || [];
                     constraints.video.optional.push({sourceId: self._desiredVideoProperties.videoSrcId});
                 }
                 // hack for opera
@@ -647,7 +646,25 @@ var Easyrtc = function() {
                 }
             }
         }
-        constraints.audio = self.audioEnabled;
+
+        if (!self.audioEnabled) {
+            constraints.audio = false;
+        }
+        else {
+            if (webrtcDetectedBrowser === "firefox") {
+                constraints.audio = {}; 
+                if (self._desiredAudioProperties.audioSrcId) {
+                    constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
+                }
+            }
+            else { // chrome and opera
+                constraints.audio = {mandatory: {}, optional: []};
+                if (self._desiredAudioProperties.audioSrcId) {
+                    constraints.audio.optional = constraints.audio.optional || [];
+                    constraints.audio.optional.push({sourceId: self._desiredAudioProperties.audioSrcId});
+                }
+            }
+        }
         return constraints;
     };
     /** Set the application name. Applications can only communicate with other applications
@@ -3254,7 +3271,7 @@ var Easyrtc = function() {
                    iceConnectionStateChangeListener(otherUser, ev.target);
                 }
 
-                var connState = ev.currentTarget.iceConnectionState;
+                var connState = ev.currentTarget ? ev.currentTarget.iceConnectionState : 'unknown';
                 switch( connState) {
                     case "connected":
                         if (peerConns[otherUser] && peerConns[otherUser].callSuccessCB) {
