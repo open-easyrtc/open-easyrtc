@@ -2434,7 +2434,8 @@ var Easyrtc = function() {
             return false;
         }
         try {
-            self.createRTCPeerConnection({"iceServers": []}, null);
+            var pc = self.createRTCPeerConnection({"iceServers": []}, null);
+            pc.close();
         } catch (oops) {
             return false;
         }
