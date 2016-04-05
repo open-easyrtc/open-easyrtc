@@ -723,12 +723,6 @@ var Easyrtc = function() {
         if (!window.RTCPeerConnection) {
             return false;
         }
-        try {
-            var pc = self.createRTCPeerConnection({"iceServers": []}, null);
-            pc.close();
-        } catch (oops) {
-            return false;
-        }
         return true;
     };
     /** @private
