@@ -3246,7 +3246,7 @@ var Easyrtc = function() {
                 dataEnabled = false;
             }
             pc.onnegotiationneeded = function(event) {
-                if( peerConns[otherUser].enableNegotiateListener ) {
+                if (peerConns[otherUser] && peerConns[otherUser].enableNegotiateListener) {
                     pc.createOffer(function(sdp) {
                         if (sdpLocalFilter) {
                             sdp.sdp = sdpLocalFilter(sdp.sdp);
@@ -3313,6 +3313,7 @@ var Easyrtc = function() {
                     self.debugPrinter("onconnection called prematurely");
                 }
             };
+
             newPeerConn = {
                 pc: pc,
                 candidatesToSend: [],
@@ -3370,8 +3371,9 @@ var Easyrtc = function() {
                 }
                 //                var remoteStreams = peerConns[i].pc.getRemoteStreams();
             };
+
             pc.onicecandidate = function(event) {
-                if (newPeerConn.cancelled) {
+                if (peerConns[otherUser] && peerConns[otherUser].cancelled) {
                     return;
                 }
                 var candidateData;
@@ -3410,9 +3412,10 @@ var Easyrtc = function() {
                     }
                 }
             };
+
             pc.onaddstream = function(event) {
 
-                if (newPeerConn.cancelled) {
+                if (peerConns[otherUser] && peerConns[otherUser].cancelled) {
                     return;
                 }
 
@@ -3450,12 +3453,14 @@ var Easyrtc = function() {
                     self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
                 }
             };
+
             pc.onremovestream = function(event) {
                 if (self.debugPrinter) {
                     self.debugPrinter("saw remove on remote media stream");
                 }
                 onRemoveStreamHelper(otherUser, event.stream);
             };
+
             peerConns[otherUser] = newPeerConn;
         } catch (e) {
             if (self.debugPrinter) {
