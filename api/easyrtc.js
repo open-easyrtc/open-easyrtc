@@ -5006,9 +5006,12 @@ var Easyrtc = function() {
 
                     case "connected":
                     case "completed":
-                        if (peerConns[otherUser].failing && self.onPeerRecovered) {
-                            self.onPeerRecovered(otherUser, peerConns[otherUser].failing, Date.now());
-                        }
+                        if (peerConns[otherUser]) {
+                            if (peerConns[otherUser].failing && self.onPeerRecovered) {
+                                self.onPeerRecovered(otherUser, peerConns[otherUser].failing, Date.now());
+                            }
+                            delete peerConns[otherUser].failing;
+                         }
                         delete peerConns[otherUser].failing;
                         break;
                 }
