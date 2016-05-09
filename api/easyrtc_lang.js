@@ -1,5 +1,16 @@
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        //RequireJS (AMD) build system
+        define(factory);
+    } else if (typeof module === 'object' && module.exports) {
+        //CommonJS build system
+        module.exports = factory();
+    } else {
+        root.easyrtc_lang = factory();
+  }
+}(this, function (undefined) {
 
-var easyrtc_constantStrings = {
+return {
   "unableToEnterRoom":"Unable to enter room {0} because {1}" ,
   "resolutionWarning": "Requested video size of {0}x{1} but got size of {2}x{3}",
   "badUserName": "Illegal username {0}",
@@ -13,3 +24,5 @@ var easyrtc_constantStrings = {
    "gumFailed":"Failed to get access to local media. Error code was {0}.",
    "requireAudioOrVideo":"At least one of audio and video must be provided"   
 };
+
+}));

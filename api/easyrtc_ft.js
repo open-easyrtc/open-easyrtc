@@ -33,6 +33,23 @@
  *</p>
  */
 
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        //RequireJS (AMD) build system
+        define(['easyrtc'], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        //CommonJS build system
+        module.exports = factory(require('easyrtc'));
+    } else {
+        //Vanilla JS, ensure dependencies are loaded correctly
+        if (typeof window.easyrtc !== 'object' || !window.easyrtc) {
+            throw new Error("easyrtc_ft requires easyrtc \n"
+                            + "http://easyrtc.com/docs/guides/easyrtc_client_tutorial.php");
+        }
+        root.easyrtc_ft = factory(window.easyrtc);
+  }
+}(this, function (easyrtc, undefined) {
+
 /* global easyrtc */ // easyrtc.js
 var easyrtc_ft = {};
 
@@ -775,3 +792,7 @@ easyrtc_ft.saveAs = (function() {
 
     return saveAs;
 })();
+
+return easyrtc_ft;
+
+}));

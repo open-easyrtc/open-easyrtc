@@ -29,7 +29,23 @@
  */
 
 /* global easyrtc */ // easyrtc.js
-(function() {
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        //RequireJS (AMD) build system
+        define(['easyrtc'], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        //CommonJS build system
+        module.exports = factory(require('easyrtc'));
+    } else {
+        //Vanilla JS, ensure dependencies are loaded correctly
+        if (typeof window.easyrtc !== 'object' || !window.easyrtc) {
+            throw new Error("easyrtc_app requires easyrtc \n"
+                            + "http://easyrtc.com/docs/guides/easyrtc_client_tutorial.php");
+        }
+        root.easyrtc_ft = factory(window.easyrtc);
+  }
+}(this, function (easyrtc, undefined) {
+
     /** @private */
     var autoAddCloseButtons = true;
     /** By default, the easyApp routine sticks a "close" button on top of each caller
@@ -412,4 +428,7 @@
                 );
         }
     };
-})();
+
+return easyrtc;
+
+}));
