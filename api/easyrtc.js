@@ -10,6 +10,8 @@
   }
 }(this, function (undefined) {
 
+  "use strict";
+
 return {
   "unableToEnterRoom":"Unable to enter room {0} because {1}" ,
   "resolutionWarning": "Requested video size of {0}x{1} but got size of {2}x{3}",
@@ -2502,9 +2504,11 @@ module.exports = {
 
 },{}]},{},[1])(1)
 });
-/** @class
- *@version 1.0.16-beta
- *<p>
+/** 
+ * @module EasyRTC
+ * @version 1.0.16-beta
+ *
+ * <p>
  * Provides client side support for the EasyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
  * for more details.</p>
@@ -2540,8 +2544,6 @@ module.exports = {
  */
 
 /* global MediaStreamTrack, createIceServer, RTCIceCandidate, RTCPeerConnection, RTCSessionDescription */ // WebRTC
-/* global webrtcDetectedBrowser, webrtcDetectedVersion*/ // adapter.js
-/* global easyrtc_lang */ // easyrtc_lang_en.js
 
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -2560,13 +2562,23 @@ module.exports = {
   }
 }(this, function (easyrtc_lang, adapter, io, undefined) {
 
+
+
+/**
+ * @class Easyrtc.
+ *
+ * @returns {EasyRTC} the new easyrtc instance.
+ *
+ * @constructs Easyrtc
+ * @memberof module:EasyRTC
+ */
 var Easyrtc = function() {
     
     var self = this;
 
-    function logDebug (message, message) {
+    function logDebug (message, obj) {
         if (self.debugPrinter) {
-            self.debugPrinter(message);
+            self.debugPrinter(message, obj);
         }
     } 
 
@@ -2717,8 +2729,8 @@ var Easyrtc = function() {
     };
 
     /**
-     * @private
      * This function checks if a socket is actually connected.
+     * @private
      * @param {Object} socket a socket.io socket.
      * @return true if the socket exists and is connected, false otherwise.
     */
@@ -7918,7 +7930,6 @@ return new Easyrtc();
  *</p>
  */
 
-/* global easyrtc */ // easyrtc.js
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         //RequireJS (AMD) build system
@@ -7936,10 +7947,21 @@ return new Easyrtc();
   }
 }(this, function (easyrtc, undefined) {
 
+    "use strict";
+
+    /**
+     * @mixin Easyrtc_App
+     * @augments Easyrtc
+     * @memberof module:EasyRTC
+     */
+
     /** @private */
     var autoAddCloseButtons = true;
+
     /** By default, the easyApp routine sticks a "close" button on top of each caller
      * video object that it manages. Call this function(before calling easyApp) to disable that particular feature.
+     * @alias easyrtc.dontAddCloseButtons
+     * @memberOf module:EasyRTC/Easyrtc_App
      * @example
      *    easyrtc.dontAddCloseButtons();
      */
