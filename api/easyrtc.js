@@ -4590,7 +4590,7 @@ var Easyrtc = function() {
             if (currentTime < firstCallTime + 1000) {
                 logDebug("Trying getUserMedia a second time");
                 try {
-                    navigator.etUserMedia(mode, onUserMediaSuccess, onUserMediaError);
+                    navigator.getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
                 } catch (e) {
                     onUserMediaError(err);
                 }
