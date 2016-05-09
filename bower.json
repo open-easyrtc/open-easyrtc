@@ -27,5 +27,10 @@
     "docs",
     "lib",
     "server_example"
-  ]
+  ],
+  "devDependencies": {
+    "webrtc-adapter": "gh-pages",
+    "jasmine": "~2.2.1",
+    "requirejs": "~2.1.16"
+  }
 }
