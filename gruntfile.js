@@ -130,6 +130,72 @@ module.exports = (function() {
                 }
             },
 
+            jsdoc : {
+                jsdoc: './node_modules/.bin/jsdoc',
+                options: {
+                    private: false,
+                    configure: '<%= config.docsPath %>/conf.json',
+                    template: './node_modules/jsdoc-oblivion/template'
+                },
+                
+                client : {
+                    src: [
+                        '<%= config.apiPath %>/easyrtc_int.js',
+                        '<%= config.apiPath %>/easyrtc_ft.js',
+                        '<%= config.apiPath %>/easyrtc_app.js',
+                        '<%= config.apiPath %>/easyrtc_lang.js',
+                        '<%= config.docsPath %>/easyrtc_client_tutorial.md'
+                    ],
+                    options: {
+                        destination: '<%= config.docsPath %>/client_html_docs'
+                    }
+                },
+
+                server: {
+                    src: [
+                        '<%= config.libPath %>/easyrtc_public_obj.js',
+                        '<%= config.libPath %>/easyrtc_default_event_listeners',
+                        '<%= config.docsPath %>/easyrtc_server_install.md'
+                    ],
+                    options: {
+                        destination: '<%= config.docsPath %>/server_html_docs_lite'
+                    }
+                },
+                
+                client_lite: {
+                    src: [
+                        '<%= config.apiPath %>/easyrtc_int.js',
+                        '<%= config.apiPath %>/easyrtc_ft.js',
+                        '<%= config.apiPath %>/easyrtc_app.js',
+                        '<%= config.apiPath %>/easyrtc_lang.js'
+                    ],
+                    options: {
+                        template: 'dev/scripts/client_jsdoc_templates',
+                        destination: '<%= config.docsPath %>/client_html_docs_lite'
+                    }
+                },
+
+                client_ft_lite: {
+                    src: [
+                        '<%= config.apiPath %>/easyrtc_ft.js'
+                    ],
+                    options: {
+                        template: 'dev/scripts/client_jsdoc_templates2',
+                        destination: '<%= config.docsPath %>/client_ft_html_docs_lite'
+                    }
+                },
+
+                server_lite: {
+                    src: [
+                        '<%= config.libPath %>/easyrtc_public_obj.js',
+                        '<%= config.libPath %>/easyrtc_default_event_listeners'
+                    ],
+                    options: {
+                        destination: '<%= config.docsPath %>/server_html_docs_lite'
+                    }
+                }
+            },
+
             connect: {
                 options: {
                     keepalive: true,
@@ -195,7 +261,7 @@ module.exports = (function() {
         grunt.loadNpmTasks('grunt-htmlhint');
 
         grunt.loadNpmTasks('grunt-karma');
-
+        grunt.loadNpmTasks('grunt-jsdoc');  
         grunt.loadNpmTasks('grunt-file-info');
         grunt.loadNpmTasks('grunt-contrib-requirejs');
 

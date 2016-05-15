@@ -1,0 +1,1 @@
+echo "Deprecated use 'grunt build_api' instead."
