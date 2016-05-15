@@ -408,7 +408,13 @@ var Easyrtc = function() {
      * @param value - true to receive audio, false otherwise. The default is true.
      */
     this.enableAudioReceive = function(value) {
-        receivedMediaConstraints.offerToReceiveAudio = value;
+        if (adapter && adapter.browserDetails && adapter.browserDetails.browser === "firefox") {
+            receivedMediaConstraints.offerToReceiveAudio = value;
+        }
+        else {
+            receivedMediaConstraints.mandatory = receivedMediaConstraints.mandatory || {};
+            receivedMediaConstraints.mandatory.OfferToReceiveAudio = value;
+        }
     };
 
     /**
@@ -417,7 +423,13 @@ var Easyrtc = function() {
      * @param value - true to receive video, false otherwise. The default is true.
      */
     this.enableVideoReceive = function(value) {
-        receivedMediaConstraints.offerToReceiveVideo = value;
+        if (adapter && adapter.browserDetails && adapter.browserDetails.browser === "firefox") {
+           receivedMediaConstraints.offerToReceiveVideo = value;
+        }
+        else {
+            receivedMediaConstraints.mandatory = receivedMediaConstraints.mandatory || {};
+            receivedMediaConstraints.mandatory.OfferToReceiveVideo = value;
+        }
     };
 
     // True by default

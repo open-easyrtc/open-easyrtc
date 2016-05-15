@@ -188,8 +188,6 @@
             return newLine.join(' ');
         }
 
-
-
         if( isLocal ) {
             return function(insdp) {
                 console.log("modifying local sdp");
