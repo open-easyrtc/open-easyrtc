@@ -958,37 +958,39 @@ var Easyrtc = function() {
                 // the stats objects has a group of entries. Each entry is either an rtcp, rtp entry
                 // or a candidate entry.
                 //
-                stats.forEach(function(entry) {
-                    var majorKey;
-                    var subKey;
-                    if (entry.type.match(/boundrtp/)) {
-                        if (entry.id.match(/audio/)) {
-                            majorKey = entry.type + "_audio";
-                        }
-                        else if (entry.id.match(/video/)) {
-                            majorKey = entry.type + "_video";
-                        }
-                        else {
-                            return;
-                        }
-                        for (subKey in entry) {
-                            if (entry.hasOwnProperty(subKey)) {
-                                items[majorKey + "." + subKey] = entry[subKey];
+                if (stats) {
+                    stats.forEach(function(entry) {
+                        var majorKey;
+                        var subKey;
+                        if (entry.type.match(/boundrtp/)) {
+                            if (entry.id.match(/audio/)) {
+                                majorKey = entry.type + "_audio";
+                            }
+                            else if (entry.id.match(/video/)) {
+                                majorKey = entry.type + "_video";
+                            }
+                            else {
+                                return;
+                            }
+                            for (subKey in entry) {
+                                if (entry.hasOwnProperty(subKey)) {
+                                    items[majorKey + "." + subKey] = entry[subKey];
+                                }
                             }
                         }
-                    }
-                    else {
-                        if( entry.hasOwnProperty("ipAddress") && entry.id) {
-                            candidates[entry.id] = entry.ipAddress + ":" +
-                                  entry.portNumber;
+                        else {
+                            if( entry.hasOwnProperty("ipAddress") && entry.id) {
+                                candidates[entry.id] = entry.ipAddress + ":" +
+                                      entry.portNumber;
+                            }
+                            else if( entry.hasOwnProperty("selected") &&
+                                     entry.hasOwnProperty("remoteCandidateId") &&
+                                     entry.selected ) {
+                                activeId =  entry.remoteCandidateId;
+                            }
                         }
-                        else if( entry.hasOwnProperty("selected") &&
-                                 entry.hasOwnProperty("remoteCandidateId") &&
-                                 entry.selected ) {
-                            activeId =  entry.remoteCandidateId;
-                        }
-                    }
-                });
+                    });
+                }
 
                 if( activeId ) {
                     items["firefoxRemoteAddress"] = candidates[activeId];
