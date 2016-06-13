@@ -1,3 +1,35 @@
+/* global define, module, require */
+/*!
+  Script: easyrtc_lang.js
+
+    Provides lang file.
+
+  About: License
+
+    Copyright (c) 2016, Priologic Software Inc.
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+        * Redistributions of source code must retain the above copyright notice,
+          this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in the
+          documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+*/
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         //RequireJS (AMD) build system
@@ -2504,6 +2536,7 @@ module.exports = {
 
 },{}]},{},[1])(1)
 });
+/* global define, module, require, console, MediaStreamTrack, createIceServer, RTCIceCandidate, RTCPeerConnection, RTCSessionDescription */
 /*!
   Script: easyrtc.js
 
@@ -2538,8 +2571,6 @@ module.exports = {
     POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* global MediaStreamTrack, createIceServer, RTCIceCandidate, RTCPeerConnection, RTCSessionDescription */ // WebRTC
-
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         //RequireJS (AMD) build system
@@ -2550,8 +2581,7 @@ module.exports = {
     } else {
         //Vanilla JS, ensure dependencies are loaded correctly
         if (typeof window.io === 'undefined' || !window.io) {
-            throw new Error("EasyRTC requires socket.io \n"
-                            + "http://easyrtc.com/docs/guides/easyrtc_client_tutorial.php");
+            throw new Error("easyrtc requires socket.io");
         }
         root.easyrtc = factory(window.easyrtc_lang, window.adapter, window.io);
   }
@@ -3297,7 +3327,7 @@ var Easyrtc = function() {
             reliable: adapter && adapter.browserDetails && 
                 adapter.browserDetails.browser !== "chrome" && 
                     adapter.browserDetails.version < 31
-        }
+        };
     };
 
     /** @private */
@@ -5740,6 +5770,42 @@ var Easyrtc = function() {
         else {
             setTimeout(sendDeltas, 100);
         }
+    }   
+
+    // Parse the uint32 PRIORITY field into its constituent parts from RFC 5245,
+    // type preference, local preference, and (256 - component ID).
+    // ex: 126 | 32252 | 255 (126 is host preference, 255 is component ID 1)
+    function formatPriority(priority) {
+        var s = '';
+        s += (priority >> 24);
+        s += ' | ';
+        s += (priority >> 8) & 0xFFFF;
+        s += ' | ';
+        s += priority & 0xFF;
+        return s;
+    }
+
+    // Parse a candidate:foo string into an object, for easier use by other methods.
+    /** @private */
+    function parseCandidate(text) {
+        var candidateStr = 'candidate:';
+        var pos = text.indexOf(candidateStr) + candidateStr.length;
+        var fields = text.substr(pos).split(' ');
+        return {
+            'component': fields[1],
+            'type': fields[7],
+            'foundation': fields[0],
+            'protocol': fields[2],
+            'address': fields[4],
+            'port': fields[5],
+            'priority': formatPriority(fields[3])
+        };
+    }
+
+    /** @private */
+    function processCandicate(candicate) {
+        self._candicates = self._candicates || [];
+        self._candicates.push(parseCandidate(candicate));
     }
     
     /** @private */
@@ -5844,7 +5910,6 @@ var Easyrtc = function() {
                         break;
                 }
             };
-
 
             pc.onconnection = function() {
                 logDebug("onconnection called prematurely");
@@ -5994,7 +6059,7 @@ var Easyrtc = function() {
             peerConns[otherUser] = newPeerConn;
         } catch (error) {
             logDebug('buildPeerConnection error', error);
-            failureCB(self.errCodes.SYSTEM_ERR, e.message);
+            failureCB(self.errCodes.SYSTEM_ERR, error.message);
             return null;
         }
 
@@ -7016,41 +7081,6 @@ var Easyrtc = function() {
         }
     }
 
-    // Parse the uint32 PRIORITY field into its constituent parts from RFC 5245,
-    // type preference, local preference, and (256 - component ID).
-    // ex: 126 | 32252 | 255 (126 is host preference, 255 is component ID 1)
-    function formatPriority(priority) {
-        var s = '';
-        s += (priority >> 24);
-        s += ' | ';
-        s += (priority >> 8) & 0xFFFF;
-        s += ' | ';
-        s += priority & 0xFF;
-        return s;
-    }
-
-    // Parse a candidate:foo string into an object, for easier use by other methods.
-    /** @private */
-    function parseCandidate(text) {
-        var candidateStr = 'candidate:';
-        var pos = text.indexOf(candidateStr) + candidateStr.length;
-        var fields = text.substr(pos).split(' ');
-        return {
-            'component': fields[1],
-            'type': fields[7],
-            'foundation': fields[0],
-            'protocol': fields[2],
-            'address': fields[4],
-            'port': fields[5],
-            'priority': formatPriority(fields[3])
-        };
-    }
-
-    function processCandicate(candicate) {
-        self._candicates = self._candicates || [];
-        self._candicates.push(parseCandidate(candicate));
-    }
-
     /** @private */
     function processIceConfig(iceConfig) {
 
@@ -7970,8 +8000,9 @@ return new Easyrtc();
 
 }));
 
+/* global define, module, require, console */
 /*!
-  Script: easyrtc_ft.js
+  Script: easyrtc_app.js
 
     Provides support file and data transfer support to easyrtc.
 
@@ -8012,8 +8043,7 @@ return new Easyrtc();
     } else {
         //Vanilla JS, ensure dependencies are loaded correctly
         if (typeof window.easyrtc !== 'object' || !window.easyrtc) {
-            throw new Error("easyrtc_app requires easyrtc \n"
-                            + "http://easyrtc.com/docs/guides/easyrtc_client_tutorial.php");
+            throw new Error("easyrtc_app requires easyrtc");
         }
         root.easyrtc_ft = factory(window.easyrtc);
   }

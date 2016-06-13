@@ -1,3 +1,4 @@
+/* global define, module, require, console */
 /*!
   Script: easyrtc_ft.js
 
@@ -40,8 +41,7 @@
     } else {
         //Vanilla JS, ensure dependencies are loaded correctly
         if (typeof window.easyrtc !== 'object' || !window.easyrtc) {
-            throw new Error("easyrtc_ft requires easyrtc \n"
-                            + "http://easyrtc.com/docs/guides/easyrtc_client_tutorial.php");
+            throw new Error("easyrtc_ft requires easyrtc");
         }
         root.easyrtc_ft = factory(window.easyrtc);
   }
@@ -69,8 +69,7 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
     if (typeof droptargetName === 'string') {
         droptarget = document.getElementById(droptargetName);
         if (!droptarget) {
-            alert("Developer error: attempt to call BuildFileSender on unknown object " + droptargetName);
-            throw("unknown object " + droptargetName);
+            throw ("unknown object " + droptargetName);
         }
     }
     else {

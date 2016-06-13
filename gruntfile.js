@@ -75,6 +75,14 @@ module.exports = (function() {
                     'Gruntfile.js',
                     '<%= config.apiPath %>/**/*.js',
                     '<%= config.libPath %>/**/*.js'
+                ],
+                api: [
+                    '<%= config.apiPath %>/**/*.js',
+                    '!<%= config.apiPath %>/**/easyrtc.js',
+                    '!<%= config.apiPath %>/labs/easyrtc_sc_extension/*.js'
+                ],
+                lib: [
+                    '<%= config.libPath %>/**/*.js'
                 ]
             },
 

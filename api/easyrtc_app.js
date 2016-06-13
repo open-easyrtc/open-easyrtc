@@ -1,5 +1,6 @@
+/* global define, module, require, console */
 /*!
-  Script: easyrtc_ft.js
+  Script: easyrtc_app.js
 
     Provides support file and data transfer support to easyrtc.
 
@@ -40,8 +41,7 @@
     } else {
         //Vanilla JS, ensure dependencies are loaded correctly
         if (typeof window.easyrtc !== 'object' || !window.easyrtc) {
-            throw new Error("easyrtc_app requires easyrtc \n"
-                            + "http://easyrtc.com/docs/guides/easyrtc_client_tutorial.php");
+            throw new Error("easyrtc_app requires easyrtc");
         }
         root.easyrtc_ft = factory(window.easyrtc);
   }
