@@ -2914,7 +2914,9 @@ var Easyrtc = function() {
      * @param value - true to receive audio, false otherwise. The default is true.
      */
     this.enableAudioReceive = function(value) {
-        if (adapter && adapter.browserDetails && adapter.browserDetails.browser === "firefox") {
+        if (adapter && adapter.browserDetails && 
+             (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
+        ) {
             receivedMediaConstraints.offerToReceiveAudio = value;
         }
         else {
@@ -2929,7 +2931,9 @@ var Easyrtc = function() {
      * @param value - true to receive video, false otherwise. The default is true.
      */
     this.enableVideoReceive = function(value) {
-        if (adapter && adapter.browserDetails && adapter.browserDetails.browser === "firefox") {
+        if (adapter && adapter.browserDetails && 
+             (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
+        ) {
            receivedMediaConstraints.offerToReceiveVideo = value;
         }
         else {
@@ -3672,10 +3676,10 @@ var Easyrtc = function() {
             adapter && adapter.browserDetails && 
                 adapter.browserDetails.browser === "firefox"
         ) {
-            self.getFirefoxPeerStatistics(easyrtcid, callback, filter);
+            getFirefoxPeerStatistics(easyrtcid, callback, filter);
         }
         else {
-            self.getChromePeerStatistics(easyrtcid, callback, filter);
+            getChromePeerStatistics(easyrtcid, callback, filter);
         }
     };
 
@@ -5748,34 +5752,42 @@ var Easyrtc = function() {
         
         logDebug("building peer connection to " + otherUser);
 
-
         //
         // we don't support data channels on chrome versions < 31
         //
-        try {
-            pc = self.createRTCPeerConnection(iceConfig, buildPeerConstraints());
-            if (!pc) {
-                message = "Unable to create PeerConnection object, check your ice configuration(" +
-                        JSON.stringify(iceConfig) + ")";
-                logDebug(message);
 
-                throw(message);
+        try {
+
+            pc = self.createRTCPeerConnection(iceConfig, buildPeerConstraints());
+            
+            if (!pc) {
+                message = "Unable to create PeerConnection object, check your ice configuration(" + JSON.stringify(iceConfig) + ")";
+                logDebug(message);
+                throw Error(message);
             }
 
             //
             // turn off data channel support if the browser doesn't support it.
             //
+            
             if (dataEnabled && typeof pc.createDataChannel === 'undefined') {
                 dataEnabled = false;
             }
+
             pc.onnegotiationneeded = function(event) {
-                if (peerConns[otherUser] && peerConns[otherUser].enableNegotiateListener) {
+                if (
+                    peerConns[otherUser] && 
+                        (peerConns[otherUser].enableNegotiateListener)
+                ) {
                     pc.createOffer(function(sdp) {
                         if (sdpLocalFilter) {
                             sdp.sdp = sdpLocalFilter(sdp.sdp);
                         }
                         pc.setLocalDescription(sdp, function() {
-                            self.sendPeerMessage(otherUser, "__addedMediaStream", {sdp: sdp});
+                            self.sendPeerMessage(otherUser, "__addedMediaStream", {
+                                sdp: sdp
+                            });
+
                         }, function() {
                         });
                     }, function(error) {
@@ -5784,13 +5796,18 @@ var Easyrtc = function() {
                 }
             };
 
-            pc.oniceconnectionstatechange = function(ev) {
+            pc.onsignalingstatechange = function () {
+                
+            };
+
+            pc.oniceconnectionstatechange = function(event) {
+
                 if (iceConnectionStateChangeListener) {
-                   iceConnectionStateChangeListener(otherUser, ev.target);
+                   iceConnectionStateChangeListener(otherUser, event.target);
                 }
 
-                var connState = ev.currentTarget ? ev.currentTarget.iceConnectionState : 'unknown';
-                switch( connState) {
+                var connState = event.currentTarget ? event.currentTarget.iceConnectionState : 'unknown';
+                switch (connState) {
                     case "connected":
                         if (peerConns[otherUser] && peerConns[otherUser].callSuccessCB) {
                             peerConns[otherUser].callSuccessCB(otherUser, "connection");
@@ -5816,8 +5833,6 @@ var Easyrtc = function() {
                           self.onPeerClosed(otherUser);
                         }
                         break;
-
-                    case "connected":
                     case "completed":
                         if (peerConns[otherUser]) {
                             if (peerConns[otherUser].failing && self.onPeerRecovered) {
@@ -5906,7 +5921,7 @@ var Easyrtc = function() {
                         candidate: event.candidate.candidate
                     };
 
-                    if( iceCandidateFilter ) {
+                    if (iceCandidateFilter ) {
                        candidateData = iceCandidateFilter(candidateData, false);
                        if( !candidateData ) {
                           return;
@@ -5918,10 +5933,7 @@ var Easyrtc = function() {
                     // The keyword "relay" in the candidate identifies it as referencing a
                     // turn server. The \d symbol in the regular expression matches a number.
                     //
-                    if (event.candidate.candidate.indexOf("typ relay") > 0) {
-                        var ipAddress = event.candidate.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/i)[2];
-                        self._turnServers[ipAddress] = true;
-                    }
+                    processCandicate(event.candidate.candidate);
 
                     if (peerConns[otherUser].connectionAccepted) {
                         sendSignalling(otherUser, "candidate", candidateData, null, function() {
@@ -6649,7 +6661,7 @@ var Easyrtc = function() {
             var pc = peerConns[easyrtcId].pc;
             peerConns[easyrtcId].enableNegotiateListener = true;
             pc.addStream(stream);
-            if( receiptHandler ) {
+            if (receiptHandler) {
                 peerConns[easyrtcId].streamsAddedAcks[streamName] = receiptHandler;
             }
         }
@@ -6998,7 +7010,45 @@ var Easyrtc = function() {
         if (url.indexOf('turn:') === 0 || url.indexOf('turns:') === 0) {
             ipAddress = url.split(/[@:&]/g)[1];
             self._turnServers[ipAddress] = true;
+        } else if (url.indexOf('stun:') === 0 || url.indexOf('stuns:') === 0) {
+            ipAddress = url.split(/[@:&]/g)[1];
+            self._stunServers[ipAddress] = true;    
         }
+    }
+
+    // Parse the uint32 PRIORITY field into its constituent parts from RFC 5245,
+    // type preference, local preference, and (256 - component ID).
+    // ex: 126 | 32252 | 255 (126 is host preference, 255 is component ID 1)
+    function formatPriority(priority) {
+        var s = '';
+        s += (priority >> 24);
+        s += ' | ';
+        s += (priority >> 8) & 0xFFFF;
+        s += ' | ';
+        s += priority & 0xFF;
+        return s;
+    }
+
+    // Parse a candidate:foo string into an object, for easier use by other methods.
+    /** @private */
+    function parseCandidate(text) {
+        var candidateStr = 'candidate:';
+        var pos = text.indexOf(candidateStr) + candidateStr.length;
+        var fields = text.substr(pos).split(' ');
+        return {
+            'component': fields[1],
+            'type': fields[7],
+            'foundation': fields[0],
+            'protocol': fields[2],
+            'address': fields[4],
+            'port': fields[5],
+            'priority': formatPriority(fields[3])
+        };
+    }
+
+    function processCandicate(candicate) {
+        self._candicates = self._candicates || [];
+        self._candicates.push(parseCandidate(candicate));
     }
 
     /** @private */
@@ -7011,6 +7061,7 @@ var Easyrtc = function() {
         };
         
         self._turnServers = {};
+        self._stunServers = {};
         
         if ( 
             !iceConfig || 
@@ -7158,18 +7209,20 @@ var Easyrtc = function() {
             });
             pc = peerConns[caller].pc;
 
-            function iceAddSuccess() {}
+            function iceAddSuccess() {
+                logDebug("iceAddSuccess: " + 
+                    JSON.stringify(candidate));
+                processCandicate(msgData.candidate);
+            }
+
             function iceAddFailure(domError) {
                 self.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice candidate (" + domError.name + "): " + 
                     JSON.stringify(candidate));
             }
-            pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
 
-            if (msgData.candidate.indexOf("typ relay") > 0) {
-                var ipAddress = msgData.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/i)[2];
-                self._turnServers[ipAddress] = true;
-            }
+            pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
         };
+
         var flushCachedCandidates = function(caller) {
             var i;
             if (queuedMessages[caller]) {
@@ -7179,6 +7232,7 @@ var Easyrtc = function() {
                 delete queuedMessages[caller];
             }
         };
+
         var processOffer = function(caller, msgData) {
 
             var helper = function(wasAccepted, streamNames) {
@@ -7460,6 +7514,17 @@ var Easyrtc = function() {
      */
     this.isTurnServer = function(ipAddress) {
         return !!self._turnServers[ipAddress];
+    };
+
+    /**
+     * Returns true if the ipAddress parameter was the address of a stun server. This is done by checking against information
+     * collected during peer to peer calls. Don't expect it to work before the first call, or to identify turn servers that aren't
+     * in the ice config.
+     * @param ipAddress
+     * @returns {boolean} true if ip address is known to be that of a stun server, false otherwise.
+     */
+    this.isStunServer = function(ipAddress) {
+        return !!self._stunServers[ipAddress];
     };
 
     /**
