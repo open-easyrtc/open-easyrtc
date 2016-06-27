@@ -60,7 +60,7 @@ The general order of testing is:
 
    + Can you establish a peer connection between two WebRTC applications running on different machines in the same subnet? If you can't, you should be looking at the firewalls running on the machines, or check to see if the router common to the two machines allows them to see each other. Note: EasyRTC uses a single signallying server with multiple clients talk to; you don't a signaling server on each client machine; it would defeat the whole notion of a "server".
 
-  + Can you establish a peer connection between two client machines that are on completely different networks? 
+   + Can you establish a peer connection between two client machines that are on completely different networks? 
 Presumably you can't, or you'd have already stopped reading this section by now.
 This case suggests that there is a router or Firewall (between the two clients) implementing a symmetric NAT policy that prevents the usual peer-peer port busting system from working. Symmetric nats are common in larger institutions (Universities, Government, Corporations), and very uncommon in home routers.
 To handle this case, you'll need a TURN server. 
@@ -68,9 +68,9 @@ Typically, you'll want your turn server to run on the standard UDP port but also
 usually left unblocked by system admins to support SSH. 
 The demos at demo.EasyRTC.com are backed by a turn server and should still work for those two client machines.
 
-  + Have you checked if your turn server is actually working on the ports you configured it at? You can filter your ice candidates to force certains types of connections. Chromes  chrome://webrtc-internals for verifying this worked.
+   + Have you checked if your turn server is actually working on the ports you configured it at? You can filter your ice candidates to force certains types of connections. Chromes  chrome://webrtc-internals for verifying this worked.
 
-  + Do you only fail to establish a peer connection when using 3G or 4G on a cell phone? Some cell providers block WebRTC. The TCP 443 dodge sometimes helps here.
+   + Do you only fail to establish a peer connection when using 3G or 4G on a cell phone? Some cell providers block WebRTC. The TCP 443 dodge sometimes helps here.
  
 
 ## Common Sense Guidelines For Posting Questions to the Forum
