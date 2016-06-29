@@ -5429,7 +5429,8 @@ var Easyrtc = function() {
      */
     this.connect = function(applicationName, successCallback, errorCallback) {
 
-        if (!window.io) {
+        // Detect invalid or missing socket.io
+        if (!io) {
             self.showError(self.errCodes.DEVELOPER_ERR, "Your HTML has not included the socket.io.js library");
         }
 
