@@ -79,7 +79,10 @@ module.exports = (function() {
                 api: [
                     '<%= config.apiPath %>/**/*.js',
                     '!<%= config.apiPath %>/**/easyrtc.js',
-                    '!<%= config.apiPath %>/labs/easyrtc_sc_extension/*.js'
+                    '!<%= config.apiPath %>/labs/**/*.js'
+                ],
+                labs: [
+                    '<%= config.apiPath %>/labs/**/*.js'
                 ],
                 lib: [
                     '<%= config.libPath %>/**/*.js'
