@@ -2055,7 +2055,7 @@ var Easyrtc = function() {
         SIGNAL_ERR: "SIGNAL_ERR"
     };
 
-    this.apiVersion = "1.0.16-beta";
+    this.apiVersion = "1.0.17-beta";
     
     /** Most basic message acknowledgment object */
     this.ackMessage = {msgType: "ack"};
