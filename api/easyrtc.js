@@ -1709,7 +1709,7 @@ try {
     }
   });
 } catch (e) {}/** @class
- *@version 1.0.16-beta
+ *@version 1.0.17-beta
  *<p>
  * Provides client side support for the EasyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
