@@ -4758,10 +4758,12 @@ var Easyrtc = function() {
         if (navigator.userAgent.match(/android/i)) {
             return adapter && adapter.browserDetails && adapter.browserDetails.version >= 34;
         }
-        else {
-            return (adapter && adapter.browserDetails && adapter.browserDetails.browser === "firefox" && adapter.browserDetails.browser !== "edge") || 
-                    (adapter && adapter.browserDetails && adapter.browserDetails.browser !== "chrome" || adapter.browserDetails.version >= 32);
+        else if (adapter && adapter.browserDetails && adapter.browserDetails.browser === "chrome") {
+            return adapter.browserDetails.version >= 32;
         }
+        else {
+            return (adapter && adapter.browserDetails && adapter.browserDetails.browser === "firefox");
+        } 
     };
 
     /**
@@ -5341,9 +5343,9 @@ var Easyrtc = function() {
                 } else {
                     peerConns[destUser].dataChannelS.send(flattenedData);
                 }
-            } catch (oops) {
-                logDebug("snedDataP2P error: ", oops);
-                throw oops;
+            } catch (sendDataErr) {
+                logDebug("sendDataP2P error: ", sendDataErr);
+                throw sendDataErr;
             }
         }
     };
