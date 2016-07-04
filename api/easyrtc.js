@@ -1709,7 +1709,7 @@ try {
     }
   });
 } catch (e) {}/** @class
- *@version 1.0.17-beta
+ *@version 1.0.17
  *<p>
  * Provides client side support for the EasyRTC framework.
  * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
@@ -2055,7 +2055,7 @@ var Easyrtc = function() {
         SIGNAL_ERR: "SIGNAL_ERR"
     };
 
-    this.apiVersion = "1.0.17-beta";
+    this.apiVersion = "1.0.17";
     
     /** Most basic message acknowledgment object */
     this.ackMessage = {msgType: "ack"};
