@@ -3387,7 +3387,6 @@ var Easyrtc = function() {
                             }
                             delete peerConns[otherUser].failing;
                          }
-                        delete peerConns[otherUser].failing;
                         break;
                 }
             };
