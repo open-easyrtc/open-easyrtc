@@ -1,7 +1,7 @@
 {
   "name": "easyrtc",
   "main": "api/easyrtc.js",
-  "version": "1.0.17-beta",
+  "version": "1.0.18-beta",
   "homepage": "http://easyrtc.com/",
   "authors": [
     "Rod Apeldoorn <rod.apeldoorn@priologic.com>",
