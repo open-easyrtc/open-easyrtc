@@ -32,10 +32,10 @@
                 <!-- Main Content -->
                 <h1>EasyRTC Demo: Ice Filter</h1>
 
-                <p>Client side filtering of ICE configuration.</p>
+                <p>Client side filtering of ICE configuration and ice candidates.</p>
 
-                <p>Client-side ice filtering is meant as a experimenting tool, not something you should need to do in a
-                    production environment.
+                <p>Client-side ice filtering is meant as a testing tool, 
+                    not something you should need to use in a production environment.
                 <p>
 
                 <hr />
@@ -46,6 +46,22 @@
                         <div id="iam">Not yet connected...</div>
                         <br />
                         <div id="iceEntries" style="clear:both;width:100%;overflow-x:hidden">
+                        </div>
+                        <h3>Types of ice candidates passed through:</h3>
+                        <div style="clear:both;width:100%;margin-top:10px">
+                          <input type="checkbox" style="float:left" checked="checked" id="allowLocal"
+                               style="float:left" />
+                          <label for="allowLocal">Allow local connections</label>
+                        </div>
+                        <div style="clear:both;width:100%">
+                          <input type="checkbox" style="float:left" checked="checked" id="allowStun"
+                               style="float:left" />
+                          <label for="allowStun">Allow stun connections</label>
+                        </div>
+                        <div style="clear:both;width:100%">
+                          <input type="checkbox" style="float:left" checked="checked" id="allowTurn"
+                               style="float:left" />
+                          <label for="allowTurn">Allow turn connections</label>
                         </div>
                         <h3>Connected users:</h3>
                         <div id="otherClients"></div>
@@ -70,7 +86,7 @@
                 </pre>
 
                 <h3>JavaScript</h3>
-                <p>The contents of demo_audio_video_simple.js:</p>
+                <p>The contents of demo_ice_filter.js:</p>
                 <pre  id="prettyJS" class="prettyprint linenums:1">
                 </pre>
 
