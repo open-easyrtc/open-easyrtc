@@ -766,6 +766,52 @@ var Easyrtc = function() {
         return typeof RTCPeerConnection !== 'undefined';
     };
 
+    /** Determines whether the current browser supports the new data channels.
+     * EasyRTC will not open up connections with the old data channels.
+     * @returns {Boolean}
+     */
+    this.supportsDataChannels = function() {
+
+        var hasCreateDataChannel = false;
+
+        if (self.supportsPeerConnections()) {
+            try {
+                var peer = new RTCPeerConnection({iceServers: []}, {});
+                hasCreateDataChannel = typeof peer.createDataChannel !== 'undefined';
+                peer.close();
+            }
+            catch (err) {
+                // Ingore possible RTCPeerConnection.close error
+                // hasCreateDataChannel should reflect the feature state still.
+            }
+        }
+
+        return hasCreateDataChannel;
+    };
+
+    /** @private */
+    //
+    // Experimental function to determine if statistics gathering is supported.
+    //
+    this.supportsStatistics = function() {
+
+        var hasGetStats = false;
+
+        if (self.supportsPeerConnections()) {
+            try {
+                var peer = new RTCPeerConnection({iceServers: []}, {});
+                hasGetStats = typeof peer.getStats !== 'undefined';
+                peer.close();
+            }
+            catch (err) {
+                // Ingore possible RTCPeerConnection.close error
+                // hasCreateDataChannel should reflect the feature state still.
+            }
+        }
+
+        return hasGetStats;
+    };
+
     /** @private
      * @param pc_config ice configuration array
      * @param optionalStuff peer constraints.
@@ -2211,22 +2257,6 @@ var Easyrtc = function() {
     this.setOnStreamClosed = function(onStreamClosed) {
         self.onStreamClosed = onStreamClosed;
     };
-    
-    /** Determines whether the current browser supports the new data channels.
-     * EasyRTC will not open up connections with the old data channels.
-     * @returns {Boolean}
-     */
-    this.supportsDataChannels = function() {
-        if (navigator.userAgent.match(/android/i)) {
-            return adapter && adapter.browserDetails && adapter.browserDetails.version >= 34;
-        }
-        else if (adapter && adapter.browserDetails && adapter.browserDetails.browser === "chrome") {
-            return adapter.browserDetails.version >= 32;
-        }
-        else {
-            return (adapter && adapter.browserDetails && adapter.browserDetails.browser === "firefox");
-        } 
-    };
 
     /**
      * Sets a listener for data sent from another client (either peer to peer or via websockets).
@@ -2590,21 +2620,6 @@ var Easyrtc = function() {
     this.getRoomField = function(roomName, fieldName) {
         var fields = self.getRoomFields(roomName);
         return (!fields || !fields[fieldName]) ? undefined : fields[fieldName].fieldValue;
-    };
-
-    /** @private */
-    //
-    // Experimental function to determine if statistics gathering is supported.
-    //
-    this.supportsStatistics = function() {
-        var peer;
-        try {
-            peer = new RTCPeerConnection({iceServers: []}, {});
-            return !!peer.getStats;
-        }
-        catch (err) {
-            return false;
-        }
     };
 
     /** @private */
