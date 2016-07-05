@@ -1,39 +1,62 @@
-/** @class
- *@version 1.0.17-beta
- *<p>
- * Provides support file and data transfer support to easyrtc.
- * </p>
- *<p>
- *copyright Copyright (c) 2015, Priologic Software Inc.
- *All rights reserved.</p>
+/* global define, module, require, console */
+/*!
+  Script: easyrtc_ft.js
+
+    Provides support file and data transfer support to easyrtc.
+
+  About: License
+
+    Copyright (c) 2016, Priologic Software Inc.
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+        * Redistributions of source code must retain the above copyright notice,
+          this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in the
+          documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+*/
+
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        //RequireJS (AMD) build system
+        define(['easyrtc'], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        //CommonJS build system
+        module.exports = factory(require('easyrtc'));
+    } else {
+        //Vanilla JS, ensure dependencies are loaded correctly
+        if (typeof window.easyrtc !== 'object' || !window.easyrtc) {
+            throw new Error("easyrtc_ft requires easyrtc");
+        }
+        root.easyrtc_ft = factory(window.easyrtc);
+  }
+}(this, function (easyrtc, undefined) {
+
+"use strict";
+
+/**
+ * @class Easyrtc_ft.
  *
- *<p>
- *Redistribution and use in source and binary forms, with or without
- *modification, are permitted provided that the following conditions are met:
- *</p>
- * <ul>
- *   <li> Redistributions of source code must retain the above copyright notice,
- *      this list of conditions and the following disclaimer. </li>
- *   <li> Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution. </li>
- *</ul>
- *<p>
- *THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- *AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- *IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- *ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- *LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- *SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- *INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- *CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- *ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *POSSIBILITY OF SUCH DAMAGE.
- *</p>
+ * @returns {Easyrtc_ft} the new easyrtc instance.
+ *
+ * @constructs Easyrtc_ft
  */
 
-/* global easyrtc */ // easyrtc.js
 var easyrtc_ft = {};
 
 /**
@@ -46,8 +69,7 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
     if (typeof droptargetName === 'string') {
         droptarget = document.getElementById(droptargetName);
         if (!droptarget) {
-            alert("Developer error: attempt to call BuildFileSender on unknown object " + droptargetName);
-            throw("unknown object " + droptargetName);
+            throw ("unknown object " + droptargetName);
         }
     }
     else {
@@ -174,16 +196,16 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
     var curFileSize;
     var filesAreBinary;
     //
-    //  maxPacketSize is the size (before base64 encoding) that is sent in a 
+    //  maxPacketSize is the size (before base64 encoding) that is sent in a
     //               single data channel message, in bytes.
     //  maxChunkSize is the amount read from a file at a time, in bytes.
-    //  ackThreshold is the amount of data that can be sent before an ack is 
+    //  ackThreshold is the amount of data that can be sent before an ack is
     //               received from the party we're sending to, bytes.
     //  maxChunkSize should be a multiple of maxPacketSize.
-    //  ackThreshold should be several times larger than maxChunkSize. For 
-    //               network paths that have greater latency, increase 
+    //  ackThreshold should be several times larger than maxChunkSize. For
+    //               network paths that have greater latency, increase
     //               ackThreshold further.
-    // 
+    //
     var maxPacketSize = 40*1024; // max bytes per packet, before base64 encoding
     var maxChunkSize = maxPacketSize * 10; // max binary bytes read at a time.
     var waitingForAck = false;
@@ -256,14 +278,14 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         var reader = new FileReader();
         reader.onloadend = function(evt) {
             if (evt.target.readyState === FileReader.DONE) { // DONE == 2
-                
+
                 var binaryString = "";
                 var bytes = new Uint8Array(evt.target.result);
                 var length = bytes.length;
                 for( var i = 0; i < length; i++ ) {
                    binaryString += String.fromCharCode(bytes[i]);
                 }
-                
+
                 for (var pp = 0; pp < binaryString.length; pp++) {
                     var oneChar = binaryString.charCodeAt(pp);
                 }
@@ -421,7 +443,7 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
         var foundUser;
         var roomName;
         for (var destUser in userStreams) {
-            if (userStreams.hasOwnProperty(destUser)) {                    
+            if (userStreams.hasOwnProperty(destUser)) {
                 foundUser = false;
                 for (roomName in eventData) {
                     if (eventData[roomName][destUser]) {
@@ -440,7 +462,7 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
     easyrtc.addEventListener("roomOccupant", roomOccupantListener);
 
     function fileOfferHandler(otherGuy, msgType, msgData) {
-        
+
         if (!userStreams[otherGuy]) {
             userStreams[otherGuy] = {};
         }
@@ -563,8 +585,8 @@ easyrtc_ft.saveAs = (function() {
 
     /*! @source http://purl.eligrey.com/github/FileSaver.js/blob/master/FileSaver.js */
     var saveAs = window.saveAs || (navigator.msSaveOrOpenBlob && navigator.msSaveOrOpenBlob.bind(navigator)) || (function(view) {
-            
-        
+
+
 
         var doc = view.document,
             // only get URL when necessary in case BlobBuilder.js hasn't overridden it yet
@@ -623,19 +645,19 @@ easyrtc_ft.saveAs = (function() {
 
         function FileSaver(blob, name) {
             // First try a.download, then web filesystem, then object URLs
-            var filesaver = this, 
-                type = blob.type, 
-                blob_changed = false, 
-                object_url, 
-                target_view, 
+            var filesaver = this,
+                type = blob.type,
+                blob_changed = false,
+                object_url,
+                target_view,
                 get_object_url = function() {
                     var object_url = get_URL().createObjectURL(blob);
                     deletion_queue.push(object_url);
                     return object_url;
-                }, 
+                },
                 dispatch_all = function() {
                     dispatch(filesaver, "writestart progress write writeend".split(" "));
-                }, 
+                },
                 // on any filesys errors revert to saving with object URLs
                 fs_error = function() {
                     // don't create more object URLs than needed
@@ -649,7 +671,7 @@ easyrtc_ft.saveAs = (function() {
                     }
                     filesaver.readyState = filesaver.DONE;
                     dispatch_all();
-                }, 
+                },
                 abortable = function(func) {
                     return function() {
                         if (filesaver.readyState !== filesaver.DONE) {
@@ -659,16 +681,16 @@ easyrtc_ft.saveAs = (function() {
                             return null;
                         }
                     };
-                }, 
-                create_if_not_found = {create: true, exclusive: false}, 
+                },
+                create_if_not_found = {create: true, exclusive: false},
                 slice;
 
             filesaver.readyState = filesaver.INIT;
-            
+
             if (!name) {
                 name = "download";
             }
-            
+
             if (can_use_save_link) {
                 object_url = get_object_url(blob);
                 save_link.href = object_url;
@@ -755,7 +777,7 @@ easyrtc_ft.saveAs = (function() {
             filesaver.readyState = filesaver.DONE;
             dispatch(filesaver, "abort");
         };
-        
+
         FS_proto.readyState = FS_proto.INIT = 0;
         FS_proto.WRITING = 1;
         FS_proto.DONE = 2;
@@ -775,3 +797,7 @@ easyrtc_ft.saveAs = (function() {
 
     return saveAs;
 })();
+
+return easyrtc_ft;
+
+}));

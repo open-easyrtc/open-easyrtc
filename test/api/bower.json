@@ -1,0 +1,18 @@
+{
+  "name": "easyrtc-test-api",
+  "main": "index.html",
+  "homepage": "http://easyrtc.com/",
+  "authors": [
+    "Rod Apeldoorn <rod.apeldoorn@priologic.com>",
+    "Eric Davies <eric.davies@priologic.com>",
+    "Harold Thétiot <hthetiot@sylaps.com>"
+  ],
+  "dependencies": {
+    "jasmine": "~2.2.1",
+    "requirejs": "~2.1.16",
+    "socket.io-client": "~1.3.7"
+  },
+  "ignore": [
+    "bower_components"
+  ]
+}
