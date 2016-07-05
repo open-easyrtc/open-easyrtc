@@ -1,5 +1,27 @@
 EasyRTC: Change Log
 ===================
+v1.0.17
+-------
+New Features:
+
+Changes:
+ - JS Client - Remove check to see if createRTCPeerConnection works.
+ - JS Client - Got rid of setVideoSrc (use setVideoSource instead)
+ - JS Client - Updated adapter.js.
+ - Doc - REmove comment about Firefox non support for video source.
+ - Doc - Updated inline documentation for getAudioSourceList and getVideoSourceList.
+ - Doc - Added .jshintrc
+ - Doc - Added copyright notice to easy_app.js
+Fixes:
+ - JS Client - Check if peer connection exists when responding to a webrtc negotiationneeded event, icecandidate event, addstream event.
+ - JS Client - Check if peer connection exists before calling onPeerRecovered.
+ - JS Client - Modified logic used to detect chrome browser.
+ - JS Client - update references in device lists from id to deviceId.
+ - JS Client - improved setting of audio and video constraints.
+ - JS Client - prevent possible null on oniceconnectionstatechange event.currentTarget
+ - JS Client - fixes to easy_app error logging.
+ - Doc - Fixed documentation for setVideoDims.
+
 
 v1.0.16
 -------

@@ -56,7 +56,7 @@
  *
  * @constructs Easyrtc_ft
  */
-    
+
 var easyrtc_ft = {};
 
 /**
@@ -196,16 +196,16 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
     var curFileSize;
     var filesAreBinary;
     //
-    //  maxPacketSize is the size (before base64 encoding) that is sent in a 
+    //  maxPacketSize is the size (before base64 encoding) that is sent in a
     //               single data channel message, in bytes.
     //  maxChunkSize is the amount read from a file at a time, in bytes.
-    //  ackThreshold is the amount of data that can be sent before an ack is 
+    //  ackThreshold is the amount of data that can be sent before an ack is
     //               received from the party we're sending to, bytes.
     //  maxChunkSize should be a multiple of maxPacketSize.
-    //  ackThreshold should be several times larger than maxChunkSize. For 
-    //               network paths that have greater latency, increase 
+    //  ackThreshold should be several times larger than maxChunkSize. For
+    //               network paths that have greater latency, increase
     //               ackThreshold further.
-    // 
+    //
     var maxPacketSize = 40*1024; // max bytes per packet, before base64 encoding
     var maxChunkSize = maxPacketSize * 10; // max binary bytes read at a time.
     var waitingForAck = false;
@@ -278,14 +278,14 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         var reader = new FileReader();
         reader.onloadend = function(evt) {
             if (evt.target.readyState === FileReader.DONE) { // DONE == 2
-                
+
                 var binaryString = "";
                 var bytes = new Uint8Array(evt.target.result);
                 var length = bytes.length;
                 for( var i = 0; i < length; i++ ) {
                    binaryString += String.fromCharCode(bytes[i]);
                 }
-                
+
                 for (var pp = 0; pp < binaryString.length; pp++) {
                     var oneChar = binaryString.charCodeAt(pp);
                 }
@@ -443,7 +443,7 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
         var foundUser;
         var roomName;
         for (var destUser in userStreams) {
-            if (userStreams.hasOwnProperty(destUser)) {                    
+            if (userStreams.hasOwnProperty(destUser)) {
                 foundUser = false;
                 for (roomName in eventData) {
                     if (eventData[roomName][destUser]) {
@@ -462,7 +462,7 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
     easyrtc.addEventListener("roomOccupant", roomOccupantListener);
 
     function fileOfferHandler(otherGuy, msgType, msgData) {
-        
+
         if (!userStreams[otherGuy]) {
             userStreams[otherGuy] = {};
         }
@@ -585,8 +585,8 @@ easyrtc_ft.saveAs = (function() {
 
     /*! @source http://purl.eligrey.com/github/FileSaver.js/blob/master/FileSaver.js */
     var saveAs = window.saveAs || (navigator.msSaveOrOpenBlob && navigator.msSaveOrOpenBlob.bind(navigator)) || (function(view) {
-            
-        
+
+
 
         var doc = view.document,
             // only get URL when necessary in case BlobBuilder.js hasn't overridden it yet
@@ -645,19 +645,19 @@ easyrtc_ft.saveAs = (function() {
 
         function FileSaver(blob, name) {
             // First try a.download, then web filesystem, then object URLs
-            var filesaver = this, 
-                type = blob.type, 
-                blob_changed = false, 
-                object_url, 
-                target_view, 
+            var filesaver = this,
+                type = blob.type,
+                blob_changed = false,
+                object_url,
+                target_view,
                 get_object_url = function() {
                     var object_url = get_URL().createObjectURL(blob);
                     deletion_queue.push(object_url);
                     return object_url;
-                }, 
+                },
                 dispatch_all = function() {
                     dispatch(filesaver, "writestart progress write writeend".split(" "));
-                }, 
+                },
                 // on any filesys errors revert to saving with object URLs
                 fs_error = function() {
                     // don't create more object URLs than needed
@@ -671,7 +671,7 @@ easyrtc_ft.saveAs = (function() {
                     }
                     filesaver.readyState = filesaver.DONE;
                     dispatch_all();
-                }, 
+                },
                 abortable = function(func) {
                     return function() {
                         if (filesaver.readyState !== filesaver.DONE) {
@@ -681,16 +681,16 @@ easyrtc_ft.saveAs = (function() {
                             return null;
                         }
                     };
-                }, 
-                create_if_not_found = {create: true, exclusive: false}, 
+                },
+                create_if_not_found = {create: true, exclusive: false},
                 slice;
 
             filesaver.readyState = filesaver.INIT;
-            
+
             if (!name) {
                 name = "download";
             }
-            
+
             if (can_use_save_link) {
                 object_url = get_object_url(blob);
                 save_link.href = object_url;
@@ -777,7 +777,7 @@ easyrtc_ft.saveAs = (function() {
             filesaver.readyState = filesaver.DONE;
             dispatch(filesaver, "abort");
         };
-        
+
         FS_proto.readyState = FS_proto.INIT = 0;
         FS_proto.WRITING = 1;
         FS_proto.DONE = 2;
