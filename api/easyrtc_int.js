@@ -1838,20 +1838,27 @@ var Easyrtc = function() {
      *  easyrtcMirror class to the video object so it looks like a proper mirror.
      *  The easyrtcMirror class is defined in this.css.
      *  Which is could be added using the same path of easyrtc.js file to an HTML file
-     *  @param {Object} videoObject an HTML5 video object
+     *  @param {Object} element an HTML5 video element
      *  @param {MediaStream|String} stream a media stream as returned by easyrtc.getLocalStream or your stream acceptor.
      * @example
      *    easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());
      *
      */
-    this.setVideoObjectSrc = function(videoObject, stream) {
+    this.setVideoObjectSrc = function(element, stream) {
         if (stream && stream !== "") {
-            videoObject.autoplay = true;
-            adapter.browserShim.attachMediaStream(videoObject, stream);
-            videoObject.play();
+            element.autoplay = true;
+
+            if (typeof element.src !== 'undefined') {
+                element.src = self.createObjectURL(stream);
+            } else if (typeof element.srcObject !== 'undefined') {
+                element.srcObject = stream;
+            } else if (typeof element.mozSrcObject !== 'undefined') {
+                element.mozSrcObject = self.createObjectURL(stream);
+            }
+            element.play();
         }
         else {
-            self.clearMediaStream(videoObject);
+            self.clearMediaStream(element);
         }
     };
 
