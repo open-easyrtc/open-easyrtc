@@ -60,6 +60,17 @@
 var easyrtc_ft = {};
 
 /**
+ * Error codes that the EasyRTC will use in the errorCode field of error object passed
+ * to error handler set by easyrtc.setOnError. The error codes are short printable strings.
+ * @type Object
+ */
+easyrtc_ft.errCodes = {
+    DATA_LOST: "DATA_LOST",
+    INVALID_DATA: "INVALID_DATA",
+    DROP_FILE: "DROP_FILE"
+};
+
+/**
  * Establish an area as a drag-n-drop drop site for files.
  * @param {DOMString} droptargetName - the id of the drag-and-drop site or the actual DOM object.
  * @param {Function} filesHandler - function that accepts an array of File's.
@@ -122,7 +133,7 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
             try {
                 filesHandler(files);
             } catch (errorEvent) {
-                console.log("dragndrop errorEvent", errorEvent);
+                easyrtc.showError(easyrtc_ft.errCodes.DROP_FILE, errorEvent);
             }
         }
         return ignore(e);
@@ -181,94 +192,159 @@ easyrtc_ft.buildDragNDropRegion = function(droptargetName, filesHandler) {
  *    {status:"done"}       // when the file is done
  *    the progressListener should always return true for normal operation, false to cancel a filetransfer.
  * @return {Function} an object that accepts an array of File (the Files to be sent), and a boolean
- *   argument that is true if the files are binary, false if they are text.
- *   It is safe to treat all files as binary, it will just require more bandwidth.
+ * @param {Object} options - overide default file transfer settings
+ *    maxPacketSize is the size (before base64 encoding) that is sent in a
+ *               single data channel message, in bytes.
+ *    maxChunkSize is the amount read from a file at a time, in bytes.
+ *    ackThreshold is the amount of data that can be sent before an ack is
+ *              received from the party we're sending to, bytes.
+ *    maxChunkSize should be a multiple of maxPacketSize.
+ *    ackThreshold should be several times larger than maxChunkSize. For
+ *              network paths that have greater latency, increase
+ *              ackThreshold further.
  */
-easyrtc_ft.buildFileSender = function(destUser, progressListener) {
+easyrtc_ft.buildFileSender = function(destUser, progressListener, options) {
+    options = options || {};
     var droptarget;
     var seq = 0;
     var positionAcked = 0;
     var filePosition = 0;
     var filesOffered = [];
     var filesBeingSent = [];
-    var sendStarted = false;
     var curFile = null;
+    var curSeq = null;
     var curFileSize;
     var filesAreBinary;
-    //
-    //  maxPacketSize is the size (before base64 encoding) that is sent in a
-    //               single data channel message, in bytes.
-    //  maxChunkSize is the amount read from a file at a time, in bytes.
-    //  ackThreshold is the amount of data that can be sent before an ack is
-    //               received from the party we're sending to, bytes.
-    //  maxChunkSize should be a multiple of maxPacketSize.
-    //  ackThreshold should be several times larger than maxChunkSize. For
-    //               network paths that have greater latency, increase
-    //               ackThreshold further.
-    //
-    var maxPacketSize = 40*1024; // max bytes per packet, before base64 encoding
-    var maxChunkSize = maxPacketSize * 10; // max binary bytes read at a time.
+    var maxPacketSize = options.maxPacketSize || (10 * 1024); // max bytes per packet, before base64 encoding
+    var maxChunkSize = options.maxPacketSize || (maxPacketSize * 10); // max binary bytes read at a time.
+    var ackThreshold = options.maxPacketSize || (maxChunkSize * 4); // send is allowed to be 400KB ahead of receiver
+
     var waitingForAck = false;
-    var ackThreshold = maxChunkSize * 4; // send is allowed to be 400KB ahead of receiver
-    var filesWaiting = [];
-    var haveFilesWaiting = false;
+    var offersWaiting = [];
     var outseq = 0;
 
     function sendFilesOffer(files, areBinary) {
-        if (haveFilesWaiting) {
-            filesWaiting.push({files: files, areBinary: areBinary});
+        
+        var fileNameList = [];
+        for (var i = 0; i < files.length; i++) {
+            fileNameList[i] = {
+                name: files[i].name, 
+                size: files[i].size
+            };
         }
-        else {
-            haveFilesWaiting = true;
-            filesAreBinary = areBinary;
-            progressListener({status: "waiting"});
-            var fileNameList = [];
-            for (var i = 0; i < files.length; i++) {
-                fileNameList[i] = {name: files[i].name, size: files[i].size};
-            }
-            seq++;
-            filesOffered[seq] = files;
-            easyrtc.sendDataWS(destUser, "filesOffer", {seq: seq, fileNameList: fileNameList});
-        }
+
+        seq++;
+        filesOffered[seq] = {
+            seq: seq,
+            files: files,
+            areBinary: areBinary
+        };
+        
+        easyrtc.sendDataWS(destUser, "filesOffer", {
+            seq: seq, 
+            fileNameList: fileNameList
+        });
+
+        progressListener({
+            seq: seq,
+            status: "waiting"
+        });
     }
 
-    function sendFilesWaiting() {
-        haveFilesWaiting = false;
-        if (filesWaiting.length > 0) {
+    function addOfferToWaitingList(offer) {
+        offersWaiting.push(offer);
+    }
+
+    function sendOffer(offer) {
+
+        curSeq = offer.seq;
+        for (var i = 0, l = offer.files.length; i < l; i++) {
+            filesBeingSent.push(offer.files[i]);
+        }
+        filesAreBinary = offer.filesAreBinary;
+        filePosition = 0;
+
+        progressListener({
+            seq: curSeq,
+            status: "started"
+        });
+
+        sendChunk(); // this starts the file reading
+    }
+
+    function processOfferWaiting() {
+        if (offersWaiting.length > 0) {
             setTimeout(function() {
-                var fileset = filesWaiting.shift();
-                sendFilesOffer(fileset.files, fileset.areBinary);
+                var fileset = offersWaiting.shift();
+                sendOffer(fileset);
             }, 240);
         }
     }
 
     function sendChunk() {
+
+        if (!curSeq) {
+            return;
+        }
+
         if (!curFile) {
             if (filesBeingSent.length === 0) {
+
                 outseq = 0;
-                easyrtc.sendData(destUser, "filesChunk", {done: "all"});
-                filesOffered.length = 0;
-                progressListener({status: "done"});
-                sendFilesWaiting();
+                easyrtc.sendData(destUser, "filesChunk", {
+                    seq: curSeq,
+                    done: "all"
+                });
+
+                progressListener({
+                    seq: curSeq,
+                    status: "done"
+                });
+                    
+                curSeq = null;
+                processOfferWaiting();
                 return;
             }
             else {
                 curFile = filesBeingSent.shift();
-                progressListener({status: "started_file", name: curFile.name});
                 curFileSize = curFile.size;
                 positionAcked = 0;
                 waitingForAck = false;
-                easyrtc.sendData(destUser, "filesChunk", {name: curFile.name, type: curFile.type, outseq: outseq, size: curFile.size});
+                easyrtc.sendData(destUser, "filesChunk", {
+                    seq: curSeq,
+                    name: curFile.name, 
+                    type: curFile.type, 
+                    outseq: outseq, 
+                    size: curFile.size
+                });
                 outseq++;
+
+                progressListener({
+                    seq: curSeq,
+                    status: "started_file", 
+                    name: curFile.name
+                });
             }
         }
 
         var amountToRead = Math.min(maxChunkSize, curFileSize - filePosition);
-        if (!progressListener({status: "working", name: curFile.name, position: filePosition, size: curFileSize, numFiles: filesBeingSent.length + 1})) {
+        var progressAck = progressListener({
+            seq: curSeq,
+            status: "working", 
+            name: curFile.name, 
+            position: filePosition, 
+            size: curFileSize, 
+            numFiles: filesBeingSent.length + 1
+        });
+
+        if (!progressAck) {
             filesOffered.length = 0;
             filePosition = 0;
-            easyrtc.sendData(destUser, "filesChunk", {done: "cancelled"});
-            sendFilesWaiting();
+            easyrtc.sendData(destUser, "filesChunk", {
+                seq: curSeq,
+                done: "cancelled"
+            });
+            processOfferWaiting();
             return;
         }
 
@@ -282,6 +358,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
                 var binaryString = "";
                 var bytes = new Uint8Array(evt.target.result);
                 var length = bytes.length;
+
                 for( var i = 0; i < length; i++ ) {
                    binaryString += String.fromCharCode(bytes[i]);
                 }
@@ -289,35 +366,41 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
                 for (var pp = 0; pp < binaryString.length; pp++) {
                     var oneChar = binaryString.charCodeAt(pp);
                 }
+
                 for (var pos = 0; pos < binaryString.length; pos += maxPacketSize) {
+                    
                     var packetLen = Math.min(maxPacketSize, amountToRead - pos);
                     var packetData = binaryString.substring(pos, pos + packetLen);
-                    var packetObject = {outseq: outseq};
+                    var packetObject = {
+                        seq: curSeq,
+                        outseq: outseq
+                    };
+                    
                     if (filesAreBinary) {
                         packetObject.data64 = btoa(packetData);
-                    }
-                    else {
+                    } else {
                         packetObject.datatxt = packetData;
                     }
+
                     easyrtc.sendData(destUser, "filesChunk", packetObject);
                     outseq++;
                 }
+
                 if (nextLocation >= curFileSize) {
-                    easyrtc.sendData(destUser, "filesChunk", {done: "file"});
+                    easyrtc.sendData(destUser, "filesChunk", {
+                        seq: curSeq,
+                        done: "file"
+                    });
                 }
+
                 if (filePosition < positionAcked + ackThreshold) {
                     sendChunk();
-                }
-                else {
+                } else {
                     waitingForAck = true;
                 }
             }
         };
 
-        // reader.readAsBinaryString(blobSlice);
-        //
-        // contribution by Harold Thetiot to support IE10
-        //
         reader.readAsArrayBuffer(blobSlice);
         filePosition = nextLocation;
 
@@ -345,7 +428,9 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
         if (!foundUser) {
             easyrtc.removeEventListener("roomOccupant", roomOccupantListener);
             if (filesBeingSent.length > 0 || filesOffered.length > 0) {
-                progressListener({status: "cancelled"});
+                progressListener({
+                    status: "cancelled"
+                });
             }
         }
     };
@@ -354,40 +439,53 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
     // if a file offer is rejected, we delete references to it.
     //
     function fileOfferRejected(sender, msgType, msgData, targeting) {
-        if (!msgData.seq) {
+        
+        if (!msgData.seq || !filesOffered[msgData.seq]){
             return;
         }
 
+        progressListener({
+            seq: msgData.seq,
+            status: "rejected"
+        });
+
         delete filesOffered[msgData.seq];
-        progressListener({status: "rejected"});
-        filesOffered.length = 0;
-        sendFilesWaiting();
     }
     //
     // if a file offer is accepted, initiate sending of files.
     //
     function fileOfferAccepted(sender, msgType, msgData, targeting) {
+        
         if (!msgData.seq || !filesOffered[msgData.seq]){
             return;
         }
+
         var alreadySending = filesBeingSent.length > 0;
-        for (var i = 0; i < filesOffered[msgData.seq].length; i++) {
-            filesBeingSent.push(filesOffered[msgData.seq][i]);
-        }
+        var offer = filesOffered[msgData.seq];
+
+        // Offer can be offered only once
         delete filesOffered[msgData.seq];
-        if (!alreadySending) {
-            filePosition = 0;
-            sendChunk(); // this starts the file reading
+
+        if (!alreadySending && !curFile) {
+            sendOffer(offer);
+        } else {
+            addOfferToWaitingList(offer);
         }
     }
 
     function fileCancelReceived(sender, msgType, msgData, targeting) {
-        filesBeingSent.empty();
-        progressListener({status: "cancelled"});
-        filesOffered.length = 0;
-        filesBeingSent.length = 0;
-        sendStarted = false;
-        sendFilesWaiting();
+
+        if (!msgData.seq || !filesOffered[msgData.seq]){
+            return;
+        }
+
+        progressListener({
+            seq: msgData.seq,
+            status: "cancelled"
+        });
+
+        // Offer can be offered only once
+        delete filesOffered[msgData.seq];
     }
 
     function packageAckReceived(sender, msgType, msgData) {
@@ -433,27 +531,42 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener) {
  *       function(otherGuy, status) {  console.log("status:" + JSON.stringify(status))}
  *     );
  */
-easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) {
-    var userStreams = {};
-    var ackThreshold = 10000; // receiver is allowed to be 10KB behind of sender
+easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB, options) {
+    options = options || {};
+
+    var usersOffers = {};
     var positionAcked = 0;
+    var ackThreshold = options.ackThreshold || 10000; // receiver is allowed to be 10KB behind of sender
 
     var roomOccupantListener = function(eventType, eventData) {
-        var user;
+        var destUser;
         var foundUser;
         var roomName;
-        for (var destUser in userStreams) {
-            if (userStreams.hasOwnProperty(destUser)) {
+        var destOffer;
+        for (destUser in usersOffers) {
+            if (usersOffers.hasOwnProperty(destUser)) {
+                
                 foundUser = false;
                 for (roomName in eventData) {
                     if (eventData[roomName][destUser]) {
                         foundUser = true;
                     }
                 }
-                if (!foundUser) {
-                    easyrtc.removeEventListener("roomOccupant", roomOccupantListener);
-                    statusCB(destUser, {status: "done", reason: "cancelled"});
-                    delete userStreams[destUser];
+
+                if (!foundUser) {   
+                    var userOffers = usersOffers[destUser];
+                    for (var userOffer in userOffers[destUser]) {
+                        if (userOffers.hasOwnProperty(userOffer)) {
+                            delete userOffers[userOffer];
+                            statusCB(destUser, {
+                                seq: destOffer,
+                                status: "done", 
+                                reason: "cancelled"
+                            });
+                        }
+                    }
+
+                    delete usersOffers[destUser];
                 }
             }
         }
@@ -462,69 +575,117 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
     easyrtc.addEventListener("roomOccupant", roomOccupantListener);
 
     function fileOfferHandler(otherGuy, msgType, msgData) {
-
-        if (!userStreams[otherGuy]) {
-            userStreams[otherGuy] = {};
+        var destOffer = msgData.seq;
+        if (!destOffer){
+            return;
         }
-
+        var userOffers = usersOffers[otherGuy] = usersOffers[otherGuy] || {};
+        var userOffer = userOffers[destOffer] = {
+            seq: destOffer,
+            status: 'pending'
+        };
         acceptRejectCB(otherGuy, msgData.fileNameList, function(wasAccepted) {
             var ackHandler = function(ackMesg) {
 
                 if (ackMesg.msgType === "error") {
-                    statusCB(otherGuy, {status: "done", reason: "accept_failed"});
-                    delete userStreams[otherGuy];
+                    statusCB(otherGuy, {
+                        seq: destOffer,
+                        status: "done", 
+                        reason: "accept_failed"
+                    });
+                    delete userOffers[destOffer];
                 }
                 else {
-                    statusCB(otherGuy, {status: "started"});
+                    statusCB(otherGuy, {
+                        seq: destOffer,
+                        status: "started"
+                    });
                 }
             };
             if (wasAccepted) {
-                userStreams[otherGuy] = {
-                    groupSeq: msgData.seq,
+                userOffers[destOffer] = {
+                    seq: destOffer,
+                    status: "accepted",
                     nextPacketSeq: 0
                 };
-                easyrtc.sendDataWS(otherGuy, "filesAccept", {seq: msgData.seq}, ackHandler);
+
+                easyrtc.sendDataWS(otherGuy, "filesAccept", {
+                    seq: destOffer
+                }, ackHandler);
             }
             else {
-                easyrtc.sendDataWS(otherGuy, "filesReject", {seq: msgData.seq});
-                delete userStreams[otherGuy];
-                statusCB(otherGuy, {status: "rejected"});
+                easyrtc.sendDataWS(otherGuy, "filesReject", {
+                    seq: destOffer
+                });
+
+                statusCB(otherGuy, {
+                    seq: destOffer,
+                    status: "rejected"
+                });
+
+                delete userOffers[destOffer];
             }
         });
     }
 
     function fileChunkHandler(otherGuy, msgType, msgData) {
-        var i;
-        var userStream = userStreams[otherGuy];
-        if (!userStream) {
+        var destOffer = msgData.seq;
+        if (!destOffer){
+            return;
+        }
+        var userOffers = usersOffers[otherGuy];
+        if (!userOffers) {
+            return;
+        }
+        var userOffer = userOffers[destOffer];
+        if (!userOffer) {
             return;
         }
         if (msgData.done) {
             switch (msgData.done) {
                 case "file":
-                    var blob = new Blob(userStream.currentData, {type: userStream.currentFileType});
-                    blobAcceptor(otherGuy, blob, userStream.currentFileName);
-                    statusCB(otherGuy, {status: "eof", name: userStream.currentFileName});
+                    var blob = new Blob(userOffer.currentData, {
+                        type: userOffer.currentFileType
+                    });
+                    blobAcceptor(otherGuy, blob, userOffer.currentFileName);
+                    statusCB(otherGuy, {
+                        seq: destOffer,
+                        status: "eof", 
+                        name: userOffer.currentFileName
+                    });
+                    
                     blob = null;
                     positionAcked = 0;
-                    userStream.currentData = [];
+                    userOffer.currentData = [];
                     break;
                 case "all":
-                    statusCB(otherGuy, {status: "done", reason: "success"});
+                    statusCB(otherGuy, {
+                        seq: destOffer,
+                        status: "done", 
+                        reason: "success"
+                    });
                     break;
                 case "cancelled":
-                    delete userStreams[otherGuy];
-                    statusCB(otherGuy, {status: "done", reason: "cancelled"});
+                    delete userOffers[destOffer];
+                    statusCB(otherGuy, {
+                        seq: destOffer,
+                        status: "done", 
+                        reason: "cancelled"
+                    });
                     break;
             }
         }
         else if (msgData.name) {
-            statusCB(otherGuy, {status: "started_file", name: msgData.name});
-            userStream.currentFileName = msgData.name;
-            userStream.currentFileType = msgData.type;
-            userStream.lengthReceived = 0;
-            userStream.lengthExpected = msgData.size;
-            userStream.currentData = [];
+            statusCB(otherGuy, {
+                seq: destOffer,
+                status: "started_file", 
+                name: msgData.name
+            });
+            userOffer.currentFileName = msgData.name;
+            userOffer.currentFileType = msgData.type;
+            userOffer.lengthReceived = 0;
+            userOffer.lengthExpected = msgData.size;
+            userOffer.currentData = [];
         }
         else if (msgData.data64 || msgData.datatxt) {
             var binData;
@@ -534,29 +695,37 @@ easyrtc_ft.buildFileReceiver = function(acceptRejectCB, blobAcceptor, statusCB) 
             else {
                 binData = msgData.datatxt;
             }
+            var i;
             var n = binData.length;
             var binheap = new Uint8Array(n);
             for (i = 0; i < n; i += 1) {
                 binheap[i] = binData.charCodeAt(i);
             }
-            userStream.lengthReceived += n;
-            if (!userStream.currentData) {
-                console.log("Lost my currentData!!!");
+            userOffer.lengthReceived += n;
+
+            if (!userOffer.currentData) {
+                easyrtc.showError(easyrtc_ft.errCodes.DATA_LOST, "file tranfert data lost");
             }
-            userStream.currentData.push(binheap);
+
+            userOffer.currentData.push(binheap);
 
             statusCB(otherGuy, {
+                seq: destOffer,
                 status: "progress",
-                name: userStream.currentFileName,
-                received: userStream.lengthReceived,
-                size: userStream.lengthExpected});
-            if (userStream.lengthReceived > positionAcked + ackThreshold) {
-                positionAcked = userStream.lengthReceived;
-                easyrtc.sendData(otherGuy, "filesAck", {positionAck: positionAcked});
+                name: userOffer.currentFileName,
+                received: userOffer.lengthReceived,
+                size: userOffer.lengthExpected});
+
+            if (userOffer.lengthReceived > positionAcked + ackThreshold) {
+                positionAcked = userOffer.lengthReceived;
+                easyrtc.sendData(otherGuy, "filesAck", {
+                    seq: destOffer,
+                    positionAck: positionAcked
+                });
             }
         }
         else {
-            console.log("Unexpected data structure in filesChunk=", msgData);
+            easyrtc.showError(easyrtc.errCodes.INVALID_DATA, "Unexpected data structure in filesChunk");
         }
     }
 
@@ -585,8 +754,6 @@ easyrtc_ft.saveAs = (function() {
 
     /*! @source http://purl.eligrey.com/github/FileSaver.js/blob/master/FileSaver.js */
     var saveAs = window.saveAs || (navigator.msSaveOrOpenBlob && navigator.msSaveOrOpenBlob.bind(navigator)) || (function(view) {
-
-
 
         var doc = view.document,
             // only get URL when necessary in case BlobBuilder.js hasn't overridden it yet
