@@ -43,7 +43,7 @@
         if (typeof window.easyrtc !== 'object' || !window.easyrtc) {
             throw new Error("easyrtc_app requires easyrtc");
         }
-        root.easyrtc_ft = factory(window.easyrtc);
+        root.easyrtc = factory(window.easyrtc);
   }
 }(this, function (easyrtc, undefined) {
 
