@@ -3543,7 +3543,9 @@ var Easyrtc = function() {
                 onRemoveStreamHelper(otherUser, event.stream);
             };
 
+            // Register PeerConn
             peerConns[otherUser] = newPeerConn;
+
         } catch (error) {
             logDebug('buildPeerConnection error', error);
             failureCB(self.errCodes.SYSTEM_ERR, error.message);
@@ -3728,15 +3730,20 @@ var Easyrtc = function() {
         // TODO check if both sides have the same browser and versions
         if (dataEnabled) {
             self.setPeerListener(function() {
-                peerConns[otherUser].dataChannelReady = true;
-                if (peerConns[otherUser].callSuccessCB) {
-                    peerConns[otherUser].callSuccessCB(otherUser, "datachannel");
+                if (peerConns[otherUser]) {
+                    peerConns[otherUser].dataChannelReady = true;
+                    if (peerConns[otherUser].callSuccessCB) {
+                        peerConns[otherUser].callSuccessCB(otherUser, "datachannel");
+                    }
+                    if (onDataChannelOpen) {
+                        onDataChannelOpen(otherUser, true);
+                    }
+                    updateConfigurationInfo();
+                } else {
+                    logDebug("failed to setup outgoing channel listener");
                 }
-                if (onDataChannelOpen) {
-                    onDataChannelOpen(otherUser, true);
-                }
-                updateConfigurationInfo();
             }, "dataChannelPrimed", otherUser);
+
             if (isInitiator) {
                 try {
 
