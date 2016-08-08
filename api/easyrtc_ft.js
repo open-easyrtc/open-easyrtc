@@ -209,7 +209,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener, options) {
     var seq = 0;
     var positionAcked = 0;
     var filePosition = 0;
-    var filesOffered = [];
+    var filesOffered = []; // TODO ARray vs Object look weird here but seq is Number 
     var filesBeingSent = [];
     var curFile = null;
     var curSeq = null;
@@ -223,10 +223,51 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener, options) {
     var offersWaiting = [];
     var outseq = 0;
 
+    function fileCancelReceived(sender, msgType, msgData, targeting) {
+
+        if (!msgData.seq || !filesOffered[msgData.seq]){
+            return;
+        }
+
+        progressListener({
+            seq: msgData.seq,
+            status: "cancelled"
+        });
+
+        // Offer can be offered only once
+        delete filesOffered[msgData.seq];
+    }
+
+    function cancelFilesOffer(offerSeq) {
+
+        // Clear from of
+        if (filesOffered[offerSeq]) {
+
+            fileCancelReceived(destUser, 'filesCancel', filesOffered[offerSeq]);  
+
+            delete filesOffered[offerSeq]; 
+        } else {
+
+            // Clear from waiting queue
+            offersWaiting = offersWaiting.filter(function(offersWaiting) {
+                var isOfferToCancel = offersWaiting.seq === offerSeq;
+                if (isOfferToCancel) {
+                    fileCancelReceived(destUser, 'filesCancel', offersWaiting);  
+                }
+                return !isOfferToCancel;
+            }); 
+        }
+
+        easyrtc.sendData(destUser, "filesChunk", {
+            seq: offerSeq,
+            done: "cancelled"
+        });
+    }
+
     function sendFilesOffer(files, areBinary) {
         
         var fileNameList = [];
-        for (var i = 0; i < files.length; i++) {
+        for (var i = 0, l = files.length; i < l; i++) {
             fileNameList[i] = {
                 name: files[i].name, 
                 size: files[i].size
@@ -249,27 +290,12 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener, options) {
             seq: seq,
             status: "waiting"
         });
+
+        return cancelFilesOffer.bind(null, seq);
     }
 
     function addOfferToWaitingList(offer) {
         offersWaiting.push(offer);
-    }
-
-    function sendOffer(offer) {
-
-        curSeq = offer.seq;
-        for (var i = 0, l = offer.files.length; i < l; i++) {
-            filesBeingSent.push(offer.files[i]);
-        }
-        filesAreBinary = offer.filesAreBinary;
-        filePosition = 0;
-
-        progressListener({
-            seq: curSeq,
-            status: "started"
-        });
-
-        sendChunk(); // this starts the file reading
     }
 
     function processOfferWaiting() {
@@ -338,12 +364,10 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener, options) {
         });
 
         if (!progressAck) {
-            filesOffered.length = 0;
+            curSeq = null;
+            curFile = null;
             filePosition = 0;
-            easyrtc.sendData(destUser, "filesChunk", {
-                seq: curSeq,
-                done: "cancelled"
-            });
+            cancelFilesOffer(curSeq);
             processOfferWaiting();
             return;
         }
@@ -427,14 +451,39 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener, options) {
         }
         if (!foundUser) {
             easyrtc.removeEventListener("roomOccupant", roomOccupantListener);
-            if (filesBeingSent.length > 0 || filesOffered.length > 0) {
-                progressListener({
-                    status: "cancelled"
+
+            if (filesBeingSent.length > 0) {
+                cancelFilesOffer(curSeq);
+            }
+            
+            if (filesOffered.length > 0) {
+                filesOffered.forEach(function (filesOffered, seq) {
+                    cancelFilesOffer(seq);
                 });
             }
         }
     };
+
     easyrtc.addEventListener("roomOccupant", roomOccupantListener);
+
+
+    function sendOffer(offer) {
+
+        curSeq = offer.seq;
+        for (var i = 0, l = offer.files.length; i < l; i++) {
+            filesBeingSent.push(offer.files[i]);
+        }
+        filesAreBinary = offer.filesAreBinary;
+        filePosition = 0;
+
+        progressListener({
+            seq: curSeq,
+            status: "started"
+        });
+
+        sendChunk(); // this starts the file reading
+    }
+    
     //
     // if a file offer is rejected, we delete references to it.
     //
@@ -471,21 +520,6 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener, options) {
         } else {
             addOfferToWaitingList(offer);
         }
-    }
-
-    function fileCancelReceived(sender, msgType, msgData, targeting) {
-
-        if (!msgData.seq || !filesOffered[msgData.seq]){
-            return;
-        }
-
-        progressListener({
-            seq: msgData.seq,
-            status: "cancelled"
-        });
-
-        // Offer can be offered only once
-        delete filesOffered[msgData.seq];
     }
 
     function packageAckReceived(sender, msgType, msgData) {
