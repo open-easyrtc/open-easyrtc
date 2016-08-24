@@ -19,7 +19,6 @@ Ubuntu EasyRTC Install Steps:
     - ensure the node is run as that user.
 
 4. Download files from the [server_example folder](../server_example/) into your EasyRTC application folder.
-    - OR [download and extract this .zip](http://easyrtc.com/files/easyrtc_server_example.zip)
 
 5. Change to the easyrtc folder and then install node modules locally
     - `cd /var/nodes/easyrtc`
@@ -39,7 +38,6 @@ Windows EasyRTC Install Steps:
     - ex: `C:\Users\USERNAME\nodes\easyrtc`
 
 3. Download files from the [server_example folder](../server_example/) into your EasyRTC application folder.
-    - OR [download and extract this .zip](http://easyrtc.com/files/easyrtc_server_example.zip)
 
 4. In the start menu, launch the Node.js command prompt
 
@@ -60,16 +58,17 @@ Mac EasyRTC Install Steps:
     - By default node.js will be installed in /usr/local/bin/node and npm will be installed in /usr/local/bin/npm
     - Make sure /usr/local/bin is in your $PATH variable (echo $PATH)
 
-2. Download files from the [server_example folder](../server_example/) into a folder of your choice.
-    - OR [download and extract this .zip](http://easyrtc.com/files/easyrtc_server_example.zip)
+2. Create an EasyRTC application folder.
     - ex: `/Users/USERNAME/nodes/easyrtc`
 
-3. Open a terminal window by double-clicking on Terminal within the Applications/Utilities directory in finder
+4. Download files from the [server_example folder](../server_example/) into your EasyRTC application folder.
 
-4. Navigate to the easyrtc folder. There should be a server.js and package.json file.
+4. Open a terminal window by double-clicking on Terminal within the Applications/Utilities directory in finder
+
+5. Navigate to the easyrtc folder. There should be a server.js and package.json file.
     - ex: `cd /Users/USERNAME/nodes/easyrtc`
 
-5. Run the node package manager to download dependencies. This will create a new folder called node_modules
+6. Run the node package manager to download dependencies. This will create a new folder called node_modules
     - `npm install`
 
 
@@ -78,20 +77,23 @@ Git Install Steps:
 
 For EasyRTC maintainers or those wishing to test the newer beta release, [a Git client](http://git-scm.com/) can be used to download EasyRTC directly from [our Github repository](github.com/priologic/easyrtc). Afterwards, EasyRTC can be updated using standard Git commands.
 
+1. Follow NodeJS install instructions for your OS
 
-1. Follow install instructions for your OS
-
-2. Delete the `easyrtc` folder from `/node_modules/`
-
-3. From `/node_modules/` clone the EasyRTC repo
+2. Clone EasyRTC repository folder.
     - `git clone https://github.com/priologic/easyrtc.git`
     - `git clone -b beta https://github.com/priologic/easyrtc.git`
 
-4. In the console, enter the `/node_modules/easyrtc/` folder
-    - `cd easyrtc` 
+4. In the console, enter the `easyrtc/` folder
+    - `cd easyrtc`
 
 5. Install EasyRTC dependencies from NPM
-    - `npm install` 
+    - `npm install`
+
+6. In the console, enter the `server_example` folder
+    - `cd server_example`
+
+7. Install EasyRTC Sample Server dependencies from NPM
+    - `npm install`
 
 
 Running EasyRTC Server
@@ -104,7 +106,11 @@ Running the server from the console may be the best approach for development. It
 
 1. Open your console on the server.
     - In Windows you can use the provided Node.js console program located in the Start Menu.
+
 2. Navigate to your EasyRTC application folder
+    - copied from [server_example folder](../server_example/)
+    - or using [Git Install Steps]() directly `cd server_example`
+
 3. Run the server using the node command.
     - `node server.js`
 
