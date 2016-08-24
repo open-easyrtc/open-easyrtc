@@ -80,8 +80,8 @@ For EasyRTC maintainers or those wishing to test the newer beta release, [a Git 
 1. Follow NodeJS install instructions for your OS
 
 2. Clone EasyRTC repository folder.
-    - `git clone https://github.com/priologic/easyrtc.git`
-    - `git clone -b beta https://github.com/priologic/easyrtc.git`
+    - Using Stable:  `git clone https://github.com/priologic/easyrtc.git`
+    - Using Beta: `git clone -b beta https://github.com/priologic/easyrtc.git`
 
 4. In the console, enter the `easyrtc/` folder
     - `cd easyrtc`
