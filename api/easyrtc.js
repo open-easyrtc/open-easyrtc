@@ -56,7 +56,7 @@ return {
   "statsNotSupported":"call statistics not supported by this browser, try Chrome.",
    "noWebrtcSupport":"Your browser doesn't appear to support WebRTC.",
    "gumFailed":"Failed to get access to local media. Error code was {0}.",
-   "requireAudioOrVideo":"At least one of audio and video must be provided"
+   "requireAudioOrVideo":"At least one of audio and video must be provided"   
 };
 
 }));
@@ -4386,20 +4386,27 @@ var Easyrtc = function() {
      *  easyrtcMirror class to the video object so it looks like a proper mirror.
      *  The easyrtcMirror class is defined in this.css.
      *  Which is could be added using the same path of easyrtc.js file to an HTML file
-     *  @param {Object} videoObject an HTML5 video object
+     *  @param {Object} element an HTML5 video element
      *  @param {MediaStream|String} stream a media stream as returned by easyrtc.getLocalStream or your stream acceptor.
      * @example
      *    easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());
      *
      */
-    this.setVideoObjectSrc = function(videoObject, stream) {
+    this.setVideoObjectSrc = function(element, stream) {
         if (stream && stream !== "") {
-            videoObject.autoplay = true;
-            adapter.browserShim.attachMediaStream(videoObject, stream);
-            videoObject.play();
+            element.autoplay = true;
+
+            if (typeof element.src !== 'undefined') {
+                element.src = self.createObjectURL(stream);
+            } else if (typeof element.srcObject !== 'undefined') {
+                element.srcObject = stream;
+            } else if (typeof element.mozSrcObject !== 'undefined') {
+                element.mozSrcObject = self.createObjectURL(stream);
+            }
+            element.play();
         }
         else {
-            self.clearMediaStream(videoObject);
+            self.clearMediaStream(element);
         }
     };
 
@@ -6130,7 +6137,9 @@ var Easyrtc = function() {
                 onRemoveStreamHelper(otherUser, event.stream);
             };
 
+            // Register PeerConn
             peerConns[otherUser] = newPeerConn;
+
         } catch (error) {
             logDebug('buildPeerConnection error', error);
             failureCB(self.errCodes.SYSTEM_ERR, error.message);
@@ -6315,15 +6324,20 @@ var Easyrtc = function() {
         // TODO check if both sides have the same browser and versions
         if (dataEnabled) {
             self.setPeerListener(function() {
-                peerConns[otherUser].dataChannelReady = true;
-                if (peerConns[otherUser].callSuccessCB) {
-                    peerConns[otherUser].callSuccessCB(otherUser, "datachannel");
+                if (peerConns[otherUser]) {
+                    peerConns[otherUser].dataChannelReady = true;
+                    if (peerConns[otherUser].callSuccessCB) {
+                        peerConns[otherUser].callSuccessCB(otherUser, "datachannel");
+                    }
+                    if (onDataChannelOpen) {
+                        onDataChannelOpen(otherUser, true);
+                    }
+                    updateConfigurationInfo();
+                } else {
+                    logDebug("failed to setup outgoing channel listener");
                 }
-                if (onDataChannelOpen) {
-                    onDataChannelOpen(otherUser, true);
-                }
-                updateConfigurationInfo();
             }, "dataChannelPrimed", otherUser);
+
             if (isInitiator) {
                 try {
 
@@ -8120,7 +8134,7 @@ return new Easyrtc();
         if (typeof window.easyrtc !== 'object' || !window.easyrtc) {
             throw new Error("easyrtc_app requires easyrtc");
         }
-        root.easyrtc_ft = factory(window.easyrtc);
+        root.easyrtc = factory(window.easyrtc);
   }
 }(this, function (easyrtc, undefined) {
 
@@ -8157,7 +8171,7 @@ return new Easyrtc();
         var videoIdsP = videoIds || [],
             numPEOPLE = videoIds.length,
             videoIdToCallerMap = {},
-            onCall = null,
+            onCall = null, 
             onHangup = null;
 
         /**
@@ -8174,7 +8188,7 @@ return new Easyrtc();
                 easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "The monitor video id passed to easyApp was bad, saw " + monitorVideoId);
                 return false;
             }
-
+    
             for (i in videoIds) {
                 if (!videoIds.hasOwnProperty(i)) {
                     continue;
@@ -8231,7 +8245,7 @@ return new Easyrtc();
             document.getElementById(monitorVideoId).muted = "muted";
         }
 
-        easyrtc.addEventListener("roomOccupants",
+        easyrtc.addEventListener("roomOccupants", 
             function(eventName, eventData) {
                 var i;
                 for (i = 0; i < numPEOPLE; i++) {
@@ -8248,7 +8262,7 @@ return new Easyrtc();
             }
         );
 
-        /** Sets an event handler that gets called when an incoming MediaStream is assigned
+        /** Sets an event handler that gets called when an incoming MediaStream is assigned 
          * to a video object. The name is poorly chosen and reflects a simpler era when you could
          * only have one media stream per peer connection.
          * @param {Function} cb has the signature function(easyrtcid, slot){}
@@ -8427,7 +8441,7 @@ return new Easyrtc();
      *              });
      */
     easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, onFailure) {
-
+        
         var gotMediaCallback = null,
             gotConnectionCallback = null;
 
@@ -8464,7 +8478,7 @@ return new Easyrtc();
         easyrtc.setGotConnection = function(gotConnectionCB) {
             gotConnectionCallback = gotConnectionCB;
         };
-
+        
         function nextInitializationStep(/* token */) {
             if (gotConnectionCallback) {
                 gotConnectionCallback(true, "");
@@ -8520,3 +8534,4 @@ return new Easyrtc();
 return easyrtc;
 
 }));
+

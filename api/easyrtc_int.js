@@ -1838,20 +1838,27 @@ var Easyrtc = function() {
      *  easyrtcMirror class to the video object so it looks like a proper mirror.
      *  The easyrtcMirror class is defined in this.css.
      *  Which is could be added using the same path of easyrtc.js file to an HTML file
-     *  @param {Object} videoObject an HTML5 video object
+     *  @param {Object} element an HTML5 video element
      *  @param {MediaStream|String} stream a media stream as returned by easyrtc.getLocalStream or your stream acceptor.
      * @example
      *    easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());
      *
      */
-    this.setVideoObjectSrc = function(videoObject, stream) {
+    this.setVideoObjectSrc = function(element, stream) {
         if (stream && stream !== "") {
-            videoObject.autoplay = true;
-            adapter.browserShim.attachMediaStream(videoObject, stream);
-            videoObject.play();
+            element.autoplay = true;
+
+            if (typeof element.src !== 'undefined') {
+                element.src = self.createObjectURL(stream);
+            } else if (typeof element.srcObject !== 'undefined') {
+                element.srcObject = stream;
+            } else if (typeof element.mozSrcObject !== 'undefined') {
+                element.mozSrcObject = self.createObjectURL(stream);
+            }
+            element.play();
         }
         else {
-            self.clearMediaStream(videoObject);
+            self.clearMediaStream(element);
         }
     };
 
@@ -3540,7 +3547,9 @@ var Easyrtc = function() {
                 onRemoveStreamHelper(otherUser, event.stream);
             };
 
+            // Register PeerConn
             peerConns[otherUser] = newPeerConn;
+
         } catch (error) {
             logDebug('buildPeerConnection error', error);
             failureCB(self.errCodes.SYSTEM_ERR, error.message);
@@ -3725,15 +3734,20 @@ var Easyrtc = function() {
         // TODO check if both sides have the same browser and versions
         if (dataEnabled) {
             self.setPeerListener(function() {
-                peerConns[otherUser].dataChannelReady = true;
-                if (peerConns[otherUser].callSuccessCB) {
-                    peerConns[otherUser].callSuccessCB(otherUser, "datachannel");
+                if (peerConns[otherUser]) {
+                    peerConns[otherUser].dataChannelReady = true;
+                    if (peerConns[otherUser].callSuccessCB) {
+                        peerConns[otherUser].callSuccessCB(otherUser, "datachannel");
+                    }
+                    if (onDataChannelOpen) {
+                        onDataChannelOpen(otherUser, true);
+                    }
+                    updateConfigurationInfo();
+                } else {
+                    logDebug("failed to setup outgoing channel listener");
                 }
-                if (onDataChannelOpen) {
-                    onDataChannelOpen(otherUser, true);
-                }
-                updateConfigurationInfo();
             }, "dataChannelPrimed", otherUser);
+
             if (isInitiator) {
                 try {
 

@@ -18,6 +18,7 @@
   "license": "BSD 2",
   "ignore": [
     "**/.*",
+    "index.js",
     "node_modules",
     "bower_components",
     "test",
