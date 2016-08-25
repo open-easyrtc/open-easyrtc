@@ -3491,6 +3491,10 @@ var Easyrtc = function() {
                 }
             };
 
+            pc.ontrack = function(event) {
+               console.log("saw track event");
+            }
+
             pc.onaddstream = function(event) {
 
                 if (peerConns[otherUser] && peerConns[otherUser].cancelled) {
