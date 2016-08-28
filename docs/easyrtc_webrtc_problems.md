@@ -3,6 +3,16 @@ WebRTC Problems and Possible Fixes
 
 Many of these issues are general WebRTC or browser issues and not specific to EasyRTC. Given time, many of these will become less frequent as the specification browsers are updated.
 
+PermissionDeniedError When Creating A Local Media Stream
+--------------------------------------------------------
+
+ - If your page is not being served using https (instead of http), 
+chrome won't let your page access a local camera or microphone.
+ - If you have previously disallowed camera or micrphone access from a 
+ particular domain, the browser remembers this and refuses permission in 
+ the future. If this is the case, you'll see a crossed-circle around the camera 
+ icon in the title bar. Click it to bring up a dialog for controlling media 
+ access, and reload the page after using the dialog. 
 
 No Self Video
 -------------
