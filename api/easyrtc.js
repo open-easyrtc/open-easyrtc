@@ -3192,31 +3192,41 @@ var Easyrtc = function() {
                     constraints.video.height = self._desiredVideoProperties.height;
                 }
                 if (self._desiredVideoProperties.frameRate) {
-                    constraints.video.frameRate = { max: self._desiredVideoProperties.frameRate};
+                    constraints.video.frameRate = { 
+                       ideal: self._desiredVideoProperties.frameRate,
+                       max: self._desiredVideoProperties.frameRate
+                     };
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
                     constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
                 }
             }
             else { // chrome and opera
-                constraints.video = {mandatory: {}, optional: []};
+                constraints.video = {};
                 if (self._desiredVideoProperties.width) {
-                    constraints.video.mandatory.maxWidth = self._desiredVideoProperties.width;
-                    constraints.video.mandatory.minWidth = self._desiredVideoProperties.width;
+                    constraints.video.width = { 
+                       max: self._desiredVideoProperties.width,
+                    min : self._desiredVideoProperties.width,
+                    ideal : self._desiredVideoProperties.width };
                 }
                 if (self._desiredVideoProperties.height) {
-                    constraints.video.mandatory.maxHeight = self._desiredVideoProperties.height;
-                    constraints.video.mandatory.minHeight = self._desiredVideoProperties.height;
+                    constraints.video.height = {
+                      max: self._desiredVideoProperties.height,
+                      min: self._desiredVideoProperties.height,
+                      ideal: self._desiredVideoProperties.height};
                 }
                 if (self._desiredVideoProperties.frameRate) {
-                    constraints.video.mandatory.maxFrameRate = self._desiredVideoProperties.frameRate;
+                    constraints.video.frameRate = {
+                      max: self._desiredVideoProperties.frameRate,
+                      ideal: self._desiredVideoProperties.frameRate
+                     };
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
                     constraints.video.optional = constraints.video.optional || [];
                     constraints.video.optional.push({sourceId: self._desiredVideoProperties.videoSrcId});
                 }
                 // hack for opera
-                if (constraints.video.mandatory.length === 0 && constraints.video.optional.length === 0) {
+                if (constraints.video === {} ) {
                     constraints.video = true;
                 }
             }
@@ -6036,44 +6046,90 @@ var Easyrtc = function() {
                 }
             };
 
-            pc.onaddstream = function(event) {
 
-                if (peerConns[otherUser] && peerConns[otherUser].cancelled) {
+            function processAddedStream(peerConn, otherUser, theStream) {
+                console.log("entered processAddStream");
+                if (!peerConns[otherUser] ||  peerConn.cancelled) {
                     return;
                 }
 
                 logDebug("saw incoming media stream");
 
 
-                if (!peerConns[otherUser].startedAV) {
-                    peerConns[otherUser].startedAV = true;
-                    peerConns[otherUser].sharingAudio = haveAudioVideo.audio;
-                    peerConns[otherUser].sharingVideo = haveAudioVideo.video;
-                    peerConns[otherUser].connectTime = new Date().getTime();
-                    if (peerConns[otherUser].callSuccessCB) {
-                        if (peerConns[otherUser].sharingAudio || peerConns[otherUser].sharingVideo) {
-                            peerConns[otherUser].callSuccessCB(otherUser, "audiovideo");
+                if (!peerConn.startedAV) {
+                    peerConn.startedAV = true;
+                    peerConn.sharingAudio = haveAudioVideo.audio;
+                    peerConn.sharingVideo = haveAudioVideo.video;
+                    peerConn.connectTime = new Date().getTime();
+                    if (peerConn.callSuccessCB) {
+                        if (peerConn.sharingAudio || peerConn.sharingVideo) {
+                            peerConn.callSuccessCB(otherUser, "audiovideo");
                         }
                     }
                     if (self.audioEnabled || self.videoEnabled) {
                         updateConfiguration();
                     }
                 }
-                var remoteName = getNameOfRemoteStream(otherUser, event.stream.id || "default");
+                var remoteName = getNameOfRemoteStream(otherUser, theStream.id || "default");
                 if (!remoteName) {
                     remoteName = "default";
                 }
-                peerConns[otherUser].remoteStreamIdToName[event.stream.id || "default"] = remoteName;
-                peerConns[otherUser].liveRemoteStreams[remoteName] = true;
-                event.stream.streamName = remoteName;
+                peerConn.remoteStreamIdToName[theStream.id || "default"] = remoteName;
+                peerConn.liveRemoteStreams[remoteName] = true;
+                theStream.streamName = remoteName;
                 if (self.streamAcceptor) {
-                    self.streamAcceptor(otherUser, event.stream, remoteName);
+                    self.streamAcceptor(otherUser, theStream, remoteName);
                     //
                     // Inform the other user that the stream they provided has been received.
                     // This should be moved into signalling at some point
                     //
                     self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
                 }
+            };
+
+            pc.ontrack = function(event) {
+
+               console.log("saw track event ",event);
+               if( !peerConns[otherUser] || peerConns[otherUser].cancelled) {
+                  return;
+               }
+
+               peerConn = peerConns[otherUser];
+
+               peerConn.trackTimers = peerConn.trackTimers || {};
+
+               //
+               // easyrtc thinks in terms of streams, not tracks.
+               // so we'll add a timeout when the first track event
+               // fires. Firefox produces two events (one of type "video",
+               // and one of type "audio".
+               //
+               var n = nstreams = event.streams.length;
+               var i;
+               for(i = 0; i < n; i++ ) {
+                  var curStream = event.streams[i];
+                  streamId = curStream.id || "default";
+                  if( peerConn.trackTimers[streamId] ) {
+                     //
+                     // do nothing because it's handled in the
+                     // already set timeout.
+                     //
+                  }
+                  else {
+                     peerConn.trackTimers[streamId] =
+                       setTimeout( function() {
+                           processAddedStream(peerConn, otherUser, curStream);
+                           if( peerConns[otherUser] && peerConn.trackTimers[streamId]) {
+                              delete peerConn.trackTimers[streamId];
+                           }
+                         }, 100);
+                  }
+               }
+            };
+
+
+            pc.onaddstream = function(event) {
+                logDebug("empty onaddStream method invoked, which is expected");
             };
 
             pc.onremovestream = function(event) {
@@ -6123,77 +6179,84 @@ var Easyrtc = function() {
                 // as it's own form of priming message. Comparing the data against "" doesn't
                 // work, so I'm going with parsing and trapping the parse error.
                 //
+                var msg;
+
                 try {
-                    var msg = JSON.parse(event.data);
-                    if (msg) {
-                        if (msg.transfer && msg.transferId) {
-                            if (msg.transfer === 'start') {
-                                logDebug('start transfer #' + msg.transferId);
+                    msg = JSON.parse(event.data);
+                } catch (err) {
+                    logDebug('Developer error, unable to parse event.data');
+                }
 
-                                var parts = parseInt(msg.parts);
-                                pendingTransfer = {
-                                    chunks: [],
-                                    parts: parts,
-                                    transferId: msg.transferId
-                                };
+                if (msg) {
+                    if (msg.transfer && msg.transferId) {
+                        if (msg.transfer === 'start') {
+                            logDebug('start transfer #' + msg.transferId);
 
-                            } else if (msg.transfer === 'chunk') {
-                                logDebug('got chunk for transfer #' + msg.transferId);
+                            var parts = parseInt(msg.parts);
+                            pendingTransfer = {
+                                chunks: [],
+                                parts: parts,
+                                transferId: msg.transferId
+                            };
 
-                                // check data is valid
-                                if (!(typeof msg.data === 'string' && msg.data.length <= self.maxP2PMessageLength)) {
-                                    logDebug('Developer error, invalid data');
+                        } else if (msg.transfer === 'chunk') {
+                            logDebug('got chunk for transfer #' + msg.transferId);
 
-                                    // check there's a pending transfer
-                                } else if (!pendingTransfer) {
-                                    logDebug('Developer error, unexpected chunk');
-
-                                // check that transferId is valid
-                                } else if (msg.transferId !== pendingTransfer.transferId) {
-                                    logDebug('Developer error, invalid transfer id');
-
-                                // check that the max length of transfer is not reached
-                                } else if (pendingTransfer.chunks.length + 1 > pendingTransfer.parts) {
-                                    logDebug('Developer error, received too many chunks');
-
-                                } else {
-                                    pendingTransfer.chunks.push(msg.data);
-                                }
-
-                            } else if (msg.transfer === 'end') {
-                                logDebug('end of transfer #' + msg.transferId);
+                            // check data is valid
+                            if (!(typeof msg.data === 'string' && msg.data.length <= self.maxP2PMessageLength)) {
+                                logDebug('Developer error, invalid data');
 
                                 // check there's a pending transfer
-                                if (!pendingTransfer) {
-                                    logDebug('Developer error, unexpected end of transfer');
+                            } else if (!pendingTransfer) {
+                                logDebug('Developer error, unexpected chunk');
 
-                                // check that transferId is valid
-                                } else if (msg.transferId !== pendingTransfer.transferId) {
-                                    logDebug('Developer error, invalid transfer id');
+                            // check that transferId is valid
+                            } else if (msg.transferId !== pendingTransfer.transferId) {
+                                logDebug('Developer error, invalid transfer id');
 
-                                // check that all the chunks were received
-                                } else if (pendingTransfer.chunks.length !== pendingTransfer.parts) {
-                                    logDebug('Developer error, received wrong number of chunks');
-
-                                } else {
-                                    try {
-                                        var chunkedMsg = JSON.parse(pendingTransfer.chunks.join(''));
-                                        self.receivePeerDistribute(otherUser, chunkedMsg, null);
-                                    } catch (err) {
-                                        logDebug('Developer error, unable to parse message');
-                                    }
-                                }
-                                pendingTransfer = {  };
+                            // check that the max length of transfer is not reached
+                            } else if (pendingTransfer.chunks.length + 1 > pendingTransfer.parts) {
+                                logDebug('Developer error, received too many chunks');
 
                             } else {
-                                logDebug('Developer error, got an unknown transfer message' + msg.transfer);
+                                pendingTransfer.chunks.push(msg.data);
                             }
+
+                        } else if (msg.transfer === 'end') {
+                            logDebug('end of transfer #' + msg.transferId);
+
+                            // check there's a pending transfer
+                            if (!pendingTransfer) {
+                                logDebug('Developer error, unexpected end of transfer');
+
+                            // check that transferId is valid
+                            } else if (msg.transferId !== pendingTransfer.transferId) {
+                                logDebug('Developer error, invalid transfer id');
+
+                            // check that all the chunks were received
+                            } else if (pendingTransfer.chunks.length !== pendingTransfer.parts) {
+                                logDebug('Developer error, received wrong number of chunks');
+
+                            } else {
+                                var chunkedMsg;
+                                try {
+                                    chunkedMsg = JSON.parse(pendingTransfer.chunks.join(''));
+                                } catch (err) {
+                                    logDebug('Developer error, unable to parse message');
+                                }
+
+                                if (chunkedMsg) {
+                                    self.receivePeerDistribute(otherUser, chunkedMsg, null);
+                                }
+                            }
+                            pendingTransfer = {  };
+
                         } else {
-                            self.receivePeerDistribute(otherUser, msg, null);
+                            logDebug('Developer error, got an unknown transfer message' + msg.transfer);
                         }
+                    } else {
+                        self.receivePeerDistribute(otherUser, msg, null);
                     }
-                }
-                catch (err) {
                 }
             }
         }
