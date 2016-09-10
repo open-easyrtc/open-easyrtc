@@ -3589,77 +3589,84 @@ var Easyrtc = function() {
                 // as it's own form of priming message. Comparing the data against "" doesn't
                 // work, so I'm going with parsing and trapping the parse error.
                 //
+                var msg;
+
                 try {
-                    var msg = JSON.parse(event.data);
-                    if (msg) {
-                        if (msg.transfer && msg.transferId) {
-                            if (msg.transfer === 'start') {
-                                logDebug('start transfer #' + msg.transferId);
+                    msg = JSON.parse(event.data);
+                } catch (err) {
+                    logDebug('Developer error, unable to parse event data');
+                }
 
-                                var parts = parseInt(msg.parts);
-                                pendingTransfer = {
-                                    chunks: [],
-                                    parts: parts,
-                                    transferId: msg.transferId
-                                };
+                if (msg) {
+                    if (msg.transfer && msg.transferId) {
+                        if (msg.transfer === 'start') {
+                            logDebug('start transfer #' + msg.transferId);
 
-                            } else if (msg.transfer === 'chunk') {
-                                logDebug('got chunk for transfer #' + msg.transferId);
+                            var parts = parseInt(msg.parts);
+                            pendingTransfer = {
+                                chunks: [],
+                                parts: parts,
+                                transferId: msg.transferId
+                            };
 
-                                // check data is valid
-                                if (!(typeof msg.data === 'string' && msg.data.length <= self.maxP2PMessageLength)) {
-                                    logDebug('Developer error, invalid data');
+                        } else if (msg.transfer === 'chunk') {
+                            logDebug('got chunk for transfer #' + msg.transferId);
 
-                                    // check there's a pending transfer
-                                } else if (!pendingTransfer) {
-                                    logDebug('Developer error, unexpected chunk');
-
-                                // check that transferId is valid
-                                } else if (msg.transferId !== pendingTransfer.transferId) {
-                                    logDebug('Developer error, invalid transfer id');
-
-                                // check that the max length of transfer is not reached
-                                } else if (pendingTransfer.chunks.length + 1 > pendingTransfer.parts) {
-                                    logDebug('Developer error, received too many chunks');
-
-                                } else {
-                                    pendingTransfer.chunks.push(msg.data);
-                                }
-
-                            } else if (msg.transfer === 'end') {
-                                logDebug('end of transfer #' + msg.transferId);
+                            // check data is valid
+                            if (!(typeof msg.data === 'string' && msg.data.length <= self.maxP2PMessageLength)) {
+                                logDebug('Developer error, invalid data');
 
                                 // check there's a pending transfer
-                                if (!pendingTransfer) {
-                                    logDebug('Developer error, unexpected end of transfer');
+                            } else if (!pendingTransfer) {
+                                logDebug('Developer error, unexpected chunk');
 
-                                // check that transferId is valid
-                                } else if (msg.transferId !== pendingTransfer.transferId) {
-                                    logDebug('Developer error, invalid transfer id');
+                            // check that transferId is valid
+                            } else if (msg.transferId !== pendingTransfer.transferId) {
+                                logDebug('Developer error, invalid transfer id');
 
-                                // check that all the chunks were received
-                                } else if (pendingTransfer.chunks.length !== pendingTransfer.parts) {
-                                    logDebug('Developer error, received wrong number of chunks');
-
-                                } else {
-                                    try {
-                                        var chunkedMsg = JSON.parse(pendingTransfer.chunks.join(''));
-                                        self.receivePeerDistribute(otherUser, chunkedMsg, null);
-                                    } catch (err) {
-                                        logDebug('Developer error, unable to parse message');
-                                    }
-                                }
-                                pendingTransfer = {  };
+                            // check that the max length of transfer is not reached
+                            } else if (pendingTransfer.chunks.length + 1 > pendingTransfer.parts) {
+                                logDebug('Developer error, received too many chunks');
 
                             } else {
-                                logDebug('Developer error, got an unknown transfer message' + msg.transfer);
+                                pendingTransfer.chunks.push(msg.data);
                             }
+
+                        } else if (msg.transfer === 'end') {
+                            logDebug('end of transfer #' + msg.transferId);
+
+                            // check there's a pending transfer
+                            if (!pendingTransfer) {
+                                logDebug('Developer error, unexpected end of transfer');
+
+                            // check that transferId is valid
+                            } else if (msg.transferId !== pendingTransfer.transferId) {
+                                logDebug('Developer error, invalid transfer id');
+
+                            // check that all the chunks were received
+                            } else if (pendingTransfer.chunks.length !== pendingTransfer.parts) {
+                                logDebug('Developer error, received wrong number of chunks');
+
+                            } else {
+                                var chunkedMsg;
+                                try {
+                                    chunkedMsg = JSON.parse(pendingTransfer.chunks.join(''));
+                                } catch (err) {
+                                    logDebug('Developer error, unable to parse message');
+                                }
+
+                                if (chunkedMsg) {
+                                    self.receivePeerDistribute(otherUser, chunkedMsg, null);
+                                }
+                            }
+                            pendingTransfer = {  };
+
                         } else {
-                            self.receivePeerDistribute(otherUser, msg, null);
+                            logDebug('Developer error, got an unknown transfer message' + msg.transfer);
                         }
+                    } else {
+                        self.receivePeerDistribute(otherUser, msg, null);
                     }
-                }
-                catch (err) {
                 }
             }
         }
