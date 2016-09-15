@@ -480,8 +480,6 @@ var Easyrtc = function() {
                   'device: ' + error;
             }
             logDebug(errorMessage);
-            // Jump back to first output device in the list as it's the default.
-            outputSelector.selectedIndex = 0;
           });
        } else {
           logDebug('Browser does not support output device selection.');
