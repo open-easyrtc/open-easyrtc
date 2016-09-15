@@ -459,7 +459,51 @@ var Easyrtc = function() {
     }
 
     /**
-     * Gets a list of the available audio sources (ie, cameras)
+     * Sets the audio output device of a Video object. 
+     * That is to say, this controls what speakers get the sound.
+     * In theory, this works on Chrome but probably doesn't work anywhere else yet.
+     * This code was cribbed from https://webrtc.github.io/samples/src/content/devices/multi/.
+     *  @param {Object} element an HTML5 video element
+     *  @param {String} sinkId a deviceid from getAudioSinkList
+     */
+    this.setAudioOutput = function(element, sinkId) {
+       if (typeof element.sinkId !== 'undefined') {
+          element.setSinkId(sinkId)
+          .then(function() {
+            logDebug('Success, audio output device attached: ' + sinkId + ' to ' +
+                'element with ' + element.title + ' as source.');
+          })
+          .catch(function(error) {
+            var errorMessage = error;
+            if (error.name === 'SecurityError') {
+              errorMessage = 'You need to use HTTPS for selecting audio output ' +
+                  'device: ' + error;
+            }
+            logDebug(errorMessage);
+            // Jump back to first output device in the list as it's the default.
+            outputSelector.selectedIndex = 0;
+          });
+       } else {
+          logDebug('Browser does not support output device selection.');
+       }
+    } 
+
+
+    /**
+     * Gets a list of the available audio sinks (ie, speakers)
+     * @param {Function} callback receives list of {deviceId:String, groupId:String, label:String, kind:"audio"}
+     * @example  easyrtc.getAudioSinkList( function(list) {
+     *               var i;
+     *               for( i = 0; i < list.length; i++ ) {
+     *                   console.log("label=" + list[i].label + ", id= " + list[i].deviceId);
+     *               }
+     *          });
+     */
+    this.getAudioSinkList = function(callback){
+       getSourceList(callback, "audiooutput");
+    };
+    /**
+     * Gets a list of the available audio sources (ie, microphones)
      * @param {Function} callback receives list of {deviceId:String, groupId:String, label:String, kind:"audio"}
      * @example  easyrtc.getAudioSourceList( function(list) {
      *               var i;
