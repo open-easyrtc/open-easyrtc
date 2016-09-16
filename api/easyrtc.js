@@ -3163,8 +3163,6 @@ var Easyrtc = function() {
                   'device: ' + error;
             }
             logDebug(errorMessage);
-            // Jump back to first output device in the list as it's the default.
-            outputSelector.selectedIndex = 0;
           });
        } else {
           logDebug('Browser does not support output device selection.');
@@ -3381,31 +3379,43 @@ var Easyrtc = function() {
                     constraints.video.height = self._desiredVideoProperties.height;
                 }
                 if (self._desiredVideoProperties.frameRate) {
-                    constraints.video.frameRate = { max: self._desiredVideoProperties.frameRate};
+                    constraints.video.frameRate = { 
+                         ideal: self._desiredVideoProperties.frameRate,
+                         max: self._desiredVideoProperties.frameRate
+                       };
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
                     constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
                 }
             }
             else { // chrome and opera
-                constraints.video = {mandatory: {}, optional: []};
+                constraints.video = {};
                 if (self._desiredVideoProperties.width) {
-                    constraints.video.mandatory.maxWidth = self._desiredVideoProperties.width;
-                    constraints.video.mandatory.minWidth = self._desiredVideoProperties.width;
+                     constraints.video.width = { 
+                        max: self._desiredVideoProperties.width,
+                        min : self._desiredVideoProperties.width,
+                        ideal : self._desiredVideoProperties.width 
+                     };
                 }
                 if (self._desiredVideoProperties.height) {
-                    constraints.video.mandatory.maxHeight = self._desiredVideoProperties.height;
-                    constraints.video.mandatory.minHeight = self._desiredVideoProperties.height;
+                    constraints.video.height = {
+                        max: self._desiredVideoProperties.height,
+                        min: self._desiredVideoProperties.height,
+                        ideal: self._desiredVideoProperties.height
+                    };
                 }
                 if (self._desiredVideoProperties.frameRate) {
-                    constraints.video.mandatory.maxFrameRate = self._desiredVideoProperties.frameRate;
+                    constraints.video.frameRate = {
+                        max: self._desiredVideoProperties.frameRate,
+                        ideal: self._desiredVideoProperties.frameRate
+                    };
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
                     constraints.video.optional = constraints.video.optional || [];
                     constraints.video.optional.push({sourceId: self._desiredVideoProperties.videoSrcId});
                 }
                 // hack for opera
-                if (constraints.video.mandatory.length === 0 && constraints.video.optional.length === 0) {
+                if (Object.keys(constraints.video).length === 0 ) {
                     constraints.video = true;
                 }
             }
@@ -6225,48 +6235,87 @@ var Easyrtc = function() {
                 }
             };
 
-            pc.ontrack = function(event) {
-               console.log("saw track event");
-            }
-
-            pc.onaddstream = function(event) {
-
-                if (peerConns[otherUser] && peerConns[otherUser].cancelled) {
+            function processAddedStream(peerConn, otherUser, theStream) {
+                if (!peerConns[otherUser] ||  peerConn.cancelled) {
                     return;
                 }
 
                 logDebug("saw incoming media stream");
 
 
-                if (!peerConns[otherUser].startedAV) {
-                    peerConns[otherUser].startedAV = true;
-                    peerConns[otherUser].sharingAudio = haveAudioVideo.audio;
-                    peerConns[otherUser].sharingVideo = haveAudioVideo.video;
-                    peerConns[otherUser].connectTime = new Date().getTime();
-                    if (peerConns[otherUser].callSuccessCB) {
-                        if (peerConns[otherUser].sharingAudio || peerConns[otherUser].sharingVideo) {
-                            peerConns[otherUser].callSuccessCB(otherUser, "audiovideo");
+                if (!peerConn.startedAV) {
+                    peerConn.startedAV = true;
+                    peerConn.sharingAudio = haveAudioVideo.audio;
+                    peerConn.sharingVideo = haveAudioVideo.video;
+                    peerConn.connectTime = new Date().getTime();
+                    if (peerConn.callSuccessCB) {
+                        if (peerConn.sharingAudio || peerConn.sharingVideo) {
+                            peerConn.callSuccessCB(otherUser, "audiovideo");
                         }
                     }
                     if (self.audioEnabled || self.videoEnabled) {
                         updateConfiguration();
                     }
                 }
-                var remoteName = getNameOfRemoteStream(otherUser, event.stream.id || "default");
+                var remoteName = getNameOfRemoteStream(otherUser, theStream.id || "default");
                 if (!remoteName) {
                     remoteName = "default";
                 }
-                peerConns[otherUser].remoteStreamIdToName[event.stream.id || "default"] = remoteName;
-                peerConns[otherUser].liveRemoteStreams[remoteName] = true;
-                event.stream.streamName = remoteName;
+                peerConn.remoteStreamIdToName[theStream.id || "default"] = remoteName;
+                peerConn.liveRemoteStreams[remoteName] = true;
+                theStream.streamName = remoteName;
                 if (self.streamAcceptor) {
-                    self.streamAcceptor(otherUser, event.stream, remoteName);
+                    self.streamAcceptor(otherUser, theStream, remoteName);
                     //
                     // Inform the other user that the stream they provided has been received.
                     // This should be moved into signalling at some point
                     //
                     self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
                 }
+            };
+
+            pc.ontrack = function(event) {
+
+               if( !peerConns[otherUser] || peerConns[otherUser].cancelled) {
+                  return;
+               }
+
+               peerConn = peerConns[otherUser];
+
+               peerConn.trackTimers = peerConn.trackTimers || {};
+
+               //
+               // easyrtc thinks in terms of streams, not tracks.
+               // so we'll add a timeout when the first track event
+               // fires. Firefox produces two events (one of type "video",
+               // and one of type "audio".
+               //
+               var n = nstreams = event.streams.length;
+               var i;
+               for(i = 0; i < n; i++ ) {
+                  var curStream = event.streams[i];
+                  streamId = curStream.id || "default";
+                  if( peerConn.trackTimers[streamId] ) {
+                     //
+                     // do nothing because it's handled in the
+                     // already set timeout.
+                     //
+                  }
+                  else {
+                     peerConn.trackTimers[streamId] =
+                       setTimeout( function() {
+                           processAddedStream(peerConn, otherUser, curStream);
+                           if( peerConns[otherUser] && peerConn.trackTimers[streamId]) {
+                              delete peerConn.trackTimers[streamId];
+                           }
+                         }, 100);
+                  }
+               }
+            };
+
+
+            pc.onaddstream = function(event) {
+                logDebug("empty onaddStream method invoked, which is expected");
             };
 
             pc.onremovestream = function(event) {
