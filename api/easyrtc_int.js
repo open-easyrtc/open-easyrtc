@@ -835,7 +835,7 @@ var Easyrtc = function() {
                 peer.close();
             }
             catch (err) {
-                // Ingore possible RTCPeerConnection.close error
+                // Ignore possible RTCPeerConnection.close error
                 // hasCreateDataChannel should reflect the feature state still.
             }
         }
