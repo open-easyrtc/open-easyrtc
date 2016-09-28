@@ -120,7 +120,7 @@
            return null;
         }
 
-        let mediaRecorder = new MediaRecorder(localStream, {mimeType: mimeType});
+        var mediaRecorder = new MediaRecorder(localStream, {mimeType: mimeType});
         if( !mediaRecorder ) {
            console.log("no media recorder");
            return;
@@ -194,7 +194,7 @@
           chunks.push(chunk);
        }
 
-       let mediaRecorder = easyrtc.recordToCallback(mediaStream,
+       var mediaRecorder = easyrtc.recordToCallback(mediaStream,
               dataConsumer);
 
        if( !mediaRecorder) {
@@ -230,7 +230,7 @@
        }
 
        downloadLink.innerHTML = "";
-       let mediaRecorder = easyrtc.recordToBlob(mediaStream, blobCallback);
+       var mediaRecorder = easyrtc.recordToBlob(mediaStream, blobCallback);
        return mediaRecorder;
    };
 
