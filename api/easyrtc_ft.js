@@ -466,7 +466,6 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener, options) {
 
     easyrtc.addEventListener("roomOccupant", roomOccupantListener);
 
-
     function sendOffer(offer) {
 
         curSeq = offer.seq;

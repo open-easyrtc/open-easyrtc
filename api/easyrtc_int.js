@@ -484,8 +484,7 @@ var Easyrtc = function() {
        } else {
           logDebug('Browser does not support output device selection.');
        }
-    } 
-
+    };
 
     /**
      * Gets a list of the available audio sinks (ie, speakers)
@@ -3350,6 +3349,44 @@ var Easyrtc = function() {
         self._candicates.push(parseCandidate(candicate));
     }
 
+    function processAddedStream(peerConn, otherUser, theStream) {
+        if (!peerConns[otherUser] ||  peerConn.cancelled) {
+            return;
+        }
+
+        logDebug("saw incoming media stream");
+
+        if (!peerConn.startedAV) {
+            peerConn.startedAV = true;
+            peerConn.sharingAudio = haveAudioVideo.audio;
+            peerConn.sharingVideo = haveAudioVideo.video;
+            peerConn.connectTime = new Date().getTime();
+            if (peerConn.callSuccessCB) {
+                if (peerConn.sharingAudio || peerConn.sharingVideo) {
+                    peerConn.callSuccessCB(otherUser, "audiovideo");
+                }
+            }
+            if (self.audioEnabled || self.videoEnabled) {
+                updateConfiguration();
+            }
+        }
+        var remoteName = getNameOfRemoteStream(otherUser, theStream.id || "default");
+        if (!remoteName) {
+            remoteName = "default";
+        }
+        peerConn.remoteStreamIdToName[theStream.id || "default"] = remoteName;
+        peerConn.liveRemoteStreams[remoteName] = true;
+        theStream.streamName = remoteName;
+        if (self.streamAcceptor) {
+            self.streamAcceptor(otherUser, theStream, remoteName);
+            //
+            // Inform the other user that the stream they provided has been received.
+            // This should be moved into signalling at some point
+            //
+            self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
+        }
+    }
+
     /** @private */
     // TODO split buildPeerConnection it more thant 500 lines
     function buildPeerConnection(otherUser, isInitiator, failureCB, streamNames) {
@@ -3552,84 +3589,37 @@ var Easyrtc = function() {
                 }
             };
 
-            function processAddedStream(peerConn, otherUser, theStream) {
-                if (!peerConns[otherUser] ||  peerConn.cancelled) {
+            pc.ontrack = function(event) {
+
+                if (!peerConns[otherUser] || peerConns[otherUser].cancelled) {
                     return;
                 }
 
-                logDebug("saw incoming media stream");
+                var peerConn = peerConns[otherUser];
+                peerConn.trackTimers = peerConn.trackTimers || {};
 
+                //
+                // easyrtc thinks in terms of streams, not tracks.
+                // so we'll add a timeout when the first track event
+                // fires. Firefox produces two events (one of type "video",
+                // and one of type "audio".
+                //
+                var i, curStream, streamId,
+                l = event.streams.length;
 
-                if (!peerConn.startedAV) {
-                    peerConn.startedAV = true;
-                    peerConn.sharingAudio = haveAudioVideo.audio;
-                    peerConn.sharingVideo = haveAudioVideo.video;
-                    peerConn.connectTime = new Date().getTime();
-                    if (peerConn.callSuccessCB) {
-                        if (peerConn.sharingAudio || peerConn.sharingVideo) {
-                            peerConn.callSuccessCB(otherUser, "audiovideo");
-                        }
-                    }
-                    if (self.audioEnabled || self.videoEnabled) {
-                        updateConfiguration();
-                    }
-                }
-                var remoteName = getNameOfRemoteStream(otherUser, theStream.id || "default");
-                if (!remoteName) {
-                    remoteName = "default";
-                }
-                peerConn.remoteStreamIdToName[theStream.id || "default"] = remoteName;
-                peerConn.liveRemoteStreams[remoteName] = true;
-                theStream.streamName = remoteName;
-                if (self.streamAcceptor) {
-                    self.streamAcceptor(otherUser, theStream, remoteName);
-                    //
-                    // Inform the other user that the stream they provided has been received.
-                    // This should be moved into signalling at some point
-                    //
-                    self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
-                }
-            };
-
-            pc.ontrack = function(event) {
-
-               if( !peerConns[otherUser] || peerConns[otherUser].cancelled) {
-                  return;
-               }
-
-               peerConn = peerConns[otherUser];
-
-               peerConn.trackTimers = peerConn.trackTimers || {};
-
-               //
-               // easyrtc thinks in terms of streams, not tracks.
-               // so we'll add a timeout when the first track event
-               // fires. Firefox produces two events (one of type "video",
-               // and one of type "audio".
-               //
-               var n = nstreams = event.streams.length;
-               var i;
-               for(i = 0; i < n; i++ ) {
-                  var curStream = event.streams[i];
-                  streamId = curStream.id || "default";
-                  if( peerConn.trackTimers[streamId] ) {
-                     //
-                     // do nothing because it's handled in the
-                     // already set timeout.
-                     //
-                  }
-                  else {
-                     peerConn.trackTimers[streamId] =
-                       setTimeout( function() {
+                for (i = 0; i < l; i++) {
+                    curStream = event.streams[i];
+                    streamId = curStream.id || "default";
+                    if (!peerConn.trackTimers[streamId]) {
+                        peerConn.trackTimers[streamId] = setTimeout(function() {
                            processAddedStream(peerConn, otherUser, curStream);
-                           if( peerConns[otherUser] && peerConn.trackTimers[streamId]) {
+                           if (peerConns[otherUser] && peerConn.trackTimers[streamId]) {
                               delete peerConn.trackTimers[streamId];
                            }
-                         }, 100);
-                  }
-               }
+                        }, 100);
+                    }
+                }
             };
-
 
             pc.onaddstream = function(event) {
                 logDebug("empty onaddStream method invoked, which is expected");
