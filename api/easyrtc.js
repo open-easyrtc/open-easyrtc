@@ -3379,9 +3379,9 @@ var Easyrtc = function() {
                 }
                 if (self._desiredVideoProperties.frameRate) {
                     constraints.video.frameRate = { 
-                         ideal: self._desiredVideoProperties.frameRate,
-                         max: self._desiredVideoProperties.frameRate
-                       };
+                        minFrameRate: self._desiredVideoProperties.frameRate,
+                        maxFrameRate: self._desiredVideoProperties.frameRate
+                    };
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
                     constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
