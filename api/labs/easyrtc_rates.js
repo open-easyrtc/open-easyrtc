@@ -31,6 +31,14 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
+    /**
+     * Provides methods for building SDP filters. SDP filters can be used
+     * to control bit rates.
+     * @class Easyrtc_Rates
+     * @augments Easyrtc
+     */
+
+
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         //RequireJS (AMD) build system
