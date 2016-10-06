@@ -66,6 +66,8 @@
         var videoSendInitialBitrate = options.videoSendInitialBitrate;
         var audioSendCodec = options.audioSendCodec || '';
         var audioRecvCodec = options.audioRecvCodec || '';
+        var videoSendCodec = options.videoSendCodec || '';
+        var videoRecvCodec = options.videoRecvCodec || '';
         var stereo = options.stereo;
         function trace(arg) {
             console.log("trace:" + arg);
@@ -192,13 +194,22 @@
             return sdpLines.join('\r\n');
         }
 
-        function preferAudioCodec(sdp, codec) {
+        function preferCodec(sdp, codec, codecType){
             var sdpLines = sdp.split('\r\n');
-            var mLineIndex = findLine(sdpLines, 'm=', 'audio');
+            var mLineIndex = findLine(sdpLines, 'm=', codecType);
             if (mLineIndex === null) {
                 return sdp;
             }
-            var codecIndex = findLine(sdpLines, 'a=rtpmap', codec);
+            //
+            // there are two m= lines in the sdp, one for audio, one for video.
+            // the audio one comes first. when we search for codecs for audio, we
+            // want stop before we enter the section for video, hence we'll hunt 
+            // for that subsequent m= line before we look for codecs. Otherwise,
+            // you could ask for a audio codec of VP9.
+            //
+            var mBottom = findLineInRange(sdpLines, mLineIndex+1, -1, "m=") || -1;
+
+            var codecIndex = findLineInRange(sdpLines, mLineIndex, mBottom, 'a=rtpmap', codec);
             if (codecIndex) {
                 var payload = getCodecPayloadType(sdpLines[codecIndex]);
                 if (payload) {
@@ -207,7 +218,25 @@
             }
             sdp = sdpLines.join('\r\n');
             return sdp;
+        } 
+
+        function maybePreferVideoSendCodec(sdp) {
+            if (videoSendCodec === '') {
+                trace('No preference on video send codec.');
+                return sdp;
+            }
+            trace('Prefer video send codec: ' + videoSendCodec);
+            return preferCodec(sdp, videoSendCodec, 'video');
         }
+
+        function maybePreferVideoReceiveCodec(sdp) {
+            if (videoRecvCodec === '') {
+                trace('No preference on video receive codec.');
+                return sdp;
+            }
+            trace('Prefer video receive codec: ' + videoRecvCodec);
+            return preferCodec(sdp, videoRecvCodec,'video');
+        } 
 
         function maybePreferAudioSendCodec(sdp) {
             if (audioSendCodec === '') {
@@ -215,7 +244,7 @@
                 return sdp;
             }
             trace('Prefer audio send codec: ' + audioSendCodec);
-            return preferAudioCodec(sdp, audioSendCodec);
+            return preferCodec(sdp, audioSendCodec, 'audio');
         }
 
         function maybePreferAudioReceiveCodec(sdp) {
@@ -224,7 +253,7 @@
                 return sdp;
             }
             trace('Prefer audio receive codec: ' + audioRecvCodec);
-            return preferAudioCodec(sdp, audioRecvCodec);
+            return preferCodec(sdp, audioRecvCodec, 'audio');
         } 
 
         function addStereo(sdp) {
@@ -248,6 +277,7 @@
                 console.log("modifying local sdp");
                 var sdp;
                 sdp = maybePreferAudioReceiveCodec(insdp);
+                sdp = maybePreferVideoReceiveCodec(insdp);
                 sdp = maybeSetAudioReceiveBitRate(sdp);
                 sdp = maybeSetVideoReceiveBitRate(sdp);
                 //if( sdp != insdp ) {
@@ -260,6 +290,7 @@
             return function(insdp) {
                 console.log("modifying remote sdp");
                 var sdp = maybePreferAudioSendCodec(insdp);
+                var sdp = maybePreferVideoSendCodec(insdp);
                 sdp = maybeSetAudioSendBitRate(sdp);
                 sdp = maybeSetVideoSendBitRate(sdp);
                 sdp = maybeSetVideoSendInitialBitRate(sdp);
@@ -276,7 +307,7 @@
 
     /**
      *  This function returns an sdp filter function.
-     * @param options A map that optionally includes values for the following keys: audioRecvCodec, audioRecvBitrate, videoRecvBitrate
+     * @param options A map that optionally includes values for the following keys: audioRecvCodec, audioRecvBitrate, videoRecvBitrate, videoRecvCodec
      * @returns {Function} which takes an SDP string and returns a modified SDP string.
      */
     easyrtc.buildLocalSdpFilter = function (options) {
@@ -285,7 +316,8 @@
 
     /**
      *  This function returns an sdp filter function.
-     * @param options A map that optionally includes values for the following keys: stereo, audioSendCodec, audioSendBitrate, videoSendBitrate, videoSendInitialBitRate
+     * @param options A map that optionally includes values for the following keys: stereo,           audioSendCodec, audioSendBitrate, videoSendBitrate, videoSendInitialBitRate,
+          videoRecvCodec
      * @returns {Function} which takes an SDP string and returns a modified SDP string.
      */
     easyrtc.buildRemoteSdpFilter = function(options) {
