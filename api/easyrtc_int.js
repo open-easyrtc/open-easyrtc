@@ -484,8 +484,7 @@ var Easyrtc = function() {
        } else {
           logDebug('Browser does not support output device selection.');
        }
-    } 
-
+    };
 
     /**
      * Gets a list of the available audio sinks (ie, speakers)
@@ -697,9 +696,9 @@ var Easyrtc = function() {
                 }
                 if (self._desiredVideoProperties.frameRate) {
                     constraints.video.frameRate = { 
-                         ideal: self._desiredVideoProperties.frameRate,
-                         max: self._desiredVideoProperties.frameRate
-                       };
+                        minFrameRate: self._desiredVideoProperties.frameRate,
+                        maxFrameRate: self._desiredVideoProperties.frameRate
+                    };
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
                     constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
@@ -2607,7 +2606,63 @@ var Easyrtc = function() {
     };
 
     /** @private */
-    var closedChannel = null;
+    function getRemoteStreamByName(peerConn, otherUser, streamName) {
+                    
+        var keyToMatch = null;
+        var remoteStreams = peerConn.pc.getRemoteStreams();
+
+        // No streamName lead to default 
+        if (!streamName) {
+            streamName = "default";
+        }
+
+        // default lead to first if available
+        if (streamName === "default") {
+            if (remoteStreams.length > 0) {
+                return remoteStreams[0];
+            }
+            else {
+                return null;
+            }
+        }
+
+        // Get mediaIds from user roomData
+        for (var roomName in self.roomData) {
+            if (self.roomData.hasOwnProperty(roomName)) {
+                var mediaIds = self.getRoomApiField(roomName, otherUser, "mediaIds");
+                keyToMatch = mediaIds ? mediaIds[streamName] : null;
+                if (keyToMatch) {
+                    break;
+                }
+            }
+        }
+
+        // 
+        if (!keyToMatch) {
+            self.showError(self.errCodes.DEVELOPER_ERR, "remote peer does not have media stream called " + streamName);
+        }
+
+        // 
+        for (var i = 0; i < remoteStreams.length; i++) {
+            var remoteId;
+            if (remoteStreams[i].id) {
+                remoteId = remoteStreams[i].id;
+            }  else {
+                remoteId = "default";
+            }
+
+            if (
+                !keyToMatch || // No match
+                    remoteId === keyToMatch || // Full match
+                        remoteId.indexOf(keyToMatch) === 0 // Partial match
+            ) {
+                return remoteStreams[i];
+            }
+
+        }
+
+        return null;
+    }
 
     /**
      * @private
@@ -2626,7 +2681,7 @@ var Easyrtc = function() {
                 self.showError(self.errCodes.DEVELOPER_ERR, "haveTracks called about a peer you don't have a connection to");
                 return false;
             }
-            stream = peerConnObj.getRemoteStreamByName(streamName);
+            stream = getRemoteStreamByName(peerConns[easyrtcid], easyrtcid, streamName);
         }
         if (!stream) {
             return false;
@@ -2688,6 +2743,9 @@ var Easyrtc = function() {
 
     /** @private */
     var preallocatedSocketIo = null;
+
+    /** @private */
+    var closedChannel = null;
 
     //
     // easyrtc.disconnect performs a clean disconnection of the client from the server.
@@ -3350,6 +3408,44 @@ var Easyrtc = function() {
         self._candicates.push(parseCandidate(candicate));
     }
 
+    function processAddedStream(peerConn, otherUser, theStream) {
+        if (!peerConns[otherUser] ||  peerConn.cancelled) {
+            return;
+        }
+
+        logDebug("saw incoming media stream");
+
+        if (!peerConn.startedAV) {
+            peerConn.startedAV = true;
+            peerConn.sharingAudio = haveAudioVideo.audio;
+            peerConn.sharingVideo = haveAudioVideo.video;
+            peerConn.connectTime = new Date().getTime();
+            if (peerConn.callSuccessCB) {
+                if (peerConn.sharingAudio || peerConn.sharingVideo) {
+                    peerConn.callSuccessCB(otherUser, "audiovideo");
+                }
+            }
+            if (self.audioEnabled || self.videoEnabled) {
+                updateConfiguration();
+            }
+        }
+        var remoteName = getNameOfRemoteStream(otherUser, theStream.id || "default");
+        if (!remoteName) {
+            remoteName = "default";
+        }
+        peerConn.remoteStreamIdToName[theStream.id || "default"] = remoteName;
+        peerConn.liveRemoteStreams[remoteName] = true;
+        theStream.streamName = remoteName;
+        if (self.streamAcceptor) {
+            self.streamAcceptor(otherUser, theStream, remoteName);
+            //
+            // Inform the other user that the stream they provided has been received.
+            // This should be moved into signalling at some point
+            //
+            self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
+        }
+    }
+
     /** @private */
     // TODO split buildPeerConnection it more thant 500 lines
     function buildPeerConnection(otherUser, isInitiator, failureCB, streamNames) {
@@ -3464,54 +3560,7 @@ var Easyrtc = function() {
                 isInitiator: isInitiator,
                 remoteStreamIdToName: {},
                 streamsAddedAcks: {},
-                liveRemoteStreams: {},
-                getRemoteStreamByName: function(streamName) {
-                    var remoteStreams = pc.getRemoteStreams();
-                    var i;
-                    var keyToMatch = null;
-                    var roomName;
-                    if (!streamName) {
-                        streamName = "default";
-                    }
-
-                    if (streamName === "default") {
-                        if (remoteStreams.length > 0) {
-                            return remoteStreams[0];
-                        }
-                        else {
-                            return null;
-                        }
-                    }
-                    for (roomName in self.roomData) {
-                        if (self.roomData.hasOwnProperty(roomName)) {
-                            var mediaIds = self.getRoomApiField(roomName, otherUser, "mediaIds");
-                            keyToMatch = mediaIds ? mediaIds[streamName] : null;
-                            if (keyToMatch) {
-                                break;
-                            }
-                        }
-                    }
-                    if (!keyToMatch) {
-                        self.showError(self.errCodes.DEVELOPER_ERR, "remote peer does not have media stream called " + streamName);
-                    }
-
-                    for (i = 0; i < remoteStreams.length; i++) {
-                        var remoteId;
-                        if (remoteStreams[i].id) {
-                            remoteId = remoteStreams[i].id;
-                        }
-                        else {
-                            remoteId = "default";
-                        }
-
-                        if (!keyToMatch || remoteId === keyToMatch) {
-                            return remoteStreams[i];
-                        }
-
-                    }
-                    return null;
-                }
-                //                var remoteStreams = peerConns[i].pc.getRemoteStreams();
+                liveRemoteStreams: {}
             };
 
             pc.onicecandidate = function(event) {
@@ -3552,84 +3601,37 @@ var Easyrtc = function() {
                 }
             };
 
-            function processAddedStream(peerConn, otherUser, theStream) {
-                if (!peerConns[otherUser] ||  peerConn.cancelled) {
+            pc.ontrack = function(event) {
+
+                if (!peerConns[otherUser] || peerConns[otherUser].cancelled) {
                     return;
                 }
 
-                logDebug("saw incoming media stream");
+                var peerConn = peerConns[otherUser];
+                peerConn.trackTimers = peerConn.trackTimers || {};
 
+                //
+                // easyrtc thinks in terms of streams, not tracks.
+                // so we'll add a timeout when the first track event
+                // fires. Firefox produces two events (one of type "video",
+                // and one of type "audio".
+                //
+                var i, curStream, streamId,
+                l = event.streams.length;
 
-                if (!peerConn.startedAV) {
-                    peerConn.startedAV = true;
-                    peerConn.sharingAudio = haveAudioVideo.audio;
-                    peerConn.sharingVideo = haveAudioVideo.video;
-                    peerConn.connectTime = new Date().getTime();
-                    if (peerConn.callSuccessCB) {
-                        if (peerConn.sharingAudio || peerConn.sharingVideo) {
-                            peerConn.callSuccessCB(otherUser, "audiovideo");
-                        }
-                    }
-                    if (self.audioEnabled || self.videoEnabled) {
-                        updateConfiguration();
-                    }
-                }
-                var remoteName = getNameOfRemoteStream(otherUser, theStream.id || "default");
-                if (!remoteName) {
-                    remoteName = "default";
-                }
-                peerConn.remoteStreamIdToName[theStream.id || "default"] = remoteName;
-                peerConn.liveRemoteStreams[remoteName] = true;
-                theStream.streamName = remoteName;
-                if (self.streamAcceptor) {
-                    self.streamAcceptor(otherUser, theStream, remoteName);
-                    //
-                    // Inform the other user that the stream they provided has been received.
-                    // This should be moved into signalling at some point
-                    //
-                    self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
-                }
-            };
-
-            pc.ontrack = function(event) {
-
-               if( !peerConns[otherUser] || peerConns[otherUser].cancelled) {
-                  return;
-               }
-
-               peerConn = peerConns[otherUser];
-
-               peerConn.trackTimers = peerConn.trackTimers || {};
-
-               //
-               // easyrtc thinks in terms of streams, not tracks.
-               // so we'll add a timeout when the first track event
-               // fires. Firefox produces two events (one of type "video",
-               // and one of type "audio".
-               //
-               var n = nstreams = event.streams.length;
-               var i;
-               for(i = 0; i < n; i++ ) {
-                  var curStream = event.streams[i];
-                  streamId = curStream.id || "default";
-                  if( peerConn.trackTimers[streamId] ) {
-                     //
-                     // do nothing because it's handled in the
-                     // already set timeout.
-                     //
-                  }
-                  else {
-                     peerConn.trackTimers[streamId] =
-                       setTimeout( function() {
+                for (i = 0; i < l; i++) {
+                    curStream = event.streams[i];
+                    streamId = curStream.id || "default";
+                    if (!peerConn.trackTimers[streamId]) {
+                        peerConn.trackTimers[streamId] = setTimeout(function() {
                            processAddedStream(peerConn, otherUser, curStream);
-                           if( peerConns[otherUser] && peerConn.trackTimers[streamId]) {
+                           if (peerConns[otherUser] && peerConn.trackTimers[streamId]) {
                               delete peerConn.trackTimers[streamId];
                            }
-                         }, 100);
-                  }
-               }
+                        }, 100);
+                    }
+                }
             };
-
 
             pc.onaddstream = function(event) {
                 logDebug("empty onaddStream method invoked, which is expected");
@@ -4171,48 +4173,69 @@ var Easyrtc = function() {
     }
 
     /** @private */
-    function hangupBody(otherUser) {
-        var i;
-        logDebug("Hanging up on " + otherUser);
+    function closePeer(otherUser) {
 
-        clearQueuedMessages(otherUser);
-        if (peerConns[otherUser]) {
+        if (acceptancePending[otherUser]) {
+            delete acceptancePending[otherUser];
+        }
+        if (offersPending[otherUser]) {
+            delete offersPending[otherUser];
+        }
 
-            if (peerConns[otherUser].pc) {
-
+        if (
+          !peerConns[otherUser].cancelled &&
+              peerConns[otherUser].pc
+        ) {
+            try {
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
-                for (i = 0; i < remoteStreams.length; i++) {
-                    if( isStreamActive(remoteStreams[i])) {
+                for (var i = 0; i < remoteStreams.length; i++) {
+                    if (isStreamActive(remoteStreams[i])) {
                         emitOnStreamClosed(otherUser, remoteStreams[i]);
                         stopStream(remoteStreams[i]);
                     }
                 }
-                //
-                // todo: may need to add a few lines here for closing the data channels
-                //
-                try {
-                    peerConns[otherUser].pc.close();
-                } catch (err) {
-                    logDebug("peer " + otherUser + " close failed:" + err);
-                }
+
+                peerConns[otherUser].pc.close();
+                peerConns[otherUser].cancelled = true;
+                logDebug("peer closed");
+            } catch (err) {
+                logDebug("peer " + otherUser + " close failed:" + err);
+            } finally {
+                self.onPeerClosed(otherUser);
+            }
+        }
+    }
+
+    /** @private */
+    function hangupBody(otherUser) {
+        
+        logDebug("Hanging up on " + otherUser);
+        clearQueuedMessages(otherUser);
+
+        if (peerConns[otherUser]) {
+
+            if (peerConns[otherUser].pc) {
+                closePeer(otherUser);
+            } 
+
+            if (peerConns[otherUser]) {
+                delete peerConns[otherUser];
             }
 
-            peerConns[otherUser].cancelled = true;
-            delete peerConns[otherUser];
-
+            updateConfigurationInfo();
+            
             if (self.webSocket) {
                 sendSignalling(otherUser, "hangup", null, function() {
-
+                    logDebug("hangup succeeds");
                 }, function(errorCode, errorText) {
                     logDebug("hangup failed:" + errorText);
                     self.showError(errorCode, errorText);
                 });
             }
-            if (acceptancePending[otherUser]) {
-                delete acceptancePending[otherUser];
-            }
         }
     }
+
+    
 
     /**
      * Hang up on a particular user or all users.
@@ -4272,7 +4295,7 @@ var Easyrtc = function() {
             throw "Developer err: no such stream";
         }
         else {
-            return peerConns[easyrtcid].getRemoteStreamByName(remoteStreamName);
+            return getRemoteStreamByName(peerConns[easyrtcid], easyrtcid, remoteStreamName);
         }
     };
 
@@ -4288,7 +4311,7 @@ var Easyrtc = function() {
     this.makeLocalStreamFromRemoteStream = function(easyrtcid, remoteStreamName, localStreamName) {
         var remoteStream;
         if (peerConns[easyrtcid].pc) {
-            remoteStream = peerConns[easyrtcid].getRemoteStreamByName(remoteStreamName);
+            remoteStream = getRemoteStreamByName(peerConns[easyrtcid], easyrtcid, remoteStreamName);
             if (remoteStream) {
                 registerLocalMediaStreamByName(remoteStream, localStreamName);
             }
@@ -4422,7 +4445,7 @@ var Easyrtc = function() {
             logDebug("setPeerListener failed: __closingMediaStream Unknow easyrtcid " + easyrtcid);
         }
         else {
-            var stream = peerConns[easyrtcid].getRemoteStreamByName(msgData.streamName);
+            var stream = getRemoteStreamByName(peerConns[easyrtcid], easyrtcid, msgData.streamName);
             if (stream) {
                 onRemoveStreamHelper(easyrtcid, stream);
                 stopStream(stream);
@@ -4455,44 +4478,29 @@ var Easyrtc = function() {
     };
 
     /** @private */
-    function onRemoteHangup(caller) {
-        delete offersPending[caller];
+    function onRemoteHangup(otherUser) {
+
         logDebug("Saw onRemote hangup event");
+        clearQueuedMessages(otherUser);
 
-        if (peerConns[caller]) {
-            peerConns[caller].cancelled = true;
-            if (peerConns[caller].pc) {
-                //
-                // close any remote streams.
-                //
-                var remoteStreams = peerConns[caller].pc.getRemoteStreams();
-                if (remoteStreams) {
-                    var i;
-                    for (i = 0; i < remoteStreams.length; i++) {
-                        emitOnStreamClosed(caller, remoteStreams[i]);
-                        try {
-                            stopStream(remoteStreams[i]);
-                        } catch (err) {
-                        }
-                    }
-                }
+        if (peerConns[otherUser]) {
 
-                try {
-                    peerConns[caller].pc.close();
-                } catch (anyErrors) {
-                }
+            if (peerConns[otherUser].pc) {
+                closePeer(otherUser);
             }
             else {
                 if (self.callCancelled) {
-                    self.callCancelled(caller, true);
+                    self.callCancelled(otherUser, true);
                 }
             }
-            delete peerConns[caller];
-            updateConfigurationInfo();
+
+            if (peerConns[otherUser]) {
+                delete peerConns[otherUser];
+            }
         }
         else {
             if (self.callCancelled) {
-                self.callCancelled(caller, true);
+                self.callCancelled(otherUser, true);
             }
         }
     }

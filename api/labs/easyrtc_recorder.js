@@ -1,8 +1,8 @@
 /* global define, module, require, console */
 /*!
-  Script: easyrtc_rates.js
+  Script: easyrtc_recorder.js
 
-    This code builds sdp filter functions
+    This code demonstrate recording of local and remote streams.
 
   About: License
 
@@ -45,7 +45,7 @@
         if (typeof window.easyrtc !== 'object' || !window.easyrtc) {
             throw new Error("easyrtc_recorder requires easyrtc");
         }
-        root = factory(window.easyrtc);
+        root.easyrtc = factory(window.easyrtc);
   }
 }(this, function (easyrtc, undefined) {
 
@@ -63,7 +63,6 @@
    easyrtc.supportsRecording = function() {
         return (typeof MediaRecorder !== "undefined" && navigator.getUserMedia );
    };
-
 
    /**
     * Check if a particular codec can be used for recording.
@@ -129,7 +128,7 @@
            return null;
         }
 
-        let mediaRecorder = new MediaRecorder(localStream, {mimeType: mimeType});
+        var mediaRecorder = new MediaRecorder(localStream, {mimeType: mimeType});
         if( !mediaRecorder ) {
            console.log("no media recorder");
            return;
@@ -187,7 +186,7 @@
           chunks.push(chunk);
        }
 
-       let mediaRecorder = easyrtc.recordToCallback(mediaStream,
+       var mediaRecorder = easyrtc.recordToCallback(mediaStream,
               dataConsumer);
 
        if( !mediaRecorder) {
@@ -223,7 +222,7 @@
        }
 
        downloadLink.innerHTML = "";
-       let mediaRecorder = easyrtc.recordToBlob(mediaStream, blobCallback);
+       var mediaRecorder = easyrtc.recordToBlob(mediaStream, blobCallback);
        return mediaRecorder;
    };
 
