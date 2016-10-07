@@ -49,9 +49,16 @@
   }
 }(this, function (easyrtc, undefined) {
 
+    /**
+     * Provides methods for building MediaStream recorders.
+     * @class Easyrtc_rates
+     * @augments Easyrtc
+     */
+
+
    /**
-     * Determines if recording is supported by the browser. Returns
-     * true if recording is supported.
+     * Determines if recording is supported by the browser. 
+     * @returns true if recording is supported.
      */
    easyrtc.supportsRecording = function() {
         return (typeof MediaRecorder !== "undefined" && navigator.getUserMedia );
@@ -60,6 +67,8 @@
    /**
     * Check if a particular codec can be used for recording.
     * @param {String} codecName, either "vp8" or "vp9 or "h264"
+    * @param {Object} options object. Currently the only supported field
+    *    is mimeType.
     * @returns true if the type can be used, or if the browser doesn't
     *  support a method to find out.
     */ 
@@ -143,22 +152,6 @@
         }
 
         return mediaRecorder;
-   };
-
-   /** This method creates a media recorder and populates it's ondataavalable
-     * method so that your own callback gets called with the data.
-     * @param mediaStream a local or remote media stream.
-     * @param {Function} dataCallback a function to receive the webm data from.
-     */
-   easyrtc.recordToCallback = function (mediaStream, dataCallback) {
-       var mediaRecorder = startRecording(mediaStream);
-       if( !mediaRecorder) {
-           return null;
-       }
-       mediaRecorder.ondataavailable = function(e) {
-           dataCallback(e.data);
-       }
-       return mediaRecorder;
    };
 
    /** This method creates a media recorder and populates it's ondataavalable
