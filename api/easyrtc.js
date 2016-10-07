@@ -2773,6 +2773,7 @@ var Easyrtc = function() {
     var iceCandidateFilter = null;
     /** @private */
     var iceConnectionStateChangeListener = null;
+    var signalingStateChangeListener = null;
     /** @private */
     var connectionOptions =  {
         'connect timeout': 10000,
@@ -2828,6 +2829,14 @@ var Easyrtc = function() {
     };
 
     /**
+     * Sets a function to warn about the peer connection open.
+     *  @param {Function} handler: a function that gets an easyrtcid as an argument.
+     */
+    this.setPeerOpenListener = function( handler ) {
+       this.onPeerOpen = handler;
+    };
+
+    /**
      * Sets a function to receive warnings about the peer connection
      * failing. The peer connection may recover by itself.
      *  @param {Function} failingHandler: a function that gets an easyrtcid as an argument.
@@ -2859,11 +2868,22 @@ var Easyrtc = function() {
      *
      * During ICE negotiation the peer connection fires the iceconnectionstatechange event.
      * It is sometimes useful for the application to learn about these changes, especially if the ICE connection fails.
-     * The function should accept two parameters: the easyrtc id of the peer and the iceconnectionstatechange event target.
+     * The function should accept three parameters: the easyrtc id of the peer, the iceconnectionstatechange event target and the iceconnectionstate.
      * @param {Function} listener
      */
     this.setIceConnectionStateChangeListener = function(listener) {
        iceConnectionStateChangeListener = listener;
+    };
+
+    /**
+     * Sets a function that listens on SignalingStateChange events.
+     *
+     * During ICE negotiation the peer connection fires the signalingstatechange event.
+     * The function should accept three parameters: the easyrtc id of the peer, the signalingstatechange event target and the signalingstate.
+     * @param {Function} listener
+     */
+    this.setSignalingStateChangeListener = function(listener) {
+       signalingStateChangeListener = listener;
     };
 
     /**
@@ -6184,18 +6204,29 @@ var Easyrtc = function() {
             };
 
             pc.onsignalingstatechange = function () {
+                
+                var eventTarget = event.currentTarget || event.target || pc,
+                    signalingState = eventTarget.signalingState || 'unknown';
 
+                if (signalingStateChangeListener) {
+                   signalingStateChangeListener(otherUser, eventTarget, signalingState);
+                }
             };
 
             pc.oniceconnectionstatechange = function(event) {
 
+                var eventTarget = event.currentTarget || event.target || pc,
+                    connState = eventTarget.iceConnectionState || 'unknown';
+
                 if (iceConnectionStateChangeListener) {
-                   iceConnectionStateChangeListener(otherUser, event.target);
+                   iceConnectionStateChangeListener(otherUser, eventTarget, connState);
                 }
 
-                var connState = event.currentTarget ? event.currentTarget.iceConnectionState : 'unknown';
                 switch (connState) {
                     case "connected":
+                        if (self.onPeerOpen ) {
+                            self.onPeerOpen(otherUser);
+                        }
                         if (peerConns[otherUser] && peerConns[otherUser].callSuccessCB) {
                             peerConns[otherUser].callSuccessCB(otherUser, "connection");
                         }
@@ -6207,7 +6238,7 @@ var Easyrtc = function() {
                         delete peerConns[otherUser];
                         break;
                     case "disconnected":
-                        if(self.onPeerFailing) {
+                        if (self.onPeerFailing) {
                             self.onPeerFailing(otherUser);
                         }
                         if (peerConns[otherUser]) {
@@ -6216,8 +6247,8 @@ var Easyrtc = function() {
                         break;
 
                     case "closed":
-                        if( self.onPeerClosed ) {
-                          self.onPeerClosed(otherUser);
+                        if (self.onPeerClosed ) {
+                            self.onPeerClosed(otherUser);
                         }
                         break;
                     case "completed":
