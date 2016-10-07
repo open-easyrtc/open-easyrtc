@@ -4629,7 +4629,7 @@ var Easyrtc = function() {
          if( !streamToClone ) {
             for(key in peerConns) {
                 if (peerConns.hasOwnProperty(key)) {
-                    var remoteStreams = peerConns[key].pc.getRemoteStreams();
+                    var remoteStreams = peerConns[key].pc.getReceivers();
                     if( remoteStreams && remoteStreams.length > 0 ) {
                         streamToClone = remoteStreams[0];
                     }
@@ -5292,7 +5292,7 @@ var Easyrtc = function() {
     function getRemoteStreamByName(peerConn, otherUser, streamName) {
                     
         var keyToMatch = null;
-        var remoteStreams = peerConn.pc.getRemoteStreams();
+        var remoteStreams = peerConn.pc.getReceivers();
 
         // No streamName lead to default 
         if (!streamName) {
@@ -6316,6 +6316,11 @@ var Easyrtc = function() {
                 }
             };
 
+            // TODO
+            pc.onremovetrack = function () {
+                
+            }
+
             pc.onaddstream = function(event) {
                 logDebug("empty onaddStream method invoked, which is expected");
             };
@@ -6870,7 +6875,7 @@ var Easyrtc = function() {
               peerConns[otherUser].pc
         ) {
             try {
-                var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
+                var remoteStreams = peerConns[otherUser].pc.getSenders();
                 for (var i = 0; i < remoteStreams.length; i++) {
                     if (isStreamActive(remoteStreams[i])) {
                         emitOnStreamClosed(otherUser, remoteStreams[i]);
@@ -7143,7 +7148,7 @@ var Easyrtc = function() {
         for (var peer in peerConns) {
             if (peerConns.hasOwnProperty(peer)) {
                 var pc = peerConns[peer].pc;
-                var remotes = pc.getRemoteStreams();
+                var remotes = pc.getReceivers();
                 var remoteIds = [];
                 for (i = 0; i < remotes.length; i++) {
                     remoteIds.push(remotes[i].id);
