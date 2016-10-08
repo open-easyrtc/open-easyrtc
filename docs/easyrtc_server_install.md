@@ -218,7 +218,7 @@ If You Run Into Problems
 ------------------------
 Please feel free to post on our discussion forum:
 
- - [https://easyrtc.com/forums/](https://easyrtc.com/forums/)
+ - [https://easyrtc.com/forum/](https://easyrtc.com/forum/)
 =======
 EasyRTC Server: Installation
 ============================
@@ -429,4 +429,4 @@ If You Run Into Problems
 First check the easyrtc_webrtc_problems.md pages for a solution. After that,
 please feel free to post on our discussion forum:
 
- - [https://easyrtc.com/forums/](https://easyrtc.com/forums/)
+ - [https://easyrtc.com/forum/](https://easyrtc.com/forum/)

@@ -86,7 +86,7 @@ If You Run Into Problems
 ------------------------
 We have a dicussion forum you can find at:
 
- - [https://easyrtc.com/forums/](https://easyrtc.com/forums/)
+ - [https://easyrtc.com/forum/](https://easyrtc.com/forum/)
 
 Note, if you are having trouble getting the demos to work on your own machine, here is a suite of easy tests for you to try before posting to our discussion forum.
 
