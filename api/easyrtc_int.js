@@ -3248,15 +3248,13 @@ var Easyrtc = function() {
         if (peerConns[easyrtcid]) {
             emitOnStreamClosed(easyrtcid, stream);
             updateConfigurationInfo();
-            if( peerConns[easyrtcid].pc ) {
+            if (peerConns[easyrtcid].pc) {
                  try {
                     peerConns[easyrtcid].pc.removeStream(stream);
                  } catch( err) {}
             }
-
         }
     }
-
 
     /** @private */
     function buildDeltaRecord(added, deleted) {
@@ -3428,12 +3426,12 @@ var Easyrtc = function() {
         self._candicates.push(parseCandidate(candicate));
     }
 
-    function processAddedStream(peerConn, otherUser, theStream) {
-        if (!peerConns[otherUser] ||  peerConn.cancelled) {
+    function processAddedStream(otherUser, theStream) {
+        if (!peerConns[otherUser] ||  peerConns[otherUser].cancelled) {
             return;
         }
 
-        logDebug("saw incoming media stream");
+        var peerConn = peerConns[otherUser];
 
         if (!peerConn.startedAV) {
             peerConn.startedAV = true;
@@ -3449,6 +3447,7 @@ var Easyrtc = function() {
                 updateConfiguration();
             }
         }
+
         var remoteName = getNameOfRemoteStream(otherUser, theStream.id || "default");
         if (!remoteName) {
             remoteName = "default";
@@ -3463,6 +3462,30 @@ var Easyrtc = function() {
             // This should be moved into signalling at some point
             //
             self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
+        }
+    }
+
+    function processAddedTrack(otherUser, peerStreams) {
+
+        if (!peerConns[otherUser] ||  peerConns[otherUser].cancelled) {
+            return;
+        }
+
+        var peerConn = peerConns[otherUser];
+        peerConn.trackTimers = peerConn.trackTimers || {};
+
+        // easyrtc thinks in terms of streams, not tracks.
+        // so we'll add a timeout when the first track event
+        // fires. Firefox produces two events (one of type "video",
+        // and one of type "audio".
+
+        for (var i = 0, l = peerStreams.length; i < l; i++) {
+            var peerStream = peerStreams[i],
+                streamId = peerStream.id || "default";
+            clearTimeout(peerConn.trackTimers[streamId]);
+            peerConn.trackTimers[streamId] = setTimeout(function(peerStream) {
+               processAddedStream(peerConn, otherUser, peerStream);
+            }.bind(peerStream), 100); // Bind peerStream
         }
     }
 
@@ -3633,39 +3656,13 @@ var Easyrtc = function() {
             };
 
             pc.ontrack = function(event) {
-
-                if (!peerConns[otherUser] || peerConns[otherUser].cancelled) {
-                    return;
-                }
-
-                var peerConn = peerConns[otherUser];
-                peerConn.trackTimers = peerConn.trackTimers || {};
-
-                //
-                // easyrtc thinks in terms of streams, not tracks.
-                // so we'll add a timeout when the first track event
-                // fires. Firefox produces two events (one of type "video",
-                // and one of type "audio".
-                //
-                var i, curStream, streamId,
-                l = event.streams.length;
-
-                for (i = 0; i < l; i++) {
-                    curStream = event.streams[i];
-                    streamId = curStream.id || "default";
-                    if (!peerConn.trackTimers[streamId]) {
-                        peerConn.trackTimers[streamId] = setTimeout(function() {
-                           processAddedStream(peerConn, otherUser, curStream);
-                           if (peerConns[otherUser] && peerConn.trackTimers[streamId]) {
-                              delete peerConn.trackTimers[streamId];
-                           }
-                        }, 100);
-                    }
-                }
+                logDebug("empty ontrack method invoked, which is expected");
+                processAddedTrack(otherUser, event.streams);
             };
 
             pc.onaddstream = function(event) {
-                logDebug("empty onaddStream method invoked, which is expected");
+                logDebug("empty onaddstream method invoked, which is expected");
+                processAddedStream(otherUser, event.stream);
             };
 
             pc.onremovestream = function(event) {
