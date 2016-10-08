@@ -426,7 +426,8 @@ var Easyrtc = function() {
      * @param value - true to receive audio, false otherwise. The default is true.
      */
     this.enableAudioReceive = function(value) {
-        if (adapter && adapter.browserDetails &&
+        if (
+            adapter && adapter.browserDetails &&
              (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
         ) {
             receivedMediaConstraints.offerToReceiveAudio = value;
@@ -443,7 +444,8 @@ var Easyrtc = function() {
      * @param value - true to receive video, false otherwise. The default is true.
      */
     this.enableVideoReceive = function(value) {
-        if (adapter && adapter.browserDetails &&
+        if (
+            adapter && adapter.browserDetails &&
              (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
         ) {
            receivedMediaConstraints.offerToReceiveVideo = value;
@@ -706,7 +708,14 @@ var Easyrtc = function() {
             constraints.video = false;
         }
         else {
-            if (adapter && adapter.browserDetails && adapter.browserDetails.browser === "firefox") {
+
+            // Tested Firefox 49 and MS Edge require minFrameRate and maxFrameRate 
+            // instead max,min,ideal that cause GetUserMedia failure.
+            // Until confirmed both browser support idea,max and min we need this.
+            if (
+                adapter && adapter.browserDetails &&
+                    (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
+            ) {
                 constraints.video = {};
                 if (self._desiredVideoProperties.width) {
                     constraints.video.width = self._desiredVideoProperties.width;
@@ -723,8 +732,9 @@ var Easyrtc = function() {
                 if (self._desiredVideoProperties.videoSrcId) {
                     constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
                 }
-            }
-            else { // chrome and opera
+
+            // chrome and opera
+            } else { 
                 constraints.video = {};
                 if (self._desiredVideoProperties.width) {
                      constraints.video.width = { 
