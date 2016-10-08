@@ -127,7 +127,7 @@ Links for help and information
 License
 -------
 
-Copyright (c) 2015, Priologic Software Inc.
+Copyright (c) 2016, Priologic Software Inc.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
