@@ -76,7 +76,7 @@ Changes:
  - JS Client - Accommodate deprecated MediaStream.stop events
  - Server - Various code quality fixes
  - Server - Added additional debug level logging of incoming and outgoing socket messages. Added wrapper for socketCallbacks to permit additional logging for returning socket messages.
- - Demos - Updated links to point to new EasyRTC forums, located at https://easyrtc.com/forums/ (issue #167)
+ - Demos - Updated links to point to new EasyRTC forums, located at https://easyrtc.com/forum/ (issue #167)
 
 Fixes:
 

@@ -113,7 +113,7 @@ Links for help and information
 * The EasyRTC website is at:
   * [http://www.easyrtc.com/](http://www.easyrtc.com/)
 * Use our support forum is at:
-  * [https://easyrtc.com/forums/](https://easyrtc.com/forums/)
+  * [https://easyrtc.com/forum/](https://easyrtc.com/forum/)
 * Live demo site:
   * [http://demo.easyrtc.com/](http://demo.easyrtc.com/)
 * Bugs and requests can be filed on our github page or on the forum:
@@ -127,7 +127,7 @@ Links for help and information
 License
 -------
 
-Copyright (c) 2015, Priologic Software Inc.
+Copyright (c) 2016, Priologic Software Inc.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
