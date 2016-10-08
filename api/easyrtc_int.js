@@ -3597,7 +3597,7 @@ var Easyrtc = function() {
                         break;
 
                     case "closed":
-                        if (self.onPeerClosed ) {
+                        if (self.onPeerClosed) {
                             self.onPeerClosed(otherUser);
                         }
                         break;
@@ -4239,7 +4239,9 @@ var Easyrtc = function() {
             } catch (err) {
                 logDebug("peer " + otherUser + " close failed:" + err);
             } finally {
-                self.onPeerClosed(otherUser);
+                if (self.onPeerClosed) {
+                    self.onPeerClosed(otherUser);
+                }
             }
         }
     }
