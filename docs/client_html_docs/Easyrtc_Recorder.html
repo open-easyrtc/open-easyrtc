@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: Easyrtc_Recorder</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: Easyrtc_Recorder</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>Easyrtc_Recorder</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+
+    <h4 class="name" id="Easyrtc_Recorder"><span class="type-signature"></span>new Easyrtc_Recorder<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Provides methods for building MediaStream recorders.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="labs_easyrtc_recorder.js.html">labs/easyrtc_recorder.js</a>, <a href="labs_easyrtc_recorder.js.html#line52">line 52</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id=".easyrtc.isRecordingTypeSupported"><span class="type-signature">(static) </span>easyrtc.isRecordingTypeSupported<span class="signature">(codecName,)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Check if a particular codec can be used for recording.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>codecName,</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">either "vp8" or "vp9 or "h264"</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="labs_easyrtc_recorder.js.html">labs/easyrtc_recorder.js</a>, <a href="labs_easyrtc_recorder.js.html#line76">line 76</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    true if the type can be used, or if the browser doesn't
+ support a method to find out.
+</div>
+
+
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".easyrtc.recordToBlob"><span class="type-signature">(static) </span>easyrtc.recordToBlob<span class="signature">(mediaStream, blobCallback)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    This method creates a media recorder that builds a blob 
+Use the media recorder's start(), stop(), pause() and resume() methods
+on the returned object.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>mediaStream</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">HTMLMediaStream</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">a local or remote media stream.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>blobCallback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">a callback function that gets called with a
+   blob once you invoke the stop method.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="labs_easyrtc_recorder.js.html">labs/easyrtc_recorder.js</a>, <a href="labs_easyrtc_recorder.js.html#line190">line 190</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".easyrtc.recordToCallback"><span class="type-signature">(static) </span>easyrtc.recordToCallback<span class="signature">(mediaStream, dataCallback)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    This method creates a media recorder and populates it's ondataavailable
+method so that your own callback gets called with the data.
+Use the media recorder's start(), stop(), pause() and resume() methods
+on the returned object.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>mediaStream</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">HTMLMediaStream</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">a local or remote media stream.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dataCallback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">a function to receive the webm data from.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="labs_easyrtc_recorder.js.html">labs/easyrtc_recorder.js</a>, <a href="labs_easyrtc_recorder.js.html#line170">line 170</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".easyrtc.recordToFile"><span class="type-signature">(static) </span>easyrtc.recordToFile<span class="signature">(a, downloadLink, basename)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    This method creates a media recorder that builds a file.
+Use the media recorder's start(), stop(), pause() and resume() methods
+on the returned object.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>a</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">HTMLMediaStream</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">local or remote media stream.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>downloadLink</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">an anchor tag to attach the file to.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>basename</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the name of the file. A .webm will be appended
+   to the file if its not already present. The file doesn't get written
+   until you call the mediaRecorder's stop method.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="labs_easyrtc_recorder.js.html">labs/easyrtc_recorder.js</a>, <a href="labs_easyrtc_recorder.js.html#line222">line 222</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".easyrtc.setRecordingVideoCodec"><span class="type-signature">(static) </span>easyrtc.setRecordingVideoCodec<span class="signature">(codecName,)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Set the desired codec for the video encoding.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>codecName,</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">either "vp8" or "vp9 or "h264"</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="labs_easyrtc_recorder.js.html">labs/easyrtc_recorder.js</a>, <a href="labs_easyrtc_recorder.js.html#line104">line 104</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    true if the type can be used.
+</div>
+
+
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".easyrtc.supportsRecording"><span class="type-signature">(static) </span>easyrtc.supportsRecording<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Determines if recording is supported by the browser.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="labs_easyrtc_recorder.js.html">labs/easyrtc_recorder.js</a>, <a href="labs_easyrtc_recorder.js.html#line64">line 64</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    true if recording is supported.
+</div>
+
+
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".startRecording"><span class="type-signature">(static) </span>startRecording<span class="signature">(mediaStream)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Create a recording object and attach a media stream to it.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>mediaStream</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">HTMLMediaStream</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="labs_easyrtc_recorder.js.html">labs/easyrtc_recorder.js</a>, <a href="labs_easyrtc_recorder.js.html#line128">line 128</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    a recorder object or null if recording not supported.
+</div>
+
+
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Easyrtc.html">Easyrtc</a></li><li><a href="Easyrtc_App.html">Easyrtc_App</a></li><li><a href="Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li><li><a href="Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li><li><a href="Easyrtc_Rates.html">Easyrtc_Rates</a></li><li><a href="Easyrtc_Recorder.html">Easyrtc_Recorder</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.0-dev</a> on Wed Oct 12 2016 08:54:49 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

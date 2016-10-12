@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: util</title>
+    <title>JSDoc: Source: easyrtc_private_obj.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,130 +17,40 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: util</h1>
+    <h1 class="page-title">Source: easyrtc_private_obj.js</h1>
 
     
 
 
 
-
-<section>
-
-<header>
     
-        <h2>
-            <span class="ancestors"><a href="module-easyrtc_public_obj.html">easyrtc_public_obj</a><a href="module-easyrtc_public_obj-pub.html">~pub</a>.</span>util</h2>
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* global module, require */
 
-<article>
-    <div class="container-overview">
-    
-        
+/**
+ * @file        Maintains private object used within EasyRTC for holding in-memory state information
+ * @module      easyrtc_private_obj
+ * @author      Priologic Software, info@easyrtc.com
+ * @copyright   Copyright 2016 Priologic Software. All rights reserved.
+ * @license     BSD v2, see LICENSE file in module root folder.
+ */
 
-    
+// var _               = require("underscore");                // General utility functions external module
+var defaultOptions  = require("./easyrtc_default_options"); // EasyRTC global variable
+var g               = require("./general_util");            // General utility functions local module
 
-    <h4 class="name" id="util"><span class="type-signature"></span>new util<span class="signature">()</span><span class="type-signature"></span></h4>
+var e = {};
 
-    
+e.version           = g.getPackageData("version");
+e.serverStartOn     = Date.now();
+e.option            = g.deepCopy(defaultOptions);
+e.app               = {};
 
-
-
-<div class="description">
-    General utility functions are grouped in this util object.  For convenience, this class has also been attached to the application, connection, session, and room classes.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line321">line 321</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-     
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+module.exports = e;
+</code></pre>
+        </article>
+    </section>
 
 
 

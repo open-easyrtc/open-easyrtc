@@ -232,7 +232,7 @@
     
     <div class="description">
         Error codes that the EasyRTC will use in the errorCode field of error object passed
- to error handler set by easyrtc.setOnError. The error codes are short printable strings.
+to error handler set by easyrtc.setOnError. The error codes are short printable strings.
     </div>
     
     
@@ -657,53 +657,6 @@ time a token is received.
         
             
 <dt>
-    <h3 class="name" id="setVideoSrc"><span class="type-signature"></span>setVideoSrc<span class="type-signature"></span></h3>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        Temporary alias for easyrtc.setVideoSource
-    </div>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-</dd>
-
-        
-            
-<dt>
     <h3 class="name" id="usernameRegExp"><span class="type-signature"></span>usernameRegExp<span class="type-signature"></span></h3>
     
     
@@ -745,66 +698,6 @@ time a token is received.
 </dl>
 
     
-    
-</dd>
-
-        
-            
-<dt>
-    <h3 class="name" id="~fields"><span class="type-signature">&lt;inner> </span>fields<span class="type-signature"></span></h3>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        Connects to the EasyRTC signaling server. You must connect before trying to
-call other users.
-    </div>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>easyrtc.connect("my_chat_app",
-                  function(easyrtcid, roomOwner){
-                      if( roomOwner){ console.log("I'm the room owner"); }
-                      console.log("my id is " + easyrtcid);
-                  },
-                  function(errorText){
-                      console.log("failed to connect ", erFrText);
-                  });</code></pre>
-
     
 </dd>
 
@@ -1893,7 +1786,8 @@ of a camera before reacquiring it at a different resolution.
     
     
     <div class="description">
-        Connect to the easyrtc signaling server.
+        Connects to the EasyRTC signaling server. You must connect before trying to
+call other users.
     </div>
     
 
@@ -1932,13 +1826,20 @@ of a camera before reacquiring it at a different resolution.
             
             <td class="type">
             
+                
+<span class="param-type">String</span>
+
+
+            
             </td>
             
             
             
             
             
-            <td class="description last"></td>
+            <td class="description last">is a string that identifies the application so that different applications can have different
+       lists of users. Note that the server configuration specifies a regular expression that is used to check application names
+       for validity. The default pattern is that of an identifier, spaces are not allowed.</td>
         </tr>
 	
 	
@@ -1950,13 +1851,20 @@ of a camera before reacquiring it at a different resolution.
             
             <td class="type">
             
+                
+<span class="param-type">function</span>
+
+
+            
             </td>
             
             
             
             
             
-            <td class="description last"></td>
+            <td class="description last">(easyrtcId, roomOwner) - is called on successful connect. easyrtcId is the
+  unique name that the client is known to the server by. A client usually only needs it's own easyrtcId for debugging purposes.
+      roomOwner is true if the user is the owner of a room. It's value is random if the user is in multiple rooms.</td>
         </tr>
 	
 	
@@ -1968,13 +1876,19 @@ of a camera before reacquiring it at a different resolution.
             
             <td class="type">
             
+                
+<span class="param-type">function</span>
+
+
+            
             </td>
             
             
             
             
             
-            <td class="description last"></td>
+            <td class="description last">(errorCode, errorText) - is called on unsuccessful connect. if null, an alert is called instead.
+ The errorCode takes it's value from easyrtc.errCodes.</td>
         </tr>
 	
 	
@@ -2018,6 +1932,18 @@ of a camera before reacquiring it at a different resolution.
     
     
     
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>easyrtc.connect("my_chat_app",
+                  function(easyrtcid, roomOwner){
+                      if( roomOwner){ console.log("I'm the room owner"); }
+                      console.log("my id is " + easyrtcid);
+                  },
+                  function(errorText){
+                      console.log("failed to connect ", erFrText);
+                  });</code></pre>
+
     
 </dd>
 
@@ -3566,7 +3492,7 @@ after a connection has been made.
         
             
 <dt>
-    <h3 class="name" id="getAudioSourceList"><span class="type-signature"></span>getAudioSourceList<span class="signature">(callback)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="getAudioSinkList"><span class="type-signature"></span>getAudioSinkList<span class="signature">(callback)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -3574,7 +3500,7 @@ after a connection has been made.
     
     
     <div class="description">
-        Gets a list of the available audio sources (ie, cameras)
+        Gets a list of the available audio sinks (ie, speakers)
     </div>
     
 
@@ -3624,9 +3550,125 @@ after a connection has been made.
             
             
             
-            <td class="description last">receives list of {label:String, id:String, kind:"audio"}
-Note: the label string always seems to be the empty string if you aren't using https.
-Note: not supported by Firefox.</td>
+            <td class="description last">receives list of {deviceId:String, groupId:String, label:String, kind:"audio"}</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>easyrtc.getAudioSinkList( function(list) {
+              var i;
+              for( i = 0; i < list.length; i++ ) {
+                  console.log("label=" + list[i].label + ", id= " + list[i].deviceId);
+              }
+         });</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="getAudioSourceList"><span class="type-signature"></span>getAudioSourceList<span class="signature">(callback)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Gets a list of the available audio sources (ie, microphones)
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">receives list of {deviceId:String, groupId:String, label:String, kind:"audio"}</td>
         </tr>
 	
 	
@@ -3676,7 +3718,7 @@ Note: not supported by Firefox.</td>
     <pre class="prettyprint"><code>easyrtc.getAudioSourceList( function(list) {
               var i;
               for( i = 0; i < list.length; i++ ) {
-                  console.log("label=" + list[i].label + ", id= " + list[i].id);
+                  console.log("label=" + list[i].label + ", id= " + list[i].deviceId);
               }
          });</code></pre>
 
@@ -4259,6 +4301,138 @@ This should be done periodically by long running applications.
         
     <pre class="prettyprint"><code>easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="getPeerConnectionByUserId"><span class="type-signature"></span>getPeerConnectionByUserId<span class="signature">(easyrtcid, for)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        This function gets the raw RTCPeerConnection for a given easyrtcid
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>easyrtcid</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>for</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">RTCPeerConnection</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">that easyrtcid, or null if no connection exists
+Submitted by Fabian Bernhard.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
     
 </dd>
 
@@ -5872,9 +6046,7 @@ for people who want to try filtering ice server configuration on the client.
             
             
             
-            <td class="description last">receives list of {facing:String, label:String, id:String, kind:"video"}
-Note: the label string always seems to be the empty string if you aren't using https.
-Note: not supported by Firefox.</td>
+            <td class="description last">receives list of {deviceId:String, groupId:String, label:String, kind:"video"}</td>
         </tr>
 	
 	
@@ -5924,7 +6096,7 @@ Note: not supported by Firefox.</td>
     <pre class="prettyprint"><code>easyrtc.getVideoSourceList( function(list) {
               var i;
               for( i = 0; i < list.length; i++ ) {
-                  console.log("label=" + list[i].label + ", id= " + list[i].id);
+                  console.log("label=" + list[i].label + ", id= " + list[i].deviceId);
               }
          });</code></pre>
 
@@ -6564,8 +6736,7 @@ no associated username.
     
     <div class="description">
         Initializes your access to a local camera and microphone.
- Failure could be caused a browser that didn't support WebRTC, or by the user
-not granting permission.
+Failure could be caused a browser that didn't support WebRTC, or by the user not granting permission.
 If you are going to call easyrtc.enableAudio or easyrtc.enableVideo, you need to do it before
 calling easyrtc.initMediaSource.
     </div>
@@ -6663,7 +6834,8 @@ calling easyrtc.initMediaSource.
             
             
             
-            <td class="description last">an optional name for the media source so you can use multiple cameras and screen share simultaneously.</td>
+            <td class="description last">an optional name for the media source so you can use multiple cameras and
+screen share simultaneously.</td>
         </tr>
 	
 	
@@ -6966,6 +7138,133 @@ If it isn't, we assume it's logged out.
         
             
 <dt>
+    <h3 class="name" id="isStunServer"><span class="type-signature"></span>isStunServer<span class="signature">(ipAddress)</span><span class="type-signature"> &rarr; {boolean}</span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Returns true if the ipAddress parameter was the address of a stun server. This is done by checking against information
+collected during peer to peer calls. Don't expect it to work before the first call, or to identify turn servers that aren't
+in the ice config.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>ipAddress</code></td>
+            
+            
+            <td class="type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    true if ip address is known to be that of a stun server, false otherwise.
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">boolean</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h3 class="name" id="isTurnServer"><span class="type-signature"></span>isTurnServer<span class="signature">(ipAddress)</span><span class="type-signature"> &rarr; {boolean}</span></h3>
     
     
@@ -7166,7 +7465,7 @@ Note: the successCB and failureDB will only be called if you are already connect
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">Object</span>
 
 
             
@@ -7655,6 +7954,137 @@ Note: the successCB and failureDB will only be called if you are already connect
     <pre class="prettyprint"><code>easyrtc.makeLocalStreamFromRemoteStream(sourcePeer, "default", "forwardedStream");
    easyrtc.call(nextPeer, callSuccessCB, callFailureCB, wasAcceptedCB, ["forwardedStream"]);</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="muteVideoObject"><span class="type-signature"></span>muteVideoObject<span class="signature">(videoObjectName, mute)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Mute a video object.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>videoObjectName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">A DOMObject or the id of the DOMObject.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>mute</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">true to mute the video object, false to unmute it.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
     
 </dd>
 
@@ -9036,6 +9466,253 @@ names. Maximum length is
         
             
 <dt>
+    <h3 class="name" id="setAudioOutput"><span class="type-signature"></span>setAudioOutput<span class="signature">(element, sinkId)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sets the audio output device of a Video object. 
+That is to say, this controls what speakers get the sound.
+In theory, this works on Chrome but probably doesn't work anywhere else yet.
+This code was cribbed from https://webrtc.github.io/samples/src/content/devices/multi/.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>element</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">an HTML5 video element</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>sinkId</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">a deviceid from getAudioSinkList</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="setAudioSource"><span class="type-signature"></span>setAudioSource<span class="signature">(audioSrcId)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Specify particular video source. Call this before you call easyrtc.initMediaSource().
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>audioSrcId</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">is a id value from one of the entries fetched by getAudioSourceList. null for default.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>easyrtc.setAudioSource( audioSrcId);</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
     <h3 class="name" id="setAutoInitUserMedia"><span class="type-signature"></span>setAutoInitUserMedia<span class="signature">(flag)</span><span class="type-signature"></span></h3>
     
     
@@ -9885,6 +10562,118 @@ candidate should be discarded).
         <tr>
             
                 <td class="name"><code>filter</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="setIceConnectionStateChangeListener"><span class="type-signature"></span>setIceConnectionStateChangeListener<span class="signature">(listener)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sets a function that listens on IceConnectionStateChange events.
+
+During ICE negotiation the peer connection fires the iceconnectionstatechange event.
+It is sometimes useful for the application to learn about these changes, especially if the ICE connection fails.
+The function should accept two parameters: the easyrtc id of the peer and the iceconnectionstatechange event target.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>listener</code></td>
             
             
             <td class="type">
@@ -11710,120 +12499,6 @@ of where the call was initiated (caller or callee).
         
             
 <dt>
-    <h3 class="name" id="setVideoBandwidth"><span class="type-signature"></span>setVideoBandwidth<span class="signature">(kbitsPerSecond)</span><span class="type-signature"></span></h3>
-    
-    
-</dt>
-<dd>
-    
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>kbitsPerSecond</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">is rate in kilobits per second.</td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-        <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>No longer supported by Google.
-Sets the bandwidth for sending video data.
-Setting the rate too low will cause connection attempts to fail. 40 is probably good lower limit.
-The default is 50. A value of zero will remove bandwidth limits.</li><ul></dd>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-    
-    
-    
-    
-    
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>easyrtc.setVideoBandwidth( 40);</code></pre>
-
-    
-</dd>
-
-        
-            
-<dt>
     <h3 class="name" id="setVideoDims"><span class="type-signature"></span>setVideoDims<span class="signature">(width, height, frameRate)</span><span class="type-signature"></span></h3>
     
     
@@ -11834,7 +12509,7 @@ The default is 50. A value of zero will remove bandwidth limits.</li><ul></dd>
     <div class="description">
         This function is used to set the dimensions of the local camera, usually to get HD.
  If called, it must be called before calling easyrtc.initMediaSource (explicitly or implicitly).
- assuming it is supported. If you don't pass any parameters, it will default to 720p dimensions.
+ assuming it is supported. If you don't pass any parameters, it will use default camera dimensions.
     </div>
     
 
@@ -11987,7 +12662,7 @@ The default is 50. A value of zero will remove bandwidth limits.</li><ul></dd>
         
             
 <dt>
-    <h3 class="name" id="setVideoObjectSrc"><span class="type-signature"></span>setVideoObjectSrc<span class="signature">(videoObject, stream)</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="setVideoObjectSrc"><span class="type-signature"></span>setVideoObjectSrc<span class="signature">(element, stream)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -12036,7 +12711,7 @@ The default is 50. A value of zero will remove bandwidth limits.</li><ul></dd>
 	
         <tr>
             
-                <td class="name"><code>videoObject</code></td>
+                <td class="name"><code>element</code></td>
             
             
             <td class="type">
@@ -12052,7 +12727,7 @@ The default is 50. A value of zero will remove bandwidth limits.</li><ul></dd>
             
             
             
-            <td class="description last">an HTML5 video object</td>
+            <td class="description last">an HTML5 video element</td>
         </tr>
 	
 	
@@ -12142,7 +12817,6 @@ The default is 50. A value of zero will remove bandwidth limits.</li><ul></dd>
     
     <div class="description">
         Specify particular video source. Call this before you call easyrtc.initMediaSource().
-Note: this function isn't supported by Firefox.
     </div>
     
 
@@ -12239,7 +12913,7 @@ Note: this function isn't supported by Firefox.
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>easyrtc.setVideoSrc( videoSrcId);</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setVideoSource( videoSrcId);</code></pre>
 
     
 </dd>
@@ -12256,10 +12930,10 @@ Note: this function isn't supported by Firefox.
     
     <div class="description">
         Default error reporting function. The default implementation displays error messages
- in a programmatically created div with the id easyrtcErrorDialog. The div has title
- component with a class name of easyrtcErrorDialog_title. The error messages get added to a
- container with the id easyrtcErrorDialog_body. Each error message is a text node inside a div
- with a class of easyrtcErrorDialog_element. There is an "okay" button with the className of easyrtcErrorDialog_okayButton.
+in a programmatically created div with the id easyrtcErrorDialog. The div has title
+component with a class name of easyrtcErrorDialog_title. The error messages get added to a
+container with the id easyrtcErrorDialog_body. Each error message is a text node inside a div
+with a class of easyrtcErrorDialog_element. There is an "okay" button with the className of easyrtcErrorDialog_okayButton.
     </div>
     
 
@@ -13027,124 +13701,6 @@ close sockets that were supplied with easyrtc.useThisSocketConnection.
     
 </dd>
 
-        
-            
-<dt>
-    <h3 class="name" id="~isSocketConnected"><span class="type-signature">&lt;inner> </span>isSocketConnected<span class="signature">(socket)</span><span class="type-signature"></span></h3>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        This function checks if a socket is actually connected.
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>socket</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">a socket.io socket.</td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    true if the socket exists and is connected, false otherwise.
-</div>
-
-
-
-        
-    
-    
-</dd>
-
         </dl>
     
     
@@ -13164,7 +13720,7 @@ close sockets that were supplied with easyrtc.useThisSocketConnection.
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Tue Oct 20 2015 11:05:23 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Sep 16 2016 14:46:21 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
