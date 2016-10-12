@@ -19,12 +19,21 @@
 // ______________
 // getScreenId.js
 
+/**
+ * Provides a method for window/screen capture using an iframe.
+ * This requires that your users install Muah Khans desktop extension.
+ * Read the source code for more details.
+ * @class Easyrtc_IframeCapture
+ */
+
 
 
 (function() {
    /** Create a local media stream for desktop capture.
      * This will fail if a desktop capture extension is not installed.
      * not granting permission.
+     * @function
+     * @memberOf Easyrtc_IframeCapture
      * @param {function(Object)} successCallback - will be called with localmedia stream on success. 
      * @param {function(String,String)} errorCallback - is called with an error code and error description.
      * @param {String} streamName - an optional name for the media source so you can use multiple cameras and screen share simultaneously.

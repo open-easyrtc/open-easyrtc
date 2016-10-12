@@ -1000,4 +1000,4 @@ easyrtc_ft.saveAs = (function() {
 
 return easyrtc_ft;
 
-}));
+})); 

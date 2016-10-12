@@ -31,12 +31,6 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
-    /**
-     * Provides methods for building SDP filters. SDP filters can be used
-     * to control bit rates.
-     * @class Easyrtc_Rates
-     * @augments Easyrtc
-     */
 
 
 (function (root, factory) {
@@ -56,6 +50,11 @@
 }(this, function (easyrtc, undefined) {
 
 "use strict";
+    /**
+     * Provides methods for building SDP filters. SDP filters can be used
+     * to control bit rates.
+     * @class Easyrtc_Rates
+     */
 
     function buildSdpFilter(options, isLocal) {
 
@@ -307,6 +306,8 @@
 
     /**
      *  This function returns an sdp filter function.
+     * @function
+     * @memberOf Easyrtc_Rates
      * @param options A map that optionally includes values for the following keys: audioRecvCodec, audioRecvBitrate, videoRecvBitrate, videoRecvCodec
      * @returns {Function} which takes an SDP string and returns a modified SDP string.
      */
@@ -315,9 +316,10 @@
     };
 
     /**
-     *  This function returns an sdp filter function.
-     * @param options A map that optionally includes values for the following keys: stereo,           audioSendCodec, audioSendBitrate, videoSendBitrate, videoSendInitialBitRate,
-          videoRecvCodec
+     * This function returns an sdp filter function.
+     * @function
+     * @memberOf Easyrtc_Rates
+     * @param options A map that optionally includes values for the following keys: stereo, audioSendCodec, audioSendBitrate, videoSendBitrate, videoSendInitialBitRate, videoRecvCodec
      * @returns {Function} which takes an SDP string and returns a modified SDP string.
      */
     easyrtc.buildRemoteSdpFilter = function(options) {
