@@ -1,5 +1,44 @@
 EasyRTC: Change Log
 ===================
+
+v1.0.18
+-------
+New Features:
+  - JS Client - Added setPeerOpenListener and setSignalingStateChangeListener. 
+  - JS Client - Added options to set prefered video codec in peer connection.
+  - JS Client - Added media stream recording feature and demo.
+  - JS Client - Added support for selecting audio playback destination.
+  - Doc - Added info on git install steps. 
+
+Changes:
+  - Doc - Updated client and server html documentation.
+  - Server - Updated socket.io from 1.3.7 to 1.4.5.
+  - Doc - Copyright date bump to 2016.
+  - Doc - Updated link to EasyyRTC forum.
+  - JS Client - Use minFrameRate/MaxFrameRate for Firefox and Edge instead of
+             frameRate.min and frameRate.max.
+  - Doc - Updated README to include bower install step.
+  - Doc - Updated docs to reflect the ../ reference in server.js and the need to run https servers.
+  - JS Client - Updated to use webrtc ontrack api and newer media constraints api.
+  - JS Client -Updated the ice filter demo and exposed it on the demo page.
+  - Server - Updated default server options to use urls instead of url for ice se.
+  
+Fixes:
+  - Doc - Added fields to the inline documentation on client side to make it
+          work better with jsdoc. We now get documentation for all the 
+          interesting files.
+  - JS Client - Fixed file sharing demo.
+  - JS Client - Put a guard on onPeerClosed.
+  - Doc - Fixed error in easyrtc_client_tutorial.md
+  - JS Client - improves in cancelling file transfer requests.
+  - Packaging - add index.js to bower ignored files cause bower is for client not server.
+  - JS Client - prevent possible undefined prop dataChannelReady if peerConns[otherUser] get recycled early.
+   - JS Client - fix easrytc_app UMD declaration.
+   - JS Client - improved try catch block so that message processing errors didn't masquerade as json parse errors.
+   - JS Client - fix possible error due missing adapter.browserShim.attachMediaStream on some platform.
+   - JS Client - In the multiparty demo, moved the socket.io reference above the easyrtc.js reference.
+
+
 v1.0.17
 -------
 New Features:
