@@ -51,13 +51,14 @@
 
     /**
      * Provides methods for building MediaStream recorders.
-     * @class Easyrtc_rates
-     * @augments Easyrtc
+     * @class Easyrtc_Recorder
      */
 
 
    /**
      * Determines if recording is supported by the browser. 
+     * @function
+     * @memberOf Easyrtc_Recorder
      * @returns true if recording is supported.
      */
    easyrtc.supportsRecording = function() {
@@ -66,9 +67,9 @@
 
    /**
     * Check if a particular codec can be used for recording.
+    * @function
+    * @memberOf Easyrtc_Recorder
     * @param {String} codecName, either "vp8" or "vp9 or "h264"
-    * @param {Object} options object. Currently the only supported field
-    *    is mimeType.
     * @returns true if the type can be used, or if the browser doesn't
     *  support a method to find out.
     */ 
@@ -95,8 +96,10 @@
 
    /**
      * Set the desired codec for the video encoding. 
-     @param {String} codecName, either "vp8" or "vp9 or "h264"
-     @returns true if the type can be used.
+     * @function
+     * @memberOf Easyrtc_Recorder
+     * @param {String} codecName, either "vp8" or "vp9 or "h264"
+     * @returns true if the type can be used.
      */ 
    easyrtc.setRecordingVideoCodec = function(videoCodecName) {
        if( !easyrtc.supportsRecording ) {
@@ -116,12 +119,13 @@
    }
 
    /**
-     * Create a recording object and attach a local media stream to it.
-     * @param mediaStream 
-     * @param onError a callback for errors encountered while recording.
+     * Create a recording object and attach a media stream to it.
+     * @function
+     * @memberOf Easyrtc_Recorder
+     * @param  {HTMLMediaStream} mediaStream 
      * @returns a recorder object or null if recording not supported.
      */
-    function startRecording( localStream) {
+    function startRecording( mediaStream) {
 
         if( !easyrtc.supportsRecording ) {
            console.log("recording not supported by your browser");
@@ -154,11 +158,13 @@
         return mediaRecorder;
    };
 
-   /** This method creates a media recorder and populates it's ondataavalable
+   /** This method creates a media recorder and populates it's ondataavailable
      * method so that your own callback gets called with the data.
      * Use the media recorder's start(), stop(), pause() and resume() methods
      * on the returned object.
-     * @param mediaStream a local or remote media stream.
+     * @function
+     * @memberOf Easyrtc_Recorder
+     * @param {HTMLMediaStream} mediaStream a local or remote media stream.
      * @param {Function} dataCallback a function to receive the webm data from.
      */
    easyrtc.recordToCallback = function (mediaStream, dataCallback) {
@@ -175,7 +181,9 @@
    /** This method creates a media recorder that builds a blob 
     * Use the media recorder's start(), stop(), pause() and resume() methods
     * on the returned object.
-    * @param mediaStream a local or remote media stream.
+    * @function
+    * @memberOf Easyrtc_Recorder
+    * @param  {HTMLMediaStream} mediaStream a local or remote media stream.
     * @param {Function} blobCallback a callback function that gets called with a
     *    blob once you invoke the stop method.
     **/
@@ -203,7 +211,9 @@
    /** This method creates a media recorder that builds a file.
     * Use the media recorder's start(), stop(), pause() and resume() methods
     * on the returned object.
-    * @param mediaStream a local or remote media stream.
+    * @function
+    * @memberOf Easyrtc_Recorder
+    * @param {HTMLMediaStream} a local or remote media stream.
     * @param {Object} downloadLink an anchor tag to attach the file to.
     * @param {String} basename the name of the file. A .webm will be appended
     *    to the file if its not already present. The file doesn't get written
@@ -229,3 +239,4 @@
 return easyrtc;
 
 }));
+

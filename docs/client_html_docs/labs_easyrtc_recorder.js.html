@@ -28,9 +28,9 @@
         <article>
             <pre class="prettyprint source linenums"><code>/* global define, module, require, console */
 /*!
-  Script: easyrtc_rates.js
+  Script: easyrtc_recorder.js
 
-    This code builds sdp filter functions
+    This code demonstrate recording of local and remote streams.
 
   About: License
 
@@ -73,27 +73,30 @@
         if (typeof window.easyrtc !== 'object' || !window.easyrtc) {
             throw new Error("easyrtc_recorder requires easyrtc");
         }
-        root = factory(window.easyrtc);
+        root.easyrtc = factory(window.easyrtc);
   }
 }(this, function (easyrtc, undefined) {
 
     /**
-     * @mixin Easyrtc_Record
-     * @augments Easyrtc
+     * Provides methods for building MediaStream recorders.
+     * @class Easyrtc_Recorder
      */
 
 
    /**
-     * Determines if recording is supported by the browser. Returns
-     * true if recording is supported.
+     * Determines if recording is supported by the browser. 
+     * @function
+     * @memberOf Easyrtc_Recorder
+     * @returns true if recording is supported.
      */
    easyrtc.supportsRecording = function() {
         return (typeof MediaRecorder !== "undefined" &amp;&amp; navigator.getUserMedia );
    };
 
-
    /**
     * Check if a particular codec can be used for recording.
+    * @function
+    * @memberOf Easyrtc_Recorder
     * @param {String} codecName, either "vp8" or "vp9 or "h264"
     * @returns true if the type can be used, or if the browser doesn't
     *  support a method to find out.
@@ -121,8 +124,10 @@
 
    /**
      * Set the desired codec for the video encoding. 
-     @param {String} codecName, either "vp8" or "vp9 or "h264"
-     @returns true if the type can be used.
+     * @function
+     * @memberOf Easyrtc_Recorder
+     * @param {String} codecName, either "vp8" or "vp9 or "h264"
+     * @returns true if the type can be used.
      */ 
    easyrtc.setRecordingVideoCodec = function(videoCodecName) {
        if( !easyrtc.supportsRecording ) {
@@ -142,19 +147,20 @@
    }
 
    /**
-     * Create a recording object and attach a local media stream to it.
-     * @param mediaStream 
-     * @param onError a callback for errors encountered while recording.
+     * Create a recording object and attach a media stream to it.
+     * @function
+     * @memberOf Easyrtc_Recorder
+     * @param  {HTMLMediaStream} mediaStream 
      * @returns a recorder object or null if recording not supported.
      */
-    function startRecording( localStream) {
+    function startRecording( mediaStream) {
 
         if( !easyrtc.supportsRecording ) {
            console.log("recording not supported by your browser");
            return null;
         }
 
-        let mediaRecorder = new MediaRecorder(localStream, {mimeType: mimeType});
+        var mediaRecorder = new MediaRecorder(localStream, {mimeType: mimeType});
         if( !mediaRecorder ) {
            console.log("no media recorder");
            return;
@@ -180,27 +186,13 @@
         return mediaRecorder;
    };
 
-   /** This method creates a media recorder and populates it's ondataavalable
-     * method so that your own callback gets called with the data.
-     * @param mediaStream a local or remote media stream.
-     * @param {Function} dataCallback a function to receive the webm data from.
-     */
-   easyrtc.recordToCallback = function (mediaStream, dataCallback) {
-       var mediaRecorder = startRecording(mediaStream);
-       if( !mediaRecorder) {
-           return null;
-       }
-       mediaRecorder.ondataavailable = function(e) {
-           dataCallback(e.data);
-       }
-       return mediaRecorder;
-   };
-
-   /** This method creates a media recorder and populates it's ondataavalable
+   /** This method creates a media recorder and populates it's ondataavailable
      * method so that your own callback gets called with the data.
      * Use the media recorder's start(), stop(), pause() and resume() methods
      * on the returned object.
-     * @param mediaStream a local or remote media stream.
+     * @function
+     * @memberOf Easyrtc_Recorder
+     * @param {HTMLMediaStream} mediaStream a local or remote media stream.
      * @param {Function} dataCallback a function to receive the webm data from.
      */
    easyrtc.recordToCallback = function (mediaStream, dataCallback) {
@@ -217,7 +209,9 @@
    /** This method creates a media recorder that builds a blob 
     * Use the media recorder's start(), stop(), pause() and resume() methods
     * on the returned object.
-    * @param mediaStream a local or remote media stream.
+    * @function
+    * @memberOf Easyrtc_Recorder
+    * @param  {HTMLMediaStream} mediaStream a local or remote media stream.
     * @param {Function} blobCallback a callback function that gets called with a
     *    blob once you invoke the stop method.
     **/
@@ -228,7 +222,7 @@
           chunks.push(chunk);
        }
 
-       let mediaRecorder = easyrtc.recordToCallback(mediaStream,
+       var mediaRecorder = easyrtc.recordToCallback(mediaStream,
               dataConsumer);
 
        if( !mediaRecorder) {
@@ -245,7 +239,9 @@
    /** This method creates a media recorder that builds a file.
     * Use the media recorder's start(), stop(), pause() and resume() methods
     * on the returned object.
-    * @param mediaStream a local or remote media stream.
+    * @function
+    * @memberOf Easyrtc_Recorder
+    * @param {HTMLMediaStream} a local or remote media stream.
     * @param {Object} downloadLink an anchor tag to attach the file to.
     * @param {String} basename the name of the file. A .webm will be appended
     *    to the file if its not already present. The file doesn't get written
@@ -264,13 +260,14 @@
        }
 
        downloadLink.innerHTML = "";
-       let mediaRecorder = easyrtc.recordToBlob(mediaStream, blobCallback);
+       var mediaRecorder = easyrtc.recordToBlob(mediaStream, blobCallback);
        return mediaRecorder;
    };
 
 return easyrtc;
 
-}));
+})); // end of module wrapper
+
 </code></pre>
         </article>
     </section>
@@ -281,13 +278,13 @@ return easyrtc;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Easyrtc.html">Easyrtc</a></li><li><a href="Easyrtc_ft.html">Easyrtc_ft</a></li></ul><h3>Mixins</h3><ul><li><a href="Easyrtc_Rates.html">Easyrtc_Rates</a></li><li><a href="Easyrtc_Record.html">Easyrtc_Record</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Easyrtc.html">Easyrtc</a></li><li><a href="Easyrtc_App.html">Easyrtc_App</a></li><li><a href="Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li><li><a href="Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li><li><a href="Easyrtc_Rates.html">Easyrtc_Rates</a></li><li><a href="Easyrtc_Recorder.html">Easyrtc_Recorder</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.0-dev</a> on Mon Sep 19 2016 09:09:15 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.0-dev</a> on Wed Oct 12 2016 08:54:49 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

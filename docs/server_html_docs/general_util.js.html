@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: general_util.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: general_util.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* global module, require, process, console */
+
+/**
+ * @file        General utility functions not specific to EasyRTC
+ * @module      general_util
+ * @author      Priologic Software, info@easyrtc.com
+ * @copyright   Copyright 2016 Priologic Software. All rights reserved.
+ * @license     BSD v2, see LICENSE file in module root folder.
+ */
+
+var util = require("util");
+
+/**
+ *  Object to hold EasyRTC General Utility methods and classes.
+ *
+ * @class
+ */
+var g = module.exports;
+
+/**
+ * Performs a deep copy of an object, returning the duplicate.
+ * Do not use on objects with circular references.
+ *
+ * @param       {Object} input          Input variable (or object) to be copied.
+ * @returns     {Object}                New copy of variable.
+ */
+g.deepCopy = function(input) {
+
+    if (
+        input === null || input === undefined ||
+            typeof input !== "object" || 
+                (input.constructor !== Object &amp;&amp; input.constructor !== Array)
+    ) {
+        return input;
+    }
+
+    if (
+        input.constructor === Boolean || 
+            input.constructor === Date || 
+                input.constructor === Function || 
+                    input.constructor === Number || 
+                        input.constructor === RegExp || 
+                            input.constructor === String
+    ) {
+        return new input.constructor(input);
+    }
+
+    var copy;
+    if (input instanceof Array) {
+        copy = [];
+        for (var i = 0, len = input.length; i &lt; len; i++) {
+            copy[i] = g.deepCopy(input[i]);
+        }
+        return copy;
+    }
+
+    if (input instanceof Object) {
+        copy = {};
+        for (var key in input) {
+            if (input.hasOwnProperty(key)) {
+                copy[key] = g.deepCopy(input[key]);
+            }
+        }
+        return copy;
+    }
+    return null;
+};
+
+
+/**
+ * Returns a field from the package.json file in the module root.
+ * Giving null field name will return the full contents of the file.
+ * If a field name is provided, it will return null if the field not found.
+ *
+ * @param       {Object} fieldName      Name of field you wish to return.
+ * @returns     {Object}                Value of the given field, or the full contents of the file if a null field is given.
+ */
+g.getPackageData = function(fieldName) {
+    var packageFile = require("../package");
+    if (!fieldName) {
+        return g.deepCopy(packageFile);
+    }
+    else if (packageFile[fieldName]) {
+        return g.deepCopy(packageFile[fieldName]);
+    }
+    else {
+        return null;
+    }
+};
+
+
+/* An abstract error object which should be easy to extend for custom Error classes.
+ *
+ * @copyright Based on code in article by Dustin Seno.
+ *
+ * @param   {String}    Custom error message.
+ * @param   {Object}    Constructor property.
+ *
+ */
+g.AbstractError = function(msg, constr){
+    Error.captureStackTrace(this, constr || this);
+    this.message = msg || "Error";
+};
+util.inherits(g.AbstractError, Error);
+g.AbstractError.prototype.name = "Abstract Error";
+
+
+/**
+ * Reads package.json and ensures all required modules are installed. Will exit if one or more is not found.
+ */
+g.checkModules = function () {
+
+    var easyrtcPackage;
+
+    try {
+        easyrtcPackage = require("../package");
+    }
+    catch( e ) {
+        console.log("ERROR: Could not load package.json from project root. This file is required for reading project properties.");
+        process.exit(1);
+    }
+
+    var moduleExists = function (modName) {
+        try { return require.resolve(modName); }
+        catch( e ) { return false; }
+    };
+
+    var isModuleMissing = false;
+    for (var key in easyrtcPackage.dependencies) {
+        if (!moduleExists(key)) {
+            isModuleMissing = true;
+            console.log("ERROR: Missing module '" + key + "'");
+        }
+    }
+
+    if (isModuleMissing) {
+        console.log("ERROR: Required modules are not installed. Run 'npm install' from command line.");
+        process.exit(1);
+    }
+
+    delete require.cache[easyrtcPackage];
+};
+
+
+/*
+ * Return a random string of characters
+ *
+ * @param {Integer} stringLength    Number of random characters the returned string should contain. Defaults to 16.
+ * @param {String}  chars           Available characters to use in a string. Defaults to [A-Za-z0-9]
+ * @returns {String}                Generated random string
+ *
+ */
+g.randomString = function(stringLength, chars){
+    var newString = "";
+
+    if (!chars) {
+        chars = "ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz0123456789";
+    }
+
+    if (!stringLength) {
+        stringLength = 16;
+    }
+
+    for (var i=0; i &lt; stringLength; i=i+1) {
+        var randomNumber = Math.floor(Math.random() * chars.length);
+        newString += chars.substring(randomNumber, randomNumber + 1);
+    }
+
+    return newString;
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li><li><a href="module-easyrtc_default_options.html">easyrtc_default_options</a></li><li><a href="module-easyrtc_private_obj.html">easyrtc_private_obj</a></li><li><a href="module-easyrtc_public_obj.html">easyrtc_public_obj</a></li><li><a href="module-easyrtc_util.html">easyrtc_util</a></li><li><a href="module-general_util.html">general_util</a></li></ul><h3>Classes</h3><ul><li><a href="module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li><li><a href="module-easyrtc_public_obj-pub.html">pub</a></li><li><a href="module-easyrtc_public_obj-pub.events.html">events</a></li><li><a href="module-easyrtc_public_obj-pub.util.html">util</a></li><li><a href="module-easyrtc_util-eu.html">eu</a></li><li><a href="module-general_util-g.html">g</a></li><li><a href="pub.appObj.html">appObj</a></li><li><a href="pub.appObj.connectionObj.html">connectionObj</a></li><li><a href="pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li><li><a href="pub.appObj.roomObj.html">roomObj</a></li><li><a href="pub.appObj.sessionObj.html">sessionObj</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.0-dev</a> on Wed Oct 12 2016 08:54:51 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

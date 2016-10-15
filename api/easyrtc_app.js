@@ -50,8 +50,9 @@
     "use strict";
 
     /**
-     * @mixin Easyrtc_App
-     * @augments Easyrtc
+     * This file adds additional methods to Easyrtc for simplifying the 
+     * management of video-mediastream assignment.
+     * @class Easyrtc_App
      */
 
     /** @private */
@@ -59,8 +60,8 @@
 
     /** By default, the easyApp routine sticks a "close" button on top of each caller
      * video object that it manages. Call this function(before calling easyApp) to disable that particular feature.
-     * @alias easyrtc.dontAddCloseButtons
-     * @memberOf module:EasyRTC/Easyrtc_App
+     * @function
+     * @memberOf Easyrtc_App
      * @example
      *    easyrtc.dontAddCloseButtons();
      */
@@ -174,6 +175,8 @@
         /** Sets an event handler that gets called when an incoming MediaStream is assigned 
          * to a video object. The name is poorly chosen and reflects a simpler era when you could
          * only have one media stream per peer connection.
+         * @function
+         * @memberOf Easyrtc_App
          * @param {Function} cb has the signature function(easyrtcid, slot){}
          * @example
          *   easyrtc.setOnCall( function(easyrtcid, slot){
@@ -190,6 +193,8 @@
          * The slot is parameter is the index into the array of video ids.
          * Note: if you call easyrtc.getConnectionCount() from inside your callback
          * it's count will reflect the number of connections before the hangup started.
+         * @function
+         * @memberOf Easyrtc_App
          * @param {Function} cb has the signature function(easyrtcid, slot){}
          * @example
          *   easyrtc.setOnHangup( function(easyrtcid, slot){
@@ -200,6 +205,13 @@
             onHangup = cb;
         };
 
+        /** 
+          * Get the easyrtcid of the ith caller, starting at 0.
+          * @function
+          * @memberOf Easyrtc_App
+          * @param {number} i
+          * @returns {String}
+          */
         easyrtc.getIthCaller = function(i) {
             if (i < 0 || i >= videoIdsP.length) {
                 return null;
@@ -208,6 +220,14 @@
             return getCallerOfVideo(vid);
         };
 
+        /** 
+          * This is the complement of getIthCaller. Given an easyrtcid,
+          * it determines which slot the easyrtc is in.
+          * @function
+          * @memberOf Easyrtc_App
+          * @param {string} easyrtcid 
+          * @returns {number} or -1 if the easyrtcid is not a caller.
+          */
         easyrtc.getSlotOfCaller = function(easyrtcid) {
             var i;
             for (i = 0; i < numPEOPLE; i++) {
@@ -335,6 +355,8 @@
      * side effects is to add hangup buttons to the remote video objects, buttons
      * that only appear when you hover over them with the mouse cursor. This method will also add the
      * easyrtcMirror class to the monitor video object so that it behaves like a mirror.
+     * @function
+     * @memberOf Easyrtc_App
      *  @param {String} applicationName - name of the application.
      *  @param {String} monitorVideoId - the id of the video object used for monitoring the local stream.
      *  @param {Array} videoIds - an array of video object ids (strings)
@@ -373,6 +395,8 @@
 
         /** Sets an event handler that gets called when a connection to the signaling
          * server has or has not been made. Can only be called after calling easyrtc.easyApp.
+         * @function
+         * @memberOf Easyrtc_App
          * @param {Function} gotConnectionCB has the signature (gotConnection, errorText)
          * @example
          *    easyrtc.setGotConnection( function(gotConnection, errorText){
@@ -442,4 +466,4 @@
 
 return easyrtc;
 
-}));
+})); // end of module wrapper

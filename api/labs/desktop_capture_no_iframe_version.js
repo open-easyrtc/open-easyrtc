@@ -11,7 +11,16 @@ var isChrome = !!navigator.webkitGetUserMedia;
 // and modified.
 var DetectRTC = {};
 
+
 (function() {
+
+/**
+ * Provides a method for window/screen capture using an iframe.
+ * Please read the comments in the source code about setting the 
+ * chrome extension that this requires to be installed in each browser.
+ * @class Easyrtc_No_IframeCapture
+ */
+
     var screenCallback;
 
     DetectRTC.screen = {
@@ -79,10 +88,35 @@ window.addEventListener('message', function(event) {
     DetectRTC.screen.onMessageCallback(event.data);
 });
 
+/**
+  * Check if desktop capture installed
+  * @function
+  * @memberOf Easyrtc_No_IframeCapture
+  * @return boolean
+  */ 
 easyrtc.isDesktopCaptureInstalled = function() {
     return DetectRTC.screen.supported;
 }
 
+  /** Create a local media stream for desktop capture.
+     * This will fail if a desktop capture extension is not installed.
+     * not granting permission.
+     * @function
+     * @memberOf Easyrtc_No_IframeCapture
+     * @param {function(HTMLMediaStream)} successCallback - will be called with localmedia stream on success.
+     * @param {function(String,String)} errorCallback - is called with an error code and error description.
+     * @param {String} streamName - an optional name for the media source so you can use multiple cameras and screen share simultaneously.
+     * @param {String} iframeUrl - an optional url for the iframe. The default is to use Muaz Khan's.
+     * @example
+     *       easyrtc.initDesktopStream(
+     *          function(mediastream){
+     *              easyrtc.setVideoObjectSrc( document.getElementById("mirrorVideo"), mediastream);
+     *          },
+     *          function(errorCode, errorText){
+     *               easyrtc.showError(errorCode, errorText);
+     *          });
+     *
+     */
 easyrtc.initDesktopStream = function(successCallback, failureCallback, streamName) {
     if (!easyrtc.isDesktopCaptureInstalled()) {
         failureCallback(easyrtc.errCodes.DEVELOPER_ERR, "Desktop capture plugin not installed").
@@ -120,6 +154,8 @@ easyrtc.initDesktopStream = function(successCallback, failureCallback, streamNam
  * with a `link` tag pointing to the extension, which is required by chrome for
  * {@link https://developer.chrome.com/webstore/inline_installation|Inline Installations}.
  *
+ * @function
+ * @memberOf Easyrtc_No_IframeCapture
  * @example
  *
  * <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/bemabaogbdfpbkkganibcmhbgjogabfj" id="custom-app-id" />

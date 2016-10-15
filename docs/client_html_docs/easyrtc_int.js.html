@@ -118,6 +118,7 @@ var Easyrtc = function() {
     var iceCandidateFilter = null;
     /** @private */
     var iceConnectionStateChangeListener = null;
+    var signalingStateChangeListener = null;
     /** @private */
     var connectionOptions =  {
         'connect timeout': 10000,
@@ -173,6 +174,14 @@ var Easyrtc = function() {
     };
 
     /**
+     * Sets a function to warn about the peer connection open.
+     *  @param {Function} handler: a function that gets an easyrtcid as an argument.
+     */
+    this.setPeerOpenListener = function( handler ) {
+       this.onPeerOpen = handler;
+    };
+
+    /**
      * Sets a function to receive warnings about the peer connection
      * failing. The peer connection may recover by itself.
      *  @param {Function} failingHandler: a function that gets an easyrtcid as an argument.
@@ -204,11 +213,22 @@ var Easyrtc = function() {
      *
      * During ICE negotiation the peer connection fires the iceconnectionstatechange event.
      * It is sometimes useful for the application to learn about these changes, especially if the ICE connection fails.
-     * The function should accept two parameters: the easyrtc id of the peer and the iceconnectionstatechange event target.
+     * The function should accept three parameters: the easyrtc id of the peer, the iceconnectionstatechange event target and the iceconnectionstate.
      * @param {Function} listener
      */
     this.setIceConnectionStateChangeListener = function(listener) {
        iceConnectionStateChangeListener = listener;
+    };
+
+    /**
+     * Sets a function that listens on SignalingStateChange events.
+     *
+     * During ICE negotiation the peer connection fires the signalingstatechange event.
+     * The function should accept three parameters: the easyrtc id of the peer, the signalingstatechange event target and the signalingstate.
+     * @param {Function} listener
+     */
+    this.setSignalingStateChangeListener = function(listener) {
+       signalingStateChangeListener = listener;
     };
 
     /**
@@ -434,7 +454,8 @@ var Easyrtc = function() {
      * @param value - true to receive audio, false otherwise. The default is true.
      */
     this.enableAudioReceive = function(value) {
-        if (adapter &amp;&amp; adapter.browserDetails &amp;&amp;
+        if (
+            adapter &amp;&amp; adapter.browserDetails &amp;&amp;
              (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
         ) {
             receivedMediaConstraints.offerToReceiveAudio = value;
@@ -451,7 +472,8 @@ var Easyrtc = function() {
      * @param value - true to receive video, false otherwise. The default is true.
      */
     this.enableVideoReceive = function(value) {
-        if (adapter &amp;&amp; adapter.browserDetails &amp;&amp;
+        if (
+            adapter &amp;&amp; adapter.browserDetails &amp;&amp;
              (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
         ) {
            receivedMediaConstraints.offerToReceiveVideo = value;
@@ -512,8 +534,7 @@ var Easyrtc = function() {
        } else {
           logDebug('Browser does not support output device selection.');
        }
-    } 
-
+    };
 
     /**
      * Gets a list of the available audio sinks (ie, speakers)
@@ -715,7 +736,14 @@ var Easyrtc = function() {
             constraints.video = false;
         }
         else {
-            if (adapter &amp;&amp; adapter.browserDetails &amp;&amp; adapter.browserDetails.browser === "firefox") {
+
+            // Tested Firefox 49 and MS Edge require minFrameRate and maxFrameRate 
+            // instead max,min,ideal that cause GetUserMedia failure.
+            // Until confirmed both browser support idea,max and min we need this.
+            if (
+                adapter &amp;&amp; adapter.browserDetails &amp;&amp;
+                    (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
+            ) {
                 constraints.video = {};
                 if (self._desiredVideoProperties.width) {
                     constraints.video.width = self._desiredVideoProperties.width;
@@ -725,15 +753,16 @@ var Easyrtc = function() {
                 }
                 if (self._desiredVideoProperties.frameRate) {
                     constraints.video.frameRate = { 
-                         ideal: self._desiredVideoProperties.frameRate,
-                         max: self._desiredVideoProperties.frameRate
-                       };
+                        minFrameRate: self._desiredVideoProperties.frameRate,
+                        maxFrameRate: self._desiredVideoProperties.frameRate
+                    };
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
                     constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
                 }
-            }
-            else { // chrome and opera
+
+            // chrome and opera
+            } else { 
                 constraints.video = {};
                 if (self._desiredVideoProperties.width) {
                      constraints.video.width = { 
@@ -895,8 +924,8 @@ var Easyrtc = function() {
     };
 
     /** @private
-     * @param pc_config ice configuration array
-     * @param optionalStuff peer constraints.
+     * @param {Array} pc_config ice configuration array
+     * @param {Object} optionalStuff peer constraints.
      */
     this.createRTCPeerConnection = function(pc_config, optionalStuff) {
         if (self.supportsPeerConnections()) {
@@ -974,28 +1003,28 @@ var Easyrtc = function() {
     var acceptancePending = {};
 
     /** @private
-     * @param caller
-     * @param helper
+     * @param {string} caller
+     * @param {Function} helper
      */
     this.acceptCheck = function(caller, helper) {
         helper(true);
     };
 
     /** @private
-     * @param easyrtcid
-     * @param stream
+     * @param {string} easyrtcid
+     * @param {HTMLMediaStream} stream
      */
     this.streamAcceptor = function(easyrtcid, stream) {
     };
 
     /** @private
-     * @param easyrtcid
+     * @param {string} easyrtcid
      */
     this.onStreamClosed = function(easyrtcid) {
     };
 
     /** @private
-     * @param easyrtcid
+     * @param {string} easyrtcid
      */
     this.callCancelled = function(easyrtcid) {
     };
@@ -2635,13 +2664,69 @@ var Easyrtc = function() {
     };
 
     /** @private */
-    var closedChannel = null;
+    function getRemoteStreamByName(peerConn, otherUser, streamName) {
+                    
+        var keyToMatch = null;
+        var remoteStreams = peerConn.pc.getRemoteStreams();
+
+        // No streamName lead to default 
+        if (!streamName) {
+            streamName = "default";
+        }
+
+        // default lead to first if available
+        if (streamName === "default") {
+            if (remoteStreams.length > 0) {
+                return remoteStreams[0];
+            }
+            else {
+                return null;
+            }
+        }
+
+        // Get mediaIds from user roomData
+        for (var roomName in self.roomData) {
+            if (self.roomData.hasOwnProperty(roomName)) {
+                var mediaIds = self.getRoomApiField(roomName, otherUser, "mediaIds");
+                keyToMatch = mediaIds ? mediaIds[streamName] : null;
+                if (keyToMatch) {
+                    break;
+                }
+            }
+        }
+
+        // 
+        if (!keyToMatch) {
+            self.showError(self.errCodes.DEVELOPER_ERR, "remote peer does not have media stream called " + streamName);
+        }
+
+        // 
+        for (var i = 0; i &lt; remoteStreams.length; i++) {
+            var remoteId;
+            if (remoteStreams[i].id) {
+                remoteId = remoteStreams[i].id;
+            }  else {
+                remoteId = "default";
+            }
+
+            if (
+                !keyToMatch || // No match
+                    remoteId === keyToMatch || // Full match
+                        remoteId.indexOf(keyToMatch) === 0 // Partial match
+            ) {
+                return remoteStreams[i];
+            }
+
+        }
+
+        return null;
+    }
 
     /**
      * @private
-     * @param easyrtcid
-     * @param checkAudio
-     * @param streamName
+     * @param {string} easyrtcid
+     * @param {boolean} checkAudio
+     * @param {string} streamName
      */
     function _haveTracks(easyrtcid, checkAudio, streamName) {
         var stream, peerConnObj;
@@ -2654,7 +2739,7 @@ var Easyrtc = function() {
                 self.showError(self.errCodes.DEVELOPER_ERR, "haveTracks called about a peer you don't have a connection to");
                 return false;
             }
-            stream = peerConnObj.getRemoteStreamByName(streamName);
+            stream = getRemoteStreamByName(peerConns[easyrtcid], easyrtcid, streamName);
         }
         if (!stream) {
             return false;
@@ -2716,6 +2801,9 @@ var Easyrtc = function() {
 
     /** @private */
     var preallocatedSocketIo = null;
+
+    /** @private */
+    var closedChannel = null;
 
     //
     // easyrtc.disconnect performs a clean disconnection of the client from the server.
@@ -3198,15 +3286,13 @@ var Easyrtc = function() {
         if (peerConns[easyrtcid]) {
             emitOnStreamClosed(easyrtcid, stream);
             updateConfigurationInfo();
-            if( peerConns[easyrtcid].pc ) {
+            if (peerConns[easyrtcid].pc) {
                  try {
                     peerConns[easyrtcid].pc.removeStream(stream);
                  } catch( err) {}
             }
-
         }
     }
-
 
     /** @private */
     function buildDeltaRecord(added, deleted) {
@@ -3378,6 +3464,69 @@ var Easyrtc = function() {
         self._candicates.push(parseCandidate(candicate));
     }
 
+    function processAddedStream(otherUser, theStream) {
+        if (!peerConns[otherUser] ||  peerConns[otherUser].cancelled) {
+            return;
+        }
+
+        var peerConn = peerConns[otherUser];
+
+        if (!peerConn.startedAV) {
+            peerConn.startedAV = true;
+            peerConn.sharingAudio = haveAudioVideo.audio;
+            peerConn.sharingVideo = haveAudioVideo.video;
+            peerConn.connectTime = new Date().getTime();
+            if (peerConn.callSuccessCB) {
+                if (peerConn.sharingAudio || peerConn.sharingVideo) {
+                    peerConn.callSuccessCB(otherUser, "audiovideo");
+                }
+            }
+            if (self.audioEnabled || self.videoEnabled) {
+                updateConfiguration();
+            }
+        }
+
+        var remoteName = getNameOfRemoteStream(otherUser, theStream.id || "default");
+        if (!remoteName) {
+            remoteName = "default";
+        }
+        peerConn.remoteStreamIdToName[theStream.id || "default"] = remoteName;
+        peerConn.liveRemoteStreams[remoteName] = true;
+        theStream.streamName = remoteName;
+        if (self.streamAcceptor) {
+            self.streamAcceptor(otherUser, theStream, remoteName);
+            //
+            // Inform the other user that the stream they provided has been received.
+            // This should be moved into signalling at some point
+            //
+            self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
+        }
+    }
+
+    function processAddedTrack(otherUser, peerStreams) {
+
+        if (!peerConns[otherUser] ||  peerConns[otherUser].cancelled) {
+            return;
+        }
+
+        var peerConn = peerConns[otherUser];
+        peerConn.trackTimers = peerConn.trackTimers || {};
+
+        // easyrtc thinks in terms of streams, not tracks.
+        // so we'll add a timeout when the first track event
+        // fires. Firefox produces two events (one of type "video",
+        // and one of type "audio".
+
+        for (var i = 0, l = peerStreams.length; i &lt; l; i++) {
+            var peerStream = peerStreams[i],
+                streamId = peerStream.id || "default";
+            clearTimeout(peerConn.trackTimers[streamId]);
+            peerConn.trackTimers[streamId] = setTimeout(function(peerStream) {
+               processAddedStream(peerConn, otherUser, peerStream);
+            }.bind(peerStream), 100); // Bind peerStream
+        }
+    }
+
     /** @private */
     // TODO split buildPeerConnection it more thant 500 lines
     function buildPeerConnection(otherUser, isInitiator, failureCB, streamNames) {
@@ -3433,18 +3582,29 @@ var Easyrtc = function() {
             };
 
             pc.onsignalingstatechange = function () {
+                
+                var eventTarget = event.currentTarget || event.target || pc,
+                    signalingState = eventTarget.signalingState || 'unknown';
 
+                if (signalingStateChangeListener) {
+                   signalingStateChangeListener(otherUser, eventTarget, signalingState);
+                }
             };
 
             pc.oniceconnectionstatechange = function(event) {
 
+                var eventTarget = event.currentTarget || event.target || pc,
+                    connState = eventTarget.iceConnectionState || 'unknown';
+
                 if (iceConnectionStateChangeListener) {
-                   iceConnectionStateChangeListener(otherUser, event.target);
+                   iceConnectionStateChangeListener(otherUser, eventTarget, connState);
                 }
 
-                var connState = event.currentTarget ? event.currentTarget.iceConnectionState : 'unknown';
                 switch (connState) {
                     case "connected":
+                        if (self.onPeerOpen ) {
+                            self.onPeerOpen(otherUser);
+                        }
                         if (peerConns[otherUser] &amp;&amp; peerConns[otherUser].callSuccessCB) {
                             peerConns[otherUser].callSuccessCB(otherUser, "connection");
                         }
@@ -3456,7 +3616,7 @@ var Easyrtc = function() {
                         delete peerConns[otherUser];
                         break;
                     case "disconnected":
-                        if(self.onPeerFailing) {
+                        if (self.onPeerFailing) {
                             self.onPeerFailing(otherUser);
                         }
                         if (peerConns[otherUser]) {
@@ -3465,8 +3625,8 @@ var Easyrtc = function() {
                         break;
 
                     case "closed":
-                        if( self.onPeerClosed ) {
-                          self.onPeerClosed(otherUser);
+                        if (self.onPeerClosed) {
+                            self.onPeerClosed(otherUser);
                         }
                         break;
                     case "completed":
@@ -3492,54 +3652,7 @@ var Easyrtc = function() {
                 isInitiator: isInitiator,
                 remoteStreamIdToName: {},
                 streamsAddedAcks: {},
-                liveRemoteStreams: {},
-                getRemoteStreamByName: function(streamName) {
-                    var remoteStreams = pc.getRemoteStreams();
-                    var i;
-                    var keyToMatch = null;
-                    var roomName;
-                    if (!streamName) {
-                        streamName = "default";
-                    }
-
-                    if (streamName === "default") {
-                        if (remoteStreams.length > 0) {
-                            return remoteStreams[0];
-                        }
-                        else {
-                            return null;
-                        }
-                    }
-                    for (roomName in self.roomData) {
-                        if (self.roomData.hasOwnProperty(roomName)) {
-                            var mediaIds = self.getRoomApiField(roomName, otherUser, "mediaIds");
-                            keyToMatch = mediaIds ? mediaIds[streamName] : null;
-                            if (keyToMatch) {
-                                break;
-                            }
-                        }
-                    }
-                    if (!keyToMatch) {
-                        self.showError(self.errCodes.DEVELOPER_ERR, "remote peer does not have media stream called " + streamName);
-                    }
-
-                    for (i = 0; i &lt; remoteStreams.length; i++) {
-                        var remoteId;
-                        if (remoteStreams[i].id) {
-                            remoteId = remoteStreams[i].id;
-                        }
-                        else {
-                            remoteId = "default";
-                        }
-
-                        if (!keyToMatch || remoteId === keyToMatch) {
-                            return remoteStreams[i];
-                        }
-
-                    }
-                    return null;
-                }
-                //                var remoteStreams = peerConns[i].pc.getRemoteStreams();
+                liveRemoteStreams: {}
             };
 
             pc.onicecandidate = function(event) {
@@ -3580,87 +3693,14 @@ var Easyrtc = function() {
                 }
             };
 
-            function processAddedStream(peerConn, otherUser, theStream) {
-                if (!peerConns[otherUser] ||  peerConn.cancelled) {
-                    return;
-                }
-
-                logDebug("saw incoming media stream");
-
-
-                if (!peerConn.startedAV) {
-                    peerConn.startedAV = true;
-                    peerConn.sharingAudio = haveAudioVideo.audio;
-                    peerConn.sharingVideo = haveAudioVideo.video;
-                    peerConn.connectTime = new Date().getTime();
-                    if (peerConn.callSuccessCB) {
-                        if (peerConn.sharingAudio || peerConn.sharingVideo) {
-                            peerConn.callSuccessCB(otherUser, "audiovideo");
-                        }
-                    }
-                    if (self.audioEnabled || self.videoEnabled) {
-                        updateConfiguration();
-                    }
-                }
-                var remoteName = getNameOfRemoteStream(otherUser, theStream.id || "default");
-                if (!remoteName) {
-                    remoteName = "default";
-                }
-                peerConn.remoteStreamIdToName[theStream.id || "default"] = remoteName;
-                peerConn.liveRemoteStreams[remoteName] = true;
-                theStream.streamName = remoteName;
-                if (self.streamAcceptor) {
-                    self.streamAcceptor(otherUser, theStream, remoteName);
-                    //
-                    // Inform the other user that the stream they provided has been received.
-                    // This should be moved into signalling at some point
-                    //
-                    self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
-                }
-            };
-
             pc.ontrack = function(event) {
-
-               if( !peerConns[otherUser] || peerConns[otherUser].cancelled) {
-                  return;
-               }
-
-               peerConn = peerConns[otherUser];
-
-               peerConn.trackTimers = peerConn.trackTimers || {};
-
-               //
-               // easyrtc thinks in terms of streams, not tracks.
-               // so we'll add a timeout when the first track event
-               // fires. Firefox produces two events (one of type "video",
-               // and one of type "audio".
-               //
-               var n = nstreams = event.streams.length;
-               var i;
-               for(i = 0; i &lt; n; i++ ) {
-                  var curStream = event.streams[i];
-                  streamId = curStream.id || "default";
-                  if( peerConn.trackTimers[streamId] ) {
-                     //
-                     // do nothing because it's handled in the
-                     // already set timeout.
-                     //
-                  }
-                  else {
-                     peerConn.trackTimers[streamId] =
-                       setTimeout( function() {
-                           processAddedStream(peerConn, otherUser, curStream);
-                           if( peerConns[otherUser] &amp;&amp; peerConn.trackTimers[streamId]) {
-                              delete peerConn.trackTimers[streamId];
-                           }
-                         }, 100);
-                  }
-               }
+                logDebug("empty ontrack method invoked, which is expected");
+                processAddedTrack(otherUser, event.streams);
             };
-
 
             pc.onaddstream = function(event) {
-                logDebug("empty onaddStream method invoked, which is expected");
+                logDebug("empty onaddstream method invoked, which is expected");
+                processAddedStream(otherUser, event.stream);
             };
 
             pc.onremovestream = function(event) {
@@ -4199,48 +4239,71 @@ var Easyrtc = function() {
     }
 
     /** @private */
-    function hangupBody(otherUser) {
-        var i;
-        logDebug("Hanging up on " + otherUser);
+    function closePeer(otherUser) {
 
-        clearQueuedMessages(otherUser);
-        if (peerConns[otherUser]) {
+        if (acceptancePending[otherUser]) {
+            delete acceptancePending[otherUser];
+        }
+        if (offersPending[otherUser]) {
+            delete offersPending[otherUser];
+        }
 
-            if (peerConns[otherUser].pc) {
-
+        if (
+          !peerConns[otherUser].cancelled &amp;&amp;
+              peerConns[otherUser].pc
+        ) {
+            try {
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
-                for (i = 0; i &lt; remoteStreams.length; i++) {
-                    if( isStreamActive(remoteStreams[i])) {
+                for (var i = 0; i &lt; remoteStreams.length; i++) {
+                    if (isStreamActive(remoteStreams[i])) {
                         emitOnStreamClosed(otherUser, remoteStreams[i]);
                         stopStream(remoteStreams[i]);
                     }
                 }
-                //
-                // todo: may need to add a few lines here for closing the data channels
-                //
-                try {
-                    peerConns[otherUser].pc.close();
-                } catch (err) {
-                    logDebug("peer " + otherUser + " close failed:" + err);
+
+                peerConns[otherUser].pc.close();
+                peerConns[otherUser].cancelled = true;
+                logDebug("peer closed");
+            } catch (err) {
+                logDebug("peer " + otherUser + " close failed:" + err);
+            } finally {
+                if (self.onPeerClosed) {
+                    self.onPeerClosed(otherUser);
                 }
             }
+        }
+    }
 
-            peerConns[otherUser].cancelled = true;
-            delete peerConns[otherUser];
+    /** @private */
+    function hangupBody(otherUser) {
+        
+        logDebug("Hanging up on " + otherUser);
+        clearQueuedMessages(otherUser);
 
+        if (peerConns[otherUser]) {
+
+            if (peerConns[otherUser].pc) {
+                closePeer(otherUser);
+            } 
+
+            if (peerConns[otherUser]) {
+                delete peerConns[otherUser];
+            }
+
+            updateConfigurationInfo();
+            
             if (self.webSocket) {
                 sendSignalling(otherUser, "hangup", null, function() {
-
+                    logDebug("hangup succeeds");
                 }, function(errorCode, errorText) {
                     logDebug("hangup failed:" + errorText);
                     self.showError(errorCode, errorText);
                 });
             }
-            if (acceptancePending[otherUser]) {
-                delete acceptancePending[otherUser];
-            }
         }
     }
+
+    
 
     /**
      * Hang up on a particular user or all users.
@@ -4300,7 +4363,7 @@ var Easyrtc = function() {
             throw "Developer err: no such stream";
         }
         else {
-            return peerConns[easyrtcid].getRemoteStreamByName(remoteStreamName);
+            return getRemoteStreamByName(peerConns[easyrtcid], easyrtcid, remoteStreamName);
         }
     };
 
@@ -4316,7 +4379,7 @@ var Easyrtc = function() {
     this.makeLocalStreamFromRemoteStream = function(easyrtcid, remoteStreamName, localStreamName) {
         var remoteStream;
         if (peerConns[easyrtcid].pc) {
-            remoteStream = peerConns[easyrtcid].getRemoteStreamByName(remoteStreamName);
+            remoteStream = getRemoteStreamByName(peerConns[easyrtcid], easyrtcid, remoteStreamName);
             if (remoteStream) {
                 registerLocalMediaStreamByName(remoteStream, localStreamName);
             }
@@ -4450,7 +4513,7 @@ var Easyrtc = function() {
             logDebug("setPeerListener failed: __closingMediaStream Unknow easyrtcid " + easyrtcid);
         }
         else {
-            var stream = peerConns[easyrtcid].getRemoteStreamByName(msgData.streamName);
+            var stream = getRemoteStreamByName(peerConns[easyrtcid], easyrtcid, msgData.streamName);
             if (stream) {
                 onRemoveStreamHelper(easyrtcid, stream);
                 stopStream(stream);
@@ -4483,44 +4546,29 @@ var Easyrtc = function() {
     };
 
     /** @private */
-    function onRemoteHangup(caller) {
-        delete offersPending[caller];
+    function onRemoteHangup(otherUser) {
+
         logDebug("Saw onRemote hangup event");
+        clearQueuedMessages(otherUser);
 
-        if (peerConns[caller]) {
-            peerConns[caller].cancelled = true;
-            if (peerConns[caller].pc) {
-                //
-                // close any remote streams.
-                //
-                var remoteStreams = peerConns[caller].pc.getRemoteStreams();
-                if (remoteStreams) {
-                    var i;
-                    for (i = 0; i &lt; remoteStreams.length; i++) {
-                        emitOnStreamClosed(caller, remoteStreams[i]);
-                        try {
-                            stopStream(remoteStreams[i]);
-                        } catch (err) {
-                        }
-                    }
-                }
+        if (peerConns[otherUser]) {
 
-                try {
-                    peerConns[caller].pc.close();
-                } catch (anyErrors) {
-                }
+            if (peerConns[otherUser].pc) {
+                closePeer(otherUser);
             }
             else {
                 if (self.callCancelled) {
-                    self.callCancelled(caller, true);
+                    self.callCancelled(otherUser, true);
                 }
             }
-            delete peerConns[caller];
-            updateConfigurationInfo();
+
+            if (peerConns[otherUser]) {
+                delete peerConns[otherUser];
+            }
         }
         else {
             if (self.callCancelled) {
-                self.callCancelled(caller, true);
+                self.callCancelled(otherUser, true);
             }
         }
     }
@@ -4545,7 +4593,7 @@ var Easyrtc = function() {
     /**
      * Checks to see if a particular peer is present in any room.
      * If it isn't, we assume it's logged out.
-     * @param easyrtcid the easyrtcId of the peer.
+     * @param {string} easyrtcid the easyrtcId of the peer.
      */
     this.isPeerInAnyRoom = function(easyrtcid) {
          return isPeerInAnyRoom(easyrtcid);
@@ -5176,7 +5224,7 @@ var Easyrtc = function() {
      * Returns true if the ipAddress parameter was the address of a stun server. This is done by checking against information
      * collected during peer to peer calls. Don't expect it to work before the first call, or to identify turn servers that aren't
      * in the ice config.
-     * @param ipAddress
+     * @param {string} ipAddress
      * @returns {boolean} true if ip address is known to be that of a stun server, false otherwise.
      */
     this.isStunServer = function(ipAddress) {
@@ -5625,7 +5673,7 @@ var Easyrtc = function() {
 
 return new Easyrtc();
 
-}));
+})); 
 </code></pre>
         </article>
     </section>
@@ -5636,13 +5684,13 @@ return new Easyrtc();
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Easyrtc.html">Easyrtc</a></li><li><a href="Easyrtc_ft.html">Easyrtc_ft</a></li></ul><h3>Mixins</h3><ul><li><a href="Easyrtc_Rates.html">Easyrtc_Rates</a></li><li><a href="Easyrtc_Record.html">Easyrtc_Record</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Easyrtc.html">Easyrtc</a></li><li><a href="Easyrtc_App.html">Easyrtc_App</a></li><li><a href="Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li><li><a href="Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li><li><a href="Easyrtc_Rates.html">Easyrtc_Rates</a></li><li><a href="Easyrtc_Recorder.html">Easyrtc_Recorder</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.0-dev</a> on Mon Sep 19 2016 09:09:15 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.0-dev</a> on Wed Oct 12 2016 08:54:49 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: easyrtc_util.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: easyrtc_util.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* global module, require */
+
+/**
+ * Utility functions specific to EasyRTC.
+ *
+ * @module      easyrtc_util
+ * @author      Priologic Software, info@easyrtc.com
+ * @copyright   Copyright 2016 Priologic Software. All rights reserved.
+ * @license     BSD v2, see LICENSE file in module root folder.
+ */
+
+var util            = require("util");
+var _               = require("underscore");                // General utility functions external module
+var g               = require("./general_util");            // General utility functions local module
+var e               = require("./easyrtc_private_obj");     // EasyRTC private object
+
+/**
+ *  Object to hold EasyRTC Utility methods and classes.
+ *
+ * @class
+ */
+var eu = module.exports;
+
+/**
+ * Disconnects socket. Failure results in a debug level log message.
+ *
+ * @param       {Object} socket         Socket.io connection object.
+ */
+eu.socketDisconnect = function(socket) {
+    try {
+        socket.disconnect();
+    } catch(err) {
+        eu.log("debug", "Socket disconnection command failed. Socket may already be disconnected.");
+    }
+};
+
+
+/**
+ * Custom Error Object for EasyRTC Server Errors.
+ *
+ * @extends     Error
+ * @param       {string} msg            Text message describing the error.
+ * @returns     {Error}
+ */
+eu.ServerError = function(msg) {
+    eu.ServerError.super_.call(this, msg, this.constructor);
+};
+util.inherits(eu.ServerError, g.AbstractError);
+eu.ServerError.prototype.name = "Server Error";
+eu.ServerError.prototype.errorLevel = "error";
+
+
+/**
+ * Custom Error Object for EasyRTC Application Errors.
+ *
+ * @extends     Error
+ * @param       {string} msg            Text message describing the error.
+ * @returns     {Error}
+ */
+eu.ApplicationError = function(msg) {
+    eu.ApplicationError.super_.call(this, msg, this.constructor);
+};
+util.inherits(eu.ApplicationError, g.AbstractError);
+eu.ApplicationError.prototype.name = "Application Error";
+eu.ApplicationError.prototype.errorLevel = "error";
+
+
+/**
+ * Custom Error Object for Connection Errors.
+ *
+ * @extends     Error
+ * @param       {string} msg            Text message describing the error.
+ * @returns     {Error}
+ */
+eu.ConnectionError = function(msg) {
+    eu.ConnectionError.super_.call(this, msg, this.constructor);
+};
+util.inherits(eu.ConnectionError, g.AbstractError);
+eu.ConnectionError.prototype.name = "Connection Error";
+eu.ConnectionError.prototype.errorLevel = "error";
+
+
+/**
+ * Custom Error Object for EasyRTC Server Warnings.
+ *
+ * @extends     Error
+ * @param       {string} msg            Text message describing the error.
+ * @returns     {Error}
+ */
+eu.ServerWarning = function(msg) {
+    eu.ServerWarning.super_.call(this, msg, this.constructor);
+};
+util.inherits(eu.ServerWarning, g.AbstractError);
+eu.ServerWarning.prototype.name = "Server Warning";
+eu.ServerWarning.prototype.errorLevel = "warning";
+
+
+/**
+ * Custom Error Object for EasyRTC Application Warnings.
+ *
+ * @extends     Error
+ * @param       {string} msg            Text message describing the error.
+ * @returns     {Error}
+ */
+eu.ApplicationWarning = function(msg) {
+    eu.ApplicationWarning.super_.call(this, msg, this.constructor);
+};
+util.inherits(eu.ApplicationWarning, g.AbstractError);
+eu.ApplicationWarning.prototype.name = "Application Warning";
+eu.ApplicationWarning.prototype.errorLevel = "warning";
+
+
+/**
+ * Custom Error Object for Connection Warnings.
+ *
+ * @extends     Error
+ * @param       {string} msg            Text message describing the error.
+ * @returns     {Error}
+ */
+eu.ConnectionWarning = function(msg) {
+    eu.ConnectionWarning.super_.call(this, msg, this.constructor);
+};
+util.inherits(eu.ConnectionWarning, g.AbstractError);
+eu.ConnectionWarning.prototype.name = "Connection Warning";
+eu.ConnectionWarning.prototype.errorLevel = "warning";
+
+
+/**
+ * Determines if an Error object is an instance of ApplicationError, ConnectionError, or ServerError. If it is, it will return true.
+ *
+ * @param   {Error}     err
+ * @return  {Boolean}
+ */
+eu.isError = function(err) {
+    if (err &amp;&amp; ((err instanceof eu.ConnectionError)||(err instanceof eu.ApplicationError)||(err instanceof eu.ServerError)||(err instanceof Error))) {
+        return true;
+    } else {
+        return false;
+    }
+};
+
+
+/**
+ * Determines if an Error object is an instance of ApplicationWarning, ConnectionWarning, or ServerWarning. If it is, it will return true.
+ *
+ * @param   {Error}     err
+ * @return  {Boolean}
+ */
+eu.isWarning = function(err) {
+    if (err &amp;&amp; ((err instanceof eu.ConnectionWarning)||(err instanceof eu.ApplicationWarning)||(err instanceof eu.ServerWarning))) {
+        return true;
+    } else {
+        return false;
+    }
+};
+
+
+/**
+ * Returns a random available easyrtcid.
+ *
+ * @return  {String} Available easyrtcid. A unique identifier for an EasyRTC connection.
+ */
+eu.getAvailableEasyrtcid = function() {
+    var newEasyrtcid = "";
+    var easyrtcidExists = false;
+
+    do {
+        newEasyrtcid = g.randomString();
+        easyrtcidExists = false;
+        for (var key in e.app) {
+            if (e.app[key].connection[newEasyrtcid]) {
+                easyrtcidExists = true;
+                break;
+            }
+        }
+    } while (easyrtcidExists);
+
+    return newEasyrtcid;
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li><li><a href="module-easyrtc_default_options.html">easyrtc_default_options</a></li><li><a href="module-easyrtc_private_obj.html">easyrtc_private_obj</a></li><li><a href="module-easyrtc_public_obj.html">easyrtc_public_obj</a></li><li><a href="module-easyrtc_util.html">easyrtc_util</a></li><li><a href="module-general_util.html">general_util</a></li></ul><h3>Classes</h3><ul><li><a href="module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li><li><a href="module-easyrtc_public_obj-pub.html">pub</a></li><li><a href="module-easyrtc_public_obj-pub.events.html">events</a></li><li><a href="module-easyrtc_public_obj-pub.util.html">util</a></li><li><a href="module-easyrtc_util-eu.html">eu</a></li><li><a href="module-general_util-g.html">g</a></li><li><a href="pub.appObj.html">appObj</a></li><li><a href="pub.appObj.connectionObj.html">connectionObj</a></li><li><a href="pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li><li><a href="pub.appObj.roomObj.html">roomObj</a></li><li><a href="pub.appObj.sessionObj.html">sessionObj</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.0-dev</a> on Wed Oct 12 2016 08:54:51 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

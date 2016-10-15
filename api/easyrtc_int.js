@@ -895,8 +895,8 @@ var Easyrtc = function() {
     };
 
     /** @private
-     * @param pc_config ice configuration array
-     * @param optionalStuff peer constraints.
+     * @param {Array} pc_config ice configuration array
+     * @param {Object} optionalStuff peer constraints.
      */
     this.createRTCPeerConnection = function(pc_config, optionalStuff) {
         if (self.supportsPeerConnections()) {
@@ -974,28 +974,28 @@ var Easyrtc = function() {
     var acceptancePending = {};
 
     /** @private
-     * @param caller
-     * @param helper
+     * @param {string} caller
+     * @param {Function} helper
      */
     this.acceptCheck = function(caller, helper) {
         helper(true);
     };
 
     /** @private
-     * @param easyrtcid
-     * @param stream
+     * @param {string} easyrtcid
+     * @param {HTMLMediaStream} stream
      */
     this.streamAcceptor = function(easyrtcid, stream) {
     };
 
     /** @private
-     * @param easyrtcid
+     * @param {string} easyrtcid
      */
     this.onStreamClosed = function(easyrtcid) {
     };
 
     /** @private
-     * @param easyrtcid
+     * @param {string} easyrtcid
      */
     this.callCancelled = function(easyrtcid) {
     };
@@ -2695,9 +2695,9 @@ var Easyrtc = function() {
 
     /**
      * @private
-     * @param easyrtcid
-     * @param checkAudio
-     * @param streamName
+     * @param {string} easyrtcid
+     * @param {boolean} checkAudio
+     * @param {string} streamName
      */
     function _haveTracks(easyrtcid, checkAudio, streamName) {
         var stream, peerConnObj;
@@ -4564,7 +4564,7 @@ var Easyrtc = function() {
     /**
      * Checks to see if a particular peer is present in any room.
      * If it isn't, we assume it's logged out.
-     * @param easyrtcid the easyrtcId of the peer.
+     * @param {string} easyrtcid the easyrtcId of the peer.
      */
     this.isPeerInAnyRoom = function(easyrtcid) {
          return isPeerInAnyRoom(easyrtcid);
@@ -5195,7 +5195,7 @@ var Easyrtc = function() {
      * Returns true if the ipAddress parameter was the address of a stun server. This is done by checking against information
      * collected during peer to peer calls. Don't expect it to work before the first call, or to identify turn servers that aren't
      * in the ice config.
-     * @param ipAddress
+     * @param {string} ipAddress
      * @returns {boolean} true if ip address is known to be that of a stun server, false otherwise.
      */
     this.isStunServer = function(ipAddress) {
@@ -5644,4 +5644,4 @@ var Easyrtc = function() {
 
 return new Easyrtc();
 
-}));
+})); 
