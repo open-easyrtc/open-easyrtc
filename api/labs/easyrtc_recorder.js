@@ -132,7 +132,7 @@
            return null;
         }
 
-        var mediaRecorder = new MediaRecorder(localStream, {mimeType: mimeType});
+        var mediaRecorder = new MediaRecorder(mediaStream, {mimeType: mimeType});
         if( !mediaRecorder ) {
            console.log("no media recorder");
            return;
