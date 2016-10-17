@@ -3151,6 +3151,7 @@ var Easyrtc = function() {
                 for (var i = 0; i < values.length; i++) {
                     var source = values[i];
                     if (source.kind === sourceType) {
+                        source.id = source.deviceId; //backwards compatibility
                         results.push(source);
                     }
                 }
@@ -3440,7 +3441,7 @@ var Easyrtc = function() {
                     };
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
-                    constraints.video.sourceId = self._desiredVideoProperties.videoSrcId;
+                    constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
                 }
                 // hack for opera
                 if (Object.keys(constraints.video).length === 0 ) {
@@ -3463,7 +3464,7 @@ var Easyrtc = function() {
                 constraints.audio = {mandatory: {}, optional: []};
                 if (self._desiredAudioProperties.audioSrcId) {
                     constraints.audio.optional = constraints.audio.optional || [];
-                    constraints.audio.optional.push({sourceId: self._desiredAudioProperties.audioSrcId});
+                    constraints.audio.optional.push({deviceId: self._desiredAudioProperties.audioSrcId});
                 }
             }
         }
@@ -3578,8 +3579,8 @@ var Easyrtc = function() {
     };
 
     /** @private
-     * @param pc_config ice configuration array
-     * @param optionalStuff peer constraints.
+     * @param {Array} pc_config ice configuration array
+     * @param {Object} optionalStuff peer constraints.
      */
     this.createRTCPeerConnection = function(pc_config, optionalStuff) {
         if (self.supportsPeerConnections()) {
@@ -3657,28 +3658,28 @@ var Easyrtc = function() {
     var acceptancePending = {};
 
     /** @private
-     * @param caller
-     * @param helper
+     * @param {string} caller
+     * @param {Function} helper
      */
     this.acceptCheck = function(caller, helper) {
         helper(true);
     };
 
     /** @private
-     * @param easyrtcid
-     * @param stream
+     * @param {string} easyrtcid
+     * @param {HTMLMediaStream} stream
      */
     this.streamAcceptor = function(easyrtcid, stream) {
     };
 
     /** @private
-     * @param easyrtcid
+     * @param {string} easyrtcid
      */
     this.onStreamClosed = function(easyrtcid) {
     };
 
     /** @private
-     * @param easyrtcid
+     * @param {string} easyrtcid
      */
     this.callCancelled = function(easyrtcid) {
     };
@@ -5378,9 +5379,9 @@ var Easyrtc = function() {
 
     /**
      * @private
-     * @param easyrtcid
-     * @param checkAudio
-     * @param streamName
+     * @param {string} easyrtcid
+     * @param {boolean} checkAudio
+     * @param {string} streamName
      */
     function _haveTracks(easyrtcid, checkAudio, streamName) {
         var stream, peerConnObj;
@@ -7247,7 +7248,7 @@ var Easyrtc = function() {
     /**
      * Checks to see if a particular peer is present in any room.
      * If it isn't, we assume it's logged out.
-     * @param easyrtcid the easyrtcId of the peer.
+     * @param {string} easyrtcid the easyrtcId of the peer.
      */
     this.isPeerInAnyRoom = function(easyrtcid) {
          return isPeerInAnyRoom(easyrtcid);
@@ -7878,7 +7879,7 @@ var Easyrtc = function() {
      * Returns true if the ipAddress parameter was the address of a stun server. This is done by checking against information
      * collected during peer to peer calls. Don't expect it to work before the first call, or to identify turn servers that aren't
      * in the ice config.
-     * @param ipAddress
+     * @param {string} ipAddress
      * @returns {boolean} true if ip address is known to be that of a stun server, false otherwise.
      */
     this.isStunServer = function(ipAddress) {
@@ -8327,7 +8328,7 @@ var Easyrtc = function() {
 
 return new Easyrtc();
 
-}));
+})); 
 
 /* global define, module, require, console */
 /*!
@@ -8381,8 +8382,9 @@ return new Easyrtc();
     "use strict";
 
     /**
-     * @mixin Easyrtc_App
-     * @augments Easyrtc
+     * This file adds additional methods to Easyrtc for simplifying the 
+     * management of video-mediastream assignment.
+     * @class Easyrtc_App
      */
 
     /** @private */
@@ -8390,8 +8392,8 @@ return new Easyrtc();
 
     /** By default, the easyApp routine sticks a "close" button on top of each caller
      * video object that it manages. Call this function(before calling easyApp) to disable that particular feature.
-     * @alias easyrtc.dontAddCloseButtons
-     * @memberOf module:EasyRTC/Easyrtc_App
+     * @function
+     * @memberOf Easyrtc_App
      * @example
      *    easyrtc.dontAddCloseButtons();
      */
@@ -8505,6 +8507,8 @@ return new Easyrtc();
         /** Sets an event handler that gets called when an incoming MediaStream is assigned 
          * to a video object. The name is poorly chosen and reflects a simpler era when you could
          * only have one media stream per peer connection.
+         * @function
+         * @memberOf Easyrtc_App
          * @param {Function} cb has the signature function(easyrtcid, slot){}
          * @example
          *   easyrtc.setOnCall( function(easyrtcid, slot){
@@ -8521,6 +8525,8 @@ return new Easyrtc();
          * The slot is parameter is the index into the array of video ids.
          * Note: if you call easyrtc.getConnectionCount() from inside your callback
          * it's count will reflect the number of connections before the hangup started.
+         * @function
+         * @memberOf Easyrtc_App
          * @param {Function} cb has the signature function(easyrtcid, slot){}
          * @example
          *   easyrtc.setOnHangup( function(easyrtcid, slot){
@@ -8531,6 +8537,13 @@ return new Easyrtc();
             onHangup = cb;
         };
 
+        /** 
+          * Get the easyrtcid of the ith caller, starting at 0.
+          * @function
+          * @memberOf Easyrtc_App
+          * @param {number} i
+          * @returns {String}
+          */
         easyrtc.getIthCaller = function(i) {
             if (i < 0 || i >= videoIdsP.length) {
                 return null;
@@ -8539,6 +8552,14 @@ return new Easyrtc();
             return getCallerOfVideo(vid);
         };
 
+        /** 
+          * This is the complement of getIthCaller. Given an easyrtcid,
+          * it determines which slot the easyrtc is in.
+          * @function
+          * @memberOf Easyrtc_App
+          * @param {string} easyrtcid 
+          * @returns {number} or -1 if the easyrtcid is not a caller.
+          */
         easyrtc.getSlotOfCaller = function(easyrtcid) {
             var i;
             for (i = 0; i < numPEOPLE; i++) {
@@ -8666,6 +8687,8 @@ return new Easyrtc();
      * side effects is to add hangup buttons to the remote video objects, buttons
      * that only appear when you hover over them with the mouse cursor. This method will also add the
      * easyrtcMirror class to the monitor video object so that it behaves like a mirror.
+     * @function
+     * @memberOf Easyrtc_App
      *  @param {String} applicationName - name of the application.
      *  @param {String} monitorVideoId - the id of the video object used for monitoring the local stream.
      *  @param {Array} videoIds - an array of video object ids (strings)
@@ -8704,6 +8727,8 @@ return new Easyrtc();
 
         /** Sets an event handler that gets called when a connection to the signaling
          * server has or has not been made. Can only be called after calling easyrtc.easyApp.
+         * @function
+         * @memberOf Easyrtc_App
          * @param {Function} gotConnectionCB has the signature (gotConnection, errorText)
          * @example
          *    easyrtc.setGotConnection( function(gotConnection, errorText){
@@ -8773,5 +8798,5 @@ return new Easyrtc();
 
 return easyrtc;
 
-}));
-
+})); // end of module wrapper
+;

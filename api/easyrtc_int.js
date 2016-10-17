@@ -468,6 +468,7 @@ var Easyrtc = function() {
                 for (var i = 0; i < values.length; i++) {
                     var source = values[i];
                     if (source.kind === sourceType) {
+                        source.id = source.deviceId; //backwards compatibility
                         results.push(source);
                     }
                 }
@@ -757,7 +758,7 @@ var Easyrtc = function() {
                     };
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
-                    constraints.video.sourceId = self._desiredVideoProperties.videoSrcId;
+                    constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
                 }
                 // hack for opera
                 if (Object.keys(constraints.video).length === 0 ) {
@@ -780,7 +781,7 @@ var Easyrtc = function() {
                 constraints.audio = {mandatory: {}, optional: []};
                 if (self._desiredAudioProperties.audioSrcId) {
                     constraints.audio.optional = constraints.audio.optional || [];
-                    constraints.audio.optional.push({sourceId: self._desiredAudioProperties.audioSrcId});
+                    constraints.audio.optional.push({deviceId: self._desiredAudioProperties.audioSrcId});
                 }
             }
         }

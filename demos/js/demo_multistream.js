@@ -113,7 +113,7 @@ function connect() {
              var videoEle = videoSrcList[i];
             var videoLabel = (videoSrcList[i].label &&videoSrcList[i].label.length > 0)?
 			(videoSrcList[i].label):("src_" + i);
-            addSrcButton(videoLabel, videoSrcList[i].id);
+            addSrcButton(videoLabel, videoSrcList[i].deviceId);
         }
         //
         // add an extra button for screen sharing
