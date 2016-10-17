@@ -613,4 +613,5 @@ If You Run Into Problems
 ------------------------
 Please feel free to post on our discussion forum:
 
- - [https://easyrtc.com/forum/](https://easyrtc.com/forum/)
+- [https://groups.google.com/forum/?fromgroups#!forum/easyrtc](https://groups.google.com/forum/?fromgroups#!forum/easyrtc)
+

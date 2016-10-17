@@ -429,4 +429,5 @@ If You Run Into Problems
 First check the easyrtc_webrtc_problems.md pages for a solution. After that,
 please feel free to post on our discussion forum:
 
- - [https://easyrtc.com/forum/](https://easyrtc.com/forum/)
+- [https://groups.google.com/forum/?fromgroups#!forum/easyrtc](https://groups.google.com/forum/?fromgroups#!forum/easyrtc)
+ 
