@@ -5,14 +5,14 @@ v1.1.0
 -------
 New Features:
  - JS Client - Added setPeerOpenListener and setSignalingStateChangeListener. 
- - JS Client - Added options to set prefered video codec in peer connection.
+ - JS Client - Added options to set preferred video codec in peer connection.
  - JS Client - Added media stream recording feature and demo.
  - JS Client - Added support for selecting audio playback destination.
  - Documentation - Added info on git install steps. 
 
 Changes:
  - JS Client - Use minFrameRate/MaxFrameRate for Firefox and Edge instead of frameRate.min and frameRate.max.
- - JS Client - Updated to use webrtc ontrack api and newer media constraints api.
+ - JS Client - Updated to use WebRTC ontrack api and newer media constraints api.
  - JS Client -Updated the ice filter demo and exposed it on the demo page.
  - Server - Updated default server options to use urls instead of url for ice se.
  - Server - Updated socket.io from 1.3.7 to 1.4.5.
@@ -25,15 +25,15 @@ Changes:
 Fixes:
  - JS Client - Fixed file sharing demo.
  - JS Client - Put a guard on onPeerClosed.
- - JS Client - improves in cancelling file transfer requests.
- - JS Client - prevent possible undefined prop dataChannelReady if peerConns  get recycled early.
- - JS Client - fix easrytc_app UMD declaration.
+ - JS Client - Improvements in cancelling file transfer requests.
+ - JS Client - Prevents possible undefined prop dataChannelReady if peer connection gets recycled early.
+ - JS Client - Fixed easrytc_app UMD declaration.
  - JS Client - improved try catch block so that message processing errors didn't masquerade as json parse errors.
- - JS Client - fix possible error due missing adapter.browserShim.attachMediaStream on some platform.
+ - JS Client - Fix possible error due missing adapter.browserShim.attachMediaStream on some platform.
  - JS Client - In the multiparty demo, moved the socket.io reference above the easyrtc.js reference.
  - Documentation - Added fields to the inline documentation on client side to make it work better with jsdoc. We now get documentation for all the interesting files.
  - Documentation - Fixed error in easyrtc_client_tutorial.md
- - Packaging - add index.js to bower ignored files cause bower is for client not server.
+ - Packaging - Added index.js to bower ignored files since bower is for client only (not server).
 
 
 v1.0.17
@@ -44,7 +44,7 @@ Changes:
  - JS Client - Remove check to see if createRTCPeerConnection works.
  - JS Client - Got rid of setVideoSrc (use setVideoSource instead)
  - JS Client - Updated adapter.js.
- - Documentation - REmove comment about Firefox non support for video source.
+ - Documentation - Removed comment about Firefox non-support for video source.
  - Documentation - Updated inline documentation for getAudioSourceList and getVideoSourceList.
  - Documentation - Added .jshintrc
  - Documentation - Added copyright notice to easy_app.js
@@ -52,10 +52,10 @@ Fixes:
  - JS Client - Check if peer connection exists when responding to a webrtc negotiationneeded event, icecandidate event, addstream event.
  - JS Client - Check if peer connection exists before calling onPeerRecovered.
  - JS Client - Modified logic used to detect chrome browser.
- - JS Client - update references in device lists from id to deviceId.
- - JS Client - improved setting of audio and video constraints.
- - JS Client - prevent possible null on oniceconnectionstatechange event.currentTarget
- - JS Client - fixes to easy_app error logging.
+ - JS Client - Updated references in device lists from id to deviceId.
+ - JS Client - Improved setting of audio and video constraints.
+ - JS Client - Prevent possible null on oniceconnectionstatechange event.currentTarget
+ - JS Client - Fixes to easy_app error logging.
  - Documentation - Fixed documentation for setVideoDims.
 
 
