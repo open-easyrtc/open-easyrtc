@@ -14,7 +14,7 @@ Changes:
   - Doc - Updated client and server html documentation.
   - Server - Updated socket.io from 1.3.7 to 1.4.5.
   - Doc - Copyright date bump to 2016.
-  - Doc - Updated link to EasyyRTC forum.
+  - Doc - Updated link to EasyRTC forum.
   - JS Client - Use minFrameRate/MaxFrameRate for Firefox and Edge instead of
              frameRate.min and frameRate.max.
   - Doc - Updated README to include bower install step.
