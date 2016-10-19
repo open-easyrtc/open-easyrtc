@@ -25,15 +25,15 @@ Changes:
 Fixes:
  - JS Client - Fixed file sharing demo.
  - JS Client - Put a guard on onPeerClosed.
- - Documentation - Added fields to the inline documentation on client side to make it work better with jsdoc. We now get documentation for all the interesting files.
- - Documentation - Fixed error in easyrtc_client_tutorial.md
  - JS Client - improves in cancelling file transfer requests.
- - Packaging - add index.js to bower ignored files cause bower is for client not server.
  - JS Client - prevent possible undefined prop dataChannelReady if peerConns  get recycled early.
  - JS Client - fix easrytc_app UMD declaration.
  - JS Client - improved try catch block so that message processing errors didn't masquerade as json parse errors.
  - JS Client - fix possible error due missing adapter.browserShim.attachMediaStream on some platform.
  - JS Client - In the multiparty demo, moved the socket.io reference above the easyrtc.js reference.
+ - Documentation - Added fields to the inline documentation on client side to make it work better with jsdoc. We now get documentation for all the interesting files.
+ - Documentation - Fixed error in easyrtc_client_tutorial.md
+ - Packaging - add index.js to bower ignored files cause bower is for client not server.
 
 
 v1.0.17
