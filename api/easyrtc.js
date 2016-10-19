@@ -1,3 +1,559 @@
+/* global define, module, require */
+/*!
+  Script: easyrtc_lang.js
+
+    Provides lang file.
+
+  About: License
+
+    Copyright (c) 2016, Priologic Software Inc.
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+        * Redistributions of source code must retain the above copyright notice,
+          this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in the
+          documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+*/
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        //RequireJS (AMD) build system
+        define('easyrtc_lang',factory);
+    } else if (typeof module === 'object' && module.exports) {
+        //CommonJS build system
+        module.exports = factory();
+    } else {
+        root.easyrtc_lang = factory();
+  }
+}(this, function (undefined) {
+
+  "use strict";
+
+return {
+  "unableToEnterRoom":"Unable to enter room {0} because {1}" ,
+  "resolutionWarning": "Requested video size of {0}x{1} but got size of {2}x{3}",
+  "badUserName": "Illegal username {0}",
+  "localMediaError": "Error getting local media stream: {0}",
+  "miscSignalError": "Miscellaneous error from signalling server. It may be ignorable.",
+  "noServer": "Unable to reach the EasyRTC signalling server.",
+  "badsocket": "Socket.io connect event fired with bad websocket.",
+  "icf": "Internal communications failure",
+  "statsNotSupported":"call statistics not supported by this browser, try Chrome.",
+   "noWebrtcSupport":"Your browser doesn't appear to support WebRTC.",
+   "gumFailed":"Failed to get access to local media. Error code was {0}.",
+   "requireAudioOrVideo":"At least one of audio and video must be provided"   
+};
+
+}));
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define('webrtc-adapter',[],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.adapter = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+ /* eslint-env node */
+
+
+// SDP helpers.
+var SDPUtils = {};
+
+// Generate an alphanumeric identifier for cname or mids.
+// TODO: use UUIDs instead? https://gist.github.com/jed/982883
+SDPUtils.generateIdentifier = function() {
+  return Math.random().toString(36).substr(2, 10);
+};
+
+// The RTCP CNAME used by all peerconnections from the same JS.
+SDPUtils.localCName = SDPUtils.generateIdentifier();
+
+// Splits SDP into lines, dealing with both CRLF and LF.
+SDPUtils.splitLines = function(blob) {
+  return blob.trim().split('\n').map(function(line) {
+    return line.trim();
+  });
+};
+// Splits SDP into sessionpart and mediasections. Ensures CRLF.
+SDPUtils.splitSections = function(blob) {
+  var parts = blob.split('\nm=');
+  return parts.map(function(part, index) {
+    return (index > 0 ? 'm=' + part : part).trim() + '\r\n';
+  });
+};
+
+// Returns lines that start with a certain prefix.
+SDPUtils.matchPrefix = function(blob, prefix) {
+  return SDPUtils.splitLines(blob).filter(function(line) {
+    return line.indexOf(prefix) === 0;
+  });
+};
+
+// Parses an ICE candidate line. Sample input:
+// candidate:702786350 2 udp 41819902 8.8.8.8 60769 typ relay raddr 8.8.8.8
+// rport 55996"
+SDPUtils.parseCandidate = function(line) {
+  var parts;
+  // Parse both variants.
+  if (line.indexOf('a=candidate:') === 0) {
+    parts = line.substring(12).split(' ');
+  } else {
+    parts = line.substring(10).split(' ');
+  }
+
+  var candidate = {
+    foundation: parts[0],
+    component: parts[1],
+    protocol: parts[2].toLowerCase(),
+    priority: parseInt(parts[3], 10),
+    ip: parts[4],
+    port: parseInt(parts[5], 10),
+    // skip parts[6] == 'typ'
+    type: parts[7]
+  };
+
+  for (var i = 8; i < parts.length; i += 2) {
+    switch (parts[i]) {
+      case 'raddr':
+        candidate.relatedAddress = parts[i + 1];
+        break;
+      case 'rport':
+        candidate.relatedPort = parseInt(parts[i + 1], 10);
+        break;
+      case 'tcptype':
+        candidate.tcpType = parts[i + 1];
+        break;
+      default: // Unknown extensions are silently ignored.
+        break;
+    }
+  }
+  return candidate;
+};
+
+// Translates a candidate object into SDP candidate attribute.
+SDPUtils.writeCandidate = function(candidate) {
+  var sdp = [];
+  sdp.push(candidate.foundation);
+  sdp.push(candidate.component);
+  sdp.push(candidate.protocol.toUpperCase());
+  sdp.push(candidate.priority);
+  sdp.push(candidate.ip);
+  sdp.push(candidate.port);
+
+  var type = candidate.type;
+  sdp.push('typ');
+  sdp.push(type);
+  if (type !== 'host' && candidate.relatedAddress &&
+      candidate.relatedPort) {
+    sdp.push('raddr');
+    sdp.push(candidate.relatedAddress); // was: relAddr
+    sdp.push('rport');
+    sdp.push(candidate.relatedPort); // was: relPort
+  }
+  if (candidate.tcpType && candidate.protocol.toLowerCase() === 'tcp') {
+    sdp.push('tcptype');
+    sdp.push(candidate.tcpType);
+  }
+  return 'candidate:' + sdp.join(' ');
+};
+
+// Parses an rtpmap line, returns RTCRtpCoddecParameters. Sample input:
+// a=rtpmap:111 opus/48000/2
+SDPUtils.parseRtpMap = function(line) {
+  var parts = line.substr(9).split(' ');
+  var parsed = {
+    payloadType: parseInt(parts.shift(), 10) // was: id
+  };
+
+  parts = parts[0].split('/');
+
+  parsed.name = parts[0];
+  parsed.clockRate = parseInt(parts[1], 10); // was: clockrate
+  // was: channels
+  parsed.numChannels = parts.length === 3 ? parseInt(parts[2], 10) : 1;
+  return parsed;
+};
+
+// Generate an a=rtpmap line from RTCRtpCodecCapability or
+// RTCRtpCodecParameters.
+SDPUtils.writeRtpMap = function(codec) {
+  var pt = codec.payloadType;
+  if (codec.preferredPayloadType !== undefined) {
+    pt = codec.preferredPayloadType;
+  }
+  return 'a=rtpmap:' + pt + ' ' + codec.name + '/' + codec.clockRate +
+      (codec.numChannels !== 1 ? '/' + codec.numChannels : '') + '\r\n';
+};
+
+// Parses an a=extmap line (headerextension from RFC 5285). Sample input:
+// a=extmap:2 urn:ietf:params:rtp-hdrext:toffset
+SDPUtils.parseExtmap = function(line) {
+  var parts = line.substr(9).split(' ');
+  return {
+    id: parseInt(parts[0], 10),
+    uri: parts[1]
+  };
+};
+
+// Generates a=extmap line from RTCRtpHeaderExtensionParameters or
+// RTCRtpHeaderExtension.
+SDPUtils.writeExtmap = function(headerExtension) {
+  return 'a=extmap:' + (headerExtension.id || headerExtension.preferredId) +
+       ' ' + headerExtension.uri + '\r\n';
+};
+
+// Parses an ftmp line, returns dictionary. Sample input:
+// a=fmtp:96 vbr=on;cng=on
+// Also deals with vbr=on; cng=on
+SDPUtils.parseFmtp = function(line) {
+  var parsed = {};
+  var kv;
+  var parts = line.substr(line.indexOf(' ') + 1).split(';');
+  for (var j = 0; j < parts.length; j++) {
+    kv = parts[j].trim().split('=');
+    parsed[kv[0].trim()] = kv[1];
+  }
+  return parsed;
+};
+
+// Generates an a=ftmp line from RTCRtpCodecCapability or RTCRtpCodecParameters.
+SDPUtils.writeFmtp = function(codec) {
+  var line = '';
+  var pt = codec.payloadType;
+  if (codec.preferredPayloadType !== undefined) {
+    pt = codec.preferredPayloadType;
+  }
+  if (codec.parameters && Object.keys(codec.parameters).length) {
+    var params = [];
+    Object.keys(codec.parameters).forEach(function(param) {
+      params.push(param + '=' + codec.parameters[param]);
+    });
+    line += 'a=fmtp:' + pt + ' ' + params.join(';') + '\r\n';
+  }
+  return line;
+};
+
+// Parses an rtcp-fb line, returns RTCPRtcpFeedback object. Sample input:
+// a=rtcp-fb:98 nack rpsi
+SDPUtils.parseRtcpFb = function(line) {
+  var parts = line.substr(line.indexOf(' ') + 1).split(' ');
+  return {
+    type: parts.shift(),
+    parameter: parts.join(' ')
+  };
+};
+// Generate a=rtcp-fb lines from RTCRtpCodecCapability or RTCRtpCodecParameters.
+SDPUtils.writeRtcpFb = function(codec) {
+  var lines = '';
+  var pt = codec.payloadType;
+  if (codec.preferredPayloadType !== undefined) {
+    pt = codec.preferredPayloadType;
+  }
+  if (codec.rtcpFeedback && codec.rtcpFeedback.length) {
+    // FIXME: special handling for trr-int?
+    codec.rtcpFeedback.forEach(function(fb) {
+      lines += 'a=rtcp-fb:' + pt + ' ' + fb.type +
+      (fb.parameter && fb.parameter.length ? ' ' + fb.parameter : '') +
+          '\r\n';
+    });
+  }
+  return lines;
+};
+
+// Parses an RFC 5576 ssrc media attribute. Sample input:
+// a=ssrc:3735928559 cname:something
+SDPUtils.parseSsrcMedia = function(line) {
+  var sp = line.indexOf(' ');
+  var parts = {
+    ssrc: parseInt(line.substr(7, sp - 7), 10)
+  };
+  var colon = line.indexOf(':', sp);
+  if (colon > -1) {
+    parts.attribute = line.substr(sp + 1, colon - sp - 1);
+    parts.value = line.substr(colon + 1);
+  } else {
+    parts.attribute = line.substr(sp + 1);
+  }
+  return parts;
+};
+
+// Extracts DTLS parameters from SDP media section or sessionpart.
+// FIXME: for consistency with other functions this should only
+//   get the fingerprint line as input. See also getIceParameters.
+SDPUtils.getDtlsParameters = function(mediaSection, sessionpart) {
+  var lines = SDPUtils.splitLines(mediaSection);
+  // Search in session part, too.
+  lines = lines.concat(SDPUtils.splitLines(sessionpart));
+  var fpLine = lines.filter(function(line) {
+    return line.indexOf('a=fingerprint:') === 0;
+  })[0].substr(14);
+  // Note: a=setup line is ignored since we use the 'auto' role.
+  var dtlsParameters = {
+    role: 'auto',
+    fingerprints: [{
+      algorithm: fpLine.split(' ')[0],
+      value: fpLine.split(' ')[1]
+    }]
+  };
+  return dtlsParameters;
+};
+
+// Serializes DTLS parameters to SDP.
+SDPUtils.writeDtlsParameters = function(params, setupType) {
+  var sdp = 'a=setup:' + setupType + '\r\n';
+  params.fingerprints.forEach(function(fp) {
+    sdp += 'a=fingerprint:' + fp.algorithm + ' ' + fp.value + '\r\n';
+  });
+  return sdp;
+};
+// Parses ICE information from SDP media section or sessionpart.
+// FIXME: for consistency with other functions this should only
+//   get the ice-ufrag and ice-pwd lines as input.
+SDPUtils.getIceParameters = function(mediaSection, sessionpart) {
+  var lines = SDPUtils.splitLines(mediaSection);
+  // Search in session part, too.
+  lines = lines.concat(SDPUtils.splitLines(sessionpart));
+  var iceParameters = {
+    usernameFragment: lines.filter(function(line) {
+      return line.indexOf('a=ice-ufrag:') === 0;
+    })[0].substr(12),
+    password: lines.filter(function(line) {
+      return line.indexOf('a=ice-pwd:') === 0;
+    })[0].substr(10)
+  };
+  return iceParameters;
+};
+
+// Serializes ICE parameters to SDP.
+SDPUtils.writeIceParameters = function(params) {
+  return 'a=ice-ufrag:' + params.usernameFragment + '\r\n' +
+      'a=ice-pwd:' + params.password + '\r\n';
+};
+
+// Parses the SDP media section and returns RTCRtpParameters.
+SDPUtils.parseRtpParameters = function(mediaSection) {
+  var description = {
+    codecs: [],
+    headerExtensions: [],
+    fecMechanisms: [],
+    rtcp: []
+  };
+  var lines = SDPUtils.splitLines(mediaSection);
+  var mline = lines[0].split(' ');
+  for (var i = 3; i < mline.length; i++) { // find all codecs from mline[3..]
+    var pt = mline[i];
+    var rtpmapline = SDPUtils.matchPrefix(
+        mediaSection, 'a=rtpmap:' + pt + ' ')[0];
+    if (rtpmapline) {
+      var codec = SDPUtils.parseRtpMap(rtpmapline);
+      var fmtps = SDPUtils.matchPrefix(
+          mediaSection, 'a=fmtp:' + pt + ' ');
+      // Only the first a=fmtp:<pt> is considered.
+      codec.parameters = fmtps.length ? SDPUtils.parseFmtp(fmtps[0]) : {};
+      codec.rtcpFeedback = SDPUtils.matchPrefix(
+          mediaSection, 'a=rtcp-fb:' + pt + ' ')
+        .map(SDPUtils.parseRtcpFb);
+      description.codecs.push(codec);
+      // parse FEC mechanisms from rtpmap lines.
+      switch (codec.name.toUpperCase()) {
+        case 'RED':
+        case 'ULPFEC':
+          description.fecMechanisms.push(codec.name.toUpperCase());
+          break;
+        default: // only RED and ULPFEC are recognized as FEC mechanisms.
+          break;
+      }
+    }
+  }
+  SDPUtils.matchPrefix(mediaSection, 'a=extmap:').forEach(function(line) {
+    description.headerExtensions.push(SDPUtils.parseExtmap(line));
+  });
+  // FIXME: parse rtcp.
+  return description;
+};
+
+// Generates parts of the SDP media section describing the capabilities /
+// parameters.
+SDPUtils.writeRtpDescription = function(kind, caps) {
+  var sdp = '';
+
+  // Build the mline.
+  sdp += 'm=' + kind + ' ';
+  sdp += caps.codecs.length > 0 ? '9' : '0'; // reject if no codecs.
+  sdp += ' UDP/TLS/RTP/SAVPF ';
+  sdp += caps.codecs.map(function(codec) {
+    if (codec.preferredPayloadType !== undefined) {
+      return codec.preferredPayloadType;
+    }
+    return codec.payloadType;
+  }).join(' ') + '\r\n';
+
+  sdp += 'c=IN IP4 0.0.0.0\r\n';
+  sdp += 'a=rtcp:9 IN IP4 0.0.0.0\r\n';
+
+  // Add a=rtpmap lines for each codec. Also fmtp and rtcp-fb.
+  caps.codecs.forEach(function(codec) {
+    sdp += SDPUtils.writeRtpMap(codec);
+    sdp += SDPUtils.writeFmtp(codec);
+    sdp += SDPUtils.writeRtcpFb(codec);
+  });
+  // FIXME: add headerExtensions, fecMechanismş and rtcp.
+  sdp += 'a=rtcp-mux\r\n';
+  return sdp;
+};
+
+// Parses the SDP media section and returns an array of
+// RTCRtpEncodingParameters.
+SDPUtils.parseRtpEncodingParameters = function(mediaSection) {
+  var encodingParameters = [];
+  var description = SDPUtils.parseRtpParameters(mediaSection);
+  var hasRed = description.fecMechanisms.indexOf('RED') !== -1;
+  var hasUlpfec = description.fecMechanisms.indexOf('ULPFEC') !== -1;
+
+  // filter a=ssrc:... cname:, ignore PlanB-msid
+  var ssrcs = SDPUtils.matchPrefix(mediaSection, 'a=ssrc:')
+  .map(function(line) {
+    return SDPUtils.parseSsrcMedia(line);
+  })
+  .filter(function(parts) {
+    return parts.attribute === 'cname';
+  });
+  var primarySsrc = ssrcs.length > 0 && ssrcs[0].ssrc;
+  var secondarySsrc;
+
+  var flows = SDPUtils.matchPrefix(mediaSection, 'a=ssrc-group:FID')
+  .map(function(line) {
+    var parts = line.split(' ');
+    parts.shift();
+    return parts.map(function(part) {
+      return parseInt(part, 10);
+    });
+  });
+  if (flows.length > 0 && flows[0].length > 1 && flows[0][0] === primarySsrc) {
+    secondarySsrc = flows[0][1];
+  }
+
+  description.codecs.forEach(function(codec) {
+    if (codec.name.toUpperCase() === 'RTX' && codec.parameters.apt) {
+      var encParam = {
+        ssrc: primarySsrc,
+        codecPayloadType: parseInt(codec.parameters.apt, 10),
+        rtx: {
+          payloadType: codec.payloadType,
+          ssrc: secondarySsrc
+        }
+      };
+      encodingParameters.push(encParam);
+      if (hasRed) {
+        encParam = JSON.parse(JSON.stringify(encParam));
+        encParam.fec = {
+          ssrc: secondarySsrc,
+          mechanism: hasUlpfec ? 'red+ulpfec' : 'red'
+        };
+        encodingParameters.push(encParam);
+      }
+    }
+  });
+  if (encodingParameters.length === 0 && primarySsrc) {
+    encodingParameters.push({
+      ssrc: primarySsrc
+    });
+  }
+
+  // we support both b=AS and b=TIAS but interpret AS as TIAS.
+  var bandwidth = SDPUtils.matchPrefix(mediaSection, 'b=');
+  if (bandwidth.length) {
+    if (bandwidth[0].indexOf('b=TIAS:') === 0) {
+      bandwidth = parseInt(bandwidth[0].substr(7), 10);
+    } else if (bandwidth[0].indexOf('b=AS:') === 0) {
+      bandwidth = parseInt(bandwidth[0].substr(5), 10);
+    }
+    encodingParameters.forEach(function(params) {
+      params.maxBitrate = bandwidth;
+    });
+  }
+  return encodingParameters;
+};
+
+SDPUtils.writeSessionBoilerplate = function() {
+  // FIXME: sess-id should be an NTP timestamp.
+  return 'v=0\r\n' +
+      'o=thisisadapterortc 8169639915646943137 2 IN IP4 127.0.0.1\r\n' +
+      's=-\r\n' +
+      't=0 0\r\n';
+};
+
+SDPUtils.writeMediaSection = function(transceiver, caps, type, stream) {
+  var sdp = SDPUtils.writeRtpDescription(transceiver.kind, caps);
+
+  // Map ICE parameters (ufrag, pwd) to SDP.
+  sdp += SDPUtils.writeIceParameters(
+      transceiver.iceGatherer.getLocalParameters());
+
+  // Map DTLS parameters to SDP.
+  sdp += SDPUtils.writeDtlsParameters(
+      transceiver.dtlsTransport.getLocalParameters(),
+      type === 'offer' ? 'actpass' : 'active');
+
+  sdp += 'a=mid:' + transceiver.mid + '\r\n';
+
+  if (transceiver.rtpSender && transceiver.rtpReceiver) {
+    sdp += 'a=sendrecv\r\n';
+  } else if (transceiver.rtpSender) {
+    sdp += 'a=sendonly\r\n';
+  } else if (transceiver.rtpReceiver) {
+    sdp += 'a=recvonly\r\n';
+  } else {
+    sdp += 'a=inactive\r\n';
+  }
+
+  // FIXME: for RTX there might be multiple SSRCs. Not implemented in Edge yet.
+  if (transceiver.rtpSender) {
+    var msid = 'msid:' + stream.id + ' ' +
+        transceiver.rtpSender.track.id + '\r\n';
+    sdp += 'a=' + msid;
+    sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
+        ' ' + msid;
+  }
+  // FIXME: this should be written by writeRtpDescription.
+  sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
+      ' cname:' + SDPUtils.localCName + '\r\n';
+  return sdp;
+};
+
+// Gets the direction from the mediaSection or the sessionpart.
+SDPUtils.getDirection = function(mediaSection, sessionpart) {
+  // Look for sendrecv, sendonly, recvonly, inactive, default to sendrecv.
+  var lines = SDPUtils.splitLines(mediaSection);
+  for (var i = 0; i < lines.length; i++) {
+    switch (lines[i]) {
+      case 'a=sendrecv':
+      case 'a=sendonly':
+      case 'a=recvonly':
+      case 'a=inactive':
+        return lines[i].substr(2);
+      default:
+        // FIXME: What should happen here?
+    }
+  }
+  if (sessionpart) {
+    return SDPUtils.getDirection(sessionpart);
+  }
+  return 'sendrecv';
+};
+
+// Expose public methods.
+module.exports = SDPUtils;
+
+},{}],2:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -5,379 +561,369 @@
  *  that can be found in the LICENSE file in the root of the source
  *  tree.
  */
+ /* eslint-env node */
 
-/* More information about these options at jshint.com/docs/options */
-/* jshint browser: true, camelcase: true, curly: true, devel: true,
-   eqeqeq: true, forin: false, globalstrict: true, node: true,
-   quotmark: single, undef: true, unused: strict */
-   
-/* global mozRTCIceCandidate, mozRTCPeerConnection, Promise,
-mozRTCSessionDescription, webkitRTCPeerConnection, MediaStreamTrack,
-MediaStream, RTCIceGatherer, RTCIceTransport, RTCDtlsTransport,
-RTCRtpSender, RTCRtpReceiver, RTCSessionDescription*/
-/* exported trace */
 
-'use strict';
 
-var getUserMedia = null;
-var attachMediaStream = null;
-var reattachMediaStream = null;
-var webrtcDetectedBrowser = null;
-var webrtcDetectedVersion = null;
-var webrtcMinimumVersion = null;
-var webrtcUtils = {
-  log: function() {
-    console.log.apply(console, arguments);
+// Shimming starts here.
+(function() {
+  // Utils.
+  var logging = require('./utils').log;
+  var browserDetails = require('./utils').browserDetails;
+  // Export to the adapter global object visible in the browser.
+  module.exports.browserDetails = browserDetails;
+  module.exports.extractVersion = require('./utils').extractVersion;
+  module.exports.disableLog = require('./utils').disableLog;
+
+  // Uncomment the line below if you want logging to occur, including logging
+  // for the switch statement below. Can also be turned on in the browser via
+  // adapter.disableLog(false), but then logging from the switch statement below
+  // will not appear.
+  // require('./utils').disableLog(false);
+
+  // Browser shims.
+  var chromeShim = require('./chrome/chrome_shim') || null;
+  var edgeShim = require('./edge/edge_shim') || null;
+  var firefoxShim = require('./firefox/firefox_shim') || null;
+  var safariShim = require('./safari/safari_shim') || null;
+
+  // Shim browser if found.
+  switch (browserDetails.browser) {
+    case 'opera': // fallthrough as it uses chrome shims
+    case 'chrome':
+      if (!chromeShim || !chromeShim.shimPeerConnection) {
+        logging('Chrome shim is not included in this adapter release.');
+        return;
+      }
+      logging('adapter.js shimming chrome.');
+      // Export to the adapter global object visible in the browser.
+      module.exports.browserShim = chromeShim;
+
+      chromeShim.shimGetUserMedia();
+      chromeShim.shimMediaStream();
+      chromeShim.shimSourceObject();
+      chromeShim.shimPeerConnection();
+      chromeShim.shimOnTrack();
+      break;
+    case 'firefox':
+      if (!firefoxShim || !firefoxShim.shimPeerConnection) {
+        logging('Firefox shim is not included in this adapter release.');
+        return;
+      }
+      logging('adapter.js shimming firefox.');
+      // Export to the adapter global object visible in the browser.
+      module.exports.browserShim = firefoxShim;
+
+      firefoxShim.shimGetUserMedia();
+      firefoxShim.shimSourceObject();
+      firefoxShim.shimPeerConnection();
+      firefoxShim.shimOnTrack();
+      break;
+    case 'edge':
+      if (!edgeShim || !edgeShim.shimPeerConnection) {
+        logging('MS edge shim is not included in this adapter release.');
+        return;
+      }
+      logging('adapter.js shimming edge.');
+      // Export to the adapter global object visible in the browser.
+      module.exports.browserShim = edgeShim;
+
+      edgeShim.shimGetUserMedia();
+      edgeShim.shimPeerConnection();
+      break;
+    case 'safari':
+      if (!safariShim) {
+        logging('Safari shim is not included in this adapter release.');
+        return;
+      }
+      logging('adapter.js shimming safari.');
+      // Export to the adapter global object visible in the browser.
+      module.exports.browserShim = safariShim;
+
+      safariShim.shimGetUserMedia();
+      break;
+    default:
+      logging('Unsupported browser!');
+  }
+})();
+
+},{"./chrome/chrome_shim":3,"./edge/edge_shim":5,"./firefox/firefox_shim":7,"./safari/safari_shim":9,"./utils":10}],3:[function(require,module,exports){
+
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+var logging = require('../utils.js').log;
+var browserDetails = require('../utils.js').browserDetails;
+
+var chromeShim = {
+  shimMediaStream: function() {
+    window.MediaStream = window.MediaStream || window.webkitMediaStream;
   },
-  extractVersion: function(uastring, expr, pos) {
-    var match = uastring.match(expr);
-    return match && match.length >= pos && parseInt(match[pos], 10);
-  }
-};
 
-function trace(text) {
-  // This function is used for logging.
-  if (text[text.length - 1] === '\n') {
-    text = text.substring(0, text.length - 1);
-  }
-  if (window.performance) {
-    var now = (window.performance.now() / 1000).toFixed(3);
-    webrtcUtils.log(now + ': ' + text);
-  } else {
-    webrtcUtils.log(text);
-  }
-}
-
-if (typeof window === 'object') {
-  if (window.HTMLMediaElement &&
-    !('srcObject' in window.HTMLMediaElement.prototype)) {
-    // Shim the srcObject property, once, when HTMLMediaElement is found.
-    Object.defineProperty(window.HTMLMediaElement.prototype, 'srcObject', {
-      get: function() {
-        // If prefixed srcObject property exists, return it.
-        // Otherwise use the shimmed property, _srcObject
-        return 'mozSrcObject' in this ? this.mozSrcObject : this._srcObject;
-      },
-      set: function(stream) {
-        if ('mozSrcObject' in this) {
-          this.mozSrcObject = stream;
-        } else {
-          // Use _srcObject as a private property for this shim
-          this._srcObject = stream;
-          // TODO: revokeObjectUrl(this.src) when !stream to release resources?
-          this.src = URL.createObjectURL(stream);
-        }
-      }
-    });
-  }
-  // Proxy existing globals
-  getUserMedia = window.navigator && window.navigator.getUserMedia;
-}
-
-// Returns the result of getUserMedia as a Promise.
-function requestUserMedia(constraints) {
-  return new Promise(function(resolve, reject) {
-    getUserMedia(constraints, resolve, reject);
-  });
-}
-
-
-// Attach a media stream to an element.
-attachMediaStream = function(element, stream) {
-  element.srcObject = stream;
-};
-
-reattachMediaStream = function(to, from) {
-  to.srcObject = from.srcObject;
-};
-
-if (typeof window === 'undefined' || !window.navigator) {
-  webrtcUtils.log('This does not appear to be a browser');
-  webrtcDetectedBrowser = 'not a browser';
-} else if (navigator.mozGetUserMedia) {
-  webrtcUtils.log('This appears to be Firefox');
-
-  webrtcDetectedBrowser = 'firefox';
-
-  // the detected firefox version.
-  webrtcDetectedVersion = webrtcUtils.extractVersion(navigator.userAgent,
-      /Firefox\/([0-9]+)\./, 1);
-
-  // the minimum firefox version still supported by adapter.
-  webrtcMinimumVersion = 31;
-
-  // Shim for RTCPeerConnection on older versions.
-  if (!window.RTCPeerConnection) {
-    window.RTCPeerConnection = function(pcConfig, pcConstraints) {
-      if (webrtcDetectedVersion < 38) {
-        // .urls is not supported in FF < 38.
-        // create RTCIceServers with a single url.
-        if (pcConfig && pcConfig.iceServers) {
-          var newIceServers = [];
-          for (var i = 0; i < pcConfig.iceServers.length; i++) {
-            var server = pcConfig.iceServers[i];
-            if (server.hasOwnProperty('urls')) {
-              for (var j = 0; j < server.urls.length; j++) {
-                var newServer = {
-                  url: server.urls[j]
-                };
-                if (server.urls[j].indexOf('turn') === 0) {
-                  newServer.username = server.username;
-                  newServer.credential = server.credential;
-                }
-                newIceServers.push(newServer);
-              }
-            } else {
-              newIceServers.push(pcConfig.iceServers[i]);
-            }
-          }
-          pcConfig.iceServers = newIceServers;
-        }
-      }
-      return new mozRTCPeerConnection(pcConfig, pcConstraints); // jscs:ignore requireCapitalizedConstructors
-    };
-
-    // wrap static methods. Currently just generateCertificate.
-    if (mozRTCPeerConnection.generateCertificate) {
-      Object.defineProperty(window.RTCPeerConnection, 'generateCertificate', {
+  shimOnTrack: function() {
+    if (typeof window === 'object' && window.RTCPeerConnection && !('ontrack' in
+        window.RTCPeerConnection.prototype)) {
+      Object.defineProperty(window.RTCPeerConnection.prototype, 'ontrack', {
         get: function() {
-          if (arguments.length) {
-            return mozRTCPeerConnection.generateCertificate.apply(null,
-                arguments);
-          } else {
-            return mozRTCPeerConnection.generateCertificate;
+          return this._ontrack;
+        },
+        set: function(f) {
+          var self = this;
+          if (this._ontrack) {
+            this.removeEventListener('track', this._ontrack);
+            this.removeEventListener('addstream', this._ontrackpoly);
           }
+          this.addEventListener('track', this._ontrack = f);
+          this.addEventListener('addstream', this._ontrackpoly = function(e) {
+            // onaddstream does not fire when a track is added to an existing
+            // stream. But stream.onaddtrack is implemented so we use that.
+            e.stream.addEventListener('addtrack', function(te) {
+              var event = new Event('track');
+              event.track = te.track;
+              event.receiver = {track: te.track};
+              event.streams = [e.stream];
+              self.dispatchEvent(event);
+            });
+            e.stream.getTracks().forEach(function(track) {
+              var event = new Event('track');
+              event.track = track;
+              event.receiver = {track: track};
+              event.streams = [e.stream];
+              this.dispatchEvent(event);
+            }.bind(this));
+          }.bind(this));
         }
       });
     }
+  },
 
-    window.RTCSessionDescription = mozRTCSessionDescription;
-    window.RTCIceCandidate = mozRTCIceCandidate;
-  }
+  shimSourceObject: function() {
+    if (typeof window === 'object') {
+      if (window.HTMLMediaElement &&
+        !('srcObject' in window.HTMLMediaElement.prototype)) {
+        // Shim the srcObject property, once, when HTMLMediaElement is found.
+        Object.defineProperty(window.HTMLMediaElement.prototype, 'srcObject', {
+          get: function() {
+            return this._srcObject;
+          },
+          set: function(stream) {
+            var self = this;
+            // Use _srcObject as a private property for this shim
+            this._srcObject = stream;
+            if (this.src) {
+              URL.revokeObjectURL(this.src);
+            }
 
-  // getUserMedia constraints shim.
-  getUserMedia = function(constraints, onSuccess, onError) {
-    var constraintsToFF37 = function(c) {
-      if (typeof c !== 'object' || c.require) {
-        return c;
-      }
-      var require = [];
-      Object.keys(c).forEach(function(key) {
-        if (key === 'require' || key === 'advanced' || key === 'mediaSource') {
-          return;
-        }
-        var r = c[key] = (typeof c[key] === 'object') ?
-            c[key] : {ideal: c[key]};
-        if (r.min !== undefined ||
-            r.max !== undefined || r.exact !== undefined) {
-          require.push(key);
-        }
-        if (r.exact !== undefined) {
-          if (typeof r.exact === 'number') {
-            r.min = r.max = r.exact;
-          } else {
-            c[key] = r.exact;
+            if (!stream) {
+              this.src = '';
+              return;
+            }
+            this.src = URL.createObjectURL(stream);
+            // We need to recreate the blob url when a track is added or
+            // removed. Doing it manually since we want to avoid a recursion.
+            stream.addEventListener('addtrack', function() {
+              if (self.src) {
+                URL.revokeObjectURL(self.src);
+              }
+              self.src = URL.createObjectURL(stream);
+            });
+            stream.addEventListener('removetrack', function() {
+              if (self.src) {
+                URL.revokeObjectURL(self.src);
+              }
+              self.src = URL.createObjectURL(stream);
+            });
           }
-          delete r.exact;
-        }
-        if (r.ideal !== undefined) {
-          c.advanced = c.advanced || [];
-          var oc = {};
-          if (typeof r.ideal === 'number') {
-            oc[key] = {min: r.ideal, max: r.ideal};
-          } else {
-            oc[key] = r.ideal;
-          }
-          c.advanced.push(oc);
-          delete r.ideal;
-          if (!Object.keys(r).length) {
-            delete c[key];
-          }
-        }
-      });
-      if (require.length) {
-        c.require = require;
-      }
-      return c;
-    };
-    if (webrtcDetectedVersion < 38) {
-      webrtcUtils.log('spec: ' + JSON.stringify(constraints));
-      if (constraints.audio) {
-        constraints.audio = constraintsToFF37(constraints.audio);
-      }
-      if (constraints.video) {
-        constraints.video = constraintsToFF37(constraints.video);
-      }
-      webrtcUtils.log('ff37: ' + JSON.stringify(constraints));
-    }
-    return navigator.mozGetUserMedia(constraints, onSuccess, onError);
-  };
-
-  navigator.getUserMedia = getUserMedia;
-
-  // Shim for mediaDevices on older versions.
-  if (!navigator.mediaDevices) {
-    navigator.mediaDevices = {getUserMedia: requestUserMedia,
-      addEventListener: function() { },
-      removeEventListener: function() { }
-    };
-  }
-  navigator.mediaDevices.enumerateDevices =
-      navigator.mediaDevices.enumerateDevices || function() {
-    return new Promise(function(resolve) {
-      var infos = [
-        {kind: 'audioinput', deviceId: 'default', label: '', groupId: ''},
-        {kind: 'videoinput', deviceId: 'default', label: '', groupId: ''}
-      ];
-      resolve(infos);
-    });
-  };
-
-  if (webrtcDetectedVersion < 41) {
-    // Work around http://bugzil.la/1169665
-    var orgEnumerateDevices =
-        navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);
-    navigator.mediaDevices.enumerateDevices = function() {
-      return orgEnumerateDevices().then(undefined, function(e) {
-        if (e.name === 'NotFoundError') {
-          return [];
-        }
-        throw e;
-      });
-    };
-  }
-} else if (navigator.webkitGetUserMedia && window.webkitRTCPeerConnection && !window.RTCPeerConnection) {
-  webrtcUtils.log('This appears to be Chrome');
-
-  webrtcDetectedBrowser = 'chrome';
-
-  // the detected chrome version.
-  webrtcDetectedVersion = webrtcUtils.extractVersion(navigator.userAgent,
-      /Chrom(e|ium)\/([0-9]+)\./, 2);
-
-  // the minimum chrome version still supported by adapter.
-  webrtcMinimumVersion = 38;
-
-  // The RTCPeerConnection object.
-  window.RTCPeerConnection = function(pcConfig, pcConstraints) {
-    // Translate iceTransportPolicy to iceTransports,
-    // see https://code.google.com/p/webrtc/issues/detail?id=4869
-    if (pcConfig && pcConfig.iceTransportPolicy) {
-      pcConfig.iceTransports = pcConfig.iceTransportPolicy;
-    }
-
-    var pc = new webkitRTCPeerConnection(pcConfig, pcConstraints); // jscs:ignore requireCapitalizedConstructors
-    var origGetStats = pc.getStats.bind(pc);
-    pc.getStats = function(selector, successCallback, errorCallback) { // jshint ignore: line
-      var self = this;
-      var args = arguments;
-
-      // If selector is a function then we are in the old style stats so just
-      // pass back the original getStats format to avoid breaking old users.
-      if (arguments.length > 0 && typeof selector === 'function') {
-        return origGetStats(selector, successCallback);
-      }
-
-      var fixChromeStats = function(response) {
-        var standardReport = {};
-        var reports = response.result();
-        reports.forEach(function(report) {
-          var standardStats = {
-            id: report.id,
-            timestamp: report.timestamp,
-            type: report.type
-          };
-          report.names().forEach(function(name) {
-            standardStats[name] = report.stat(name);
-          });
-          standardReport[standardStats.id] = standardStats;
         });
+      }
+    }
+  },
 
-        return standardReport;
-      };
+  shimPeerConnection: function() {
+    // The RTCPeerConnection object.
+    window.RTCPeerConnection = function(pcConfig, pcConstraints) {
+      // Translate iceTransportPolicy to iceTransports,
+      // see https://code.google.com/p/webrtc/issues/detail?id=4869
+      logging('PeerConnection');
+      if (pcConfig && pcConfig.iceTransportPolicy) {
+        pcConfig.iceTransports = pcConfig.iceTransportPolicy;
+      }
 
-      if (arguments.length >= 2) {
-        var successCallbackWrapper = function(response) {
-          args[1](fixChromeStats(response));
+      var pc = new webkitRTCPeerConnection(pcConfig, pcConstraints);
+      var origGetStats = pc.getStats.bind(pc);
+      pc.getStats = function(selector, successCallback, errorCallback) {
+        var self = this;
+        var args = arguments;
+
+        // If selector is a function then we are in the old style stats so just
+        // pass back the original getStats format to avoid breaking old users.
+        if (arguments.length > 0 && typeof selector === 'function') {
+          return origGetStats(selector, successCallback);
+        }
+
+        var fixChromeStats_ = function(response) {
+          var standardReport = {};
+          var reports = response.result();
+          reports.forEach(function(report) {
+            var standardStats = {
+              id: report.id,
+              timestamp: report.timestamp,
+              type: report.type
+            };
+            report.names().forEach(function(name) {
+              standardStats[name] = report.stat(name);
+            });
+            standardReport[standardStats.id] = standardStats;
+          });
+
+          return standardReport;
         };
 
-        return origGetStats.apply(this, [successCallbackWrapper, arguments[0]]);
-      }
+        // shim getStats with maplike support
+        var makeMapStats = function(stats, legacyStats) {
+          var map = new Map(Object.keys(stats).map(function(key) {
+            return[key, stats[key]];
+          }));
+          legacyStats = legacyStats || stats;
+          Object.keys(legacyStats).forEach(function(key) {
+            map[key] = legacyStats[key];
+          });
+          return map;
+        };
 
-      // promise-support
-      return new Promise(function(resolve, reject) {
-        if (args.length === 1 && selector === null) {
-          origGetStats.apply(self, [
-              function(response) {
-                resolve.apply(null, [fixChromeStats(response)]);
-              }, reject]);
-        } else {
-          origGetStats.apply(self, [resolve, reject]);
+        if (arguments.length >= 2) {
+          var successCallbackWrapper_ = function(response) {
+            args[1](makeMapStats(fixChromeStats_(response)));
+          };
+
+          return origGetStats.apply(this, [successCallbackWrapper_,
+              arguments[0]]);
         }
-      });
+
+        // promise-support
+        return new Promise(function(resolve, reject) {
+          if (args.length === 1 && typeof selector === 'object') {
+            origGetStats.apply(self, [
+              function(response) {
+                resolve(makeMapStats(fixChromeStats_(response)));
+              }, reject]);
+          } else {
+            // Preserve legacy chrome stats only on legacy access of stats obj
+            origGetStats.apply(self, [
+              function(response) {
+                resolve(makeMapStats(fixChromeStats_(response),
+                    response.result()));
+              }, reject]);
+          }
+        }).then(successCallback, errorCallback);
+      };
+
+      return pc;
     };
+    window.RTCPeerConnection.prototype = webkitRTCPeerConnection.prototype;
 
-    return pc;
-  };
-
-  // wrap static methods. Currently just generateCertificate.
-  if (webkitRTCPeerConnection.generateCertificate) {
-    Object.defineProperty(window.RTCPeerConnection, 'generateCertificate', {
-      get: function() {
-        if (arguments.length) {
-          return webkitRTCPeerConnection.generateCertificate.apply(null,
-              arguments);
-        } else {
+    // wrap static methods. Currently just generateCertificate.
+    if (webkitRTCPeerConnection.generateCertificate) {
+      Object.defineProperty(window.RTCPeerConnection, 'generateCertificate', {
+        get: function() {
           return webkitRTCPeerConnection.generateCertificate;
         }
-      }
-    });
-  }
-
-  // add promise support
-  ['createOffer', 'createAnswer'].forEach(function(method) {
-    var nativeMethod = webkitRTCPeerConnection.prototype[method];
-    webkitRTCPeerConnection.prototype[method] = function() {
-      var self = this;
-      if (arguments.length < 1 || (arguments.length === 1 &&
-          typeof(arguments[0]) === 'object')) {
-        var opts = arguments.length === 1 ? arguments[0] : undefined;
-        return new Promise(function(resolve, reject) {
-          nativeMethod.apply(self, [resolve, reject, opts]);
-        });
-      } else {
-        return nativeMethod.apply(this, arguments);
-      }
-    };
-  });
-
-  ['setLocalDescription', 'setRemoteDescription',
-      'addIceCandidate'].forEach(function(method) {
-    var nativeMethod = webkitRTCPeerConnection.prototype[method];
-    webkitRTCPeerConnection.prototype[method] = function() {
-      var args = arguments;
-      var self = this;
-      return new Promise(function(resolve, reject) {
-        nativeMethod.apply(self, [args[0],
-            function() {
-              resolve();
-              if (args.length >= 2) {
-                args[1].apply(null, []);
-              }
-            },
-            function(err) {
-              reject(err);
-              if (args.length >= 3) {
-                args[2].apply(null, [err]);
-              }
-            }]
-          );
       });
-    };
-  });
+    }
 
-  // getUserMedia constraints shim.
-  var constraintsToChrome = function(c) {
+    ['createOffer', 'createAnswer'].forEach(function(method) {
+      var nativeMethod = webkitRTCPeerConnection.prototype[method];
+      webkitRTCPeerConnection.prototype[method] = function() {
+        var self = this;
+        if (arguments.length < 1 || (arguments.length === 1 &&
+            typeof arguments[0] === 'object')) {
+          var opts = arguments.length === 1 ? arguments[0] : undefined;
+          return new Promise(function(resolve, reject) {
+            nativeMethod.apply(self, [resolve, reject, opts]);
+          });
+        }
+        return nativeMethod.apply(this, arguments);
+      };
+    });
+
+    // add promise support -- natively available in Chrome 51
+    if (browserDetails.version < 51) {
+      ['setLocalDescription', 'setRemoteDescription', 'addIceCandidate']
+          .forEach(function(method) {
+            var nativeMethod = webkitRTCPeerConnection.prototype[method];
+            webkitRTCPeerConnection.prototype[method] = function() {
+              var args = arguments;
+              var self = this;
+              var promise = new Promise(function(resolve, reject) {
+                nativeMethod.apply(self, [args[0], resolve, reject]);
+              });
+              if (args.length < 2) {
+                return promise;
+              }
+              return promise.then(function() {
+                args[1].apply(null, []);
+              },
+              function(err) {
+                if (args.length >= 3) {
+                  args[2].apply(null, [err]);
+                }
+              });
+            };
+          });
+    }
+
+    // shim implicit creation of RTCSessionDescription/RTCIceCandidate
+    ['setLocalDescription', 'setRemoteDescription', 'addIceCandidate']
+        .forEach(function(method) {
+          var nativeMethod = webkitRTCPeerConnection.prototype[method];
+          webkitRTCPeerConnection.prototype[method] = function() {
+            arguments[0] = new ((method === 'addIceCandidate') ?
+                RTCIceCandidate : RTCSessionDescription)(arguments[0]);
+            return nativeMethod.apply(this, arguments);
+          };
+        });
+
+    // support for addIceCandidate(null)
+    var nativeAddIceCandidate =
+        RTCPeerConnection.prototype.addIceCandidate;
+    RTCPeerConnection.prototype.addIceCandidate = function() {
+      return arguments[0] === null ? Promise.resolve()
+          : nativeAddIceCandidate.apply(this, arguments);
+    };
+  }
+};
+
+
+// Expose public methods.
+module.exports = {
+  shimMediaStream: chromeShim.shimMediaStream,
+  shimOnTrack: chromeShim.shimOnTrack,
+  shimSourceObject: chromeShim.shimSourceObject,
+  shimPeerConnection: chromeShim.shimPeerConnection,
+  shimGetUserMedia: require('./getusermedia')
+};
+
+},{"../utils.js":10,"./getusermedia":4}],4:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+var logging = require('../utils.js').log;
+
+// Expose public methods.
+module.exports = function() {
+  var constraintsToChrome_ = function(c) {
     if (typeof c !== 'object' || c.mandatory || c.optional) {
       return c;
     }
@@ -390,7 +936,7 @@ if (typeof window === 'undefined' || !window.navigator) {
       if (r.exact !== undefined && typeof r.exact === 'number') {
         r.min = r.max = r.exact;
       }
-      var oldname = function(prefix, name) {
+      var oldname_ = function(prefix, name) {
         if (prefix) {
           return prefix + name.charAt(0).toUpperCase() + name.slice(1);
         }
@@ -400,24 +946,24 @@ if (typeof window === 'undefined' || !window.navigator) {
         cc.optional = cc.optional || [];
         var oc = {};
         if (typeof r.ideal === 'number') {
-          oc[oldname('min', key)] = r.ideal;
+          oc[oldname_('min', key)] = r.ideal;
           cc.optional.push(oc);
           oc = {};
-          oc[oldname('max', key)] = r.ideal;
+          oc[oldname_('max', key)] = r.ideal;
           cc.optional.push(oc);
         } else {
-          oc[oldname('', key)] = r.ideal;
+          oc[oldname_('', key)] = r.ideal;
           cc.optional.push(oc);
         }
       }
       if (r.exact !== undefined && typeof r.exact !== 'number') {
         cc.mandatory = cc.mandatory || {};
-        cc.mandatory[oldname('', key)] = r.exact;
+        cc.mandatory[oldname_('', key)] = r.exact;
       } else {
         ['min', 'max'].forEach(function(mix) {
           if (r[mix] !== undefined) {
             cc.mandatory = cc.mandatory || {};
-            cc.mandatory[oldname(mix, key)] = r[mix];
+            cc.mandatory[oldname_(mix, key)] = r[mix];
           }
         });
       }
@@ -428,40 +974,102 @@ if (typeof window === 'undefined' || !window.navigator) {
     return cc;
   };
 
-  getUserMedia = function(constraints, onSuccess, onError) {
-    if (constraints.audio) {
-      constraints.audio = constraintsToChrome(constraints.audio);
+  var shimConstraints_ = function(constraints, func) {
+    constraints = JSON.parse(JSON.stringify(constraints));
+    if (constraints && constraints.audio) {
+      constraints.audio = constraintsToChrome_(constraints.audio);
     }
-    if (constraints.video) {
-      constraints.video = constraintsToChrome(constraints.video);
+    if (constraints && typeof constraints.video === 'object') {
+      // Shim facingMode for mobile, where it defaults to "user".
+      var face = constraints.video.facingMode;
+      face = face && ((typeof face === 'object') ? face : {ideal: face});
+
+      if ((face && (face.exact === 'user' || face.exact === 'environment' ||
+                    face.ideal === 'user' || face.ideal === 'environment')) &&
+          !(navigator.mediaDevices.getSupportedConstraints &&
+            navigator.mediaDevices.getSupportedConstraints().facingMode)) {
+        delete constraints.video.facingMode;
+        if (face.exact === 'environment' || face.ideal === 'environment') {
+          // Look for "back" in label, or use last cam (typically back cam).
+          return navigator.mediaDevices.enumerateDevices()
+          .then(function(devices) {
+            devices = devices.filter(function(d) {
+              return d.kind === 'videoinput';
+            });
+            var back = devices.find(function(d) {
+              return d.label.toLowerCase().indexOf('back') !== -1;
+            }) || (devices.length && devices[devices.length - 1]);
+            if (back) {
+              constraints.video.deviceId = face.exact ? {exact: back.deviceId} :
+                                                        {ideal: back.deviceId};
+            }
+            constraints.video = constraintsToChrome_(constraints.video);
+            logging('chrome: ' + JSON.stringify(constraints));
+            return func(constraints);
+          });
+        }
+      }
+      constraints.video = constraintsToChrome_(constraints.video);
     }
-    webrtcUtils.log('chrome: ' + JSON.stringify(constraints));
-    return navigator.webkitGetUserMedia(constraints, onSuccess, onError);
+    logging('chrome: ' + JSON.stringify(constraints));
+    return func(constraints);
   };
-  navigator.getUserMedia = getUserMedia;
+
+  var shimError_ = function(e) {
+    return {
+      name: {
+        PermissionDeniedError: 'NotAllowedError',
+        ConstraintNotSatisfiedError: 'OverconstrainedError'
+      }[e.name] || e.name,
+      message: e.message,
+      constraint: e.constraintName,
+      toString: function() {
+        return this.name + (this.message && ': ') + this.message;
+      }
+    };
+  };
+
+  var getUserMedia_ = function(constraints, onSuccess, onError) {
+    shimConstraints_(constraints, function(c) {
+      navigator.webkitGetUserMedia(c, onSuccess, function(e) {
+        onError(shimError_(e));
+      });
+    });
+  };
+
+  navigator.getUserMedia = getUserMedia_;
+
+  // Returns the result of getUserMedia as a Promise.
+  var getUserMediaPromise_ = function(constraints) {
+    return new Promise(function(resolve, reject) {
+      navigator.getUserMedia(constraints, resolve, reject);
+    });
+  };
 
   if (!navigator.mediaDevices) {
-    navigator.mediaDevices = {getUserMedia: requestUserMedia,
-                              enumerateDevices: function() {
-      return new Promise(function(resolve) {
-        var kinds = {audio: 'audioinput', video: 'videoinput'};
-        return MediaStreamTrack.getSources(function(devices) {
-          resolve(devices.map(function(device) {
-            return {label: device.label,
-                    kind: kinds[device.kind],
-                    deviceId: device.id,
-                    groupId: ''};
-          }));
+    navigator.mediaDevices = {
+      getUserMedia: getUserMediaPromise_,
+      enumerateDevices: function() {
+        return new Promise(function(resolve) {
+          var kinds = {audio: 'audioinput', video: 'videoinput'};
+          return MediaStreamTrack.getSources(function(devices) {
+            resolve(devices.map(function(device) {
+              return {label: device.label,
+                      kind: kinds[device.kind],
+                      deviceId: device.id,
+                      groupId: ''};
+            }));
+          });
         });
-      });
-    }};
+      }
+    };
   }
 
   // A shim for getUserMedia method on the mediaDevices object.
   // TODO(KaptenJansson) remove once implemented in Chrome stable.
   if (!navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia = function(constraints) {
-      return requestUserMedia(constraints);
+      return getUserMediaPromise_(constraints);
     };
   } else {
     // Even though Chrome 45 has navigator.mediaDevices and a getUserMedia
@@ -469,12 +1077,12 @@ if (typeof window === 'undefined' || !window.navigator) {
     // constraints.
     var origGetUserMedia = navigator.mediaDevices.getUserMedia.
         bind(navigator.mediaDevices);
-    navigator.mediaDevices.getUserMedia = function(c) {
-      webrtcUtils.log('spec:   ' + JSON.stringify(c)); // whitespace for alignment
-      c.audio = constraintsToChrome(c.audio);
-      c.video = constraintsToChrome(c.video);
-      webrtcUtils.log('chrome: ' + JSON.stringify(c));
-      return origGetUserMedia(c);
+    navigator.mediaDevices.getUserMedia = function(cs) {
+      return shimConstraints_(cs, function(c) {
+        return origGetUserMedia(c).catch(function(e) {
+          return Promise.reject(shimError_(e));
+        });
+      });
     };
   }
 
@@ -482,442 +1090,62 @@ if (typeof window === 'undefined' || !window.navigator) {
   // TODO(KaptenJansson) remove once implemented in Chrome stable.
   if (typeof navigator.mediaDevices.addEventListener === 'undefined') {
     navigator.mediaDevices.addEventListener = function() {
-      webrtcUtils.log('Dummy mediaDevices.addEventListener called.');
+      logging('Dummy mediaDevices.addEventListener called.');
     };
   }
   if (typeof navigator.mediaDevices.removeEventListener === 'undefined') {
     navigator.mediaDevices.removeEventListener = function() {
-      webrtcUtils.log('Dummy mediaDevices.removeEventListener called.');
+      logging('Dummy mediaDevices.removeEventListener called.');
     };
   }
+};
 
-  // Attach a media stream to an element.
-  attachMediaStream = function(element, stream) {
-    if (webrtcDetectedVersion >= 43) {
-      element.srcObject = stream;
-    } else if (typeof element.src !== 'undefined') {
-      element.src = URL.createObjectURL(stream);
-    } else {
-      webrtcUtils.log('Error attaching stream to element.');
-    }
-  };
-  reattachMediaStream = function(to, from) {
-    if (webrtcDetectedVersion >= 43) {
-      to.srcObject = from.srcObject;
-    } else {
-      to.src = from.src;
-    }
-  };
+},{"../utils.js":10}],5:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
 
-} else if (navigator.mediaDevices && navigator.userAgent.match(
-    /Edge\/(\d+).(\d+)$/)) {
-  webrtcUtils.log('This appears to be Edge');
-  webrtcDetectedBrowser = 'edge';
 
-  webrtcDetectedVersion = webrtcUtils.extractVersion(navigator.userAgent,
-      /Edge\/(\d+).(\d+)$/, 2);
+var SDPUtils = require('sdp');
+var browserDetails = require('../utils').browserDetails;
 
-  // The minimum version still supported by adapter.
-  // This is the build number for Edge.
-  webrtcMinimumVersion = 10547;
-
-  if (window.RTCIceGatherer) {
-    // Generate an alphanumeric identifier for cname or mids.
-    // TODO: use UUIDs instead? https://gist.github.com/jed/982883
-    var generateIdentifier = function() {
-      return Math.random().toString(36).substr(2, 10);
-    };
-
-    // The RTCP CNAME used by all peerconnections from the same JS.
-    var localCName = generateIdentifier();
-
-    // SDP helpers - to be moved into separate module.
-    var SDPUtils = {};
-
-    // Splits SDP into lines, dealing with both CRLF and LF.
-    SDPUtils.splitLines = function(blob) {
-      return blob.trim().split('\n').map(function(line) {
-        return line.trim();
-      });
-    };
-
-    // Splits SDP into sessionpart and mediasections. Ensures CRLF.
-    SDPUtils.splitSections = function(blob) {
-      var parts = blob.split('\r\nm=');
-      return parts.map(function(part, index) {
-        return (index > 0 ? 'm=' + part : part).trim() + '\r\n';
-      });
-    };
-
-    // Returns lines that start with a certain prefix.
-    SDPUtils.matchPrefix = function(blob, prefix) {
-      return SDPUtils.splitLines(blob).filter(function(line) {
-        return line.indexOf(prefix) === 0;
-      });
-    };
-
-    // Parses an ICE candidate line. Sample input:
-    // candidate:702786350 2 udp 41819902 8.8.8.8 60769 typ relay raddr 8.8.8.8 rport 55996"
-    SDPUtils.parseCandidate = function(line) {
-      var parts;
-      // Parse both variants.
-      if (line.indexOf('a=candidate:') === 0) {
-        parts = line.substring(12).split(' ');
-      } else {
-        parts = line.substring(10).split(' ');
+var edgeShim = {
+  shimPeerConnection: function() {
+    if (window.RTCIceGatherer) {
+      // ORTC defines an RTCIceCandidate object but no constructor.
+      // Not implemented in Edge.
+      if (!window.RTCIceCandidate) {
+        window.RTCIceCandidate = function(args) {
+          return args;
+        };
       }
-
-      var candidate = {
-        foundation: parts[0],
-        component: parts[1],
-        protocol: parts[2].toLowerCase(),
-        priority: parseInt(parts[3], 10),
-        ip: parts[4],
-        port: parseInt(parts[5], 10),
-        // skip parts[6] == 'typ'
-        type: parts[7]
-      };
-
-      for (var i = 8; i < parts.length; i += 2) {
-        switch (parts[i]) {
-          case 'raddr':
-            candidate.relatedAddress = parts[i + 1];
-            break;
-          case 'rport':
-            candidate.relatedPort = parseInt(parts[i + 1], 10);
-            break;
-          case 'tcptype':
-            candidate.tcpType = parts[i + 1];
-            break;
-          default: // Unknown extensions are silently ignored.
-            break;
-        }
+      // ORTC does not have a session description object but
+      // other browsers (i.e. Chrome) that will support both PC and ORTC
+      // in the future might have this defined already.
+      if (!window.RTCSessionDescription) {
+        window.RTCSessionDescription = function(args) {
+          return args;
+        };
       }
-      return candidate;
-    };
-
-    // Translates a candidate object into SDP candidate attribute.
-    SDPUtils.writeCandidate = function(candidate) {
-      var sdp = [];
-      sdp.push(candidate.foundation);
-      sdp.push(candidate.component);
-      sdp.push(candidate.protocol.toUpperCase());
-      sdp.push(candidate.priority);
-      sdp.push(candidate.ip);
-      sdp.push(candidate.port);
-
-      var type = candidate.type;
-      sdp.push('typ');
-      sdp.push(type);
-      if (type !== 'host' && candidate.relatedAddress &&
-          candidate.relatedPort) {
-        sdp.push('raddr');
-        sdp.push(candidate.relatedAddress); // was: relAddr
-        sdp.push('rport');
-        sdp.push(candidate.relatedPort); // was: relPort
-      }
-      if (candidate.tcpType && candidate.protocol.toLowerCase() === 'tcp') {
-        sdp.push('tcptype');
-        sdp.push(candidate.tcpType);
-      }
-      return 'candidate:' + sdp.join(' ');
-    };
-
-    // Parses an rtpmap line, returns RTCRtpCoddecParameters. Sample input:
-    // a=rtpmap:111 opus/48000/2
-    SDPUtils.parseRtpMap = function(line) {
-      var parts = line.substr(9).split(' ');
-      var parsed = {
-        payloadType: parseInt(parts.shift(), 10) // was: id
-      };
-
-      parts = parts[0].split('/');
-
-      parsed.name = parts[0];
-      parsed.clockRate = parseInt(parts[1], 10); // was: clockrate
-      parsed.numChannels = parts.length === 3 ? parseInt(parts[2], 10) : 1; // was: channels
-      return parsed;
-    };
-
-    // Generate an a=rtpmap line from RTCRtpCodecCapability or RTCRtpCodecParameters.
-    SDPUtils.writeRtpMap = function(codec) {
-      var pt = codec.payloadType;
-      if (codec.preferredPayloadType !== undefined) {
-        pt = codec.preferredPayloadType;
-      }
-      return 'a=rtpmap:' + pt + ' ' + codec.name + '/' + codec.clockRate +
-          (codec.numChannels !== 1 ? '/' + codec.numChannels : '') + '\r\n';
-    };
-
-    // Parses an ftmp line, returns dictionary. Sample input:
-    // a=fmtp:96 vbr=on;cng=on
-    // Also deals with vbr=on; cng=on
-    SDPUtils.parseFmtp = function(line) {
-      var parsed = {};
-      var kv;
-      var parts = line.substr(line.indexOf(' ') + 1).split(';');
-      for (var j = 0; j < parts.length; j++) {
-        kv = parts[j].trim().split('=');
-        parsed[kv[0].trim()] = kv[1];
-      }
-      return parsed;
-    };
-
-    // Generates an a=ftmp line from RTCRtpCodecCapability or RTCRtpCodecParameters.
-    SDPUtils.writeFtmp = function(codec) {
-      var line = '';
-      var pt = codec.payloadType;
-      if (codec.preferredPayloadType !== undefined) {
-        pt = codec.preferredPayloadType;
-      }
-      if (codec.parameters && codec.parameters.length) {
-        var params = [];
-        Object.keys(codec.parameters).forEach(function(param) {
-          params.push(param + '=' + codec.parameters[param]);
-        });
-        line += 'a=fmtp:' + pt + ' ' + params.join(';') + '\r\n';
-      }
-      return line;
-    };
-
-    // Parses an rtcp-fb line, returns RTCPRtcpFeedback object. Sample input:
-    // a=rtcp-fb:98 nack rpsi
-    SDPUtils.parseRtcpFb = function(line) {
-      var parts = line.substr(line.indexOf(' ') + 1).split(' ');
-      return {
-        type: parts.shift(),
-        parameter: parts.join(' ')
-      };
-    };
-    // Generate a=rtcp-fb lines from RTCRtpCodecCapability or RTCRtpCodecParameters.
-    SDPUtils.writeRtcpFb = function(codec) {
-      var lines = '';
-      var pt = codec.payloadType;
-      if (codec.preferredPayloadType !== undefined) {
-        pt = codec.preferredPayloadType;
-      }
-      if (codec.rtcpFeedback && codec.rtcpFeedback.length) {
-        // FIXME: special handling for trr-int?
-        codec.rtcpFeedback.forEach(function(fb) {
-          lines += 'a=rtcp-fb:' + pt + ' ' + fb.type + ' ' + fb.parameter +
-              '\r\n';
-        });
-      }
-      return lines;
-    };
-
-    // Parses an RFC 5576 ssrc media attribute. Sample input:
-    // a=ssrc:3735928559 cname:something
-    SDPUtils.parseSsrcMedia = function(line) {
-      var sp = line.indexOf(' ');
-      var parts = {
-        ssrc: line.substr(7, sp - 7),
-      };
-      var colon = line.indexOf(':', sp);
-      if (colon > -1) {
-        parts.attribute = line.substr(sp + 1, colon - sp - 1);
-        parts.value = line.substr(colon + 1);
-      } else {
-        parts.attribute = line.substr(sp + 1);
-      }
-      return parts;
-    };
-
-    // Extracts DTLS parameters from SDP media section or sessionpart.
-    // FIXME: for consistency with other functions this should only
-    //   get the fingerprint line as input. See also getIceParameters.
-    SDPUtils.getDtlsParameters = function(mediaSection, sessionpart) {
-      var lines = SDPUtils.splitLines(mediaSection);
-      lines = lines.concat(SDPUtils.splitLines(sessionpart)); // Search in session part, too.
-      var fpLine = lines.filter(function(line) {
-        return line.indexOf('a=fingerprint:') === 0;
-      })[0].substr(14);
-      // Note: a=setup line is ignored since we use the 'auto' role.
-      var dtlsParameters = {
-        role: 'auto',
-        fingerprints: [{
-          algorithm: fpLine.split(' ')[0],
-          value: fpLine.split(' ')[1]
-        }]
-      };
-      return dtlsParameters;
-    };
-
-    // Serializes DTLS parameters to SDP.
-    SDPUtils.writeDtlsParameters = function(params, setupType) {
-      var sdp = 'a=setup:' + setupType + '\r\n';
-      params.fingerprints.forEach(function(fp) {
-        sdp += 'a=fingerprint:' + fp.algorithm + ' ' + fp.value + '\r\n';
-      });
-      return sdp;
-    };
-    // Parses ICE information from SDP media section or sessionpart.
-    // FIXME: for consistency with other functions this should only
-    //   get the ice-ufrag and ice-pwd lines as input.
-    SDPUtils.getIceParameters = function(mediaSection, sessionpart) {
-      var lines = SDPUtils.splitLines(mediaSection);
-      lines = lines.concat(SDPUtils.splitLines(sessionpart)); // Search in session part, too.
-      var iceParameters = {
-        usernameFragment: lines.filter(function(line) {
-          return line.indexOf('a=ice-ufrag:') === 0;
-        })[0].substr(12),
-        password: lines.filter(function(line) {
-          return line.indexOf('a=ice-pwd:') === 0;
-        })[0].substr(10)
-      };
-      return iceParameters;
-    };
-
-    // Serializes ICE parameters to SDP.
-    SDPUtils.writeIceParameters = function(params) {
-      return 'a=ice-ufrag:' + params.usernameFragment + '\r\n' +
-          'a=ice-pwd:' + params.password + '\r\n';
-    };
-
-    // Parses the SDP media section and returns RTCRtpParameters.
-    SDPUtils.parseRtpParameters = function(mediaSection) {
-      var description = {
-        codecs: [],
-        headerExtensions: [],
-        fecMechanisms: [],
-        rtcp: []
-      };
-      var lines = SDPUtils.splitLines(mediaSection);
-      var mline = lines[0].split(' ');
-      for (var i = 3; i < mline.length; i++) { // find all codecs from mline[3..]
-        var pt = mline[i];
-        var rtpmapline = SDPUtils.matchPrefix(
-            mediaSection, 'a=rtpmap:' + pt + ' ')[0];
-        if (rtpmapline) {
-          var codec = SDPUtils.parseRtpMap(rtpmapline);
-          var fmtps = SDPUtils.matchPrefix(
-              mediaSection, 'a=fmtp:' + pt + ' ');
-          // Only the first a=fmtp:<pt> is considered.
-          codec.parameters = fmtps.length ? SDPUtils.parseFmtp(fmtps[0]) : {};
-          codec.rtcpFeedback = SDPUtils.matchPrefix(
-              mediaSection, 'a=rtcp-fb:' + pt + ' ')
-            .map(SDPUtils.parseRtcpFb);
-          description.codecs.push(codec);
-        }
-      }
-      // FIXME: parse headerExtensions, fecMechanisms and rtcp.
-      return description;
-    };
-
-    // Generates parts of the SDP media section describing the capabilities / parameters.
-    SDPUtils.writeRtpDescription = function(kind, caps) {
-      var sdp = '';
-
-      // Build the mline.
-      sdp += 'm=' + kind + ' ';
-      sdp += caps.codecs.length > 0 ? '9' : '0'; // reject if no codecs.
-      sdp += ' UDP/TLS/RTP/SAVPF ';
-      sdp += caps.codecs.map(function(codec) {
-        if (codec.preferredPayloadType !== undefined) {
-          return codec.preferredPayloadType;
-        }
-        return codec.payloadType;
-      }).join(' ') + '\r\n';
-
-      sdp += 'c=IN IP4 0.0.0.0\r\n';
-      sdp += 'a=rtcp:9 IN IP4 0.0.0.0\r\n';
-
-      // Add a=rtpmap lines for each codec. Also fmtp and rtcp-fb.
-      caps.codecs.forEach(function(codec) {
-        sdp += SDPUtils.writeRtpMap(codec);
-        sdp += SDPUtils.writeFtmp(codec);
-        sdp += SDPUtils.writeRtcpFb(codec);
-      });
-      // FIXME: add headerExtensions, fecMechanismş and rtcp.
-      sdp += 'a=rtcp-mux\r\n';
-      return sdp;
-    };
-
-    SDPUtils.writeSessionBoilerplate = function() {
-      // FIXME: sess-id should be an NTP timestamp.
-      return 'v=0\r\n' +
-          'o=thisisadapterortc 8169639915646943137 2 IN IP4 127.0.0.1\r\n' +
-          's=-\r\n' +
-          't=0 0\r\n';
-    };
-
-    SDPUtils.writeMediaSection = function(transceiver, caps, type, stream) {
-      var sdp = SDPUtils.writeRtpDescription(transceiver.kind, caps);
-
-      // Map ICE parameters (ufrag, pwd) to SDP.
-      sdp += SDPUtils.writeIceParameters(
-          transceiver.iceGatherer.getLocalParameters());
-
-      // Map DTLS parameters to SDP.
-      sdp += SDPUtils.writeDtlsParameters(
-          transceiver.dtlsTransport.getLocalParameters(),
-          type === 'offer' ? 'actpass' : 'active');
-
-      sdp += 'a=mid:' + transceiver.mid + '\r\n';
-
-      if (transceiver.rtpSender && transceiver.rtpReceiver) {
-        sdp += 'a=sendrecv\r\n';
-      } else if (transceiver.rtpSender) {
-        sdp += 'a=sendonly\r\n';
-      } else if (transceiver.rtpReceiver) {
-        sdp += 'a=recvonly\r\n';
-      } else {
-        sdp += 'a=inactive\r\n';
-      }
-
-      // FIXME: for RTX there might be multiple SSRCs. Not implemented in Edge yet.
-      if (transceiver.rtpSender) {
-        var msid = 'msid:' + stream.id + ' ' +
-            transceiver.rtpSender.track.id + '\r\n';
-        sdp += 'a=' + msid;
-        sdp += 'a=ssrc:' + transceiver.sendSsrc + ' ' + msid;
-      }
-      // FIXME: this should be written by writeRtpDescription.
-      sdp += 'a=ssrc:' + transceiver.sendSsrc + ' cname:' +
-          localCName + '\r\n';
-      return sdp;
-    };
-
-    // Gets the direction from the mediaSection or the sessionpart.
-    SDPUtils.getDirection = function(mediaSection, sessionpart) {
-      // Look for sendrecv, sendonly, recvonly, inactive, default to sendrecv.
-      var lines = SDPUtils.splitLines(mediaSection);
-      for (var i = 0; i < lines.length; i++) {
-        switch (lines[i]) {
-          case 'a=sendrecv':
-          case 'a=sendonly':
-          case 'a=recvonly':
-          case 'a=inactive':
-            return lines[i].substr(2);
-        }
-      }
-      if (sessionpart) {
-        return SDPUtils.getDirection(sessionpart);
-      }
-      return 'sendrecv';
-    };
-
-    // ORTC defines an RTCIceCandidate object but no constructor.
-    // Not implemented in Edge.
-    if (!window.RTCIceCandidate) {
-      window.RTCIceCandidate = function(args) {
-        return args;
-      };
-    }
-    // ORTC does not have a session description object but
-    // other browsers (i.e. Chrome) that will support both PC and ORTC
-    // in the future might have this defined already.
-    if (!window.RTCSessionDescription) {
-      window.RTCSessionDescription = function(args) {
-        return args;
-      };
     }
 
     window.RTCPeerConnection = function(config) {
       var self = this;
 
+      var _eventTarget = document.createDocumentFragment();
+      ['addEventListener', 'removeEventListener', 'dispatchEvent']
+          .forEach(function(method) {
+            self[method] = _eventTarget[method].bind(_eventTarget);
+          });
+
       this.onicecandidate = null;
       this.onaddstream = null;
+      this.ontrack = null;
       this.onremovestream = null;
       this.onsignalingstatechange = null;
       this.oniceconnectionstatechange = null;
@@ -926,8 +1154,12 @@ if (typeof window === 'undefined' || !window.navigator) {
 
       this.localStreams = [];
       this.remoteStreams = [];
-      this.getLocalStreams = function() { return self.localStreams; };
-      this.getRemoteStreams = function() { return self.remoteStreams; };
+      this.getLocalStreams = function() {
+        return self.localStreams;
+      };
+      this.getRemoteStreams = function() {
+        return self.remoteStreams;
+      };
 
       this.localDescription = new RTCSessionDescription({
         type: '',
@@ -939,6 +1171,7 @@ if (typeof window === 'undefined' || !window.navigator) {
       });
       this.signalingState = 'stable';
       this.iceConnectionState = 'new';
+      this.iceGatheringState = 'new';
 
       this.iceOptions = {
         gatherPolicy: 'all',
@@ -953,29 +1186,35 @@ if (typeof window === 'undefined' || !window.navigator) {
           case 'none':
             // FIXME: remove once implementation and spec have added this.
             throw new TypeError('iceTransportPolicy "none" not supported');
+          default:
+            // don't set iceTransportPolicy.
+            break;
         }
       }
+      this.usingBundle = config && config.bundlePolicy === 'max-bundle';
+
       if (config && config.iceServers) {
         // Edge does not like
         // 1) stun:
         // 2) turn: that does not have all of turn:host:port?transport=udp
-        // 3) an array of urls
-        config.iceServers.forEach(function(server) {
-          if (server.urls) {
-            var url;
-            if (typeof(server.urls) === 'string') {
-              url = server.urls;
-            } else {
-              url = server.urls[0];
+        // 3) turn: with ipv6 addresses
+        var iceServers = JSON.parse(JSON.stringify(config.iceServers));
+        this.iceOptions.iceServers = iceServers.filter(function(server) {
+          if (server && server.urls) {
+            var urls = server.urls;
+            if (typeof urls === 'string') {
+              urls = [urls];
             }
-            if (url.indexOf('transport=udp') !== -1) {
-              self.iceServers.push({
-                username: server.username,
-                credential: server.credential,
-                urls: url
-              });
-            }
+            urls = urls.filter(function(url) {
+              return (url.indexOf('turn:') === 0 &&
+                  url.indexOf('transport=udp') !== -1 &&
+                  url.indexOf('turn:[') === -1) ||
+                  (url.indexOf('stun:') === 0 &&
+                    browserDetails.version >= 14393);
+            })[0];
+            return !!urls;
           }
+          return false;
         });
       }
 
@@ -991,10 +1230,35 @@ if (typeof window === 'undefined' || !window.navigator) {
 
     window.RTCPeerConnection.prototype._emitBufferedCandidates = function() {
       var self = this;
-      // FIXME: need to apply ice candidates in a way which is async but in-order
+      var sections = SDPUtils.splitSections(self.localDescription.sdp);
+      // FIXME: need to apply ice candidates in a way which is async but
+      // in-order
       this._localIceCandidatesBuffer.forEach(function(event) {
+        var end = !event.candidate || Object.keys(event.candidate).length === 0;
+        if (end) {
+          for (var j = 1; j < sections.length; j++) {
+            if (sections[j].indexOf('\r\na=end-of-candidates\r\n') === -1) {
+              sections[j] += 'a=end-of-candidates\r\n';
+            }
+          }
+        } else if (event.candidate.candidate.indexOf('typ endOfCandidates')
+            === -1) {
+          sections[event.candidate.sdpMLineIndex + 1] +=
+              'a=' + event.candidate.candidate + '\r\n';
+        }
+        self.localDescription.sdp = sections.join('');
+        self.dispatchEvent(event);
         if (self.onicecandidate !== null) {
           self.onicecandidate(event);
+        }
+        if (!event.candidate && self.iceGatheringState !== 'complete') {
+          var complete = self.transceivers.every(function(transceiver) {
+            return transceiver.iceGatherer &&
+                transceiver.iceGatherer.state === 'completed';
+          });
+          if (complete) {
+            self.iceGatheringState = 'complete';
+          }
         }
       });
       this._localIceCandidatesBuffer = [];
@@ -1015,119 +1279,175 @@ if (typeof window === 'undefined' || !window.navigator) {
       }
     };
 
+    window.RTCPeerConnection.prototype.getSenders = function() {
+      return this.transceivers.filter(function(transceiver) {
+        return !!transceiver.rtpSender;
+      })
+      .map(function(transceiver) {
+        return transceiver.rtpSender;
+      });
+    };
+
+    window.RTCPeerConnection.prototype.getReceivers = function() {
+      return this.transceivers.filter(function(transceiver) {
+        return !!transceiver.rtpReceiver;
+      })
+      .map(function(transceiver) {
+        return transceiver.rtpReceiver;
+      });
+    };
+
     // Determines the intersection of local and remote capabilities.
     window.RTCPeerConnection.prototype._getCommonCapabilities =
         function(localCapabilities, remoteCapabilities) {
-      var commonCapabilities = {
-        codecs: [],
-        headerExtensions: [],
-        fecMechanisms: []
-      };
-      localCapabilities.codecs.forEach(function(lCodec) {
-        for (var i = 0; i < remoteCapabilities.codecs.length; i++) {
-          var rCodec = remoteCapabilities.codecs[i];
-          if (lCodec.name.toLowerCase() === rCodec.name.toLowerCase() &&
-              lCodec.clockRate === rCodec.clockRate &&
-              lCodec.numChannels === rCodec.numChannels) {
-            // push rCodec so we reply with offerer payload type
-            commonCapabilities.codecs.push(rCodec);
+          var commonCapabilities = {
+            codecs: [],
+            headerExtensions: [],
+            fecMechanisms: []
+          };
+          localCapabilities.codecs.forEach(function(lCodec) {
+            for (var i = 0; i < remoteCapabilities.codecs.length; i++) {
+              var rCodec = remoteCapabilities.codecs[i];
+              if (lCodec.name.toLowerCase() === rCodec.name.toLowerCase() &&
+                  lCodec.clockRate === rCodec.clockRate &&
+                  lCodec.numChannels === rCodec.numChannels) {
+                // push rCodec so we reply with offerer payload type
+                commonCapabilities.codecs.push(rCodec);
 
-            // FIXME: also need to determine intersection between
-            // .rtcpFeedback and .parameters
-            break;
-          }
-        }
-      });
+                // determine common feedback mechanisms
+                rCodec.rtcpFeedback = rCodec.rtcpFeedback.filter(function(fb) {
+                  for (var j = 0; j < lCodec.rtcpFeedback.length; j++) {
+                    if (lCodec.rtcpFeedback[j].type === fb.type &&
+                        lCodec.rtcpFeedback[j].parameter === fb.parameter) {
+                      return true;
+                    }
+                  }
+                  return false;
+                });
+                // FIXME: also need to determine .parameters
+                //  see https://github.com/openpeer/ortc/issues/569
+                break;
+              }
+            }
+          });
 
-      localCapabilities.headerExtensions.forEach(function(lHeaderExtension) {
-        for (var i = 0; i < remoteCapabilities.headerExtensions.length; i++) {
-          var rHeaderExtension = remoteCapabilities.headerExtensions[i];
-          if (lHeaderExtension.uri === rHeaderExtension.uri) {
-            commonCapabilities.headerExtensions.push(rHeaderExtension);
-            break;
-          }
-        }
-      });
+          localCapabilities.headerExtensions
+              .forEach(function(lHeaderExtension) {
+                for (var i = 0; i < remoteCapabilities.headerExtensions.length;
+                     i++) {
+                  var rHeaderExtension = remoteCapabilities.headerExtensions[i];
+                  if (lHeaderExtension.uri === rHeaderExtension.uri) {
+                    commonCapabilities.headerExtensions.push(rHeaderExtension);
+                    break;
+                  }
+                }
+              });
 
-      // FIXME: fecMechanisms
-      return commonCapabilities;
-    };
+          // FIXME: fecMechanisms
+          return commonCapabilities;
+        };
 
     // Create ICE gatherer, ICE transport and DTLS transport.
     window.RTCPeerConnection.prototype._createIceAndDtlsTransports =
         function(mid, sdpMLineIndex) {
-      var self = this;
-      var iceGatherer = new RTCIceGatherer(self.iceOptions);
-      var iceTransport = new RTCIceTransport(iceGatherer);
-      iceGatherer.onlocalcandidate = function(evt) {
-        var event = {};
-        event.candidate = {sdpMid: mid, sdpMLineIndex: sdpMLineIndex};
+          var self = this;
+          var iceGatherer = new RTCIceGatherer(self.iceOptions);
+          var iceTransport = new RTCIceTransport(iceGatherer);
+          iceGatherer.onlocalcandidate = function(evt) {
+            var event = new Event('icecandidate');
+            event.candidate = {sdpMid: mid, sdpMLineIndex: sdpMLineIndex};
 
-        var cand = evt.candidate;
-        // Edge emits an empty object for RTCIceCandidateComplete‥
-        if (!cand || Object.keys(cand).length === 0) {
-          // polyfill since RTCIceGatherer.state is not implemented in Edge 10547 yet.
-          if (iceGatherer.state === undefined) {
-            iceGatherer.state = 'completed';
-          }
+            var cand = evt.candidate;
+            var end = !cand || Object.keys(cand).length === 0;
+            // Edge emits an empty object for RTCIceCandidateComplete‥
+            if (end) {
+              // polyfill since RTCIceGatherer.state is not implemented in
+              // Edge 10547 yet.
+              if (iceGatherer.state === undefined) {
+                iceGatherer.state = 'completed';
+              }
 
-          // Emit a candidate with type endOfCandidates to make the samples work.
-          // Edge requires addIceCandidate with this empty candidate to start checking.
-          // The real solution is to signal end-of-candidates to the other side when
-          // getting the null candidate but some apps (like the samples) don't do that.
-          event.candidate.candidate =
-              'candidate:1 1 udp 1 0.0.0.0 9 typ endOfCandidates';
-        } else {
-          // RTCIceCandidate doesn't have a component, needs to be added
-          cand.component = iceTransport.component === 'RTCP' ? 2 : 1;
-          event.candidate.candidate = SDPUtils.writeCandidate(cand);
-        }
-
-        var complete = self.transceivers.every(function(transceiver) {
-          return transceiver.iceGatherer &&
-              transceiver.iceGatherer.state === 'completed';
-        });
-        // FIXME: update .localDescription with candidate and (potentially) end-of-candidates.
-        //     To make this harder, the gatherer might emit candidates before localdescription
-        //     is set. To make things worse, gather.getLocalCandidates still errors in
-        //     Edge 10547 when no candidates have been gathered yet.
-
-        if (self.onicecandidate !== null) {
-          // Emit candidate if localDescription is set.
-          // Also emits null candidate when all gatherers are complete.
-          if (self.localDescription && self.localDescription.type === '') {
-            self._localIceCandidatesBuffer.push(event);
-            if (complete) {
-              self._localIceCandidatesBuffer.push({});
+              // Emit a candidate with type endOfCandidates to make the samples
+              // work. Edge requires addIceCandidate with this empty candidate
+              // to start checking. The real solution is to signal
+              // end-of-candidates to the other side when getting the null
+              // candidate but some apps (like the samples) don't do that.
+              event.candidate.candidate =
+                  'candidate:1 1 udp 1 0.0.0.0 9 typ endOfCandidates';
+            } else {
+              // RTCIceCandidate doesn't have a component, needs to be added
+              cand.component = iceTransport.component === 'RTCP' ? 2 : 1;
+              event.candidate.candidate = SDPUtils.writeCandidate(cand);
             }
-          } else {
-            self.onicecandidate(event);
-            if (complete) {
-              self.onicecandidate({});
+
+            // update local description.
+            var sections = SDPUtils.splitSections(self.localDescription.sdp);
+            if (event.candidate.candidate.indexOf('typ endOfCandidates')
+                === -1) {
+              sections[event.candidate.sdpMLineIndex + 1] +=
+                  'a=' + event.candidate.candidate + '\r\n';
+            } else {
+              sections[event.candidate.sdpMLineIndex + 1] +=
+                  'a=end-of-candidates\r\n';
             }
-          }
-        }
-      };
-      iceTransport.onicestatechange = function() {
-        self._updateConnectionState();
-      };
+            self.localDescription.sdp = sections.join('');
 
-      var dtlsTransport = new RTCDtlsTransport(iceTransport);
-      dtlsTransport.ondtlsstatechange = function() {
-        self._updateConnectionState();
-      };
-      dtlsTransport.onerror = function() {
-        // onerror does not set state to failed by itself.
-        dtlsTransport.state = 'failed';
-        self._updateConnectionState();
-      };
+            var complete = self.transceivers.every(function(transceiver) {
+              return transceiver.iceGatherer &&
+                  transceiver.iceGatherer.state === 'completed';
+            });
 
-      return {
-        iceGatherer: iceGatherer,
-        iceTransport: iceTransport,
-        dtlsTransport: dtlsTransport
-      };
-    };
+            // Emit candidate if localDescription is set.
+            // Also emits null candidate when all gatherers are complete.
+            switch (self.iceGatheringState) {
+              case 'new':
+                self._localIceCandidatesBuffer.push(event);
+                if (end && complete) {
+                  self._localIceCandidatesBuffer.push(
+                      new Event('icecandidate'));
+                }
+                break;
+              case 'gathering':
+                self._emitBufferedCandidates();
+                self.dispatchEvent(event);
+                if (self.onicecandidate !== null) {
+                  self.onicecandidate(event);
+                }
+                if (complete) {
+                  self.dispatchEvent(new Event('icecandidate'));
+                  if (self.onicecandidate !== null) {
+                    self.onicecandidate(new Event('icecandidate'));
+                  }
+                  self.iceGatheringState = 'complete';
+                }
+                break;
+              case 'complete':
+                // should not happen... currently!
+                break;
+              default: // no-op.
+                break;
+            }
+          };
+          iceTransport.onicestatechange = function() {
+            self._updateConnectionState();
+          };
+
+          var dtlsTransport = new RTCDtlsTransport(iceTransport);
+          dtlsTransport.ondtlsstatechange = function() {
+            self._updateConnectionState();
+          };
+          dtlsTransport.onerror = function() {
+            // onerror does not set state to failed by itself.
+            dtlsTransport.state = 'failed';
+            self._updateConnectionState();
+          };
+
+          return {
+            iceGatherer: iceGatherer,
+            iceTransport: iceTransport,
+            dtlsTransport: dtlsTransport
+          };
+        };
 
     // Start the RTP Sender and Receiver for a transceiver.
     window.RTCPeerConnection.prototype._transceive = function(transceiver,
@@ -1135,246 +1455,380 @@ if (typeof window === 'undefined' || !window.navigator) {
       var params = this._getCommonCapabilities(transceiver.localCapabilities,
           transceiver.remoteCapabilities);
       if (send && transceiver.rtpSender) {
-        params.encodings = [{
-          ssrc: transceiver.sendSsrc
-        }];
+        params.encodings = transceiver.sendEncodingParameters;
         params.rtcp = {
-          cname: localCName,
-          ssrc: transceiver.recvSsrc
+          cname: SDPUtils.localCName
         };
+        if (transceiver.recvEncodingParameters.length) {
+          params.rtcp.ssrc = transceiver.recvEncodingParameters[0].ssrc;
+        }
         transceiver.rtpSender.send(params);
       }
       if (recv && transceiver.rtpReceiver) {
-        params.encodings = [{
-          ssrc: transceiver.recvSsrc
-        }];
+        params.encodings = transceiver.recvEncodingParameters;
         params.rtcp = {
-          cname: transceiver.cname,
-          ssrc: transceiver.sendSsrc
+          cname: transceiver.cname
         };
+        if (transceiver.sendEncodingParameters.length) {
+          params.rtcp.ssrc = transceiver.sendEncodingParameters[0].ssrc;
+        }
         transceiver.rtpReceiver.receive(params);
       }
     };
 
     window.RTCPeerConnection.prototype.setLocalDescription =
         function(description) {
-      var self = this;
-      if (description.type === 'offer') {
-        if (this._pendingOffer) {
-          this.transceivers = this._pendingOffer;
-          delete this._pendingOffer;
-        }
-      } else if (description.type === 'answer') {
-        var sections = SDPUtils.splitSections(self.remoteDescription.sdp);
-        var sessionpart = sections.shift();
-        sections.forEach(function(mediaSection, sdpMLineIndex) {
-          var transceiver = self.transceivers[sdpMLineIndex];
-          var iceGatherer = transceiver.iceGatherer;
-          var iceTransport = transceiver.iceTransport;
-          var dtlsTransport = transceiver.dtlsTransport;
-          var localCapabilities = transceiver.localCapabilities;
-          var remoteCapabilities = transceiver.remoteCapabilities;
-          var rejected = mediaSection.split('\n', 1)[0]
-              .split(' ', 2)[1] === '0';
+          var self = this;
+          var sections;
+          var sessionpart;
+          if (description.type === 'offer') {
+            // FIXME: What was the purpose of this empty if statement?
+            // if (!this._pendingOffer) {
+            // } else {
+            if (this._pendingOffer) {
+              // VERY limited support for SDP munging. Limited to:
+              // * changing the order of codecs
+              sections = SDPUtils.splitSections(description.sdp);
+              sessionpart = sections.shift();
+              sections.forEach(function(mediaSection, sdpMLineIndex) {
+                var caps = SDPUtils.parseRtpParameters(mediaSection);
+                self._pendingOffer[sdpMLineIndex].localCapabilities = caps;
+              });
+              this.transceivers = this._pendingOffer;
+              delete this._pendingOffer;
+            }
+          } else if (description.type === 'answer') {
+            sections = SDPUtils.splitSections(self.remoteDescription.sdp);
+            sessionpart = sections.shift();
+            var isIceLite = SDPUtils.matchPrefix(sessionpart,
+                'a=ice-lite').length > 0;
+            sections.forEach(function(mediaSection, sdpMLineIndex) {
+              var transceiver = self.transceivers[sdpMLineIndex];
+              var iceGatherer = transceiver.iceGatherer;
+              var iceTransport = transceiver.iceTransport;
+              var dtlsTransport = transceiver.dtlsTransport;
+              var localCapabilities = transceiver.localCapabilities;
+              var remoteCapabilities = transceiver.remoteCapabilities;
 
-          if (!rejected) {
-            var remoteIceParameters = SDPUtils.getIceParameters(mediaSection,
-                sessionpart);
-            iceTransport.start(iceGatherer, remoteIceParameters, 'controlled');
+              var rejected = mediaSection.split('\n', 1)[0]
+                  .split(' ', 2)[1] === '0';
 
-            var remoteDtlsParameters = SDPUtils.getDtlsParameters(mediaSection,
-              sessionpart);
-            dtlsTransport.start(remoteDtlsParameters);
+              if (!rejected && !transceiver.isDatachannel) {
+                var remoteIceParameters = SDPUtils.getIceParameters(
+                    mediaSection, sessionpart);
+                if (isIceLite) {
+                  var cands = SDPUtils.matchPrefix(mediaSection, 'a=candidate:')
+                  .map(function(cand) {
+                    return SDPUtils.parseCandidate(cand);
+                  })
+                  .filter(function(cand) {
+                    return cand.component === '1';
+                  });
+                  // ice-lite only includes host candidates in the SDP so we can
+                  // use setRemoteCandidates (which implies an
+                  // RTCIceCandidateComplete)
+                  if (cands.length) {
+                    iceTransport.setRemoteCandidates(cands);
+                  }
+                }
+                var remoteDtlsParameters = SDPUtils.getDtlsParameters(
+                    mediaSection, sessionpart);
+                if (isIceLite) {
+                  remoteDtlsParameters.role = 'server';
+                }
 
-            // Calculate intersection of capabilities.
-            var params = self._getCommonCapabilities(localCapabilities,
-                remoteCapabilities);
+                if (!self.usingBundle || sdpMLineIndex === 0) {
+                  iceTransport.start(iceGatherer, remoteIceParameters,
+                      isIceLite ? 'controlling' : 'controlled');
+                  dtlsTransport.start(remoteDtlsParameters);
+                }
 
-            // Start the RTCRtpSender. The RTCRtpReceiver for this transceiver
-            // has already been started in setRemoteDescription.
-            self._transceive(transceiver,
-                params.codecs.length > 0,
-                false);
+                // Calculate intersection of capabilities.
+                var params = self._getCommonCapabilities(localCapabilities,
+                    remoteCapabilities);
+
+                // Start the RTCRtpSender. The RTCRtpReceiver for this
+                // transceiver has already been started in setRemoteDescription.
+                self._transceive(transceiver,
+                    params.codecs.length > 0,
+                    false);
+              }
+            });
           }
-        });
-      }
 
-      this.localDescription = description;
-      switch (description.type) {
-        case 'offer':
-          this._updateSignalingState('have-local-offer');
-          break;
-        case 'answer':
-          this._updateSignalingState('stable');
-          break;
-        default:
-          throw new TypeError('unsupported type "' + description.type + '"');
-      }
+          this.localDescription = {
+            type: description.type,
+            sdp: description.sdp
+          };
+          switch (description.type) {
+            case 'offer':
+              this._updateSignalingState('have-local-offer');
+              break;
+            case 'answer':
+              this._updateSignalingState('stable');
+              break;
+            default:
+              throw new TypeError('unsupported type "' + description.type +
+                  '"');
+          }
 
-      // If a success callback was provided, emit ICE candidates after it has been
-      // executed. Otherwise, emit callback after the Promise is resolved.
-      var hasCallback = arguments.length > 1 &&
-        typeof arguments[1] === 'function';
-      if (hasCallback) {
-        var cb = arguments[1];
-        window.setTimeout(function() {
-          cb();
-          self._emitBufferedCandidates();
-        }, 0);
-      }
-      var p = Promise.resolve();
-      p.then(function() {
-        if (!hasCallback) {
-          window.setTimeout(self._emitBufferedCandidates.bind(self), 0);
-        }
-      });
-      return p;
-    };
+          // If a success callback was provided, emit ICE candidates after it
+          // has been executed. Otherwise, emit callback after the Promise is
+          // resolved.
+          var hasCallback = arguments.length > 1 &&
+            typeof arguments[1] === 'function';
+          if (hasCallback) {
+            var cb = arguments[1];
+            window.setTimeout(function() {
+              cb();
+              if (self.iceGatheringState === 'new') {
+                self.iceGatheringState = 'gathering';
+              }
+              self._emitBufferedCandidates();
+            }, 0);
+          }
+          var p = Promise.resolve();
+          p.then(function() {
+            if (!hasCallback) {
+              if (self.iceGatheringState === 'new') {
+                self.iceGatheringState = 'gathering';
+              }
+              // Usually candidates will be emitted earlier.
+              window.setTimeout(self._emitBufferedCandidates.bind(self), 500);
+            }
+          });
+          return p;
+        };
 
     window.RTCPeerConnection.prototype.setRemoteDescription =
         function(description) {
-      var self = this;
-      var stream = new MediaStream();
-      var sections = SDPUtils.splitSections(description.sdp);
-      var sessionpart = sections.shift();
-      sections.forEach(function(mediaSection, sdpMLineIndex) {
-        var lines = SDPUtils.splitLines(mediaSection);
-        var mline = lines[0].substr(2).split(' ');
-        var kind = mline[0];
-        var rejected = mline[1] === '0';
-        var direction = SDPUtils.getDirection(mediaSection, sessionpart);
+          var self = this;
+          var stream = new MediaStream();
+          var receiverList = [];
+          var sections = SDPUtils.splitSections(description.sdp);
+          var sessionpart = sections.shift();
+          var isIceLite = SDPUtils.matchPrefix(sessionpart,
+              'a=ice-lite').length > 0;
+          this.usingBundle = SDPUtils.matchPrefix(sessionpart,
+              'a=group:BUNDLE ').length > 0;
+          sections.forEach(function(mediaSection, sdpMLineIndex) {
+            var lines = SDPUtils.splitLines(mediaSection);
+            var mline = lines[0].substr(2).split(' ');
+            var kind = mline[0];
+            var rejected = mline[1] === '0';
+            var direction = SDPUtils.getDirection(mediaSection, sessionpart);
 
-        var transceiver;
-        var iceGatherer;
-        var iceTransport;
-        var dtlsTransport;
-        var rtpSender;
-        var rtpReceiver;
-        var sendSsrc;
-        var recvSsrc;
-        var localCapabilities;
+            var mid = SDPUtils.matchPrefix(mediaSection, 'a=mid:');
+            if (mid.length) {
+              mid = mid[0].substr(6);
+            } else {
+              mid = SDPUtils.generateIdentifier();
+            }
 
-        // FIXME: ensure the mediaSection has rtcp-mux set.
-        var remoteCapabilities = SDPUtils.parseRtpParameters(mediaSection);
-        var remoteIceParameters;
-        var remoteDtlsParameters;
-        if (!rejected) {
-          remoteIceParameters = SDPUtils.getIceParameters(mediaSection,
-              sessionpart);
-          remoteDtlsParameters = SDPUtils.getDtlsParameters(mediaSection,
-              sessionpart);
-        }
-        var mid = SDPUtils.matchPrefix(mediaSection, 'a=mid:')[0].substr(6);
+            // Reject datachannels which are not implemented yet.
+            if (kind === 'application' && mline[2] === 'DTLS/SCTP') {
+              self.transceivers[sdpMLineIndex] = {
+                mid: mid,
+                isDatachannel: true
+              };
+              return;
+            }
 
-        var cname;
-        // Gets the first SSRC. Note that with RTX there might be multiple SSRCs.
-        var remoteSsrc = SDPUtils.matchPrefix(mediaSection, 'a=ssrc:')
-            .map(function(line) {
-              return SDPUtils.parseSsrcMedia(line);
-            })
-            .filter(function(obj) {
-              return obj.attribute === 'cname';
-            })[0];
-        if (remoteSsrc) {
-          recvSsrc = parseInt(remoteSsrc.ssrc, 10);
-          cname = remoteSsrc.value;
-        }
+            var transceiver;
+            var iceGatherer;
+            var iceTransport;
+            var dtlsTransport;
+            var rtpSender;
+            var rtpReceiver;
+            var sendEncodingParameters;
+            var recvEncodingParameters;
+            var localCapabilities;
 
-        if (description.type === 'offer') {
-          var transports = self._createIceAndDtlsTransports(mid, sdpMLineIndex);
+            var track;
+            // FIXME: ensure the mediaSection has rtcp-mux set.
+            var remoteCapabilities = SDPUtils.parseRtpParameters(mediaSection);
+            var remoteIceParameters;
+            var remoteDtlsParameters;
+            if (!rejected) {
+              remoteIceParameters = SDPUtils.getIceParameters(mediaSection,
+                  sessionpart);
+              remoteDtlsParameters = SDPUtils.getDtlsParameters(mediaSection,
+                  sessionpart);
+              remoteDtlsParameters.role = 'client';
+            }
+            recvEncodingParameters =
+                SDPUtils.parseRtpEncodingParameters(mediaSection);
 
-          localCapabilities = RTCRtpReceiver.getCapabilities(kind);
-          sendSsrc = (2 * sdpMLineIndex + 2) * 1001;
+            var cname;
+            // Gets the first SSRC. Note that with RTX there might be multiple
+            // SSRCs.
+            var remoteSsrc = SDPUtils.matchPrefix(mediaSection, 'a=ssrc:')
+                .map(function(line) {
+                  return SDPUtils.parseSsrcMedia(line);
+                })
+                .filter(function(obj) {
+                  return obj.attribute === 'cname';
+                })[0];
+            if (remoteSsrc) {
+              cname = remoteSsrc.value;
+            }
 
-          rtpReceiver = new RTCRtpReceiver(transports.dtlsTransport, kind);
+            var isComplete = SDPUtils.matchPrefix(mediaSection,
+                'a=end-of-candidates', sessionpart).length > 0;
+            var cands = SDPUtils.matchPrefix(mediaSection, 'a=candidate:')
+                .map(function(cand) {
+                  return SDPUtils.parseCandidate(cand);
+                })
+                .filter(function(cand) {
+                  return cand.component === '1';
+                });
+            if (description.type === 'offer' && !rejected) {
+              var transports = self.usingBundle && sdpMLineIndex > 0 ? {
+                iceGatherer: self.transceivers[0].iceGatherer,
+                iceTransport: self.transceivers[0].iceTransport,
+                dtlsTransport: self.transceivers[0].dtlsTransport
+              } : self._createIceAndDtlsTransports(mid, sdpMLineIndex);
 
-          // FIXME: not correct when there are multiple streams but that is
-          // not currently supported in this shim.
-          stream.addTrack(rtpReceiver.track);
+              if (isComplete) {
+                transports.iceTransport.setRemoteCandidates(cands);
+              }
 
-          // FIXME: look at direction.
-          if (self.localStreams.length > 0 &&
-              self.localStreams[0].getTracks().length >= sdpMLineIndex) {
-            // FIXME: actually more complicated, needs to match types etc
-            var localtrack = self.localStreams[0].getTracks()[sdpMLineIndex];
-            rtpSender = new RTCRtpSender(localtrack, transports.dtlsTransport);
-          }
+              localCapabilities = RTCRtpReceiver.getCapabilities(kind);
+              sendEncodingParameters = [{
+                ssrc: (2 * sdpMLineIndex + 2) * 1001
+              }];
 
-          self.transceivers[sdpMLineIndex] = {
-            iceGatherer: transports.iceGatherer,
-            iceTransport: transports.iceTransport,
-            dtlsTransport: transports.dtlsTransport,
-            localCapabilities: localCapabilities,
-            remoteCapabilities: remoteCapabilities,
-            rtpSender: rtpSender,
-            rtpReceiver: rtpReceiver,
-            kind: kind,
-            mid: mid,
-            cname: cname,
-            sendSsrc: sendSsrc,
-            recvSsrc: recvSsrc
+              rtpReceiver = new RTCRtpReceiver(transports.dtlsTransport, kind);
+
+              track = rtpReceiver.track;
+              receiverList.push([track, rtpReceiver]);
+              // FIXME: not correct when there are multiple streams but that is
+              // not currently supported in this shim.
+              stream.addTrack(track);
+
+              // FIXME: look at direction.
+              if (self.localStreams.length > 0 &&
+                  self.localStreams[0].getTracks().length >= sdpMLineIndex) {
+                var localTrack;
+                if (kind === 'audio') {
+                  localTrack = self.localStreams[0].getAudioTracks()[0];
+                } else if (kind === 'video') {
+                  localTrack = self.localStreams[0].getVideoTracks()[0];
+                }
+                if (localTrack) {
+                  rtpSender = new RTCRtpSender(localTrack,
+                      transports.dtlsTransport);
+                }
+              }
+
+              self.transceivers[sdpMLineIndex] = {
+                iceGatherer: transports.iceGatherer,
+                iceTransport: transports.iceTransport,
+                dtlsTransport: transports.dtlsTransport,
+                localCapabilities: localCapabilities,
+                remoteCapabilities: remoteCapabilities,
+                rtpSender: rtpSender,
+                rtpReceiver: rtpReceiver,
+                kind: kind,
+                mid: mid,
+                cname: cname,
+                sendEncodingParameters: sendEncodingParameters,
+                recvEncodingParameters: recvEncodingParameters
+              };
+              // Start the RTCRtpReceiver now. The RTPSender is started in
+              // setLocalDescription.
+              self._transceive(self.transceivers[sdpMLineIndex],
+                  false,
+                  direction === 'sendrecv' || direction === 'sendonly');
+            } else if (description.type === 'answer' && !rejected) {
+              transceiver = self.transceivers[sdpMLineIndex];
+              iceGatherer = transceiver.iceGatherer;
+              iceTransport = transceiver.iceTransport;
+              dtlsTransport = transceiver.dtlsTransport;
+              rtpSender = transceiver.rtpSender;
+              rtpReceiver = transceiver.rtpReceiver;
+              sendEncodingParameters = transceiver.sendEncodingParameters;
+              localCapabilities = transceiver.localCapabilities;
+
+              self.transceivers[sdpMLineIndex].recvEncodingParameters =
+                  recvEncodingParameters;
+              self.transceivers[sdpMLineIndex].remoteCapabilities =
+                  remoteCapabilities;
+              self.transceivers[sdpMLineIndex].cname = cname;
+
+              if ((isIceLite || isComplete) && cands.length) {
+                iceTransport.setRemoteCandidates(cands);
+              }
+              if (!self.usingBundle || sdpMLineIndex === 0) {
+                iceTransport.start(iceGatherer, remoteIceParameters,
+                    'controlling');
+                dtlsTransport.start(remoteDtlsParameters);
+              }
+
+              self._transceive(transceiver,
+                  direction === 'sendrecv' || direction === 'recvonly',
+                  direction === 'sendrecv' || direction === 'sendonly');
+
+              if (rtpReceiver &&
+                  (direction === 'sendrecv' || direction === 'sendonly')) {
+                track = rtpReceiver.track;
+                receiverList.push([track, rtpReceiver]);
+                stream.addTrack(track);
+              } else {
+                // FIXME: actually the receiver should be created later.
+                delete transceiver.rtpReceiver;
+              }
+            }
+          });
+
+          this.remoteDescription = {
+            type: description.type,
+            sdp: description.sdp
           };
-          // Start the RTCRtpReceiver now. The RTPSender is started in setLocalDescription.
-          self._transceive(self.transceivers[sdpMLineIndex],
-              false,
-              direction === 'sendrecv' || direction === 'sendonly');
-        } else if (description.type === 'answer' && !rejected) {
-          transceiver = self.transceivers[sdpMLineIndex];
-          iceGatherer = transceiver.iceGatherer;
-          iceTransport = transceiver.iceTransport;
-          dtlsTransport = transceiver.dtlsTransport;
-          rtpSender = transceiver.rtpSender;
-          rtpReceiver = transceiver.rtpReceiver;
-          sendSsrc = transceiver.sendSsrc;
-          //recvSsrc = transceiver.recvSsrc;
-          localCapabilities = transceiver.localCapabilities;
-
-          self.transceivers[sdpMLineIndex].recvSsrc = recvSsrc;
-          self.transceivers[sdpMLineIndex].remoteCapabilities =
-              remoteCapabilities;
-          self.transceivers[sdpMLineIndex].cname = cname;
-
-          iceTransport.start(iceGatherer, remoteIceParameters, 'controlling');
-          dtlsTransport.start(remoteDtlsParameters);
-
-          self._transceive(transceiver,
-              direction === 'sendrecv' || direction === 'recvonly',
-              direction === 'sendrecv' || direction === 'sendonly');
-
-          if (rtpReceiver &&
-              (direction === 'sendrecv' || direction === 'sendonly')) {
-            stream.addTrack(rtpReceiver.track);
-          } else {
-            // FIXME: actually the receiver should be created later.
-            delete transceiver.rtpReceiver;
+          switch (description.type) {
+            case 'offer':
+              this._updateSignalingState('have-remote-offer');
+              break;
+            case 'answer':
+              this._updateSignalingState('stable');
+              break;
+            default:
+              throw new TypeError('unsupported type "' + description.type +
+                  '"');
           }
-        }
-      });
+          if (stream.getTracks().length) {
+            self.remoteStreams.push(stream);
+            window.setTimeout(function() {
+              var event = new Event('addstream');
+              event.stream = stream;
+              self.dispatchEvent(event);
+              if (self.onaddstream !== null) {
+                window.setTimeout(function() {
+                  self.onaddstream(event);
+                }, 0);
+              }
 
-      this.remoteDescription = description;
-      switch (description.type) {
-        case 'offer':
-          this._updateSignalingState('have-remote-offer');
-          break;
-        case 'answer':
-          this._updateSignalingState('stable');
-          break;
-        default:
-          throw new TypeError('unsupported type "' + description.type + '"');
-      }
-      window.setTimeout(function() {
-        if (self.onaddstream !== null && stream.getTracks().length) {
-          self.remoteStreams.push(stream);
-          window.setTimeout(function() {
-            self.onaddstream({stream: stream});
-          }, 0);
-        }
-      }, 0);
-      if (arguments.length > 1 && typeof arguments[1] === 'function') {
-        window.setTimeout(arguments[1], 0);
-      }
-      return Promise.resolve();
-    };
+              receiverList.forEach(function(item) {
+                var track = item[0];
+                var receiver = item[1];
+                var trackEvent = new Event('track');
+                trackEvent.track = track;
+                trackEvent.receiver = receiver;
+                trackEvent.streams = [stream];
+                self.dispatchEvent(event);
+                if (self.ontrack !== null) {
+                  window.setTimeout(function() {
+                    self.ontrack(trackEvent);
+                  }, 0);
+                }
+              });
+            }, 0);
+          }
+          if (arguments.length > 1 && typeof arguments[1] === 'function') {
+            window.setTimeout(arguments[1], 0);
+          }
+          return Promise.resolve();
+        };
 
     window.RTCPeerConnection.prototype.close = function() {
       this.transceivers.forEach(function(transceiver) {
@@ -1403,24 +1857,27 @@ if (typeof window === 'undefined' || !window.navigator) {
     // Update the signaling state.
     window.RTCPeerConnection.prototype._updateSignalingState =
         function(newState) {
-      this.signalingState = newState;
-      if (this.onsignalingstatechange !== null) {
-        this.onsignalingstatechange();
-      }
-    };
+          this.signalingState = newState;
+          var event = new Event('signalingstatechange');
+          this.dispatchEvent(event);
+          if (this.onsignalingstatechange !== null) {
+            this.onsignalingstatechange(event);
+          }
+        };
 
     // Determine whether to fire the negotiationneeded event.
     window.RTCPeerConnection.prototype._maybeFireNegotiationNeeded =
         function() {
-      // Fire away (for now).
-      if (this.onnegotiationneeded !== null) {
-        this.onnegotiationneeded();
-      }
-    };
+          // Fire away (for now).
+          var event = new Event('negotiationneeded');
+          this.dispatchEvent(event);
+          if (this.onnegotiationneeded !== null) {
+            this.onnegotiationneeded(event);
+          }
+        };
 
     // Update the connection state.
-    window.RTCPeerConnection.prototype._updateConnectionState =
-        function() {
+    window.RTCPeerConnection.prototype._updateConnectionState = function() {
       var self = this;
       var newState;
       var states = {
@@ -1448,14 +1905,16 @@ if (typeof window === 'undefined' || !window.navigator) {
         newState = 'disconnected';
       } else if (states.new > 0) {
         newState = 'new';
-      } else if (states.connecting > 0 || states.completed > 0) {
+      } else if (states.connected > 0 || states.completed > 0) {
         newState = 'connected';
       }
 
       if (newState !== self.iceConnectionState) {
         self.iceConnectionState = newState;
+        var event = new Event('iceconnectionstatechange');
+        this.dispatchEvent(event);
         if (this.oniceconnectionstatechange !== null) {
-          this.oniceconnectionstatechange();
+          this.oniceconnectionstatechange(event);
         }
       }
     };
@@ -1531,20 +1990,26 @@ if (typeof window === 'undefined' || !window.navigator) {
       var sdp = SDPUtils.writeSessionBoilerplate();
       var transceivers = [];
       tracks.forEach(function(mline, sdpMLineIndex) {
-        // For each track, create an ice gatherer, ice transport, dtls transport,
-        // potentially rtpsender and rtpreceiver.
+        // For each track, create an ice gatherer, ice transport,
+        // dtls transport, potentially rtpsender and rtpreceiver.
         var track = mline.track;
         var kind = mline.kind;
-        var mid = generateIdentifier();
+        var mid = SDPUtils.generateIdentifier();
 
-        var transports = self._createIceAndDtlsTransports(mid, sdpMLineIndex);
+        var transports = self.usingBundle && sdpMLineIndex > 0 ? {
+          iceGatherer: transceivers[0].iceGatherer,
+          iceTransport: transceivers[0].iceTransport,
+          dtlsTransport: transceivers[0].dtlsTransport
+        } : self._createIceAndDtlsTransports(mid, sdpMLineIndex);
 
         var localCapabilities = RTCRtpSender.getCapabilities(kind);
         var rtpSender;
         var rtpReceiver;
 
         // generate an ssrc now, to be used later in rtpSender.send
-        var sendSsrc = (2 * sdpMLineIndex + 1) * 1001;
+        var sendEncodingParameters = [{
+          ssrc: (2 * sdpMLineIndex + 1) * 1001
+        }];
         if (track) {
           rtpSender = new RTCRtpSender(track, transports.dtlsTransport);
         }
@@ -1563,9 +2028,16 @@ if (typeof window === 'undefined' || !window.navigator) {
           rtpReceiver: rtpReceiver,
           kind: kind,
           mid: mid,
-          sendSsrc: sendSsrc,
-          recvSsrc: null
+          sendEncodingParameters: sendEncodingParameters,
+          recvEncodingParameters: null
         };
+      });
+      if (this.usingBundle) {
+        sdp += 'a=group:BUNDLE ' + transceivers.map(function(t) {
+          return t.mid;
+        }).join(' ') + '\r\n';
+      }
+      tracks.forEach(function(mline, sdpMLineIndex) {
         var transceiver = transceivers[sdpMLineIndex];
         sdp += SDPUtils.writeMediaSection(transceiver,
             transceiver.localCapabilities, 'offer', self.localStreams[0]);
@@ -1584,15 +2056,20 @@ if (typeof window === 'undefined' || !window.navigator) {
 
     window.RTCPeerConnection.prototype.createAnswer = function() {
       var self = this;
-      var answerOptions;
-      if (arguments.length === 1 && typeof arguments[0] !== 'function') {
-        answerOptions = arguments[0];
-      } else if (arguments.length === 3) {
-        answerOptions = arguments[2];
-      }
 
       var sdp = SDPUtils.writeSessionBoilerplate();
+      if (this.usingBundle) {
+        sdp += 'a=group:BUNDLE ' + this.transceivers.map(function(t) {
+          return t.mid;
+        }).join(' ') + '\r\n';
+      }
       this.transceivers.forEach(function(transceiver) {
+        if (transceiver.isDatachannel) {
+          sdp += 'm=application 0 DTLS/SCTP 5000\r\n' +
+              'c=IN IP4 0.0.0.0\r\n' +
+              'a=mid:' + transceiver.mid + '\r\n';
+          return;
+        }
         // Calculate intersection of capabilities.
         var commonCapabilities = self._getCommonCapabilities(
             transceiver.localCapabilities,
@@ -1613,32 +2090,44 @@ if (typeof window === 'undefined' || !window.navigator) {
     };
 
     window.RTCPeerConnection.prototype.addIceCandidate = function(candidate) {
-      var mLineIndex = candidate.sdpMLineIndex;
-      if (candidate.sdpMid) {
-        for (var i = 0; i < this.transceivers.length; i++) {
-          if (this.transceivers[i].mid === candidate.sdpMid) {
-            mLineIndex = i;
-            break;
+      if (candidate === null) {
+        this.transceivers.forEach(function(transceiver) {
+          transceiver.iceTransport.addRemoteCandidate({});
+        });
+      } else {
+        var mLineIndex = candidate.sdpMLineIndex;
+        if (candidate.sdpMid) {
+          for (var i = 0; i < this.transceivers.length; i++) {
+            if (this.transceivers[i].mid === candidate.sdpMid) {
+              mLineIndex = i;
+              break;
+            }
           }
         }
-      }
-      var transceiver = this.transceivers[mLineIndex];
-      if (transceiver) {
-        var cand = Object.keys(candidate.candidate).length > 0 ?
-            SDPUtils.parseCandidate(candidate.candidate) : {};
-        // Ignore Chrome's invalid candidates since Edge does not like them.
-        if (cand.protocol === 'tcp' && cand.port === 0) {
-          return;
+        var transceiver = this.transceivers[mLineIndex];
+        if (transceiver) {
+          var cand = Object.keys(candidate.candidate).length > 0 ?
+              SDPUtils.parseCandidate(candidate.candidate) : {};
+          // Ignore Chrome's invalid candidates since Edge does not like them.
+          if (cand.protocol === 'tcp' && (cand.port === 0 || cand.port === 9)) {
+            return;
+          }
+          // Ignore RTCP candidates, we assume RTCP-MUX.
+          if (cand.component !== '1') {
+            return;
+          }
+          // A dirty hack to make samples work.
+          if (cand.type === 'endOfCandidates') {
+            cand = {};
+          }
+          transceiver.iceTransport.addRemoteCandidate(cand);
+
+          // update the remoteDescription.
+          var sections = SDPUtils.splitSections(this.remoteDescription.sdp);
+          sections[mLineIndex + 1] += (cand.type ? candidate.candidate.trim()
+              : 'a=end-of-candidates') + '\r\n';
+          this.remoteDescription.sdp = sections.join('');
         }
-        // Ignore RTCP candidates, we assume RTCP-MUX.
-        if (cand.component !== '1') {
-          return;
-        }
-        // A dirty hack to make samples work.
-        if (cand.type === 'endOfCandidates') {
-          cand = {};
-        }
-        transceiver.iceTransport.addRemoteCandidate(cand);
       }
       if (arguments.length > 1 && typeof arguments[1] === 'function') {
         window.setTimeout(arguments[1], 0);
@@ -1651,18 +2140,20 @@ if (typeof window === 'undefined' || !window.navigator) {
       this.transceivers.forEach(function(transceiver) {
         ['rtpSender', 'rtpReceiver', 'iceGatherer', 'iceTransport',
             'dtlsTransport'].forEach(function(method) {
-          if (transceiver[method]) {
-            promises.push(transceiver[method].getStats());
-          }
-        });
+              if (transceiver[method]) {
+                promises.push(transceiver[method].getStats());
+              }
+            });
       });
       var cb = arguments.length > 1 && typeof arguments[1] === 'function' &&
           arguments[1];
       return new Promise(function(resolve) {
-        var results = {};
+        // shim getStats with maplike support
+        var results = new Map();
         Promise.all(promises).then(function(res) {
           res.forEach(function(result) {
             Object.keys(result).forEach(function(id) {
+              results.set(id, result[id]);
               results[id] = result[id];
             });
           });
@@ -1674,83 +2165,590 @@ if (typeof window === 'undefined' || !window.navigator) {
       });
     };
   }
-} else {
-  webrtcUtils.log('Browser does not appear to be WebRTC-capable');
-}
+};
 
-// Polyfill ontrack on browsers that don't yet have it
-if (typeof window === 'object' && window.RTCPeerConnection && !('ontrack' in window.RTCPeerConnection)) {
-  Object.defineProperty(window.RTCPeerConnection.prototype, 'ontrack', {
-    get: function() { return this._ontrack; },
-    set: function(f) {
-      if (this._ontrack) {
-        this.removeEventListener('track', this._ontrack);
-        this.removeEventListener('addstream', this._ontrackpoly);
+// Expose public methods.
+module.exports = {
+  shimPeerConnection: edgeShim.shimPeerConnection,
+  shimGetUserMedia: require('./getusermedia')
+};
+
+},{"../utils":10,"./getusermedia":6,"sdp":1}],6:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+
+// Expose public methods.
+module.exports = function() {
+  var shimError_ = function(e) {
+    return {
+      name: {PermissionDeniedError: 'NotAllowedError'}[e.name] || e.name,
+      message: e.message,
+      constraint: e.constraint,
+      toString: function() {
+        return this.name;
       }
-      this.addEventListener('track', this._ontrack = f);
-      this.addEventListener('addstream', this._ontrackpoly = function(e) {
-        e.stream.getTracks().forEach(function(track) {
-          var event = new Event('track');
-          event.track = track;
-          event.receiver = {track: track};
-          event.streams = [e.stream];
-          this.dispatchEvent(event);
-        }.bind(this));
-      }.bind(this));
-    }
-  });
-}
+    };
+  };
 
-var webrtcTesting = {};
-try {
-  Object.defineProperty(webrtcTesting, 'version', {
-    set: function(version) {
-      webrtcDetectedVersion = version;
+  // getUserMedia error shim.
+  var origGetUserMedia = navigator.mediaDevices.getUserMedia.
+      bind(navigator.mediaDevices);
+  navigator.mediaDevices.getUserMedia = function(c) {
+    return origGetUserMedia(c).catch(function(e) {
+      return Promise.reject(shimError_(e));
+    });
+  };
+};
+
+},{}],7:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+
+var browserDetails = require('../utils').browserDetails;
+
+var firefoxShim = {
+  shimOnTrack: function() {
+    if (typeof window === 'object' && window.RTCPeerConnection && !('ontrack' in
+        window.RTCPeerConnection.prototype)) {
+      Object.defineProperty(window.RTCPeerConnection.prototype, 'ontrack', {
+        get: function() {
+          return this._ontrack;
+        },
+        set: function(f) {
+          if (this._ontrack) {
+            this.removeEventListener('track', this._ontrack);
+            this.removeEventListener('addstream', this._ontrackpoly);
+          }
+          this.addEventListener('track', this._ontrack = f);
+          this.addEventListener('addstream', this._ontrackpoly = function(e) {
+            e.stream.getTracks().forEach(function(track) {
+              var event = new Event('track');
+              event.track = track;
+              event.receiver = {track: track};
+              event.streams = [e.stream];
+              this.dispatchEvent(event);
+            }.bind(this));
+          }.bind(this));
+        }
+      });
     }
-  });
-} catch (e) {}/** @class
- *@version 1.0.17
- *<p>
- * Provides client side support for the EasyRTC framework.
- * Please see the easyrtc_client_api.md and easyrtc_client_tutorial.md
- * for more details.</p>
+  },
+
+  shimSourceObject: function() {
+    // Firefox has supported mozSrcObject since FF22, unprefixed in 42.
+    if (typeof window === 'object') {
+      if (window.HTMLMediaElement &&
+        !('srcObject' in window.HTMLMediaElement.prototype)) {
+        // Shim the srcObject property, once, when HTMLMediaElement is found.
+        Object.defineProperty(window.HTMLMediaElement.prototype, 'srcObject', {
+          get: function() {
+            return this.mozSrcObject;
+          },
+          set: function(stream) {
+            this.mozSrcObject = stream;
+          }
+        });
+      }
+    }
+  },
+
+  shimPeerConnection: function() {
+    if (typeof window !== 'object' || !(window.RTCPeerConnection ||
+        window.mozRTCPeerConnection)) {
+      return; // probably media.peerconnection.enabled=false in about:config
+    }
+    // The RTCPeerConnection object.
+    if (!window.RTCPeerConnection) {
+      window.RTCPeerConnection = function(pcConfig, pcConstraints) {
+        if (browserDetails.version < 38) {
+          // .urls is not supported in FF < 38.
+          // create RTCIceServers with a single url.
+          if (pcConfig && pcConfig.iceServers) {
+            var newIceServers = [];
+            for (var i = 0; i < pcConfig.iceServers.length; i++) {
+              var server = pcConfig.iceServers[i];
+              if (server.hasOwnProperty('urls')) {
+                for (var j = 0; j < server.urls.length; j++) {
+                  var newServer = {
+                    url: server.urls[j]
+                  };
+                  if (server.urls[j].indexOf('turn') === 0) {
+                    newServer.username = server.username;
+                    newServer.credential = server.credential;
+                  }
+                  newIceServers.push(newServer);
+                }
+              } else {
+                newIceServers.push(pcConfig.iceServers[i]);
+              }
+            }
+            pcConfig.iceServers = newIceServers;
+          }
+        }
+        return new mozRTCPeerConnection(pcConfig, pcConstraints);
+      };
+      window.RTCPeerConnection.prototype = mozRTCPeerConnection.prototype;
+
+      // wrap static methods. Currently just generateCertificate.
+      if (mozRTCPeerConnection.generateCertificate) {
+        Object.defineProperty(window.RTCPeerConnection, 'generateCertificate', {
+          get: function() {
+            return mozRTCPeerConnection.generateCertificate;
+          }
+        });
+      }
+
+      window.RTCSessionDescription = mozRTCSessionDescription;
+      window.RTCIceCandidate = mozRTCIceCandidate;
+    }
+
+    // shim away need for obsolete RTCIceCandidate/RTCSessionDescription.
+    ['setLocalDescription', 'setRemoteDescription', 'addIceCandidate']
+        .forEach(function(method) {
+          var nativeMethod = RTCPeerConnection.prototype[method];
+          RTCPeerConnection.prototype[method] = function() {
+            arguments[0] = new ((method === 'addIceCandidate') ?
+                RTCIceCandidate : RTCSessionDescription)(arguments[0]);
+            return nativeMethod.apply(this, arguments);
+          };
+        });
+
+    // support for addIceCandidate(null)
+    var nativeAddIceCandidate =
+        RTCPeerConnection.prototype.addIceCandidate;
+    RTCPeerConnection.prototype.addIceCandidate = function() {
+      return arguments[0] === null ? Promise.resolve()
+          : nativeAddIceCandidate.apply(this, arguments);
+    };
+
+    // shim getStats with maplike support
+    var makeMapStats = function(stats) {
+      var map = new Map();
+      Object.keys(stats).forEach(function(key) {
+        map.set(key, stats[key]);
+        map[key] = stats[key];
+      });
+      return map;
+    };
+
+    var nativeGetStats = RTCPeerConnection.prototype.getStats;
+    RTCPeerConnection.prototype.getStats = function(selector, onSucc, onErr) {
+      return nativeGetStats.apply(this, [selector || null])
+        .then(function(stats) {
+          return makeMapStats(stats);
+        })
+        .then(onSucc, onErr);
+    };
+  }
+};
+
+// Expose public methods.
+module.exports = {
+  shimOnTrack: firefoxShim.shimOnTrack,
+  shimSourceObject: firefoxShim.shimSourceObject,
+  shimPeerConnection: firefoxShim.shimPeerConnection,
+  shimGetUserMedia: require('./getusermedia')
+};
+
+},{"../utils":10,"./getusermedia":8}],8:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
- *<p>
- *copyright Copyright (c) 2015, Priologic Software Inc.
- *All rights reserved.</p>
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+
+var logging = require('../utils').log;
+var browserDetails = require('../utils').browserDetails;
+
+// Expose public methods.
+module.exports = function() {
+  var shimError_ = function(e) {
+    return {
+      name: {
+        SecurityError: 'NotAllowedError',
+        PermissionDeniedError: 'NotAllowedError'
+      }[e.name] || e.name,
+      message: {
+        'The operation is insecure.': 'The request is not allowed by the ' +
+        'user agent or the platform in the current context.'
+      }[e.message] || e.message,
+      constraint: e.constraint,
+      toString: function() {
+        return this.name + (this.message && ': ') + this.message;
+      }
+    };
+  };
+
+  // getUserMedia constraints shim.
+  var getUserMedia_ = function(constraints, onSuccess, onError) {
+    var constraintsToFF37_ = function(c) {
+      if (typeof c !== 'object' || c.require) {
+        return c;
+      }
+      var require = [];
+      Object.keys(c).forEach(function(key) {
+        if (key === 'require' || key === 'advanced' || key === 'mediaSource') {
+          return;
+        }
+        var r = c[key] = (typeof c[key] === 'object') ?
+            c[key] : {ideal: c[key]};
+        if (r.min !== undefined ||
+            r.max !== undefined || r.exact !== undefined) {
+          require.push(key);
+        }
+        if (r.exact !== undefined) {
+          if (typeof r.exact === 'number') {
+            r. min = r.max = r.exact;
+          } else {
+            c[key] = r.exact;
+          }
+          delete r.exact;
+        }
+        if (r.ideal !== undefined) {
+          c.advanced = c.advanced || [];
+          var oc = {};
+          if (typeof r.ideal === 'number') {
+            oc[key] = {min: r.ideal, max: r.ideal};
+          } else {
+            oc[key] = r.ideal;
+          }
+          c.advanced.push(oc);
+          delete r.ideal;
+          if (!Object.keys(r).length) {
+            delete c[key];
+          }
+        }
+      });
+      if (require.length) {
+        c.require = require;
+      }
+      return c;
+    };
+    constraints = JSON.parse(JSON.stringify(constraints));
+    if (browserDetails.version < 38) {
+      logging('spec: ' + JSON.stringify(constraints));
+      if (constraints.audio) {
+        constraints.audio = constraintsToFF37_(constraints.audio);
+      }
+      if (constraints.video) {
+        constraints.video = constraintsToFF37_(constraints.video);
+      }
+      logging('ff37: ' + JSON.stringify(constraints));
+    }
+    return navigator.mozGetUserMedia(constraints, onSuccess, function(e) {
+      onError(shimError_(e));
+    });
+  };
+
+  // Returns the result of getUserMedia as a Promise.
+  var getUserMediaPromise_ = function(constraints) {
+    return new Promise(function(resolve, reject) {
+      getUserMedia_(constraints, resolve, reject);
+    });
+  };
+
+  // Shim for mediaDevices on older versions.
+  if (!navigator.mediaDevices) {
+    navigator.mediaDevices = {getUserMedia: getUserMediaPromise_,
+      addEventListener: function() { },
+      removeEventListener: function() { }
+    };
+  }
+  navigator.mediaDevices.enumerateDevices =
+      navigator.mediaDevices.enumerateDevices || function() {
+        return new Promise(function(resolve) {
+          var infos = [
+            {kind: 'audioinput', deviceId: 'default', label: '', groupId: ''},
+            {kind: 'videoinput', deviceId: 'default', label: '', groupId: ''}
+          ];
+          resolve(infos);
+        });
+      };
+
+  if (browserDetails.version < 41) {
+    // Work around http://bugzil.la/1169665
+    var orgEnumerateDevices =
+        navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);
+    navigator.mediaDevices.enumerateDevices = function() {
+      return orgEnumerateDevices().then(undefined, function(e) {
+        if (e.name === 'NotFoundError') {
+          return [];
+        }
+        throw e;
+      });
+    };
+  }
+  if (browserDetails.version < 49) {
+    var origGetUserMedia = navigator.mediaDevices.getUserMedia.
+        bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = function(c) {
+      return origGetUserMedia(c).catch(function(e) {
+        return Promise.reject(shimError_(e));
+      });
+    };
+  }
+  navigator.getUserMedia = function(constraints, onSuccess, onError) {
+    if (browserDetails.version < 44) {
+      return getUserMedia_(constraints, onSuccess, onError);
+    }
+    // Replace Firefox 44+'s deprecation warning with unprefixed version.
+    console.warn('navigator.getUserMedia has been replaced by ' +
+                 'navigator.mediaDevices.getUserMedia');
+    navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onError);
+  };
+};
+
+},{"../utils":10}],9:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
- *<p>
- *Redistribution and use in source and binary forms, with or without
- *modification, are permitted provided that the following conditions are met:
- *</p>
- * <ul>
- *   <li> Redistributions of source code must retain the above copyright notice,
- *      this list of conditions and the following disclaimer. </li>
- *   <li> Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution. </li>
- *</ul>
- *<p>
- *THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- *AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- *IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- *ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- *LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- *SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- *INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- *CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- *ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *POSSIBILITY OF SUCH DAMAGE.
- *</p>
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
  */
 
-/* global getUserMedia, MediaStreamTrack, createIceServer, RTCIceCandidate, RTCPeerConnection, RTCSessionDescription */ // WebRTC
-/* global webrtcDetectedBrowser, webrtcDetectedVersion, attachMediaStream , webrtcUtils*/ // adapter.js
-/* global easyrtc_constantStrings */ // easyrtc_lang_en.js
-/* global io */
+var safariShim = {
+  // TODO: DrAlex, should be here, double check against LayoutTests
+  // shimOnTrack: function() { },
 
+  // TODO: once the back-end for the mac port is done, add.
+  // TODO: check for webkitGTK+
+  // shimPeerConnection: function() { },
+
+  shimGetUserMedia: function() {
+    navigator.getUserMedia = navigator.webkitGetUserMedia;
+  }
+};
+
+// Expose public methods.
+module.exports = {
+  shimGetUserMedia: safariShim.shimGetUserMedia
+  // TODO
+  // shimOnTrack: safariShim.shimOnTrack,
+  // shimPeerConnection: safariShim.shimPeerConnection
+};
+
+},{}],10:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+
+var logDisabled_ = true;
+
+// Utility methods.
+var utils = {
+  disableLog: function(bool) {
+    if (typeof bool !== 'boolean') {
+      return new Error('Argument type: ' + typeof bool +
+          '. Please use a boolean.');
+    }
+    logDisabled_ = bool;
+    return (bool) ? 'adapter.js logging disabled' :
+        'adapter.js logging enabled';
+  },
+
+  log: function() {
+    if (typeof window === 'object') {
+      if (logDisabled_) {
+        return;
+      }
+      if (typeof console !== 'undefined' && typeof console.log === 'function') {
+        console.log.apply(console, arguments);
+      }
+    }
+  },
+
+  /**
+   * Extract browser version out of the provided user agent string.
+   *
+   * @param {!string} uastring userAgent string.
+   * @param {!string} expr Regular expression used as match criteria.
+   * @param {!number} pos position in the version string to be returned.
+   * @return {!number} browser version.
+   */
+  extractVersion: function(uastring, expr, pos) {
+    var match = uastring.match(expr);
+    return match && match.length >= pos && parseInt(match[pos], 10);
+  },
+
+  /**
+   * Browser detector.
+   *
+   * @return {object} result containing browser and version
+   *     properties.
+   */
+  detectBrowser: function() {
+    // Returned result object.
+    var result = {};
+    result.browser = null;
+    result.version = null;
+
+    // Fail early if it's not a browser
+    if (typeof window === 'undefined' || !window.navigator) {
+      result.browser = 'Not a browser.';
+      return result;
+    }
+
+    // Firefox.
+    if (navigator.mozGetUserMedia) {
+      result.browser = 'firefox';
+      result.version = this.extractVersion(navigator.userAgent,
+          /Firefox\/([0-9]+)\./, 1);
+
+    // all webkit-based browsers
+    } else if (navigator.webkitGetUserMedia) {
+      // Chrome, Chromium, Webview, Opera, all use the chrome shim for now
+      if (window.webkitRTCPeerConnection) {
+        result.browser = 'chrome';
+        result.version = this.extractVersion(navigator.userAgent,
+          /Chrom(e|ium)\/([0-9]+)\./, 2);
+
+      // Safari or unknown webkit-based
+      // for the time being Safari has support for MediaStreams but not webRTC
+      } else {
+        // Safari UA substrings of interest for reference:
+        // - webkit version:           AppleWebKit/602.1.25 (also used in Op,Cr)
+        // - safari UI version:        Version/9.0.3 (unique to Safari)
+        // - safari UI webkit version: Safari/601.4.4 (also used in Op,Cr)
+        //
+        // if the webkit version and safari UI webkit versions are equals,
+        // ... this is a stable version.
+        //
+        // only the internal webkit version is important today to know if
+        // media streams are supported
+        //
+        if (navigator.userAgent.match(/Version\/(\d+).(\d+)/)) {
+          result.browser = 'safari';
+          result.version = this.extractVersion(navigator.userAgent,
+            /AppleWebKit\/([0-9]+)\./, 1);
+
+        // unknown webkit-based browser
+        } else {
+          result.browser = 'Unsupported webkit-based browser ' +
+              'with GUM support but no WebRTC support.';
+          return result;
+        }
+      }
+
+    // Edge.
+    } else if (navigator.mediaDevices &&
+        navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
+      result.browser = 'edge';
+      result.version = this.extractVersion(navigator.userAgent,
+          /Edge\/(\d+).(\d+)$/, 2);
+
+    // Default fallthrough: not supported.
+    } else {
+      result.browser = 'Not a supported browser.';
+      return result;
+    }
+
+    return result;
+  }
+};
+
+// Export.
+module.exports = {
+  log: utils.log,
+  disableLog: utils.disableLog,
+  browserDetails: utils.detectBrowser(),
+  extractVersion: utils.extractVersion
+};
+
+},{}]},{},[2])(2)
+});
+/* global define, module, require, console, MediaStreamTrack, createIceServer, RTCIceCandidate, RTCPeerConnection, RTCSessionDescription */
+/*!
+  Script: easyrtc.js
+
+    Provides client side support for the EasyRTC framework.
+    See the easyrtc_client_api.md and easyrtc_client_tutorial.md
+    for more details.
+
+  About: License
+
+    Copyright (c) 2016, Priologic Software Inc.
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+        * Redistributions of source code must retain the above copyright notice,
+          this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in the
+          documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+*/
+
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        //RequireJS (AMD) build system
+        define('easyrtc',['easyrtc_lang', 'webrtc-adapter', 'socket.io'], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        //CommonJS build system
+        module.exports = factory(require('easyrtc_lang'), require('webrtc-adapter'), require('socket.io'));
+    } else {
+        //Vanilla JS, ensure dependencies are loaded correctly
+        if (typeof window.io === 'undefined' || !window.io) {
+            throw new Error("easyrtc requires socket.io");
+        }
+        root.easyrtc = factory(window.easyrtc_lang, window.adapter, window.io);
+  }
+}(this, function (easyrtc_lang, adapter, io, undefined) {
+
+
+/**
+ * @class Easyrtc.
+ *
+ * @returns {Easyrtc} the new easyrtc instance.
+ *
+ * @constructs Easyrtc
+ */
 var Easyrtc = function() {
+
+    var self = this;
+
+    function logDebug (message, obj) {
+        if (self.debugPrinter) {
+            self.debugPrinter(message, obj);
+        }
+    }
 
     function isEmptyObj(obj) {
         if (obj === null || obj === undefined) {
@@ -1764,9 +2762,7 @@ var Easyrtc = function() {
         }
         return true;
     }
-    
-    var self = this;
-    
+
     /** @private */
     var autoInitUserMedia = true;
     /** @private */
@@ -1777,11 +2773,12 @@ var Easyrtc = function() {
     var iceCandidateFilter = null;
     /** @private */
     var iceConnectionStateChangeListener = null;
+    var signalingStateChangeListener = null;
     /** @private */
     var connectionOptions =  {
         'connect timeout': 10000,
         'force new connection': true
-    };  
+    };
 
     /** @private */
     //
@@ -1832,6 +2829,14 @@ var Easyrtc = function() {
     };
 
     /**
+     * Sets a function to warn about the peer connection open.
+     *  @param {Function} handler: a function that gets an easyrtcid as an argument.
+     */
+    this.setPeerOpenListener = function( handler ) {
+       this.onPeerOpen = handler;
+    };
+
+    /**
      * Sets a function to receive warnings about the peer connection
      * failing. The peer connection may recover by itself.
      *  @param {Function} failingHandler: a function that gets an easyrtcid as an argument.
@@ -1857,17 +2862,28 @@ var Easyrtc = function() {
     this.setIceCandidateFilter = function(filter) {
         iceCandidateFilter = filter;
     };
-    
+
     /**
      * Sets a function that listens on IceConnectionStateChange events.
      *
-     * During ICE negotiation the peer connection fires the iceconnectionstatechange event. 
+     * During ICE negotiation the peer connection fires the iceconnectionstatechange event.
      * It is sometimes useful for the application to learn about these changes, especially if the ICE connection fails.
-     * The function should accept two parameters: the easyrtc id of the peer and the iceconnectionstatechange event target.
+     * The function should accept three parameters: the easyrtc id of the peer, the iceconnectionstatechange event target and the iceconnectionstate.
      * @param {Function} listener
      */
     this.setIceConnectionStateChangeListener = function(listener) {
        iceConnectionStateChangeListener = listener;
+    };
+
+    /**
+     * Sets a function that listens on SignalingStateChange events.
+     *
+     * During ICE negotiation the peer connection fires the signalingstatechange event.
+     * The function should accept three parameters: the easyrtc id of the peer, the signalingstatechange event target and the signalingstate.
+     * @param {Function} listener
+     */
+    this.setSignalingStateChangeListener = function(listener) {
+       signalingStateChangeListener = listener;
     };
 
     /**
@@ -1901,38 +2917,38 @@ var Easyrtc = function() {
     };
 
     /**
-     * @private
      * This function checks if a socket is actually connected.
+     * @private
      * @param {Object} socket a socket.io socket.
      * @return true if the socket exists and is connected, false otherwise.
     */
     function isSocketConnected(socket) {
        return socket && (
             (socket.socket && socket.socket.connected) || socket.connected
-        ); 
+        );
     }
 
     /** @private */
     //
-    // Maps a key to a language specific string using the easyrtc_constantStrings map.
+    // Maps a key to a language specific string using the easyrtc_lang map.
     // Defaults to the key if the key can not be found, but outputs a warning in that case.
     // This function is only used internally by easyrtc.js
     //
     var haveAudioVideo = {
-        audio: false, 
-        video: false    
+        audio: false,
+        video: false
     };
-    
+
     /**
      * @private
      * @param {String} key
      */
     this.getConstantString = function(key) {
-        if (easyrtc_constantStrings[key]) {
-            return easyrtc_constantStrings[key];
+        if (easyrtc_lang[key]) {
+            return easyrtc_lang[key];
         }
         else {
-            self.showError(self.errCodes.DEVELOPER_ERR, "Could not find key='" + key + "' in easyrtc_constantStrings");
+            self.showError(self.errCodes.DEVELOPER_ERR, "Could not find key='" + key + "' in easyrtc_lang");
             return key;
         }
     };
@@ -1952,7 +2968,7 @@ var Easyrtc = function() {
     //
     var eventListeners = {};
 
-    /** 
+    /**
      * This function checks if an attempt was made to add an event listener or
      * or emit an unlisted event, since such is typically a typo.
      * @private
@@ -2033,7 +3049,7 @@ var Easyrtc = function() {
         }
     };
 
-    /** 
+    /**
      * Error codes that the EasyRTC will use in the errorCode field of error object passed
      * to error handler set by easyrtc.setOnError. The error codes are short printable strings.
      * @type Object
@@ -2055,35 +3071,35 @@ var Easyrtc = function() {
         SIGNAL_ERR: "SIGNAL_ERR"
     };
 
-    this.apiVersion = "1.0.17";
-    
+    this.apiVersion = "1.1.0";
+
     /** Most basic message acknowledgment object */
     this.ackMessage = {msgType: "ack"};
-    
+
     /** Regular expression pattern for user ids. This will need modification to support non US character sets */
     this.usernameRegExp = /^(.){1,64}$/;
-    
+
     /** Default cookieId name */
     this.cookieId = "easyrtcsid";
-    
+
     /** @private */
     var username = null;
-    
+
     /** Flag to indicate that user is currently logging out */
     this.loggingOut = false;
-    
+
     /** @private */
     this.disconnecting = false;
-    
+
     /** @private */
     //
     // A map of ids to local media streams.
     //
     var namedLocalMediaStreams = {};
-    
+
     /** @private */
     var sessionFields = [];
-    
+
     /** @private */
     var receivedMediaConstraints = {};
 
@@ -2093,7 +3109,10 @@ var Easyrtc = function() {
      * @param value - true to receive audio, false otherwise. The default is true.
      */
     this.enableAudioReceive = function(value) {
-        if (webrtcDetectedBrowser === "firefox") {
+        if (
+            adapter && adapter.browserDetails &&
+             (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
+        ) {
             receivedMediaConstraints.offerToReceiveAudio = value;
         }
         else {
@@ -2108,7 +3127,10 @@ var Easyrtc = function() {
      * @param value - true to receive video, false otherwise. The default is true.
      */
     this.enableVideoReceive = function(value) {
-        if (webrtcDetectedBrowser === "firefox") {
+        if (
+            adapter && adapter.browserDetails &&
+             (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
+        ) {
            receivedMediaConstraints.offerToReceiveVideo = value;
         }
         else {
@@ -2129,6 +3151,7 @@ var Easyrtc = function() {
                 for (var i = 0; i < values.length; i++) {
                     var source = values[i];
                     if (source.kind === sourceType) {
+                        source.id = source.deviceId; //backwards compatibility
                         results.push(source);
                     }
                 }
@@ -2136,13 +3159,54 @@ var Easyrtc = function() {
              }
           ).catch(
             function(reason) {
-               webrtcUtils.log("Unable to enumerate devices (" + reason + ")");
+               logDebug("Unable to enumerate devices (" + reason + ")");
             }
         );
     }
 
     /**
-     * Gets a list of the available audio sources (ie, cameras)
+     * Sets the audio output device of a Video object. 
+     * That is to say, this controls what speakers get the sound.
+     * In theory, this works on Chrome but probably doesn't work anywhere else yet.
+     * This code was cribbed from https://webrtc.github.io/samples/src/content/devices/multi/.
+     *  @param {Object} element an HTML5 video element
+     *  @param {String} sinkId a deviceid from getAudioSinkList
+     */
+    this.setAudioOutput = function(element, sinkId) {
+       if (typeof element.sinkId !== 'undefined') {
+          element.setSinkId(sinkId)
+          .then(function() {
+            logDebug('Success, audio output device attached: ' + sinkId + ' to ' +
+                'element with ' + element.title + ' as source.');
+          })
+          .catch(function(error) {
+            var errorMessage = error;
+            if (error.name === 'SecurityError') {
+              errorMessage = 'You need to use HTTPS for selecting audio output ' +
+                  'device: ' + error;
+            }
+            logDebug(errorMessage);
+          });
+       } else {
+          logDebug('Browser does not support output device selection.');
+       }
+    };
+
+    /**
+     * Gets a list of the available audio sinks (ie, speakers)
+     * @param {Function} callback receives list of {deviceId:String, groupId:String, label:String, kind:"audio"}
+     * @example  easyrtc.getAudioSinkList( function(list) {
+     *               var i;
+     *               for( i = 0; i < list.length; i++ ) {
+     *                   console.log("label=" + list[i].label + ", id= " + list[i].deviceId);
+     *               }
+     *          });
+     */
+    this.getAudioSinkList = function(callback){
+       getSourceList(callback, "audiooutput");
+    };
+    /**
+     * Gets a list of the available audio sources (ie, microphones)
      * @param {Function} callback receives list of {deviceId:String, groupId:String, label:String, kind:"audio"}
      * @example  easyrtc.getAudioSourceList( function(list) {
      *               var i;
@@ -2169,43 +3233,50 @@ var Easyrtc = function() {
        getSourceList(callback, "videoinput");
     };
 
+
+    /** @private */
+    var dataChannelName = "dc";
+    /** @private */
+    var oldConfig = {};
+    /** @private */
+    var offersPending = {};
+    /** @private */
+    var credential = null;
+
     /** @private */
     self.audioEnabled = true;
     /** @private */
     self.videoEnabled = true;
     /** @private */
-    var dataChannelName = "dc";
-    /** @private */
     this.debugPrinter = null;
     /** Your easyrtcid */
     this.myEasyrtcid = "";
-    /** @private */
-    var oldConfig = {};
-    /** @private */
-    var offersPending = {};
+
     /** The height of the local media stream video in pixels. This field is set an indeterminate period
      * of time after easyrtc.initMediaSource succeeds. Note: in actuality, the dimensions of a video stream
      * change dynamically in response to external factors, you should check the videoWidth and videoHeight attributes
      * of your video objects before you use them for pixel specific operations.
      */
     this.nativeVideoHeight = 0;
+
     /** This constant determines how long (in bytes) a message can be before being split in chunks of that size.
     * This is because there is a limitation of the length of the message you can send on the
     * data channel between browsers.
     */
     this.maxP2PMessageLength = 1000;
+
     /** The width of the local media stream video in pixels. This field is set an indeterminate period
      * of time after easyrtc.initMediaSource succeeds.  Note: in actuality, the dimensions of a video stream
      * change dynamically in response to external factors, you should check the videoWidth and videoHeight attributes
      * of your video objects before you use them for pixel specific operations.
      */
     this.nativeVideoWidth = 0;
-    /** @private */
-    var credential = null;
+
     /** The rooms the user is in. This only applies to room oriented applications and is set at the same
      * time a token is received.
      */
     this.roomJoin = {};
+
     /** Checks if the supplied string is a valid user name (standard identifier rules)
      * @param {String} name
      * @return {Boolean} true for a valid user name
@@ -2218,6 +3289,7 @@ var Easyrtc = function() {
     this.isNameValid = function(name) {
         return self.usernameRegExp.test(name);
     };
+
     /**
      * This function sets the name of the cookie that client side library will look for
      * and transmit back to the server as it's easyrtcsid in the first message.
@@ -2270,6 +3342,7 @@ var Easyrtc = function() {
             self._desiredVideoProperties.frameRate = frameRate;
         }
     };
+
     /** This function requests that screen capturing be used to provide the local media source
      * rather than a webcam. If you have multiple screens, they are composited side by side.
      * Note: this functionality is not supported by Firefox, has to be called before calling initMediaSource (or easyApp), we don't currently supply a way to
@@ -2283,6 +3356,7 @@ var Easyrtc = function() {
     this.setScreenCapture = function(enableScreenCapture) {
         self._desiredVideoProperties.screenCapture = (enableScreenCapture !== false);
     };
+
     /**
      * Builds the constraint object passed to getUserMedia.
      * @returns {Object} mediaConstraints
@@ -2318,8 +3392,15 @@ var Easyrtc = function() {
             constraints.video = false;
         }
         else {
-            if (webrtcDetectedBrowser === "firefox") {
-                constraints.video = {}; 
+
+            // Tested Firefox 49 and MS Edge require minFrameRate and maxFrameRate 
+            // instead max,min,ideal that cause GetUserMedia failure.
+            // Until confirmed both browser support idea,max and min we need this.
+            if (
+                adapter && adapter.browserDetails &&
+                    (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
+            ) {
+                constraints.video = {};
                 if (self._desiredVideoProperties.width) {
                     constraints.video.width = self._desiredVideoProperties.width;
                 }
@@ -2327,31 +3408,43 @@ var Easyrtc = function() {
                     constraints.video.height = self._desiredVideoProperties.height;
                 }
                 if (self._desiredVideoProperties.frameRate) {
-                    constraints.video.frameRate = { max: self._desiredVideoProperties.frameRate};
+                    constraints.video.frameRate = { 
+                        minFrameRate: self._desiredVideoProperties.frameRate,
+                        maxFrameRate: self._desiredVideoProperties.frameRate
+                    };
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
                     constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
                 }
-            }
-            else { // chrome and opera
-                constraints.video = {mandatory: {}, optional: []};
+
+            // chrome and opera
+            } else { 
+                constraints.video = {};
                 if (self._desiredVideoProperties.width) {
-                    constraints.video.mandatory.maxWidth = self._desiredVideoProperties.width;
-                    constraints.video.mandatory.minWidth = self._desiredVideoProperties.width;
+                     constraints.video.width = { 
+                        max: self._desiredVideoProperties.width,
+                        min : self._desiredVideoProperties.width,
+                        ideal : self._desiredVideoProperties.width 
+                     };
                 }
                 if (self._desiredVideoProperties.height) {
-                    constraints.video.mandatory.maxHeight = self._desiredVideoProperties.height;
-                    constraints.video.mandatory.minHeight = self._desiredVideoProperties.height;
+                    constraints.video.height = {
+                        max: self._desiredVideoProperties.height,
+                        min: self._desiredVideoProperties.height,
+                        ideal: self._desiredVideoProperties.height
+                    };
                 }
                 if (self._desiredVideoProperties.frameRate) {
-                    constraints.video.mandatory.maxFrameRate = self._desiredVideoProperties.frameRate;
+                    constraints.video.frameRate = {
+                        max: self._desiredVideoProperties.frameRate,
+                        ideal: self._desiredVideoProperties.frameRate
+                    };
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
-                    constraints.video.optional = constraints.video.optional || [];
-                    constraints.video.optional.push({sourceId: self._desiredVideoProperties.videoSrcId});
+                    constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
                 }
                 // hack for opera
-                if (constraints.video.mandatory.length === 0 && constraints.video.optional.length === 0) {
+                if (Object.keys(constraints.video).length === 0 ) {
                     constraints.video = true;
                 }
             }
@@ -2361,8 +3454,8 @@ var Easyrtc = function() {
             constraints.audio = false;
         }
         else {
-            if (webrtcDetectedBrowser === "firefox") {
-                constraints.audio = {}; 
+            if (adapter && adapter.browserDetails && adapter.browserDetails.browser === "firefox") {
+                constraints.audio = {};
                 if (self._desiredAudioProperties.audioSrcId) {
                     constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
                 }
@@ -2371,12 +3464,13 @@ var Easyrtc = function() {
                 constraints.audio = {mandatory: {}, optional: []};
                 if (self._desiredAudioProperties.audioSrcId) {
                     constraints.audio.optional = constraints.audio.optional || [];
-                    constraints.audio.optional.push({sourceId: self._desiredAudioProperties.audioSrcId});
+                    constraints.audio.optional.push({deviceId: self._desiredAudioProperties.audioSrcId});
                 }
             }
         }
         return constraints;
     };
+
     /** Set the application name. Applications can only communicate with other applications
      * that share the same API Key and application name. There is no predefined set of application
      * names. Maximum length is
@@ -2387,6 +3481,7 @@ var Easyrtc = function() {
     this.setApplicationName = function(name) {
         self.applicationName = name;
     };
+
     /** Enable or disable logging to the console.
      * Note: if you want to control the printing of debug messages, override the
      *    easyrtc.debugPrinter variable with a function that takes a message string as it's argument.
@@ -2397,17 +3492,23 @@ var Easyrtc = function() {
      */
     this.enableDebug = function(enable) {
         if (enable) {
-            self.debugPrinter = function(message) {
+            self.debugPrinter = function(message, obj) {
+                var now = new Date().toISOString();
                 var stackString = new Error().stack;
                 var srcLine = "location unknown";
                 if (stackString) {
                     var stackFrameStrings = stackString.split('\n');
                     srcLine = "";
-                    if (stackFrameStrings.length >= 3) {
-                        srcLine = stackFrameStrings[2];
+                    if (stackFrameStrings.length >= 5) {
+                        srcLine = stackFrameStrings[4];
                     }
                 }
-                webrtcUtils.log("debug " + (new Date()).toISOString() + " : " + message + " [" + srcLine + "]");
+
+                console.log("debug " + now + " : " + message + " [" + srcLine + "]");
+
+                if (typeof obj !== 'undefined') {
+                    console.log("debug " + now + " : ", obj);
+                }
             };
         }
         else {
@@ -2420,50 +3521,89 @@ var Easyrtc = function() {
      * @returns {Boolean} True getUserMedia is supported.
      */
     this.supportsGetUserMedia = function() {
-        return !!getUserMedia;
+        return typeof navigator.getUserMedia !== 'undefined';
     };
+
     /**
      * Determines if the local browser supports WebRTC Peer connections to the extent of being able to do video chats.
      * @returns {Boolean} True if Peer connections are supported.
      */
     this.supportsPeerConnections = function() {
-        if (!self.supportsGetUserMedia()) {
-            return false;
-        }
-        if (!window.RTCPeerConnection) {
-            return false;
-        }
-        return true;
+        return typeof RTCPeerConnection !== 'undefined';
     };
-    /** @private
-     * @param pc_config ice configuration array
-     * @param optionalStuff peer constraints.
+
+    /** Determines whether the current browser supports the new data channels.
+     * EasyRTC will not open up connections with the old data channels.
+     * @returns {Boolean}
      */
+    this.supportsDataChannels = function() {
+
+        var hasCreateDataChannel = false;
+
+        if (self.supportsPeerConnections()) {
+            try {
+                var peer = new RTCPeerConnection({iceServers: []}, {});
+                hasCreateDataChannel = typeof peer.createDataChannel !== 'undefined';
+                peer.close();
+            }
+            catch (err) {
+                // Ignore possible RTCPeerConnection.close error
+                // hasCreateDataChannel should reflect the feature state still.
+            }
+        }
+
+        return hasCreateDataChannel;
+    };
+
+    /** @private */
+    //
+    // Experimental function to determine if statistics gathering is supported.
+    //
+    this.supportsStatistics = function() {
+
+        var hasGetStats = false;
+
+        if (self.supportsPeerConnections()) {
+            try {
+                var peer = new RTCPeerConnection({iceServers: []}, {});
+                hasGetStats = typeof peer.getStats !== 'undefined';
+                peer.close();
+            }
+            catch (err) {
+                // Ingore possible RTCPeerConnection.close error
+                // hasCreateDataChannel should reflect the feature state still.
+            }
+        }
+
+        return hasGetStats;
+    };
+
     /** @private
-     * @param pc_config ice configuration array
-     * @param optionalStuff peer constraints.
+     * @param {Array} pc_config ice configuration array
+     * @param {Object} optionalStuff peer constraints.
      */
     this.createRTCPeerConnection = function(pc_config, optionalStuff) {
-        if (RTCPeerConnection) {
+        if (self.supportsPeerConnections()) {
             return new RTCPeerConnection(pc_config, optionalStuff);
         }
         else {
             throw "Your browser doesn't support webRTC (RTCPeerConnection)";
         }
     };
-//
-// this should really be part of adapter.js
-// Versions of chrome < 31 don't support reliable data channels transport.
-// Firefox does.
-//
+
+    //
+    // this should really be part of adapter.js
+    // Versions of chrome < 31 don't support reliable data channels transport.
+    // Firefox does.
+    //
     this.getDatachannelConstraints = function() {
-        if (webrtcDetectedBrowser === "chrome" && webrtcDetectedVersion < 31) {
-            return {reliable: false};
-        }
-        else {
-            return {reliable: true};
-        }
+        return {
+            reliable: adapter && adapter.browserDetails &&
+                adapter.browserDetails.browser !== "chrome" &&
+                    adapter.browserDetails.version < 31
+        };
     };
+
     /** @private */
     haveAudioVideo = {
         audio: false,
@@ -2487,7 +3627,7 @@ var Easyrtc = function() {
     var receiveServerCB = null;
     /** @private */
     // dummy placeholder for when we aren't connected
-    var updateConfigurationInfo = function() { }; 
+    var updateConfigurationInfo = function() { };
     /** @private */
     //
     //
@@ -2516,30 +3656,30 @@ var Easyrtc = function() {
     // call them a second time before they've responded.
     //
     var acceptancePending = {};
-    
+
     /** @private
-     * @param caller
-     * @param helper
+     * @param {string} caller
+     * @param {Function} helper
      */
     this.acceptCheck = function(caller, helper) {
         helper(true);
     };
 
     /** @private
-     * @param easyrtcid
-     * @param stream
+     * @param {string} easyrtcid
+     * @param {HTMLMediaStream} stream
      */
     this.streamAcceptor = function(easyrtcid, stream) {
     };
 
     /** @private
-     * @param easyrtcid
+     * @param {string} easyrtcid
      */
     this.onStreamClosed = function(easyrtcid) {
     };
-    
+
     /** @private
-     * @param easyrtcid
+     * @param {string} easyrtcid
      */
     this.callCancelled = function(easyrtcid) {
     };
@@ -2551,10 +3691,10 @@ var Easyrtc = function() {
      * Submitted by Fabian Bernhard.
      */
     this.getPeerConnectionByUserId = function(userId) {
-    	if (peerConns && peerConns[userId]) {
-    		return peerConns[userId].pc;
-    	}
-    	return null;
+        if (peerConns && peerConns[userId]) {
+            return peerConns[userId].pc;
+        }
+        return null;
     };
 
 
@@ -2611,7 +3751,8 @@ var Easyrtc = function() {
         "firefoxRemoteAddress": "remoteAddress"
     };
 
-    var standardStatsFilter = webrtcDetectedBrowser === "firefox" ? firefoxStatsFilter : chromeStatsFilter;
+    var standardStatsFilter = adapter && adapter.browserDetails &&
+                adapter.browserDetails.browser === "firefox" ? firefoxStatsFilter : chromeStatsFilter;
 
     function getFirefoxPeerStatistics(peerId, callback, filter) {
 
@@ -2629,37 +3770,39 @@ var Easyrtc = function() {
                 // the stats objects has a group of entries. Each entry is either an rtcp, rtp entry
                 // or a candidate entry.
                 //
-                stats.forEach(function(entry) {
-                    var majorKey;
-                    var subKey;
-                    if (entry.type.match(/boundrtp/)) {
-                        if (entry.id.match(/audio/)) {
-                            majorKey = entry.type + "_audio";
-                        }
-                        else if (entry.id.match(/video/)) {
-                            majorKey = entry.type + "_video";
-                        }
-                        else {
-                            return;
-                        }
-                        for (subKey in entry) {
-                            if (entry.hasOwnProperty(subKey)) {
-                                items[majorKey + "." + subKey] = entry[subKey];
+                if (stats) {
+                    stats.forEach(function(entry) {
+                        var majorKey;
+                        var subKey;
+                        if (entry.type.match(/boundrtp/)) {
+                            if (entry.id.match(/audio/)) {
+                                majorKey = entry.type + "_audio";
+                            }
+                            else if (entry.id.match(/video/)) {
+                                majorKey = entry.type + "_video";
+                            }
+                            else {
+                                return;
+                            }
+                            for (subKey in entry) {
+                                if (entry.hasOwnProperty(subKey)) {
+                                    items[majorKey + "." + subKey] = entry[subKey];
+                                }
                             }
                         }
-                    }
-                    else {
-                        if( entry.hasOwnProperty("ipAddress") && entry.id) {
-                            candidates[entry.id] = entry.ipAddress + ":" +
-                                  entry.portNumber;
+                        else {
+                            if( entry.hasOwnProperty("ipAddress") && entry.id) {
+                                candidates[entry.id] = entry.ipAddress + ":" +
+                                      entry.portNumber;
+                            }
+                            else if( entry.hasOwnProperty("selected") &&
+                                     entry.hasOwnProperty("remoteCandidateId") &&
+                                     entry.selected ) {
+                                activeId =  entry.remoteCandidateId;
+                            }
                         }
-                        else if( entry.hasOwnProperty("selected") &&
-                                 entry.hasOwnProperty("remoteCandidateId") &&
-                                 entry.selected ) {
-                            activeId =  entry.remoteCandidateId;
-                        }
-                    }
-                });
+                    });
+                }
 
                 if( activeId ) {
                     items["firefoxRemoteAddress"] = candidates[activeId];
@@ -2678,7 +3821,7 @@ var Easyrtc = function() {
                 }
             },
                     function(error) {
-                        webrtcUtils.log("unable to get statistics");
+                        logDebug("unable to get statistics");
                     });
         }
         else {
@@ -2835,11 +3978,14 @@ var Easyrtc = function() {
      * It is still experimental.
      */
     this.getPeerStatistics = function(easyrtcid, callback, filter) {
-        if (webrtcDetectedBrowser === "firefox") {
-            self.getFirefoxPeerStatistics(easyrtcid, callback, filter);
+        if (
+            adapter && adapter.browserDetails &&
+                adapter.browserDetails.browser === "firefox"
+        ) {
+            getFirefoxPeerStatistics(easyrtcid, callback, filter);
         }
         else {
-            self.getChromePeerStatistics(easyrtcid, callback, filter);
+            getChromePeerStatistics(easyrtcid, callback, filter);
         }
     };
 
@@ -2872,7 +4018,7 @@ var Easyrtc = function() {
     /** @private */
     var roomApiFieldTimer = null;
 
-    /** 
+    /**
      * @private
      * @param {String} roomName
      */
@@ -2939,7 +4085,7 @@ var Easyrtc = function() {
         }
     };
 
-    /** 
+    /**
      * Default error reporting function. The default implementation displays error messages
      * in a programmatically created div with the id easyrtcErrorDialog. The div has title
      * component with a class name of easyrtcErrorDialog_title. The error messages get added to a
@@ -2954,14 +4100,13 @@ var Easyrtc = function() {
         self.onError({errorCode: messageCode, errorText: message});
     };
 
-    /** 
+    /**
      * @private
      * @param errorObject
      */
     this.onError = function(errorObject) {
-        if (self.debugPrinter) {
-            self.debugPrinter("saw error " + errorObject.errorText);
-        }
+        logDebug("saw error " + errorObject.errorText);
+
         var errorDiv = document.getElementById('easyrtcErrorDialog');
         var errorBody;
         if (!errorDiv) {
@@ -3011,9 +4156,7 @@ var Easyrtc = function() {
         }
         else {
             errMessage = "Your browsers does not support URL.createObjectURL.";
-            if (self.debugPrinter) {
-                self.debugPrinter("saw exception " + errMessage);
-            }
+            logDebug("saw exception " + errMessage);
             throw errMessage;
         }
     };
@@ -3036,7 +4179,7 @@ var Easyrtc = function() {
         });
     };
 
-    /** 
+    /**
      * Set a callback that will be invoked when the application enters or leaves a room.
      * @param {Function} handler - the first parameter is true for entering a room, false for leaving a room. The second parameter is the room name.
      * @example
@@ -3053,7 +4196,7 @@ var Easyrtc = function() {
         self.roomEntryListener = handler;
     };
 
-    /** 
+    /**
      * Set the callback that will be invoked when the list of people logged in changes.
      * The callback expects to receive a room name argument, and
      * a map whose ideas are easyrtcids and whose values are in turn maps
@@ -3071,7 +4214,7 @@ var Easyrtc = function() {
     self.setRoomOccupantListener = function(listener) {
         roomOccupantListener = listener;
     };
-    
+
     /**
      * Sets a callback that is called when a data channel is open and ready to send data.
      * The callback will be called with an easyrtcid as it's sole argument.
@@ -3084,7 +4227,7 @@ var Easyrtc = function() {
     this.setDataChannelOpenListener = function(listener) {
         onDataChannelOpen = listener;
     };
-    
+
     /** Sets a callback that is called when a previously open data channel closes.
      * The callback will be called with an easyrtcid as it's sole argument.
      * @param {Function} listener
@@ -3198,7 +4341,7 @@ var Easyrtc = function() {
         var mediaMap = {};
         var streamName;
         for (streamName in namedLocalMediaStreams) {
-            if (namedLocalMediaStreams.hasOwnProperty(streamName)) {    
+            if (namedLocalMediaStreams.hasOwnProperty(streamName)) {
                 mediaMap[streamName] = namedLocalMediaStreams[streamName].id || "default";
             }
         }
@@ -3265,13 +4408,16 @@ var Easyrtc = function() {
                 }
                 //
                 // a stream from chrome to firefox will be missing it's id/label.
-                // there is no correct solution. 
+                // there is no correct solution.
                 //
-                if (webrtcDetectedBrowser === "firefox") {
+                if (
+                    adapter && adapter.browserDetails &&
+                        adapter.browserDetails.browser === "firefox"
+                ) {
 
                    // if there is a stream called default, return it in preference
                    if (mediaIds["default"]) {
-                       return "default"; 
+                       return "default";
                    }
 
                    //
@@ -3322,15 +4468,15 @@ var Easyrtc = function() {
                     self.sendPeerMessage(id, "__closingMediaStream", {streamId: streamId, streamName: streamName});
                 }
             }
-            
-            stopStream(namedLocalMediaStreams[streamName]);    
+
+            stopStream(namedLocalMediaStreams[streamName]);
             delete namedLocalMediaStreams[streamName];
 
             if (streamName !== "default") {
                 var mediaIds = buildMediaIds();
                 for (roomName in self.roomData) {
                     if (self.roomData.hasOwnProperty(roomName)) {
-                        self.setRoomApiField(roomName, "mediaIds", mediaIds);   
+                        self.setRoomApiField(roomName, "mediaIds", mediaIds);
                     }
                 }
             }
@@ -3446,7 +4592,7 @@ var Easyrtc = function() {
             element.srcObject = "";
         } else if (typeof element.mozSrcObject !== 'undefined') {
             element.mozSrcObject = null;
-        } 
+        }
     };
 
     /**
@@ -3458,20 +4604,27 @@ var Easyrtc = function() {
      *  easyrtcMirror class to the video object so it looks like a proper mirror.
      *  The easyrtcMirror class is defined in this.css.
      *  Which is could be added using the same path of easyrtc.js file to an HTML file
-     *  @param {Object} videoObject an HTML5 video object
+     *  @param {Object} element an HTML5 video element
      *  @param {MediaStream|String} stream a media stream as returned by easyrtc.getLocalStream or your stream acceptor.
      * @example
      *    easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());
      *
      */
-    this.setVideoObjectSrc = function(videoObject, stream) {
+    this.setVideoObjectSrc = function(element, stream) {
         if (stream && stream !== "") {
-            videoObject.autoplay = true;
-            attachMediaStream(videoObject, stream);
-            videoObject.play();
+            element.autoplay = true;
+
+            if (typeof element.src !== 'undefined') {
+                element.src = self.createObjectURL(stream);
+            } else if (typeof element.srcObject !== 'undefined') {
+                element.srcObject = stream;
+            } else if (typeof element.mozSrcObject !== 'undefined') {
+                element.mozSrcObject = self.createObjectURL(stream);
+            }
+            element.play();
         }
         else {
-            self.clearMediaStream(videoObject);
+            self.clearMediaStream(element);
         }
     };
 
@@ -3489,7 +4642,7 @@ var Easyrtc = function() {
     this.buildLocalMediaStream = function(streamName, audioTracks, videoTracks) {
         var i;
         if (typeof streamName !== 'string') {
-            self.showError(self.errCodes.DEVELOPER_ERR, 
+            self.showError(self.errCodes.DEVELOPER_ERR,
                "easyrtc.buildLocalMediaStream not supplied a stream name");
             return null;
         }
@@ -3509,7 +4662,7 @@ var Easyrtc = function() {
                     var remoteStreams = peerConns[key].pc.getRemoteStreams();
                     if( remoteStreams && remoteStreams.length > 0 ) {
                         streamToClone = remoteStreams[0];
-                    }   
+                    }
                 }
             }
          }
@@ -3584,7 +4737,7 @@ var Easyrtc = function() {
 
     /**
      * @private
-     * @param {String} x 
+     * @param {String} x
      */
     this.formatError = function(x) {
         var name, result;
@@ -3619,14 +4772,14 @@ var Easyrtc = function() {
         }
     };
 
-    /** 
+    /**
      * Initializes your access to a local camera and microphone.
      * Failure could be caused a browser that didn't support WebRTC, or by the user not granting permission.
      * If you are going to call easyrtc.enableAudio or easyrtc.enableVideo, you need to do it before
      * calling easyrtc.initMediaSource.
      * @param {function(Object)} successCallback - will be called with localmedia stream on success.
      * @param {function(String,String)} errorCallback - is called with an error code and error description.
-     * @param {String} streamName - an optional name for the media source so you can use multiple cameras and 
+     * @param {String} streamName - an optional name for the media source so you can use multiple cameras and
      * screen share simultaneously.
      * @example
      *       easyrtc.initMediaSource(
@@ -3639,9 +4792,7 @@ var Easyrtc = function() {
      */
     this.initMediaSource = function(successCallback, errorCallback, streamName) {
 
-        if (self.debugPrinter) {
-            self.debugPrinter("about to request local media");
-        }
+        logDebug("about to request local media");
 
         if (!streamName) {
             streamName = "default";
@@ -3655,9 +4806,7 @@ var Easyrtc = function() {
         if (!errorCallback) {
             errorCallback = function(errorCode, errorText) {
                 var message = "easyrtc.initMediaSource: " + self.formatError(errorText);
-                if (self.debugPrinter) {
-                    self.debugPrinter(message);
-                }
+                logDebug(message);
                 self.showError(self.errCodes.MEDIA_ERR, message);
             };
         }
@@ -3678,13 +4827,8 @@ var Easyrtc = function() {
          * @param {Object} stream - A mediaStream object.
          *  */
         var onUserMediaSuccess = function(stream) {
-            if (self.debugPrinter) {
-                self.debugPrinter("getUserMedia success callback entered");
-            }
-
-            if (self.debugPrinter) {
-                self.debugPrinter("successfully got local media");
-            }
+            logDebug("getUserMedia success callback entered");
+            logDebug("successfully got local media");
 
             stream.streamName = streamName;
             registerLocalMediaStreamByName(stream, streamName);
@@ -3705,7 +4849,7 @@ var Easyrtc = function() {
                                     self._desiredVideoProperties.width, self._desiredVideoProperties.height,
                                     self.nativeVideoWidth, self.nativeVideoHeight));
                         }
-                        self.setVideoObjectSrc(videoObj, null); 
+                        self.setVideoObjectSrc(videoObj, null);
                         if (videoObj.removeNode) {
                             videoObj.removeNode(true);
                         }
@@ -3736,15 +4880,13 @@ var Easyrtc = function() {
             }
         };
 
-        /** 
+        /**
          * @private
          * @param {String} error
          */
         var onUserMediaError = function(error) {
-            webrtcUtils.log("getusermedia failed");
-            if (self.debugPrinter) {
-                self.debugPrinter("failed to get local media");
-            }
+            logDebug("getusermedia failed");
+            logDebug("failed to get local media");
             var errText;
             if (typeof error === 'string') {
                 errText = error;
@@ -3756,7 +4898,7 @@ var Easyrtc = function() {
                 errText = "Unknown";
             }
             if (errorCallback) {
-                webrtcUtils.log("invoking error callback", errText);
+                logDebug("invoking error callback", errText);
                 errorCallback(self.errCodes.MEDIA_ERR, self.format(self.getConstantString("gumFailed"), errText));
             }
             closeLocalMediaStreamByName(streamName);
@@ -3777,33 +4919,32 @@ var Easyrtc = function() {
         }
 
         var firstCallTime;
-        function tryAgain(error) {
+        function tryAgain(err) {
             var currentTime = getCurrentTime();
             if (currentTime < firstCallTime + 1000) {
-                webrtcUtils.log("Trying getUserMedia a second time");
-                setTimeout(function() {
-                    getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
-                }, 3000);
+                logDebug("Trying getUserMedia a second time");
+                try {
+                    navigator.getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
+                } catch (e) {
+                    onUserMediaError(err);
+                }
             }
             else {
-                onUserMediaError(error);
+                onUserMediaError(err);
             }
         }
-         
+
         //
         // getUserMedia sometimes fails the first time I call it. I suspect it's a page loading
         // issue. So I'm going to try adding a 1 second delay to allow things to settle down first.
         // In addition, I'm going to try again after 3 seconds.
         //
-        // TODO debounce timer via clearTimeout ?
-        setTimeout(function() {
-            try {
-                firstCallTime = getCurrentTime();
-                getUserMedia(mode, onUserMediaSuccess, tryAgain);
-            } catch (e) {
-                tryAgain(e);
-            }
-        }, 1000);
+        try {
+            firstCallTime = getCurrentTime();
+            navigator.getUserMedia(mode, onUserMediaSuccess, tryAgain);
+        } catch (err) {
+            tryAgain(err);
+        }
     };
 
     /**
@@ -3889,19 +5030,6 @@ var Easyrtc = function() {
     this.setOnStreamClosed = function(onStreamClosed) {
         self.onStreamClosed = onStreamClosed;
     };
-    
-    /** Determines whether the current browser supports the new data channels.
-     * EasyRTC will not open up connections with the old data channels.
-     * @returns {Boolean}
-     */
-    this.supportsDataChannels = function() {
-        if (navigator.userAgent.match(/android/i)) {
-            return webrtcDetectedVersion >= 34;
-        }
-        else {
-            return (webrtcDetectedBrowser === "firefox" || webrtcDetectedVersion >= 32);
-        }
-    };
 
     /**
      * Sets a listener for data sent from another client (either peer to peer or via websockets).
@@ -3956,7 +5084,7 @@ var Easyrtc = function() {
         var msgType = msg.msgType;
         var msgData = msg.msgData;
         if (!msgType) {
-            webrtcUtils.log("received peer message without msgType", msg);
+            logDebug("received peer message without msgType", msg);
             return;
         }
 
@@ -4002,9 +5130,7 @@ var Easyrtc = function() {
      *     easyrtc.setSocketUrl(":8080", options);
      */
     this.setSocketUrl = function(socketUrl, options) {
-        if (self.debugPrinter) {
-            self.debugPrinter("WebRTC signaling server URL set to " + socketUrl);
-        }
+        logDebug("WebRTC signaling server URL set to " + socketUrl);
         serverPath = socketUrl;
         if( options ) {
             connectionOptions = options;
@@ -4155,7 +5281,7 @@ var Easyrtc = function() {
     this.setUseFreshIceEachPeerConnection = function(value) {
         use_fresh_ice_each_peer = value;
     };
-    
+
     /**
      * Returns the last ice config supplied by the EasyRTC server. This function is not normally used, it is provided
      * for people who want to try filtering ice server configuration on the client.
@@ -4164,7 +5290,7 @@ var Easyrtc = function() {
     this.getServerIce = function() {
         return pc_config;
     };
-    
+
     /**
      * Sets the ice server configuration that will be used in subsequent calls. You only need this function if you are filtering
      * the ice server configuration on the client or if you are using TURN certificates that have a very short lifespan.
@@ -4191,15 +5317,71 @@ var Easyrtc = function() {
             pc_config_to_use = ice;
         }
     };
-    
+
     /** @private */
-    var closedChannel = null;
-    
-    /** 
+    function getRemoteStreamByName(peerConn, otherUser, streamName) {
+                    
+        var keyToMatch = null;
+        var remoteStreams = peerConn.pc.getRemoteStreams();
+
+        // No streamName lead to default 
+        if (!streamName) {
+            streamName = "default";
+        }
+
+        // default lead to first if available
+        if (streamName === "default") {
+            if (remoteStreams.length > 0) {
+                return remoteStreams[0];
+            }
+            else {
+                return null;
+            }
+        }
+
+        // Get mediaIds from user roomData
+        for (var roomName in self.roomData) {
+            if (self.roomData.hasOwnProperty(roomName)) {
+                var mediaIds = self.getRoomApiField(roomName, otherUser, "mediaIds");
+                keyToMatch = mediaIds ? mediaIds[streamName] : null;
+                if (keyToMatch) {
+                    break;
+                }
+            }
+        }
+
+        // 
+        if (!keyToMatch) {
+            self.showError(self.errCodes.DEVELOPER_ERR, "remote peer does not have media stream called " + streamName);
+        }
+
+        // 
+        for (var i = 0; i < remoteStreams.length; i++) {
+            var remoteId;
+            if (remoteStreams[i].id) {
+                remoteId = remoteStreams[i].id;
+            }  else {
+                remoteId = "default";
+            }
+
+            if (
+                !keyToMatch || // No match
+                    remoteId === keyToMatch || // Full match
+                        remoteId.indexOf(keyToMatch) === 0 // Partial match
+            ) {
+                return remoteStreams[i];
+            }
+
+        }
+
+        return null;
+    }
+
+    /**
      * @private
-     * @param easyrtcid
-     * @param checkAudio
-     * @param streamName
+     * @param {string} easyrtcid
+     * @param {boolean} checkAudio
+     * @param {string} streamName
      */
     function _haveTracks(easyrtcid, checkAudio, streamName) {
         var stream, peerConnObj;
@@ -4212,7 +5394,7 @@ var Easyrtc = function() {
                 self.showError(self.errCodes.DEVELOPER_ERR, "haveTracks called about a peer you don't have a connection to");
                 return false;
             }
-            stream = peerConnObj.getRemoteStreamByName(streamName);
+            stream = getRemoteStreamByName(peerConns[easyrtcid], easyrtcid, streamName);
         }
         if (!stream) {
             return false;
@@ -4220,19 +5402,19 @@ var Easyrtc = function() {
 
         var tracks;
         try {
-        
+
             if (checkAudio) {
                 tracks = stream.getAudioTracks();
             }
             else {
                 tracks = stream.getVideoTracks();
             }
-        
+
         } catch (oops) {
             // TODO why do we return true here ?
             return true;
         }
-        
+
         if (!tracks) {
             return false;
         }
@@ -4248,7 +5430,7 @@ var Easyrtc = function() {
     this.haveAudioTrack = function(easyrtcid, streamName) {
         return _haveTracks(easyrtcid, true, streamName);
     };
-    
+
     /** Determines if a particular peer2peer connection has a video track.
      * @param {String} easyrtcid - the id of the other caller in the connection. If easyrtcid is not supplied, checks the local media.
      * @param {String} streamName - an optional stream id.     *
@@ -4257,7 +5439,7 @@ var Easyrtc = function() {
     this.haveVideoTrack = function(easyrtcid, streamName) {
         return _haveTracks(easyrtcid, false, streamName);
     };
-    
+
     /**
      * Gets a data field associated with a room.
      * @param {String} roomName - the name of the room.
@@ -4270,26 +5452,14 @@ var Easyrtc = function() {
     };
 
     /** @private */
-    //
-    // Experimental function to determine if statistics gathering is supported.
-    //
-    this.supportsStatistics = function() {
-        var peer;
-        try {
-            peer = new RTCPeerConnection({iceServers: []}, {});
-            return !!peer.getStats;
-        }
-        catch (err) {
-            return false;
-        }
-    };
-
-    /** @private */
     var fields = null;
 
     /** @private */
     var preallocatedSocketIo = null;
-    
+
+    /** @private */
+    var closedChannel = null;
+
     //
     // easyrtc.disconnect performs a clean disconnection of the client from the server.
     //
@@ -4331,9 +5501,7 @@ var Easyrtc = function() {
      */
     this.disconnect = function() {
 
-        if (self.debugPrinter) {
-            self.debugPrinter("attempt to disconnect from WebRTC signalling server");
-        }
+        logDebug("attempt to disconnect from WebRTC signalling server");
 
         self.disconnecting = true;
         self.hangupAll();
@@ -4389,9 +5557,8 @@ var Easyrtc = function() {
                 dataToShip.msgData = msgData;
             }
 
-            if (self.debugPrinter) {
-                self.debugPrinter("sending socket message " + JSON.stringify(dataToShip));
-            }
+            logDebug("sending socket message " + JSON.stringify(dataToShip));
+
             self.webSocket.json.emit("easyrtcCmd", dataToShip,
                     function(ackMsg) {
                         if (ackMsg.msgType !== "error") {
@@ -4467,9 +5634,7 @@ var Easyrtc = function() {
     this.sendDataP2P = function(destUser, msgType, msgData) {
 
         var flattenedData = JSON.stringify({msgType: msgType, msgData: msgData});
-        if (self.debugPrinter) {
-            self.debugPrinter("sending p2p message to " + destUser + " with data=" + JSON.stringify(flattenedData));
-        }
+        logDebug("sending p2p message to " + destUser + " with data=" + JSON.stringify(flattenedData));
 
         if (!peerConns[destUser]) {
             self.showError(self.errCodes.DEVELOPER_ERR, "Attempt to send data peer to peer without a connection to " + destUser + ' first.');
@@ -4487,9 +5652,9 @@ var Easyrtc = function() {
                 } else {
                     peerConns[destUser].dataChannelS.send(flattenedData);
                 }
-            } catch (oops) {
-                webrtcUtils.log("snedDataP2P error: ", oops);
-                throw oops;
+            } catch (sendDataErr) {
+                logDebug("sendDataP2P error: ", sendDataErr);
+                throw sendDataErr;
             }
         }
     };
@@ -4512,9 +5677,8 @@ var Easyrtc = function() {
      *    );
      */
     this.sendDataWS = function(destination, msgType, msgData, ackhandler) {
-        if (self.debugPrinter) {
-            self.debugPrinter("sending client message via websockets to " + destination + " with data=" + JSON.stringify(msgData));
-        }
+        logDebug("sending client message via websockets to " + destination + " with data=" + JSON.stringify(msgData));
+
         if (!ackhandler) {
             ackhandler = function(msg) {
                 if (msg.msgType === "error") {
@@ -4549,9 +5713,8 @@ var Easyrtc = function() {
             self.webSocket.json.emit("easyrtcMsg", outgoingMessage, ackhandler);
         }
         else {
-            if (self.debugPrinter) {
-                self.debugPrinter("websocket failed because no connection to server");
-            }
+            logDebug("websocket failed because no connection to server");
+
             throw "Attempt to send message without a valid connection to the server.";
         }
     };
@@ -4599,9 +5762,8 @@ var Easyrtc = function() {
             self.showError(self.errCodes.DEVELOPER_ERR, "destination was null in sendPeerMessage");
         }
 
-        if (self.debugPrinter) {
-            self.debugPrinter("sending peer message " + JSON.stringify(msgData));
-        }
+        logDebug("sending peer message " + JSON.stringify(msgData));
+
         function ackHandler(response) {
             if (response.msgType === "error") {
                 if (failureCB) {
@@ -4635,10 +5797,10 @@ var Easyrtc = function() {
      *             });
      */
     this.sendServerMessage = function(msgType, msgData, successCB, failureCB) {
-        if (self.debugPrinter) {
-            var dataToShip = {msgType: msgType, msgData: msgData};
-            self.debugPrinter("sending server message " + JSON.stringify(dataToShip));
-        }
+
+        var dataToShip = {msgType: msgType, msgData: msgData};
+        logDebug("sending server message " + JSON.stringify(dataToShip));
+
         function ackhandler(response) {
             if (response.msgType === "error") {
                 if (failureCB) {
@@ -4779,15 +5941,13 @@ var Easyrtc = function() {
         if (peerConns[easyrtcid]) {
             emitOnStreamClosed(easyrtcid, stream);
             updateConfigurationInfo();
-            if( peerConns[easyrtcid].pc ) {
+            if (peerConns[easyrtcid].pc) {
                  try {
                     peerConns[easyrtcid].pc.removeStream(stream);
                  } catch( err) {}
             }
-
         }
     }
-
 
     /** @private */
     function buildDeltaRecord(added, deleted) {
@@ -4907,9 +6067,8 @@ var Easyrtc = function() {
             // send all the configuration information that changes during the session
             //
             if (alteredData) {
-                if (self.debugPrinter) {
-                    self.debugPrinter("cfg=" + JSON.stringify(alteredData.added));
-                }
+                logDebug("cfg=" + JSON.stringify(alteredData.added));
+
                 if (self.webSocket) {
                     sendSignalling(null, "setUserCfg", {setUserCfg: alteredData.added}, null, null);
                 }
@@ -4923,7 +6082,106 @@ var Easyrtc = function() {
             setTimeout(sendDeltas, 100);
         }
     }
-    
+
+    // Parse the uint32 PRIORITY field into its constituent parts from RFC 5245,
+    // type preference, local preference, and (256 - component ID).
+    // ex: 126 | 32252 | 255 (126 is host preference, 255 is component ID 1)
+    function formatPriority(priority) {
+        var s = '';
+        s += (priority >> 24);
+        s += ' | ';
+        s += (priority >> 8) & 0xFFFF;
+        s += ' | ';
+        s += priority & 0xFF;
+        return s;
+    }
+
+    // Parse a candidate:foo string into an object, for easier use by other methods.
+    /** @private */
+    function parseCandidate(text) {
+        var candidateStr = 'candidate:';
+        var pos = text.indexOf(candidateStr) + candidateStr.length;
+        var fields = text.substr(pos).split(' ');
+        return {
+            'component': fields[1],
+            'type': fields[7],
+            'foundation': fields[0],
+            'protocol': fields[2],
+            'address': fields[4],
+            'port': fields[5],
+            'priority': formatPriority(fields[3])
+        };
+    }
+
+    /** @private */
+    function processCandicate(candicate) {
+        self._candicates = self._candicates || [];
+        self._candicates.push(parseCandidate(candicate));
+    }
+
+    function processAddedStream(otherUser, theStream) {
+        if (!peerConns[otherUser] ||  peerConns[otherUser].cancelled) {
+            return;
+        }
+
+        var peerConn = peerConns[otherUser];
+
+        if (!peerConn.startedAV) {
+            peerConn.startedAV = true;
+            peerConn.sharingAudio = haveAudioVideo.audio;
+            peerConn.sharingVideo = haveAudioVideo.video;
+            peerConn.connectTime = new Date().getTime();
+            if (peerConn.callSuccessCB) {
+                if (peerConn.sharingAudio || peerConn.sharingVideo) {
+                    peerConn.callSuccessCB(otherUser, "audiovideo");
+                }
+            }
+            if (self.audioEnabled || self.videoEnabled) {
+                updateConfiguration();
+            }
+        }
+
+        var remoteName = getNameOfRemoteStream(otherUser, theStream.id || "default");
+        if (!remoteName) {
+            remoteName = "default";
+        }
+        peerConn.remoteStreamIdToName[theStream.id || "default"] = remoteName;
+        peerConn.liveRemoteStreams[remoteName] = true;
+        theStream.streamName = remoteName;
+        if (self.streamAcceptor) {
+            self.streamAcceptor(otherUser, theStream, remoteName);
+            //
+            // Inform the other user that the stream they provided has been received.
+            // This should be moved into signalling at some point
+            //
+            self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
+        }
+    }
+
+    function processAddedTrack(otherUser, peerStreams) {
+
+        if (!peerConns[otherUser] ||  peerConns[otherUser].cancelled) {
+            return;
+        }
+
+        var peerConn = peerConns[otherUser];
+        peerConn.trackTimers = peerConn.trackTimers || {};
+
+        // easyrtc thinks in terms of streams, not tracks.
+        // so we'll add a timeout when the first track event
+        // fires. Firefox produces two events (one of type "video",
+        // and one of type "audio".
+
+        for (var i = 0, l = peerStreams.length; i < l; i++) {
+            var peerStream = peerStreams[i],
+                streamId = peerStream.id || "default";
+            clearTimeout(peerConn.trackTimers[streamId]);
+            peerConn.trackTimers[streamId] = setTimeout(function(peerStream) {
+               processAddedStream(peerConn, otherUser, peerStream);
+            }.bind(peerStream), 100); // Bind peerStream
+        }
+    }
+
     /** @private */
     // TODO split buildPeerConnection it more thant 500 lines
     function buildPeerConnection(otherUser, isInitiator, failureCB, streamNames) {
@@ -4931,54 +6189,77 @@ var Easyrtc = function() {
         var message;
         var newPeerConn;
         var iceConfig = pc_config_to_use ? pc_config_to_use : pc_config;
-        if (self.debugPrinter) {
-            self.debugPrinter("building peer connection to " + otherUser);
-        }
+
+        logDebug("building peer connection to " + otherUser);
 
         //
         // we don't support data channels on chrome versions < 31
         //
+
         try {
+
             pc = self.createRTCPeerConnection(iceConfig, buildPeerConstraints());
+
             if (!pc) {
-                message = "Unable to create PeerConnection object, check your ice configuration(" +
-                        JSON.stringify(iceConfig) + ")";
-                if (self.debugPrinter) {
-                    self.debugPrinter(message);
-                }
-                throw(message);
+                message = "Unable to create PeerConnection object, check your ice configuration(" + JSON.stringify(iceConfig) + ")";
+                logDebug(message);
+                throw Error(message);
             }
 
             //
             // turn off data channel support if the browser doesn't support it.
             //
+
             if (dataEnabled && typeof pc.createDataChannel === 'undefined') {
                 dataEnabled = false;
             }
+
             pc.onnegotiationneeded = function(event) {
-                if (peerConns[otherUser] && peerConns[otherUser].enableNegotiateListener) {
+                if (
+                    peerConns[otherUser] &&
+                        (peerConns[otherUser].enableNegotiateListener)
+                ) {
                     pc.createOffer(function(sdp) {
                         if (sdpLocalFilter) {
                             sdp.sdp = sdpLocalFilter(sdp.sdp);
                         }
                         pc.setLocalDescription(sdp, function() {
-                            self.sendPeerMessage(otherUser, "__addedMediaStream", {sdp: sdp});
+                            self.sendPeerMessage(otherUser, "__addedMediaStream", {
+                                sdp: sdp
+                            });
+
                         }, function() {
                         });
                     }, function(error) {
-                        webrtcUtils.log("unexpected error in creating offer");
+                        logDebug("unexpected error in creating offer");
                     });
                 }
             };
 
-            pc.oniceconnectionstatechange = function(ev) {
+            pc.onsignalingstatechange = function () {
+                
+                var eventTarget = event.currentTarget || event.target || pc,
+                    signalingState = eventTarget.signalingState || 'unknown';
+
+                if (signalingStateChangeListener) {
+                   signalingStateChangeListener(otherUser, eventTarget, signalingState);
+                }
+            };
+
+            pc.oniceconnectionstatechange = function(event) {
+
+                var eventTarget = event.currentTarget || event.target || pc,
+                    connState = eventTarget.iceConnectionState || 'unknown';
+
                 if (iceConnectionStateChangeListener) {
-                   iceConnectionStateChangeListener(otherUser, ev.target);
+                   iceConnectionStateChangeListener(otherUser, eventTarget, connState);
                 }
 
-                var connState = ev.currentTarget ? ev.currentTarget.iceConnectionState : 'unknown';
-                switch( connState) {
+                switch (connState) {
                     case "connected":
+                        if (self.onPeerOpen ) {
+                            self.onPeerOpen(otherUser);
+                        }
                         if (peerConns[otherUser] && peerConns[otherUser].callSuccessCB) {
                             peerConns[otherUser].callSuccessCB(otherUser, "connection");
                         }
@@ -4990,7 +6271,7 @@ var Easyrtc = function() {
                         delete peerConns[otherUser];
                         break;
                     case "disconnected":
-                        if(self.onPeerFailing) {
+                        if (self.onPeerFailing) {
                             self.onPeerFailing(otherUser);
                         }
                         if (peerConns[otherUser]) {
@@ -4999,12 +6280,10 @@ var Easyrtc = function() {
                         break;
 
                     case "closed":
-                        if( self.onPeerClosed ) {
-                          self.onPeerClosed(otherUser);
+                        if (self.onPeerClosed) {
+                            self.onPeerClosed(otherUser);
                         }
                         break;
-
-                    case "connected":
                     case "completed":
                         if (peerConns[otherUser]) {
                             if (peerConns[otherUser].failing && self.onPeerRecovered) {
@@ -5012,16 +6291,12 @@ var Easyrtc = function() {
                             }
                             delete peerConns[otherUser].failing;
                          }
-                        delete peerConns[otherUser].failing;
                         break;
                 }
             };
 
-
             pc.onconnection = function() {
-                if (self.debugPrinter) {
-                    self.debugPrinter("onconnection called prematurely");
-                }
+                logDebug("onconnection called prematurely");
             };
 
             newPeerConn = {
@@ -5032,54 +6307,7 @@ var Easyrtc = function() {
                 isInitiator: isInitiator,
                 remoteStreamIdToName: {},
                 streamsAddedAcks: {},
-                liveRemoteStreams: {},
-                getRemoteStreamByName: function(streamName) {
-                    var remoteStreams = pc.getRemoteStreams();
-                    var i;
-                    var keyToMatch = null;
-                    var roomName;
-                    if (!streamName) {
-                        streamName = "default";
-                    }
-
-                    if (streamName === "default") {
-                        if (remoteStreams.length > 0) {
-                            return remoteStreams[0];
-                        }
-                        else {
-                            return null;
-                        }
-                    }
-                    for (roomName in self.roomData) {
-                        if (self.roomData.hasOwnProperty(roomName)) {
-                            var mediaIds = self.getRoomApiField(roomName, otherUser, "mediaIds");
-                            keyToMatch = mediaIds ? mediaIds[streamName] : null;
-                            if (keyToMatch) {
-                                break;
-                            }
-                        }
-                    }
-                    if (!keyToMatch) {
-                        self.showError(self.errCodes.DEVELOPER_ERR, "remote peer does not have media stream called " + streamName);
-                    }
-
-                    for (i = 0; i < remoteStreams.length; i++) {
-                        var remoteId;
-                        if (remoteStreams[i].id) {
-                            remoteId = remoteStreams[i].id;
-                        }
-                        else {
-                            remoteId = "default";
-                        }
-
-                        if (!keyToMatch || remoteId === keyToMatch) {
-                            return remoteStreams[i];
-                        }
-
-                    }
-                    return null;
-                }
-                //                var remoteStreams = peerConns[i].pc.getRemoteStreams();
+                liveRemoteStreams: {}
             };
 
             pc.onicecandidate = function(event) {
@@ -5095,7 +6323,7 @@ var Easyrtc = function() {
                         candidate: event.candidate.candidate
                     };
 
-                    if( iceCandidateFilter ) {
+                    if (iceCandidateFilter ) {
                        candidateData = iceCandidateFilter(candidateData, false);
                        if( !candidateData ) {
                           return;
@@ -5107,10 +6335,7 @@ var Easyrtc = function() {
                     // The keyword "relay" in the candidate identifies it as referencing a
                     // turn server. The \d symbol in the regular expression matches a number.
                     //
-                    if (event.candidate.candidate.indexOf("typ relay") > 0) {
-                        var ipAddress = event.candidate.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/i)[2];
-                        self._turnServers[ipAddress] = true;
-                    }
+                    processCandicate(event.candidate.candidate);
 
                     if (peerConns[otherUser].connectionAccepted) {
                         sendSignalling(otherUser, "candidate", candidateData, null, function() {
@@ -5123,60 +6348,27 @@ var Easyrtc = function() {
                 }
             };
 
+            pc.ontrack = function(event) {
+                logDebug("empty ontrack method invoked, which is expected");
+                processAddedTrack(otherUser, event.streams);
+            };
+
             pc.onaddstream = function(event) {
-
-                if (peerConns[otherUser] && peerConns[otherUser].cancelled) {
-                    return;
-                }
-
-                if (self.debugPrinter) {
-                    self.debugPrinter("saw incoming media stream");
-                }                
-
-                if (!peerConns[otherUser].startedAV) {
-                    peerConns[otherUser].startedAV = true;
-                    peerConns[otherUser].sharingAudio = haveAudioVideo.audio;
-                    peerConns[otherUser].sharingVideo = haveAudioVideo.video;
-                    peerConns[otherUser].connectTime = new Date().getTime();
-                    if (peerConns[otherUser].callSuccessCB) {
-                        if (peerConns[otherUser].sharingAudio || peerConns[otherUser].sharingVideo) {
-                            peerConns[otherUser].callSuccessCB(otherUser, "audiovideo");
-                        }
-                    }
-                    if (self.audioEnabled || self.videoEnabled) {
-                        updateConfiguration();
-                    }
-                }
-                var remoteName = getNameOfRemoteStream(otherUser, event.stream.id || "default");
-                if (!remoteName) {
-                    remoteName = "default";
-                }
-                peerConns[otherUser].remoteStreamIdToName[event.stream.id || "default"] = remoteName;
-                peerConns[otherUser].liveRemoteStreams[remoteName] = true;
-                event.stream.streamName = remoteName;
-                if (self.streamAcceptor) {
-                    self.streamAcceptor(otherUser, event.stream, remoteName);
-                    //
-                    // Inform the other user that the stream they provided has been received.
-                    // This should be moved into signalling at some point
-                    //
-                    self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
-                }
+                logDebug("empty onaddstream method invoked, which is expected");
+                processAddedStream(otherUser, event.stream);
             };
 
             pc.onremovestream = function(event) {
-                if (self.debugPrinter) {
-                    self.debugPrinter("saw remove on remote media stream");
-                }
+                logDebug("saw remove on remote media stream");
                 onRemoveStreamHelper(otherUser, event.stream);
             };
 
+            // Register PeerConn
             peerConns[otherUser] = newPeerConn;
-        } catch (e) {
-            if (self.debugPrinter) {
-                self.debugPrinter(JSON.stringify(e));
-            }
-            failureCB(self.errCodes.SYSTEM_ERR, e.message);
+
+        } catch (error) {
+            logDebug('buildPeerConnection error', error);
+            failureCB(self.errCodes.SYSTEM_ERR, error.message);
             return null;
         }
 
@@ -5188,7 +6380,7 @@ var Easyrtc = function() {
                     pc.addStream(stream);
                 }
                 else {
-                    webrtcUtils.log("Developer error, attempt to access unknown local media stream " + streamNames[i]);
+                    logDebug("Developer error, attempt to access unknown local media stream " + streamNames[i]);
                 }
             }
         }
@@ -5202,9 +6394,7 @@ var Easyrtc = function() {
         //
         var pendingTransfer = {};
         function dataChannelMessageHandler(event) {
-            if (self.debugPrinter) {
-                self.debugPrinter("saw dataChannel.onmessage event: " + JSON.stringify(event.data));
-            }
+            logDebug("saw dataChannel.onmessage event: ", event.data);
 
             if (event.data === "dataChannelPrimed") {
                 self.sendDataWS(otherUser, "dataChannelPrimed", "");
@@ -5215,107 +6405,105 @@ var Easyrtc = function() {
                 // as it's own form of priming message. Comparing the data against "" doesn't
                 // work, so I'm going with parsing and trapping the parse error.
                 //
+                var msg;
+
                 try {
-                    var msg = JSON.parse(event.data);
-                    if (msg) {
-                        if (msg.transfer && msg.transferId) {
-                            if (msg.transfer === 'start') {
-                                if (self.debugPrinter) {
-                                    self.debugPrinter('start transfer #' + msg.transferId);
-                                }
+                    msg = JSON.parse(event.data);
+                } catch (err) {
+                    logDebug('Developer error, unable to parse event data');
+                }
 
-                                var parts = parseInt(msg.parts);
-                                pendingTransfer = {
-                                    chunks: [],
-                                    parts: parts,
-                                    transferId: msg.transferId
-                                };
+                if (msg) {
+                    if (msg.transfer && msg.transferId) {
+                        if (msg.transfer === 'start') {
+                            logDebug('start transfer #' + msg.transferId);
 
-                            } else if (msg.transfer === 'chunk') {
-                                if (self.debugPrinter) {
-                                    self.debugPrinter('got chunk for transfer #' + msg.transferId);
-                                }
+                            var parts = parseInt(msg.parts);
+                            pendingTransfer = {
+                                chunks: [],
+                                parts: parts,
+                                transferId: msg.transferId
+                            };
 
-                                // check data is valid
-                                if (!(typeof msg.data === 'string' && msg.data.length <= self.maxP2PMessageLength)) {
-                                    webrtcUtils.log('Developer error, invalid data');
+                        } else if (msg.transfer === 'chunk') {
+                            logDebug('got chunk for transfer #' + msg.transferId);
 
-                                    // check there's a pending transfer
-                                } else if (!pendingTransfer) {
-                                    webrtcUtils.log('Developer error, unexpected chunk');
-
-                                // check that transferId is valid
-                                } else if (msg.transferId !== pendingTransfer.transferId) {
-                                    webrtcUtils.log('Developer error, invalid transfer id');
-
-                                // check that the max length of transfer is not reached
-                                } else if (pendingTransfer.chunks.length + 1 > pendingTransfer.parts) {
-                                    webrtcUtils.log('Developer error, received too many chunks');
-
-                                } else {
-                                    pendingTransfer.chunks.push(msg.data);
-                                }
-
-                            } else if (msg.transfer === 'end') {
-                                if (self.debugPrinter) {
-                                    self.debugPrinter('end of transfer #' + msg.transferId);
-                                }
+                            // check data is valid
+                            if (!(typeof msg.data === 'string' && msg.data.length <= self.maxP2PMessageLength)) {
+                                logDebug('Developer error, invalid data');
 
                                 // check there's a pending transfer
-                                if (!pendingTransfer) {
-                                    webrtcUtils.log('Developer error, unexpected end of transfer');
+                            } else if (!pendingTransfer) {
+                                logDebug('Developer error, unexpected chunk');
 
-                                // check that transferId is valid
-                                } else if (msg.transferId !== pendingTransfer.transferId) {
-                                    webrtcUtils.log('Developer error, invalid transfer id');
+                            // check that transferId is valid
+                            } else if (msg.transferId !== pendingTransfer.transferId) {
+                                logDebug('Developer error, invalid transfer id');
 
-                                // check that all the chunks were received
-                                } else if (pendingTransfer.chunks.length !== pendingTransfer.parts) {
-                                    webrtcUtils.log('Developer error, received wrong number of chunks');
-
-                                } else {
-                                    try {
-                                        var chunkedMsg = JSON.parse(pendingTransfer.chunks.join(''));
-                                        self.receivePeerDistribute(otherUser, chunkedMsg, null);
-                                    } catch (err) {
-                                        webrtcUtils.log('Developer error, unable to parse message');
-                                    }
-                                }
-                                pendingTransfer = {  };
+                            // check that the max length of transfer is not reached
+                            } else if (pendingTransfer.chunks.length + 1 > pendingTransfer.parts) {
+                                logDebug('Developer error, received too many chunks');
 
                             } else {
-                                webrtcUtils.log('Developer error, got an unknown transfer message' + msg.transfer);
+                                pendingTransfer.chunks.push(msg.data);
                             }
+
+                        } else if (msg.transfer === 'end') {
+                            logDebug('end of transfer #' + msg.transferId);
+
+                            // check there's a pending transfer
+                            if (!pendingTransfer) {
+                                logDebug('Developer error, unexpected end of transfer');
+
+                            // check that transferId is valid
+                            } else if (msg.transferId !== pendingTransfer.transferId) {
+                                logDebug('Developer error, invalid transfer id');
+
+                            // check that all the chunks were received
+                            } else if (pendingTransfer.chunks.length !== pendingTransfer.parts) {
+                                logDebug('Developer error, received wrong number of chunks');
+
+                            } else {
+                                var chunkedMsg;
+                                try {
+                                    chunkedMsg = JSON.parse(pendingTransfer.chunks.join(''));
+                                } catch (err) {
+                                    logDebug('Developer error, unable to parse message');
+                                }
+
+                                if (chunkedMsg) {
+                                    self.receivePeerDistribute(otherUser, chunkedMsg, null);
+                                }
+                            }
+                            pendingTransfer = {  };
+
                         } else {
-                            self.receivePeerDistribute(otherUser, msg, null);
+                            logDebug('Developer error, got an unknown transfer message' + msg.transfer);
                         }
+                    } else {
+                        self.receivePeerDistribute(otherUser, msg, null);
                     }
-                }
-                catch (err) {
                 }
             }
         }
 
         function initOutGoingChannel(otherUser) {
-            if (self.debugPrinter) {
-                self.debugPrinter("saw initOutgoingChannel call");
-            }
+            logDebug("saw initOutgoingChannel call");
+
             var dataChannel = pc.createDataChannel(dataChannelName, self.getDatachannelConstraints());
             peerConns[otherUser].dataChannelS = dataChannel;
             peerConns[otherUser].dataChannelR = dataChannel;
             dataChannel.onmessage = dataChannelMessageHandler;
             dataChannel.onopen = function(event) {
-                if (self.debugPrinter) {
-                    self.debugPrinter("saw dataChannel.onopen event");
-                }
+                logDebug("saw dataChannel.onopen event");
+
                 if (peerConns[otherUser]) {
                     dataChannel.send("dataChannelPrimed");
                 }
             };
             dataChannel.onclose = function(event) {
-                if (self.debugPrinter) {
-                    self.debugPrinter("saw dataChannelS.onclose event");
-                }
+                logDebug("saw dataChannelS.onclose event");
+
                 if (peerConns[otherUser]) {
                     peerConns[otherUser].dataChannelReady = false;
                     delete peerConns[otherUser].dataChannelS;
@@ -5329,15 +6517,11 @@ var Easyrtc = function() {
         }
 
         function initIncomingChannel(otherUser) {
-            if (self.debugPrinter) {
-                self.debugPrinter("initializing incoming channel handler for " + otherUser);
-            }
+            logDebug("initializing incoming channel handler for " + otherUser);
 
             peerConns[otherUser].pc.ondatachannel = function(event) {
 
-                if (self.debugPrinter) {
-                    self.debugPrinter("saw incoming data channel");
-                }
+                logDebug("saw incoming data channel");
 
                 var dataChannel = event.channel;
                 peerConns[otherUser].dataChannelR = dataChannel;
@@ -5345,9 +6529,8 @@ var Easyrtc = function() {
                 peerConns[otherUser].dataChannelReady = true;
                 dataChannel.onmessage = dataChannelMessageHandler;
                 dataChannel.onclose = function(event) {
-                    if (self.debugPrinter) {
-                        self.debugPrinter("saw dataChannelR.onclose event");
-                    }
+                    logDebug("saw dataChannelR.onclose event");
+
                     if (peerConns[otherUser]) {
                         peerConns[otherUser].dataChannelReady = false;
                         delete peerConns[otherUser].dataChannelR;
@@ -5359,9 +6542,8 @@ var Easyrtc = function() {
                     updateConfigurationInfo();
                 };
                 dataChannel.onopen = function(event) {
-                    if (self.debugPrinter) {
-                        self.debugPrinter("saw dataChannel.onopen event");
-                    }
+                    logDebug("saw dataChannel.onopen event");
+
                     if (peerConns[otherUser]) {
                         dataChannel.send("dataChannelPrimed");
                     }
@@ -5375,21 +6557,26 @@ var Easyrtc = function() {
         // TODO check if both sides have the same browser and versions
         if (dataEnabled) {
             self.setPeerListener(function() {
-                peerConns[otherUser].dataChannelReady = true;
-                if (peerConns[otherUser].callSuccessCB) {
-                    peerConns[otherUser].callSuccessCB(otherUser, "datachannel");
+                if (peerConns[otherUser]) {
+                    peerConns[otherUser].dataChannelReady = true;
+                    if (peerConns[otherUser].callSuccessCB) {
+                        peerConns[otherUser].callSuccessCB(otherUser, "datachannel");
+                    }
+                    if (onDataChannelOpen) {
+                        onDataChannelOpen(otherUser, true);
+                    }
+                    updateConfigurationInfo();
+                } else {
+                    logDebug("failed to setup outgoing channel listener");
                 }
-                if (onDataChannelOpen) {
-                    onDataChannelOpen(otherUser, true);
-                }
-                updateConfigurationInfo();
             }, "dataChannelPrimed", otherUser);
+
             if (isInitiator) {
                 try {
 
                     initOutGoingChannel(otherUser);
                 } catch (channelErrorEvent) {
-                    webrtcUtils.log("failed to init outgoing channel");
+                    logDebug("failed to init outgoing channel");
                     failureCB(self.errCodes.SYSTEM_ERR,
                             self.formatError(channelErrorEvent));
                 }
@@ -5400,9 +6587,7 @@ var Easyrtc = function() {
         }
 
         pc.onconnection = function() {
-            if (self.debugPrinter) {
-                self.debugPrinter("setup pc.onconnection ");
-            }
+            logDebug("setup pc.onconnection ");
         };
 
         //
@@ -5424,37 +6609,34 @@ var Easyrtc = function() {
         }, streamNames);
         var newPeerConn = peerConns[caller];
         if (!pc) {
-            if (self.debugPrinter) {
-                self.debugPrinter("buildPeerConnection failed. Call not answered");
-            }
+            logDebug("buildPeerConnection failed. Call not answered");
             return;
         }
         var setLocalAndSendMessage1 = function(sessionDescription) {
-            
+
             if (newPeerConn.cancelled) {
                 return;
             }
 
             var sendAnswer = function() {
-                if (self.debugPrinter) {
-                    self.debugPrinter("sending answer");
-                }
+                logDebug("sending answer");
+
                 function onSignalSuccess() {
+                    logDebug("sending success");
                 }
 
                 function onSignalFailure(errorCode, errorText) {
+                    logDebug("sending error");
                     delete peerConns[caller];
                     self.showError(errorCode, errorText);
                 }
 
-                sendSignalling(caller, "answer", sessionDescription,
-                        onSignalSuccess, onSignalFailure);
+                sendSignalling(caller, "answer", sessionDescription, onSignalSuccess, onSignalFailure);
                 peerConns[caller].connectionAccepted = true;
                 sendQueuedCandidates(caller, onSignalSuccess, onSignalFailure);
+
                 if (pc.connectDataConnection) {
-                    if (self.debugPrinter) {
-                        self.debugPrinter("calling connectDataConnection(5002,5001)");
-                    }
+                    logDebug("calling connectDataConnection(5002,5001)");
                     pc.connectDataConnection(5002, 5001);
                 }
             };
@@ -5466,26 +6648,26 @@ var Easyrtc = function() {
             });
         };
         var sd = new RTCSessionDescription(msgData);
+
         if (!sd) {
             throw "Could not create the RTCSessionDescription";
         }
 
-        if (self.debugPrinter) {
-            self.debugPrinter("sdp ||  " + JSON.stringify(sd));
-        }
+        logDebug("sdp ||  " + JSON.stringify(sd));
+
         var invokeCreateAnswer = function() {
             if (newPeerConn.cancelled) {
                 return;
             }
             pc.createAnswer(setLocalAndSendMessage1,
-                    function(message) {
-                        self.showError(self.errCodes.INTERNAL_ERR, "create-answer: " + message);
-                    },
-                    receivedMediaConstraints);
+                function(message) {
+                    self.showError(self.errCodes.INTERNAL_ERR, "create-answer: " + message);
+                },
+                receivedMediaConstraints);
         };
-        if (self.debugPrinter) {
-            self.debugPrinter("about to call setRemoteDescription in doAnswer");
-        }
+
+        logDebug("about to call setRemoteDescription in doAnswer");
+
         try {
 
             if (sdpRemoteFilter) {
@@ -5495,14 +6677,11 @@ var Easyrtc = function() {
                 self.showError(self.errCodes.INTERNAL_ERR, "set-remote-description: " + message);
             });
         } catch (srdError) {
-            webrtcUtils.log("set remote description failed");
-            if (self.debugPrinter) {
-                self.debugPrinter("saw exception in setRemoteDescription");
-            }
+            logDebug("set remote description failed");
             self.showError(self.errCodes.INTERNAL_ERR, "setRemoteDescription failed: " + srdError.message);
         }
     }
-    
+
     /** @private */
     function doAnswer(caller, msgData, streamNames) {
         if (!streamNames && autoInitUserMedia) {
@@ -5541,9 +6720,7 @@ var Easyrtc = function() {
         var message;
         if (!pc) {
             message = "buildPeerConnection failed, call not completed";
-            if (self.debugPrinter) {
-                self.debugPrinter(message);
-            }
+            logDebug(message);
             throw message;
         }
 
@@ -5619,12 +6796,11 @@ var Easyrtc = function() {
             }
         }
 
-        if (self.debugPrinter) {
-            self.debugPrinter("initiating peer to peer call to " + otherUser +
+        logDebug("initiating peer to peer call to " + otherUser +
                     " audio=" + self.audioEnabled +
                     " video=" + self.videoEnabled +
                     " data=" + dataEnabled);
-        }
+
 
         if (!self.supportsPeerConnections()) {
             callFailureCB(self.errCodes.CALL_ERR, self.getConstantString("noWebrtcSupport"));
@@ -5648,9 +6824,7 @@ var Easyrtc = function() {
 
         if (!self.webSocket) {
             message = "Attempt to make a call prior to connecting to service";
-            if (self.debugPrinter) {
-                self.debugPrinter(message);
-            }
+            logDebug(message);
             throw message;
         }
 
@@ -5669,9 +6843,7 @@ var Easyrtc = function() {
         // do we already have a pending call?
         if (typeof acceptancePending[otherUser] !== 'undefined') {
             message = "Call already pending acceptance";
-            if (self.debugPrinter) {
-                self.debugPrinter(message);
-            }
+            logDebug(message);
             callFailureCB(self.errCodes.ALREADY_CONNECTED, message);
             return;
         }
@@ -5693,7 +6865,7 @@ var Easyrtc = function() {
 
     /** @private */
     //
-    // this function check the deprecated MediaStream.ended attribute 
+    // this function check the deprecated MediaStream.ended attribute
     // and new .active. Also fallback .enable on track for Firefox.
     //
     function isStreamActive(stream) {
@@ -5713,7 +6885,7 @@ var Easyrtc = function() {
 
     /** @private */
     var queuedMessages = {};
-    
+
     /** @private */
     function clearQueuedMessages(caller) {
         queuedMessages[caller] = {
@@ -5722,52 +6894,71 @@ var Easyrtc = function() {
     }
 
     /** @private */
-    function hangupBody(otherUser) {
-        var i;
-        if (self.debugPrinter) {
-            self.debugPrinter("Hanging up on " + otherUser);
-        }
-        clearQueuedMessages(otherUser);
-        if (peerConns[otherUser]) {
+    function closePeer(otherUser) {
 
-            if (peerConns[otherUser].pc) {
-                
+        if (acceptancePending[otherUser]) {
+            delete acceptancePending[otherUser];
+        }
+        if (offersPending[otherUser]) {
+            delete offersPending[otherUser];
+        }
+
+        if (
+          !peerConns[otherUser].cancelled &&
+              peerConns[otherUser].pc
+        ) {
+            try {
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
-                for (i = 0; i < remoteStreams.length; i++) {
-                    if( isStreamActive(remoteStreams[i])) {
+                for (var i = 0; i < remoteStreams.length; i++) {
+                    if (isStreamActive(remoteStreams[i])) {
                         emitOnStreamClosed(otherUser, remoteStreams[i]);
                         stopStream(remoteStreams[i]);
                     }
                 }
-                //
-                // todo: may need to add a few lines here for closing the data channels
-                //
-                try {
-                    peerConns[otherUser].pc.close();
-                } catch (err) {
-                    if (self.debugPrinter) {
-                        self.debugPrinter("peer close failed:" + err);
-                    }
+
+                peerConns[otherUser].pc.close();
+                peerConns[otherUser].cancelled = true;
+                logDebug("peer closed");
+            } catch (err) {
+                logDebug("peer " + otherUser + " close failed:" + err);
+            } finally {
+                if (self.onPeerClosed) {
+                    self.onPeerClosed(otherUser);
                 }
-            }
-
-            peerConns[otherUser].cancelled = true;
-            delete peerConns[otherUser];
-
-            if (self.webSocket) {
-                sendSignalling(otherUser, "hangup", null, function() {
-
-                }, function(errorCode, errorText) {
-                    if (self.debugPrinter) {
-                        self.debugPrinter("hangup failed:" + errorText);
-                    }
-                });
-            }
-            if (acceptancePending[otherUser]) {
-                delete acceptancePending[otherUser];
             }
         }
     }
+
+    /** @private */
+    function hangupBody(otherUser) {
+        
+        logDebug("Hanging up on " + otherUser);
+        clearQueuedMessages(otherUser);
+
+        if (peerConns[otherUser]) {
+
+            if (peerConns[otherUser].pc) {
+                closePeer(otherUser);
+            } 
+
+            if (peerConns[otherUser]) {
+                delete peerConns[otherUser];
+            }
+
+            updateConfigurationInfo();
+            
+            if (self.webSocket) {
+                sendSignalling(otherUser, "hangup", null, function() {
+                    logDebug("hangup succeeds");
+                }, function(errorCode, errorText) {
+                    logDebug("hangup failed:" + errorText);
+                    self.showError(errorCode, errorText);
+                });
+            }
+        }
+    }
+
+    
 
     /**
      * Hang up on a particular user or all users.
@@ -5801,7 +6992,7 @@ var Easyrtc = function() {
         }
     };
 
-    /** 
+    /**
      * Checks to see if data channels work between two peers.
      * @param {String} otherUser - the other peer.
      * @returns {Boolean} true if data channels work and are ready to be used
@@ -5827,7 +7018,7 @@ var Easyrtc = function() {
             throw "Developer err: no such stream";
         }
         else {
-            return peerConns[easyrtcid].getRemoteStreamByName(remoteStreamName);
+            return getRemoteStreamByName(peerConns[easyrtcid], easyrtcid, remoteStreamName);
         }
     };
 
@@ -5843,7 +7034,7 @@ var Easyrtc = function() {
     this.makeLocalStreamFromRemoteStream = function(easyrtcid, remoteStreamName, localStreamName) {
         var remoteStream;
         if (peerConns[easyrtcid].pc) {
-            remoteStream = peerConns[easyrtcid].getRemoteStreamByName(remoteStreamName);
+            remoteStream = getRemoteStreamByName(peerConns[easyrtcid], easyrtcid, remoteStreamName);
             if (remoteStream) {
                 registerLocalMediaStreamByName(remoteStream, localStreamName);
             }
@@ -5870,16 +7061,16 @@ var Easyrtc = function() {
         }
         var stream = getLocalMediaStreamByName(streamName);
         if (!stream) {
-            webrtcUtils.log("attempt to add nonexistent stream " + streamName);
+            logDebug("attempt to add nonexistent stream " + streamName);
         }
         else if (!peerConns[easyrtcId] || !peerConns[easyrtcId].pc) {
-            webrtcUtils.log("Can't add stream before a call has started.");
+            logDebug("Can't add stream before a call has started.");
         }
         else {
             var pc = peerConns[easyrtcId].pc;
             peerConns[easyrtcId].enableNegotiateListener = true;
             pc.addStream(stream);
-            if( receiptHandler ) {
+            if (receiptHandler) {
                 peerConns[easyrtcId].streamsAddedAcks[streamName] = receiptHandler;
             }
         }
@@ -5890,7 +7081,7 @@ var Easyrtc = function() {
     //
     this.setPeerListener(function(easyrtcid, msgType, msgData) {
         if (!peerConns[easyrtcid] || !peerConns[easyrtcid].pc) {
-            self.showError(self.errCodes.DEVELOPER_ERR, 
+            self.showError(self.errCodes.DEVELOPER_ERR,
                   "Attempt to add additional stream before establishing the base call.");
         }
         else {
@@ -5899,13 +7090,16 @@ var Easyrtc = function() {
 
             var setLocalAndSendMessage1 = function(sessionDescription) {
                 var sendAnswer = function() {
-                   if (self.debugPrinter) {
-                       self.debugPrinter("sending answer");
-                   }
+                   logDebug("sending answer");
+
                    function onSignalSuccess() {
+                        logDebug("sending answer succeeded");
+
                    }
 
                    function onSignalFailure(errorCode, errorText) {
+                        logDebug("sending answer failed");
+
                        delete peerConns[easyrtcid];
                        self.showError(errorCode, errorText);
                    }
@@ -5933,9 +7127,8 @@ var Easyrtc = function() {
                self.sendPeerMessage(easyrtcid, "__gotAddedMediaStream", {sdp: sdp});
             };
 
-            if (self.debugPrinter) {
-                self.debugPrinter("about to call setRemoteDescription in doAnswer");
-            }
+            logDebug("about to call setRemoteDescription in doAnswer");
+
             try {
 
                 if (sdpRemoteFilter) {
@@ -5946,10 +7139,7 @@ var Easyrtc = function() {
                     self.showError(self.errCodes.INTERNAL_ERR, "set-remote-description: " + message);
                 });
             } catch (srdError) {
-                webrtcUtils.log("set remote description failed");
-                if (self.debugPrinter) {
-                    self.debugPrinter("saw exception in setRemoteDescription");
-                }
+                logDebug("saw exception in setRemoteDescription", srdError);
                 self.showError(self.errCodes.INTERNAL_ERR, "setRemoteDescription failed: " + srdError.message);
             }
         }
@@ -5957,9 +7147,7 @@ var Easyrtc = function() {
 
     this.setPeerListener(function(easyrtcid, msgType, msgData) {
         if (!peerConns[easyrtcid] || !peerConns[easyrtcid].pc) {
-            if (self.debugPrinter) {
-                self.debugPrinter("setPeerListener failed: __gotAddedMediaStream Unknow easyrtcid " + easyrtcid);
-            }
+            logDebug("setPeerListener failed: __gotAddedMediaStream Unknow easyrtcid " + easyrtcid);
         }
         else {
             var sdp = msgData.sdp;
@@ -5977,12 +7165,10 @@ var Easyrtc = function() {
 
     this.setPeerListener(function(easyrtcid, msgType, msgData) {
         if (!peerConns[easyrtcid] || !peerConns[easyrtcid].pc) {
-            if (self.debugPrinter) {
-                self.debugPrinter("setPeerListener failed: __closingMediaStream Unknow easyrtcid " + easyrtcid);
-            }
+            logDebug("setPeerListener failed: __closingMediaStream Unknow easyrtcid " + easyrtcid);
         }
         else {
-            var stream = peerConns[easyrtcid].getRemoteStreamByName(msgData.streamName);
+            var stream = getRemoteStreamByName(peerConns[easyrtcid], easyrtcid, msgData.streamName);
             if (stream) {
                 onRemoveStreamHelper(easyrtcid, stream);
                 stopStream(stream);
@@ -5996,7 +7182,6 @@ var Easyrtc = function() {
         var i;
         for (var peer in peerConns) {
             if (peerConns.hasOwnProperty(peer)) {
-                webrtcUtils.log("For peer " + peer);
                 var pc = peerConns[peer].pc;
                 var remotes = pc.getRemoteStreams();
                 var remoteIds = [];
@@ -6008,55 +7193,41 @@ var Easyrtc = function() {
                 for (i = 0; i < locals.length; i++) {
                     localIds.push(locals[i].id);
                 }
-                webrtcUtils.log("    " + JSON.stringify({local: localIds, remote: remoteIds}));
+
+                logDebug("For peer " + peer);
+                logDebug("    " + JSON.stringify({local: localIds, remote: remoteIds}));
             }
         }
     };
-    
-    /** @private */
-    function onRemoteHangup(caller) {
-        delete offersPending[caller];
-        if (self.debugPrinter) {
-            self.debugPrinter("Saw onRemote hangup event");
-        }
-        if (peerConns[caller]) {
-            peerConns[caller].cancelled = true;
-            if (peerConns[caller].pc) {
-                //
-                // close any remote streams.
-                //
-                var remoteStreams = peerConns[caller].pc.getRemoteStreams();
-                if (remoteStreams) {
-                    var i;
-                    for (i = 0; i < remoteStreams.length; i++) {
-                        emitOnStreamClosed(caller, remoteStreams[i]);
-                        try {
-                            stopStream(remoteStreams[i]);
-                        } catch (err) {
-                        }
-                    }
-                }
 
-                try {
-                    peerConns[caller].pc.close();
-                } catch (anyErrors) {
-                }
+    /** @private */
+    function onRemoteHangup(otherUser) {
+
+        logDebug("Saw onRemote hangup event");
+        clearQueuedMessages(otherUser);
+
+        if (peerConns[otherUser]) {
+
+            if (peerConns[otherUser].pc) {
+                closePeer(otherUser);
             }
             else {
                 if (self.callCancelled) {
-                    self.callCancelled(caller, true);
+                    self.callCancelled(otherUser, true);
                 }
             }
-            delete peerConns[caller];
-            updateConfigurationInfo();
+
+            if (peerConns[otherUser]) {
+                delete peerConns[otherUser];
+            }
         }
         else {
             if (self.callCancelled) {
-                self.callCancelled(caller, true);
+                self.callCancelled(otherUser, true);
             }
         }
     }
-    
+
     /** @private */
     //
     // checks to see if a particular peer is in any room at all.
@@ -6077,7 +7248,7 @@ var Easyrtc = function() {
     /**
      * Checks to see if a particular peer is present in any room.
      * If it isn't, we assume it's logged out.
-     * @param easyrtcid the easyrtcId of the peer.
+     * @param {string} easyrtcid the easyrtcId of the peer.
      */
     this.isPeerInAnyRoom = function(easyrtcid) {
          return isPeerInAnyRoom(easyrtcid);
@@ -6222,7 +7393,7 @@ var Easyrtc = function() {
                 receiveServerCB(msg.msgType, msg.msgData, targeting);
             }
             else {
-                webrtcUtils.log("Unhandled server message " + JSON.stringify(msg));
+                logDebug("Unhandled server message " + JSON.stringify(msg));
             }
         }
     }
@@ -6233,6 +7404,9 @@ var Easyrtc = function() {
         if (url.indexOf('turn:') === 0 || url.indexOf('turns:') === 0) {
             ipAddress = url.split(/[@:&]/g)[1];
             self._turnServers[ipAddress] = true;
+        } else if (url.indexOf('stun:') === 0 || url.indexOf('stuns:') === 0) {
+            ipAddress = url.split(/[@:&]/g)[1];
+            self._stunServers[ipAddress] = true;
         }
     }
 
@@ -6240,26 +7414,27 @@ var Easyrtc = function() {
     function processIceConfig(iceConfig) {
 
         var i, j, item;
-        
+
         pc_config = {
             iceServers: []
         };
-        
+
         self._turnServers = {};
-        
-        if ( 
-            !iceConfig || 
+        self._stunServers = {};
+
+        if (
+            !iceConfig ||
                 !iceConfig.iceServers ||
                     typeof iceConfig.iceServers.length === "undefined"
         ) {
             self.showError(
-                self.errCodes.DEVELOPER_ERR, 
+                self.errCodes.DEVELOPER_ERR,
                 "iceConfig received from server didn't have an array called iceServers, ignoring it"
             );
         } else {
             pc_config = {
                 iceServers: iceConfig.iceServers
-            };            
+            };
         }
 
         for (i = 0; i < iceConfig.iceServers.length; i++) {
@@ -6267,7 +7442,7 @@ var Easyrtc = function() {
             if( item.urls && item.urls.length ) {
                for( j = 0; j < item.urls.length; j++ ) {
                   processUrl(item.urls[j]);
-               } 
+               }
             }
             else if( item.url ) {
                processUrl(item.url);
@@ -6290,9 +7465,9 @@ var Easyrtc = function() {
     /** @private */
     function processRoomData(roomData) {
         self.roomData = roomData;
-        
-        var k, roomName, 
-            stuffToRemove, stuffToAdd, 
+
+        var k, roomName,
+            stuffToRemove, stuffToAdd,
             id, removeId;
 
         for (roomName in self.roomData) {
@@ -6369,9 +7544,9 @@ var Easyrtc = function() {
         var msgType = msg.msgType;
         var msgData = msg.msgData;
         var pc;
-        if (self.debugPrinter) {
-            self.debugPrinter('received message of type ' + msgType);
-        }
+
+        logDebug('received message of type ' + msgType);
+
 
         if (typeof queuedMessages[caller] === "undefined") {
             clearQueuedMessages(caller);
@@ -6393,18 +7568,20 @@ var Easyrtc = function() {
             });
             pc = peerConns[caller].pc;
 
-            function iceAddSuccess() {}
+            function iceAddSuccess() {
+                logDebug("iceAddSuccess: " +
+                    JSON.stringify(candidate));
+                processCandicate(msgData.candidate);
+            }
+
             function iceAddFailure(domError) {
-                self.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice candidate (" + domError.name + "): " + 
+                self.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice candidate (" + domError.name + "): " +
                     JSON.stringify(candidate));
             }
-            pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
 
-            if (msgData.candidate.indexOf("typ relay") > 0) {
-                var ipAddress = msgData.candidate.match(/(udp|tcp) \d+ (\d+\.\d+\.\d+\.\d+)/i)[2];
-                self._turnServers[ipAddress] = true;
-            }
+            pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
         };
+
         var flushCachedCandidates = function(caller) {
             var i;
             if (queuedMessages[caller]) {
@@ -6414,6 +7591,7 @@ var Easyrtc = function() {
                 delete queuedMessages[caller];
             }
         };
+
         var processOffer = function(caller, msgData) {
 
             var helper = function(wasAccepted, streamNames) {
@@ -6427,9 +7605,9 @@ var Easyrtc = function() {
                         return;
                     }
                 }
-                if (self.debugPrinter) {
-                    self.debugPrinter("offer accept=" + wasAccepted);
-                }
+
+                logDebug("offer accept=" + wasAccepted);
+
                 delete offersPending[caller];
 
                 if (wasAccepted) {
@@ -6456,10 +7634,12 @@ var Easyrtc = function() {
                 if (queuedMessages[caller]) {
                     delete queuedMessages[caller];
                 }
-                if (peerConns[caller].wasAcceptedCB) {
-                    peerConns[caller].wasAcceptedCB(true, caller);
+                if (peerConns[caller]) {
+                    if (peerConns[caller].wasAcceptedCB) {
+                        peerConns[caller].wasAcceptedCB(true, caller);
+                    }
+                    delete peerConns[caller];
                 }
-                delete peerConns[caller];
                 helper(true);
                 return;
             }
@@ -6521,25 +7701,23 @@ var Easyrtc = function() {
                 throw "Could not create the RTCSessionDescription";
             }
 
-            if (self.debugPrinter) {
-                self.debugPrinter("about to call initiating setRemoteDescription");
-            }
+            logDebug("about to call initiating setRemoteDescription");
+
             try {
                 if (sdpRemoteFilter) {
                     sd.sdp = sdpRemoteFilter(sd.sdp);
                 }
                 pc.setRemoteDescription(sd, function() {
                     if (pc.connectDataConnection) {
-                        if (self.debugPrinter) {
-                            self.debugPrinter("calling connectDataConnection(5001,5002)");
-                        }
+                        logDebug("calling connectDataConnection(5001,5002)");
+
                         pc.connectDataConnection(5001, 5002); // these are like ids for data channels
                     }
                 }, function(message){
-                     webrtcUtils.log("setRemoteDescription failed ", message);
+                     logDebug("setRemoteDescription failed ", message);
                  });
             } catch (smdException) {
-                webrtcUtils.log("setRemoteDescription failed ", smdException);
+                logDebug("setRemoteDescription failed ", smdException);
             }
             flushCachedCandidates(caller);
         }
@@ -6613,14 +7791,14 @@ var Easyrtc = function() {
      * @example   easyrtc.updatePresence('dnd', 'sleeping');
      */
     this.updatePresence = function(state, statusText) {
-            
+
         self.presenceShow = state;
         self.presenceStatus = statusText;
 
         if (self.webSocketConnected) {
             sendSignalling(null, 'setPresence', {
                 setPresence: {
-                    'show': self.presenceShow, 
+                    'show': self.presenceShow,
                     'status': self.presenceStatus
                 }
             }, null);
@@ -6695,6 +7873,17 @@ var Easyrtc = function() {
      */
     this.isTurnServer = function(ipAddress) {
         return !!self._turnServers[ipAddress];
+    };
+
+    /**
+     * Returns true if the ipAddress parameter was the address of a stun server. This is done by checking against information
+     * collected during peer to peer calls. Don't expect it to work before the first call, or to identify turn servers that aren't
+     * in the ice config.
+     * @param {string} ipAddress
+     * @returns {boolean} true if ip address is known to be that of a stun server, false otherwise.
+     */
+    this.isStunServer = function(ipAddress) {
+        return !!self._stunServers[ipAddress];
     };
 
     /**
@@ -6848,10 +8037,10 @@ var Easyrtc = function() {
      * if you are not connected to the room.
      */
     this.getRoomFields = function(roomName) {
-        return (!fields || !fields.rooms || !fields.rooms[roomName]) ? 
+        return (!fields || !fields.rooms || !fields.rooms[roomName]) ?
                     undefined : fields.rooms[roomName];
     };
-    
+
     /** Get server defined fields associated with the current application. Only valid
      * after a connection has been made.
      * @returns {Object} A dictionary containing entries of the form {key:{'fieldName':key, 'fieldValue':value1}}
@@ -6882,9 +8071,8 @@ var Easyrtc = function() {
     /** @private */
     function processToken(msg) {
         var msgData = msg.msgData;
-        if (self.debugPrinter) {
-            self.debugPrinter("entered process token");
-        }
+        logDebug("entered process token");
+
         if (msgData.easyrtcid) {
             self.myEasyrtcid = msgData.easyrtcid;
         }
@@ -6935,7 +8123,7 @@ var Easyrtc = function() {
         }
         if (self.presenceShow) {
             msgData.setPresence = {
-                show: self.presenceShow, 
+                show: self.presenceShow,
                 status: self.presenceStatus
             };
         }
@@ -6999,7 +8187,7 @@ var Easyrtc = function() {
             } catch(socketErr) {
                 self.webSocket = 0;
                 errorCallback( self.errCodes.SYSTEM_ERROR, socketErr.toString());
-               
+
                return;
             }
         }
@@ -7014,14 +8202,14 @@ var Easyrtc = function() {
         }
 
         self.websocketListeners = [];
-        
+
         function addSocketListener(event, handler) {
             self.webSocket.on(event, handler);
             self.websocketListeners.push({event: event, handler: handler});
         }
 
         addSocketListener("close", function(event) {
-            webrtcUtils.log("the web socket closed");
+            logDebug("the web socket closed");
         });
 
         addSocketListener('error', function(event) {
@@ -7051,9 +8239,8 @@ var Easyrtc = function() {
                 self.showError(self.errCodes.CONNECT_ERR, self.getConstantString("badsocket"));
             }
 
-            if (self.debugPrinter) {
-                self.debugPrinter("saw socket-server onconnect event");
-            }
+            logDebug("saw socket-server onconnect event");
+
             if (self.webSocketConnected) {
                 sendAuthenticate(successCallback, errorCallback);
             }
@@ -7072,7 +8259,7 @@ var Easyrtc = function() {
         addSocketListener("easyrtcMsg", onChannelMsg);
         addSocketListener("easyrtcCmd", onChannelCmd);
         addSocketListener("disconnect", function(/* code, reason, wasClean */) {
-            
+
             self.webSocketConnected = false;
             updateConfigurationInfo = function() {}; // dummy update function
             oldConfig = {};
@@ -7107,7 +8294,8 @@ var Easyrtc = function() {
      */
     this.connect = function(applicationName, successCallback, errorCallback) {
 
-        if (!window.io) {
+        // Detect invalid or missing socket.io
+        if (!io) {
             self.showError(self.errCodes.DEVELOPER_ERR, "Your HTML has not included the socket.io.js library");
         }
 
@@ -7126,9 +8314,7 @@ var Easyrtc = function() {
             connection: {}
         };
 
-        if (self.debugPrinter) {
-            self.debugPrinter("attempt to connect to WebRTC signalling server with application name=" + applicationName);
-        }
+        logDebug("attempt to connect to WebRTC signalling server with application name=" + applicationName);
 
         if (errorCallback === null) {
             errorCallback = function(errorCode, errorText) {
@@ -7140,43 +8326,74 @@ var Easyrtc = function() {
     };
 };
 
-window.easyrtc = new Easyrtc();
-/** 
- *copyright Copyright (c) 2016, Priologic Software Inc.
- *All rights reserved.</p>
- *
- *<p>
- *Redistribution and use in source and binary forms, with or without
- *modification, are permitted provided that the following conditions are met:
- *</p>
- * <ul>
- *   <li> Redistributions of source code must retain the above copyright notice,
- *      this list of conditions and the following disclaimer. </li>
- *   <li> Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution. </li>
- *</ul>
- *<p>
- *THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- *AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- *IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- *ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- *LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- *SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- *INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- *CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- *ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *POSSIBILITY OF SUCH DAMAGE.
- *</p>
- */
+return new Easyrtc();
 
-/* global easyrtc */ // easyrtc.js
-(function() {
+})); 
+
+/* global define, module, require, console */
+/*!
+  Script: easyrtc_app.js
+
+    Provides support file and data transfer support to easyrtc.
+
+  About: License
+
+    Copyright (c) 2016, Priologic Software Inc.
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+        * Redistributions of source code must retain the above copyright notice,
+          this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in the
+          documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+*/
+
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        //RequireJS (AMD) build system
+        define('easyrtc_app',['easyrtc'], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        //CommonJS build system
+        module.exports = factory(require('easyrtc'));
+    } else {
+        //Vanilla JS, ensure dependencies are loaded correctly
+        if (typeof window.easyrtc !== 'object' || !window.easyrtc) {
+            throw new Error("easyrtc_app requires easyrtc");
+        }
+        root.easyrtc = factory(window.easyrtc);
+  }
+}(this, function (easyrtc, undefined) {
+
+    "use strict";
+
+    /**
+     * This file adds additional methods to Easyrtc for simplifying the 
+     * management of video-mediastream assignment.
+     * @class Easyrtc_App
+     */
+
     /** @private */
     var autoAddCloseButtons = true;
+
     /** By default, the easyApp routine sticks a "close" button on top of each caller
      * video object that it manages. Call this function(before calling easyApp) to disable that particular feature.
+     * @function
+     * @memberOf Easyrtc_App
      * @example
      *    easyrtc.dontAddCloseButtons();
      */
@@ -7290,6 +8507,8 @@ window.easyrtc = new Easyrtc();
         /** Sets an event handler that gets called when an incoming MediaStream is assigned 
          * to a video object. The name is poorly chosen and reflects a simpler era when you could
          * only have one media stream per peer connection.
+         * @function
+         * @memberOf Easyrtc_App
          * @param {Function} cb has the signature function(easyrtcid, slot){}
          * @example
          *   easyrtc.setOnCall( function(easyrtcid, slot){
@@ -7306,6 +8525,8 @@ window.easyrtc = new Easyrtc();
          * The slot is parameter is the index into the array of video ids.
          * Note: if you call easyrtc.getConnectionCount() from inside your callback
          * it's count will reflect the number of connections before the hangup started.
+         * @function
+         * @memberOf Easyrtc_App
          * @param {Function} cb has the signature function(easyrtcid, slot){}
          * @example
          *   easyrtc.setOnHangup( function(easyrtcid, slot){
@@ -7316,6 +8537,13 @@ window.easyrtc = new Easyrtc();
             onHangup = cb;
         };
 
+        /** 
+          * Get the easyrtcid of the ith caller, starting at 0.
+          * @function
+          * @memberOf Easyrtc_App
+          * @param {number} i
+          * @returns {String}
+          */
         easyrtc.getIthCaller = function(i) {
             if (i < 0 || i >= videoIdsP.length) {
                 return null;
@@ -7324,6 +8552,14 @@ window.easyrtc = new Easyrtc();
             return getCallerOfVideo(vid);
         };
 
+        /** 
+          * This is the complement of getIthCaller. Given an easyrtcid,
+          * it determines which slot the easyrtc is in.
+          * @function
+          * @memberOf Easyrtc_App
+          * @param {string} easyrtcid 
+          * @returns {number} or -1 if the easyrtcid is not a caller.
+          */
         easyrtc.getSlotOfCaller = function(easyrtcid) {
             var i;
             for (i = 0; i < numPEOPLE; i++) {
@@ -7451,6 +8687,8 @@ window.easyrtc = new Easyrtc();
      * side effects is to add hangup buttons to the remote video objects, buttons
      * that only appear when you hover over them with the mouse cursor. This method will also add the
      * easyrtcMirror class to the monitor video object so that it behaves like a mirror.
+     * @function
+     * @memberOf Easyrtc_App
      *  @param {String} applicationName - name of the application.
      *  @param {String} monitorVideoId - the id of the video object used for monitoring the local stream.
      *  @param {Array} videoIds - an array of video object ids (strings)
@@ -7489,6 +8727,8 @@ window.easyrtc = new Easyrtc();
 
         /** Sets an event handler that gets called when a connection to the signaling
          * server has or has not been made. Can only be called after calling easyrtc.easyApp.
+         * @function
+         * @memberOf Easyrtc_App
          * @param {Function} gotConnectionCB has the signature (gotConnection, errorText)
          * @example
          *    easyrtc.setGotConnection( function(gotConnection, errorText){
@@ -7555,19 +8795,8 @@ window.easyrtc = new Easyrtc();
                 );
         }
     };
-})();
 
-var easyrtc_constantStrings = {
-  "unableToEnterRoom":"Unable to enter room {0} because {1}" ,
-  "resolutionWarning": "Requested video size of {0}x{1} but got size of {2}x{3}",
-  "badUserName": "Illegal username {0}",
-  "localMediaError": "Error getting local media stream: {0}",
-  "miscSignalError": "Miscellaneous error from signalling server. It may be ignorable.",
-  "noServer": "Unable to reach the EasyRTC signalling server.",
-  "badsocket": "Socket.io connect event fired with bad websocket.",
-  "icf": "Internal communications failure",
-  "statsNotSupported":"call statistics not supported by this browser, try Chrome.",
-   "noWebrtcSupport":"Your browser doesn't appear to support WebRTC.",
-   "gumFailed":"Failed to get access to local media. Error code was {0}.",
-   "requireAudioOrVideo":"At least one of audio and video must be provided"   
-};
+return easyrtc;
+
+})); // end of module wrapper
+;

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
+        <title>EasyRTC Demo: Simple Video+Audio</title>
+        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
+
+        <!--hide-->
+        <link rel="stylesheet" type="text/css" href="css/landing.css" />
+        <link rel="stylesheet" type="text/css" href="css/demo_recording.css" />
+        <!-- Prettify Code -->
+        <script type="text/javascript" src="js/prettify/prettify.js"></script>
+        <script type="text/javascript" src="js/prettify/loadAndFilter.js"></script>
+        <script type="text/javascript" src="js/prettify/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="js/prettify/prettify.css" />
+
+        <!--show-->
+        <!-- Assumes global locations for socket.io.js and easyrtc.js -->
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
+        <script type="text/javascript" src="/easyrtc/labs/easyrtc_recorder.js"></script>
+        <script type="text/javascript" src="js/demo_recording.js"></script>
+
+    </head>
+    <body onload="connect();">
+        <!--hide-->
+        <div id="container">
+            <div id="header">
+                <a href="index.html"><img id="logo_easyrtc" src="images/easyrtc_logo.png" alt="EasyRTC" style="" /></a>
+            </div>
+            <div id="menu"><a class="menu_link" href="index.html"><div class="menu_item">Local Demos</div></a><a class="menu_link" href="https://github.com/priologic/easyrtc/tree/master/docs"><div class="menu_item">Documentation</div></a><a class="menu_link" href="https://easyrtc.com/forum/"><div class="menu_item">Support: EasyRTC Forums</div></a><a class="menu_link" href="http://www.easyrtc.com/"><div class="menu_item">EasyRTC.com</div></a></div>
+            <div id="main">
+                <!-- Main Content -->
+                <h1>EasyRTC Demo: Simple Video+Audio</h1>
+
+                <p>The application provides a simple audio-video chat using the easyrtc.easyApp method.</p>
+
+                <p>Connection is handled using an onload statement in the body. Requests are automatically accepted.<p>
+
+                <p>To hang-up on a call, hover your mouse over the upper right of the video, and click on the 'X' which appears at the top right of other person's video object.</p>
+
+                <hr />
+                <h2>The Demo</h2>
+                <!--show-->
+                <div id="demoContainer">
+                    <div id="connectControls">
+                        <div id="iam">Not yet connected...</div>
+                        <br />
+                        <strong>Connected users:</strong>
+                        <div id="otherClients"></div>
+                    </div>
+                    <div id="videos">
+                        <video autoplay="autoplay" class="easyrtcMirror" id="selfVideo" muted="muted" volume="0" ></video>
+                        <div style="position:relative;float:left;">
+                        <video autoplay="autoplay" id="callerVideo"></video>
+                        </div>
+                        <!-- each caller video needs to be in it's own div so it's close button can be positioned correctly -->
+                    </div>
+                    <div id="recordButtons">
+                        <input type="radio" onclick="easyrtc.setRecordingVideoCodec('vp8');" checked="checked" id="useVP8" name="codecUsed"> VP8 </input>
+                        <input type="radio" onclick="easyrtc.setRecordingVideoCodec('vp9');" id="useVP9" name="codecUsed"> VP9 </input>
+                        <input type="radio" onclick="easyrtc.setRecordingVideoCodec('h264');" id="useH264" name="codecUsed"> H264 </input>
+                        <br>
+                        <button id="startRecording" disabled="disabled" onclick="startRecording();" >Start recording</button> 
+                        <button id="stopRecording" disabled="disabled" onclick="endRecording();" >End/finish recording</button> 
+                       <br>
+                       download links for videos: self:<a id="selfDownloadLink"></a>
+                        &nbsp;&nbsp;caller:<a id="callerDownloadLink"></a>
+                    </div>
+                </div>
+                <!--hide-->
+                <br style="clear:both;" />
+                <hr />
+
+                <h2>The Code</h2>
+                <h3>HTML</h3>
+                <pre   id="prettyHtml" class="prettyprint linenums:1">
+
+                </pre>
+
+                <h3>CSS</h3>
+                <p>In order to show the 'X' in the upper right corner, the callerVideo video tag must be in a div with relative positioning.:</p>
+                <pre id="prettyCSS" class="prettyprint linenums:1">
+                </pre>
+
+                <h3>JavaScript</h3>
+                <p>The contents of demo_recording.js:</p>
+                <pre  id="prettyJS" class="prettyprint linenums:1">
+                </pre>
+
+
+                <!-- Runs the SyntaxHighlighter -->
+                <script type="text/javascript">
+                    loadAndFilter(window.location.href, "prettyHtml",2 );
+                    loadAndFilter(getHelperPath("js"), "prettyJS", 2);
+                    loadAndFilter(getHelperPath("css"), "prettyCSS", 2);
+                </script>
+
+                <!-- End Main Content -->
+            </div>
+            <div id="footer">
+                <a href="http://www.skedans.com/?from=landing"><img id="logo_priologic" src="images/skedans_logo.png" height="40" width="150" alt="Created By Skedans Systems, Inc." /></a>
+                <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="/easyrtc/img/powered_by_easyrtc.png" height="60" width="200" alt="Powered By EasyRTC" /></a>
+                <p><em>&copy; 2016 - Skedans Systems, Inc., All Rights Reserved.</em></p>
+                <p id="license">EasyRTC source code released under a BSD2 License. <a href="https://github.com/priologic/easyrtc/blob/master/LICENSE">See LICENSE file in project folder</a> for details.</p>
+            </div>
+        </div>
+        <!--show-->
+    </body>
+</html>

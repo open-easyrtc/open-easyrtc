@@ -98,4 +98,5 @@ If You Run Into Problems
 ------------------------
 Please feel free to post on our discussion forum:
 
- - [https://easyrtc.com/forums/](https://easyrtc.com/forums/)
+- [https://groups.google.com/forum/?fromgroups#!forum/easyrtc](https://groups.google.com/forum/?fromgroups#!forum/easyrtc)
+ 

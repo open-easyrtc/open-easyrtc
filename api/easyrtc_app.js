@@ -1,39 +1,67 @@
-/** 
- *copyright Copyright (c) 2016, Priologic Software Inc.
- *All rights reserved.</p>
- *
- *<p>
- *Redistribution and use in source and binary forms, with or without
- *modification, are permitted provided that the following conditions are met:
- *</p>
- * <ul>
- *   <li> Redistributions of source code must retain the above copyright notice,
- *      this list of conditions and the following disclaimer. </li>
- *   <li> Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution. </li>
- *</ul>
- *<p>
- *THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- *AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- *IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- *ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- *LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- *SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- *INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- *CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- *ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *POSSIBILITY OF SUCH DAMAGE.
- *</p>
- */
+/* global define, module, require, console */
+/*!
+  Script: easyrtc_app.js
 
-/* global easyrtc */ // easyrtc.js
-(function() {
+    Provides support file and data transfer support to easyrtc.
+
+  About: License
+
+    Copyright (c) 2016, Priologic Software Inc.
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+        * Redistributions of source code must retain the above copyright notice,
+          this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in the
+          documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+*/
+
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        //RequireJS (AMD) build system
+        define(['easyrtc'], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        //CommonJS build system
+        module.exports = factory(require('easyrtc'));
+    } else {
+        //Vanilla JS, ensure dependencies are loaded correctly
+        if (typeof window.easyrtc !== 'object' || !window.easyrtc) {
+            throw new Error("easyrtc_app requires easyrtc");
+        }
+        root.easyrtc = factory(window.easyrtc);
+  }
+}(this, function (easyrtc, undefined) {
+
+    "use strict";
+
+    /**
+     * This file adds additional methods to Easyrtc for simplifying the 
+     * management of video-mediastream assignment.
+     * @class Easyrtc_App
+     */
+
     /** @private */
     var autoAddCloseButtons = true;
+
     /** By default, the easyApp routine sticks a "close" button on top of each caller
      * video object that it manages. Call this function(before calling easyApp) to disable that particular feature.
+     * @function
+     * @memberOf Easyrtc_App
      * @example
      *    easyrtc.dontAddCloseButtons();
      */
@@ -147,6 +175,8 @@
         /** Sets an event handler that gets called when an incoming MediaStream is assigned 
          * to a video object. The name is poorly chosen and reflects a simpler era when you could
          * only have one media stream per peer connection.
+         * @function
+         * @memberOf Easyrtc_App
          * @param {Function} cb has the signature function(easyrtcid, slot){}
          * @example
          *   easyrtc.setOnCall( function(easyrtcid, slot){
@@ -163,6 +193,8 @@
          * The slot is parameter is the index into the array of video ids.
          * Note: if you call easyrtc.getConnectionCount() from inside your callback
          * it's count will reflect the number of connections before the hangup started.
+         * @function
+         * @memberOf Easyrtc_App
          * @param {Function} cb has the signature function(easyrtcid, slot){}
          * @example
          *   easyrtc.setOnHangup( function(easyrtcid, slot){
@@ -173,6 +205,13 @@
             onHangup = cb;
         };
 
+        /** 
+          * Get the easyrtcid of the ith caller, starting at 0.
+          * @function
+          * @memberOf Easyrtc_App
+          * @param {number} i
+          * @returns {String}
+          */
         easyrtc.getIthCaller = function(i) {
             if (i < 0 || i >= videoIdsP.length) {
                 return null;
@@ -181,6 +220,14 @@
             return getCallerOfVideo(vid);
         };
 
+        /** 
+          * This is the complement of getIthCaller. Given an easyrtcid,
+          * it determines which slot the easyrtc is in.
+          * @function
+          * @memberOf Easyrtc_App
+          * @param {string} easyrtcid 
+          * @returns {number} or -1 if the easyrtcid is not a caller.
+          */
         easyrtc.getSlotOfCaller = function(easyrtcid) {
             var i;
             for (i = 0; i < numPEOPLE; i++) {
@@ -308,6 +355,8 @@
      * side effects is to add hangup buttons to the remote video objects, buttons
      * that only appear when you hover over them with the mouse cursor. This method will also add the
      * easyrtcMirror class to the monitor video object so that it behaves like a mirror.
+     * @function
+     * @memberOf Easyrtc_App
      *  @param {String} applicationName - name of the application.
      *  @param {String} monitorVideoId - the id of the video object used for monitoring the local stream.
      *  @param {Array} videoIds - an array of video object ids (strings)
@@ -346,6 +395,8 @@
 
         /** Sets an event handler that gets called when a connection to the signaling
          * server has or has not been made. Can only be called after calling easyrtc.easyApp.
+         * @function
+         * @memberOf Easyrtc_App
          * @param {Function} gotConnectionCB has the signature (gotConnection, errorText)
          * @example
          *    easyrtc.setGotConnection( function(gotConnection, errorText){
@@ -412,4 +463,7 @@
                 );
         }
     };
-})();
+
+return easyrtc;
+
+})); // end of module wrapper

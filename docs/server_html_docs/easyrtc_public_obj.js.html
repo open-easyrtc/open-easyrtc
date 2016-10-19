@@ -26,12 +26,14 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
+            <pre class="prettyprint source linenums"><code>/* global module, require */
+
+/**
  * Public interface for interacting with EasyRTC. Contains the public object returned by the EasyRTC listen() function.
  *
  * @module      easyrtc_public_obj
  * @author      Priologic Software, info@easyrtc.com
- * @copyright   Copyright 2015 Priologic Software. All rights reserved.
+ * @copyright   Copyright 2016 Priologic Software. All rights reserved.
  * @license     BSD v2, see LICENSE file in module root folder.
  */
 
@@ -50,7 +52,6 @@ var eu = require("./easyrtc_util");            // EasyRTC utility functions
  * @class
  */
 var pub = module.exports;
-
 
 /**
  * Alias for Socket.io server object. Set during Listen().
@@ -448,6 +449,15 @@ pub.util.ServerError = eu.ServerError;
  * @returns     {Error}
  */
 pub.util.ServerWarning = eu.ServerWarning;
+
+
+/**
+ * Returns a random available easyrtcid.
+ *
+ * @function
+ * @return  {String} Available easyrtcid. A unique identifier for an EasyRTC connection.
+ */
+pub.util.getAvailableEasyrtcid = eu.getAvailableEasyrtcid;
 
 
 /**
@@ -1526,29 +1536,31 @@ pub.app = function(appName, callback) {
             return;
         }
 
+        var socketId = e.app[appName].connection[easyrtcid].socketId;
+
         if (pub.socketServer.sockets.connected){
-            if (!pub.socketServer.sockets.connected[easyrtcid] || pub.socketServer.sockets.connected[easyrtcid].disconnected) {
-                pub.util.logWarning("Attempt to request non-existent socket: '" + easyrtcid + "'");
-                callback(new pub.util.ConnectionWarning("Attempt to request non-existent socket: '" + easyrtcid + "'"));
+            if (!pub.socketServer.sockets.connected[socketId] || pub.socketServer.sockets.connected[socketId].disconnected) {
+                pub.util.logWarning("["+easyrtcid+"] Attempt to request non-existent socket: '" + socketId + "'");
+                callback(new pub.util.ConnectionWarning("Attempt to request non-existent socket: '" + socketId + "'"));
                 return;
             }
 
-            if (pub.socketServer.sockets.connected[easyrtcid].disconnected) {
-                pub.util.logWarning("Attempt to request disconnected socket: '" + easyrtcid + "'");
-                callback(new pub.util.ConnectionWarning("Attempt to request disconnected socket: '" + easyrtcid + "'"));
+            if (pub.socketServer.sockets.connected[socketId].disconnected) {
+                pub.util.logWarning("["+easyrtcid+"] Attempt to request disconnected socket: '" + socketId + "'");
+                callback(new pub.util.ConnectionWarning("Attempt to request disconnected socket: '" + socketId + "'"));
                 return;
             }
         }
         else {
-            if (!pub.socketServer.sockets.sockets[easyrtcid] || pub.socketServer.sockets.sockets[easyrtcid].disconnected) {
-                pub.util.logWarning("Attempt to request non-existent socket: '" + easyrtcid + "'");
-                callback(new pub.util.ConnectionWarning("Attempt to request non-existent socket: '" + easyrtcid + "'"));
+            if (!pub.socketServer.sockets.sockets[socketId] || pub.socketServer.sockets.sockets[socketId].disconnected) {
+                pub.util.logWarning("["+easyrtcid+"] Attempt to request non-existent socket: '" + socketId + "'");
+                callback(new pub.util.ConnectionWarning("Attempt to request non-existent socket: '" + socketId + "'"));
                 return;
             }
 
-            if (pub.socketServer.sockets.sockets[easyrtcid].disconnected) {
-                pub.util.logWarning("Attempt to request disconnected socket: '" + easyrtcid + "'");
-                callback(new pub.util.ConnectionWarning("Attempt to request disconnected socket: '" + easyrtcid + "'"));
+            if (pub.socketServer.sockets.sockets[socketId].disconnected) {
+                pub.util.logWarning("["+easyrtcid+"] Attempt to request disconnected socket: '" + socketId + "'");
+                callback(new pub.util.ConnectionWarning("Attempt to request disconnected socket: '" + socketId + "'"));
                 return;
             }
         }
@@ -1585,10 +1597,10 @@ pub.app = function(appName, callback) {
          * @memberof    pub.appObj.connectionObj
          */
         if (pub.socketServer.sockets.connected){
-            connectionObj.socket = pub.socketServer.sockets.connected[easyrtcid];
+            connectionObj.socket = pub.socketServer.sockets.connected[socketId];
         }
         else {
-            connectionObj.socket = pub.socketServer.sockets.sockets[easyrtcid];
+            connectionObj.socket = pub.socketServer.sockets.sockets[socketId];
         }
 
 
@@ -2486,9 +2498,10 @@ pub.app = function(appName, callback) {
      *
      * @memberof    pub.appObj
      * @param       {string}    easyrtcid   EasyRTC unique identifier for a socket connection.
+     * @param       {string}    socketId    Socket.io socket identifier for a socket connection.
      * @param       {function(?Error, Object=)} callback Callback with error and object containing EasyRTC connection object (same as calling connection(easyrtcid))
      */
-    appObj.createConnection = function(easyrtcid, callback) {
+    appObj.createConnection = function(easyrtcid, socketId, callback) {
         if (!easyrtcid || !appObj.getOption("easyrtcidRegExp").test(easyrtcid)) {
             pub.util.logWarning("Can not create connection with improper name: '" + easyrtcid + "'");
             callback(new pub.util.ConnectionWarning("Can not create connection with improper name: '" + easyrtcid + "'"));
@@ -2504,6 +2517,7 @@ pub.app = function(appName, callback) {
         // Set the connection structure with some default values
         e.app[appName].connection[easyrtcid] = {
             easyrtcid: easyrtcid,
+            socketId: socketId,
             connectOn: Date.now(),
             isAuthenticated: false,
             userName: null,
@@ -2574,9 +2588,11 @@ pub.app = function(appName, callback) {
             return;
         }
 
-        // If room is already deleted or if it doesn't exist, then report success
+        // If room is already deleted or if it doesn't exist, report error
         if (!appObj.isRoomSync(roomName)) {
-            callback(null, true);
+            var errorMsg = "Can't delete non-existing room: " + roomName;
+            pub.util.logWarning(errorMsg);
+            callback(new pub.util.ApplicationWarning(errorMsg), false);
             return;
         }
 
@@ -3490,13 +3506,13 @@ pub.events.setDefaultListeners();
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li><li><a href="module-easyrtc_public_obj.html">easyrtc_public_obj</a></li></ul><h3>Classes</h3><ul><li><a href="module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li><li><a href="module-easyrtc_public_obj-pub.html">pub</a></li><li><a href="module-easyrtc_public_obj-pub.events.html">events</a></li><li><a href="module-easyrtc_public_obj-pub.util.html">util</a></li><li><a href="pub.appObj.html">appObj</a></li><li><a href="pub.appObj.connectionObj.html">connectionObj</a></li><li><a href="pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li><li><a href="pub.appObj.roomObj.html">roomObj</a></li><li><a href="pub.appObj.sessionObj.html">sessionObj</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li><li><a href="module-easyrtc_default_options.html">easyrtc_default_options</a></li><li><a href="module-easyrtc_private_obj.html">easyrtc_private_obj</a></li><li><a href="module-easyrtc_public_obj.html">easyrtc_public_obj</a></li><li><a href="module-easyrtc_util.html">easyrtc_util</a></li><li><a href="module-general_util.html">general_util</a></li></ul><h3>Classes</h3><ul><li><a href="module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li><li><a href="module-easyrtc_public_obj-pub.html">pub</a></li><li><a href="module-easyrtc_public_obj-pub.events.html">events</a></li><li><a href="module-easyrtc_public_obj-pub.util.html">util</a></li><li><a href="module-easyrtc_util-eu.html">eu</a></li><li><a href="module-general_util-g.html">g</a></li><li><a href="pub.appObj.html">appObj</a></li><li><a href="pub.appObj.connectionObj.html">connectionObj</a></li><li><a href="pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li><li><a href="pub.appObj.roomObj.html">roomObj</a></li><li><a href="pub.appObj.sessionObj.html">sessionObj</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Tue Oct 20 2015 10:53:18 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.0-dev</a> on Wed Oct 12 2016 08:54:51 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

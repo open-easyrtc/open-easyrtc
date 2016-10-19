@@ -1,5 +1,5 @@
 //
-//Copyright (c) 2015, Skedans Systems, Inc.
+//Copyright (c) 2016, Skedans Systems, Inc.
 //All rights reserved.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,8 @@ function enable(domId) {
     document.getElementById(domId).disabled = "";
 }
 
+var onceOnly = true;
+
 
 function connect() {	
   easyrtc.enableAudio(document.getElementById("shareAudio").checked);
@@ -42,13 +44,34 @@ function connect() {
   easyrtc.enableDataChannels(true);
   easyrtc.setRoomOccupantListener( convertListToButtons);    
   easyrtc.connect("easyrtc.audioVideo", loginSuccess, loginFailure);			  
+  if( onceOnly ) {
+      easyrtc.getAudioSinkList( function(list) {
+         for(let ele of list ) {
+             addSinkButton(ele.label, ele.deviceId);
+         }
+      });
+      onceOnly = false;
+  }
 } 
+
+
+function addSinkButton(label, deviceId){
+   let button = document.createElement("button");
+   button.innerText = label?label:deviceId;
+   button.onclick = function() {
+      easyrtc.setAudioOutput( document.getElementById("callerVideo"), deviceId);
+   }
+   document.getElementById("audioSinkButtons").appendChild(button);
+}
 
 
 function hangup() {
     easyrtc.hangupAll();
     disable('hangupButton');
 }
+
+
+
 
 
 function clearConnectList() {

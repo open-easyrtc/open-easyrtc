@@ -91,7 +91,7 @@ find out who else is hooked up to the server. The callback is registered using E
 Here is an example initialization function:
 
      function my_init() {
-         easyrtc.setRoomOccupantListener( roomListener);
+         easyrtc.setRoomOccupantListener( loggedInListener);
          easyrtc.easyApp("Company_Chat_Line", "self", ["caller"],
              function(myId) {
                 console.log("My easyrtcid is " + myId);
@@ -117,9 +117,9 @@ We'll add a &lt;div> to the &lt;body> to hold these buttons.
         ...
      </body>
 
-The text for the roomListener is below:
+The text for the loggedInListener is below:
 
-    function roomListener(roomName, otherPeers) {
+    function loggedInListener(roomName, otherPeers) {
         var otherClientDiv = document.getElementById('otherClients');
         while (otherClientDiv.hasChildNodes()) {
             otherClientDiv.removeChild(otherClientDiv.lastChild);
@@ -153,16 +153,16 @@ passing it the easyrtcid of the person, and three callbacks:
 
 Here is some code for the actual call initiation:
 
-    function performCall(easyrtcid) {
-        easyrtc.call(
-           easyrtcid,
-           function(easyrtcid) { console.log("completed call to " + easyrtcid);
-           function(errorMessage) { console.log("err:" + errorMessage);
-           function(accepted, bywho) {
-              console.log((accepted?"accepted":"rejected")+ " by " + bywho);
-           }
-        );
-    }
+        function performCall(easyrtcid) {
+            easyrtc.call(
+               easyrtcid,
+               function(easyrtcid) { console.log("completed call to " + easyrtcid);},
+               function(errorMessage) { console.log("err:" + errorMessage);},
+               function(accepted, bywho) {
+                  console.log((accepted?"accepted":"rejected")+ " by " + bywho);
+               }
+           );
+        }
 
 Now we just have to modify the body tag of our html file to actually call the my_init function.
 
@@ -314,7 +314,7 @@ The entire JavaScript looks like the below code:
 
 
         function my_init() {
-            easyrtc.setRoomOccupantListener( roomListener);
+            easyrtc.setRoomOccupantListener( loggedInListener);
             var connectSuccess = function(myId) {
                 console.log("My easyrtcid is " + myId);
             }
@@ -332,7 +332,7 @@ The entire JavaScript looks like the below code:
          }
 
 
-        function roomListener(roomName, otherPeers) {
+        function loggedInListener(roomName, otherPeers) {
             var otherClientDiv = document.getElementById('otherClients');
             while (otherClientDiv.hasChildNodes()) {
                 otherClientDiv.removeChild(otherClientDiv.lastChild);
@@ -613,4 +613,5 @@ If You Run Into Problems
 ------------------------
 Please feel free to post on our discussion forum:
 
- - [https://easyrtc.com/forums/](https://easyrtc.com/forums/)
+- [https://groups.google.com/forum/?fromgroups#!forum/easyrtc](https://groups.google.com/forum/?fromgroups#!forum/easyrtc)
+

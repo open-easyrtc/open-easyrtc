@@ -1,5 +1,5 @@
 //
-//Copyright (c) 2015, Skedans Systems, Inc.
+//Copyright (c) 2016, Skedans Systems, Inc.
 //All rights reserved.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -113,7 +113,7 @@ function connect() {
              var videoEle = videoSrcList[i];
             var videoLabel = (videoSrcList[i].label &&videoSrcList[i].label.length > 0)?
 			(videoSrcList[i].label):("src_" + i);
-            addSrcButton(videoLabel, videoSrcList[i].id);
+            addSrcButton(videoLabel, videoSrcList[i].deviceId);
         }
         //
         // add an extra button for screen sharing

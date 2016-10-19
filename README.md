@@ -18,13 +18,14 @@ Features
 Installation In A Nutshell
 --------------------------
  1. Install [Node.js](http://nodejs.org)
- 2. Download files from [server_example/](./server_example/) and place them in a local folder of your choice.
-    - [package.json](./server_example/package.json)
-    - [server.js](./server_example/server.js)
-    - OR [download and extract this .zip](http://easyrtc.com/files/easyrtc_server_example.zip)
- 3. Run `npm install` from the installation folder to install dependent packages (including EasyRTC)
- 4. Start EasyRTC by running `node server.js`
+ 2. Download the EasyRTC distribution from github (https://github.com/priologic/easyrtc.git)
+ 3. Run `npm install` in the easyrtc directory.
+ 4. Enter the easyrtc/server_example directory by executing `cd server_example`
+ 5. Run `npm install` in the server_example directory.
+ 4. Start EasyRTC by running `node server.js` while in the server_example directory.
  5. Browse the examples using a WebRTC enabled browser. *(defaults to port `8080`)*
+
+Important note: Chrome will not grant access to local microphones or cameras for a page served using http except for the localhost case. See the docs/easyrtc_server_ssl.md file for instructions on serving files using https.
 
 Step by step instructions including additional setup options can be found in `/docs/easyrtc_server_install.md`
 
@@ -68,6 +69,8 @@ All documentation can be found within [the docs folder](./docs/).
      * `/docs/easyrtc_with_other_servers.md`  
  * [Upcoming features](./docs/easyrtc_upcoming_features.md)
      * `/docs/easyrtc_upcoming_features.md`
+ * [Common WebRTC problems](./docs/easyrtc_webrtc_problems.md)
+     * `/docs/easyrtc_webrtc_problems.md`
  * [Changelog](./docs/easyrtc_changelog.md)
      * `/docs/easyrtc_changelog.md`
 
@@ -102,6 +105,7 @@ EasyRTC comes with a number of demo's which work immediately after installation.
  * Text Messaging with or without Data Channels
  * Screen and tab sharing
  * File transfer
+ * Client side video recording
 
 
 Links for help and information
@@ -110,7 +114,7 @@ Links for help and information
 * The EasyRTC website is at:
   * [http://www.easyrtc.com/](http://www.easyrtc.com/)
 * Use our support forum is at:
-  * [https://easyrtc.com/forums/](https://easyrtc.com/forums/)
+  * [https://easyrtc.com/forum/](https://easyrtc.com/forum/)
 * Live demo site:
   * [http://demo.easyrtc.com/](http://demo.easyrtc.com/)
 * Bugs and requests can be filed on our github page or on the forum:
@@ -118,16 +122,13 @@ Links for help and information
 * Our YouTube channel has live demo's:
   * [http://www.youtube.com/user/priologic](http://www.youtube.com/user/priologic)
 * Information on complimentary EasyRTC commercial products can be found here: 
-  * [iOS SDK - https://easyrtc.com/products/easyrtc-ios-sdk](https://easyrtc.com/products/easyrtc-ios-sdk)
-  * [Android SDK - https://easyrtc.com/products/easyrtc-android-sdk](https://easyrtc.com/products/easyrtc-android-sdk)
-  * [Autonomous Vehicle Application Enablement Platform - http://www.skedans.com/](http://www.skedans.com/)
   * [Product and support pricing - https://easyrtc.com/pricing/](https://easyrtc.com/pricing/)
 
 
 License
 -------
 
-Copyright (c) 2015, Priologic Software Inc.
+Copyright (c) 2016, Priologic Software Inc.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

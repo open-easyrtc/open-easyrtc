@@ -180,3 +180,5 @@ nbproject
 /.idea
 desktopCapture
 /api/labs/desktopCapture
+test/reports/
+bower_components/
