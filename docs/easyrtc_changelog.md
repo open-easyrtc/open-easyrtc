@@ -1,42 +1,39 @@
 EasyRTC: Change Log
 ===================
 
-v1.0.18
+v1.1.0
 -------
 New Features:
-  - JS Client - Added setPeerOpenListener and setSignalingStateChangeListener. 
-  - JS Client - Added options to set prefered video codec in peer connection.
-  - JS Client - Added media stream recording feature and demo.
-  - JS Client - Added support for selecting audio playback destination.
-  - Doc - Added info on git install steps. 
+ - JS Client - Added setPeerOpenListener and setSignalingStateChangeListener. 
+ - JS Client - Added options to set prefered video codec in peer connection.
+ - JS Client - Added media stream recording feature and demo.
+ - JS Client - Added support for selecting audio playback destination.
+ - Documentation - Added info on git install steps. 
 
 Changes:
-  - Doc - Updated client and server html documentation.
-  - Server - Updated socket.io from 1.3.7 to 1.4.5.
-  - Doc - Copyright date bump to 2016.
-  - Doc - Updated link to EasyRTC forum.
-  - JS Client - Use minFrameRate/MaxFrameRate for Firefox and Edge instead of
-             frameRate.min and frameRate.max.
-  - Doc - Updated README to include bower install step.
-  - Doc - Updated docs to reflect the ../ reference in server.js and the need to run https servers.
-  - JS Client - Updated to use webrtc ontrack api and newer media constraints api.
-  - JS Client -Updated the ice filter demo and exposed it on the demo page.
-  - Server - Updated default server options to use urls instead of url for ice se.
+ - JS Client - Use minFrameRate/MaxFrameRate for Firefox and Edge instead of frameRate.min and frameRate.max.
+ - JS Client - Updated to use webrtc ontrack api and newer media constraints api.
+ - JS Client -Updated the ice filter demo and exposed it on the demo page.
+ - Server - Updated default server options to use urls instead of url for ice se.
+ - Server - Updated socket.io from 1.3.7 to 1.4.5.
+ - Documentation - Updated client and server html documentation.
+ - Documentation - Copyright date bump to 2016.
+ - Documentation - Updated link to EasyRTC forum.
+ - Documentation - Updated README to include bower install step.
+ - Documentation - Updated docs to reflect the ../ reference in server.js and the need to run https servers.
   
 Fixes:
-  - Doc - Added fields to the inline documentation on client side to make it
-          work better with jsdoc. We now get documentation for all the 
-          interesting files.
-  - JS Client - Fixed file sharing demo.
-  - JS Client - Put a guard on onPeerClosed.
-  - Doc - Fixed error in easyrtc_client_tutorial.md
-  - JS Client - improves in cancelling file transfer requests.
-  - Packaging - add index.js to bower ignored files cause bower is for client not server.
-  - JS Client - prevent possible undefined prop dataChannelReady if peerConns[otherUser] get recycled early.
-   - JS Client - fix easrytc_app UMD declaration.
-   - JS Client - improved try catch block so that message processing errors didn't masquerade as json parse errors.
-   - JS Client - fix possible error due missing adapter.browserShim.attachMediaStream on some platform.
-   - JS Client - In the multiparty demo, moved the socket.io reference above the easyrtc.js reference.
+ - JS Client - Fixed file sharing demo.
+ - JS Client - Put a guard on onPeerClosed.
+ - Documentation - Added fields to the inline documentation on client side to make it work better with jsdoc. We now get documentation for all the interesting files.
+ - Documentation - Fixed error in easyrtc_client_tutorial.md
+ - JS Client - improves in cancelling file transfer requests.
+ - Packaging - add index.js to bower ignored files cause bower is for client not server.
+ - JS Client - prevent possible undefined prop dataChannelReady if peerConns  get recycled early.
+ - JS Client - fix easrytc_app UMD declaration.
+ - JS Client - improved try catch block so that message processing errors didn't masquerade as json parse errors.
+ - JS Client - fix possible error due missing adapter.browserShim.attachMediaStream on some platform.
+ - JS Client - In the multiparty demo, moved the socket.io reference above the easyrtc.js reference.
 
 
 v1.0.17
@@ -47,10 +44,10 @@ Changes:
  - JS Client - Remove check to see if createRTCPeerConnection works.
  - JS Client - Got rid of setVideoSrc (use setVideoSource instead)
  - JS Client - Updated adapter.js.
- - Doc - REmove comment about Firefox non support for video source.
- - Doc - Updated inline documentation for getAudioSourceList and getVideoSourceList.
- - Doc - Added .jshintrc
- - Doc - Added copyright notice to easy_app.js
+ - Documentation - REmove comment about Firefox non support for video source.
+ - Documentation - Updated inline documentation for getAudioSourceList and getVideoSourceList.
+ - Documentation - Added .jshintrc
+ - Documentation - Added copyright notice to easy_app.js
 Fixes:
  - JS Client - Check if peer connection exists when responding to a webrtc negotiationneeded event, icecandidate event, addstream event.
  - JS Client - Check if peer connection exists before calling onPeerRecovered.
@@ -59,19 +56,19 @@ Fixes:
  - JS Client - improved setting of audio and video constraints.
  - JS Client - prevent possible null on oniceconnectionstatechange event.currentTarget
  - JS Client - fixes to easy_app error logging.
- - Doc - Fixed documentation for setVideoDims.
+ - Documentation - Fixed documentation for setVideoDims.
 
 
 v1.0.16
 -------
 
 New Features:
-- Add getSourceList and getAudioSourceList #80
-- IceConnectionStateChangeListener #122
+ - Add getSourceList and getAudioSourceList #80
+ - IceConnectionStateChangeListener #122
 
 Changes:
-- Update to socket.io 1.3.7 #209
-- Remove deprecated easyrtc.setVideoBandwidth #120
+ - Update to socket.io 1.3.7 #209
+ - Remove deprecated easyrtc.setVideoBandwidth #120
 
 Fixes:
  - JS Client - WebRTC Version Detecting Fails When Simulating iPad In Chrome Dev Tools #90
@@ -94,7 +91,7 @@ Fixes:
  - JS Client -  JSHint on easyrtc_int.js #169
  - Demos - Remove duplicate line #117
  - Demos - Fixed css class for mirroring local video #153
- - Doc - A mistake in documentation #188
+ - Documentation - A mistake in documentation #188
  - Server - error "attempt to connect when already connected to socket server" even if connection failed #98
 
  Thanks to contribution by @omochi for report and reviewing 1.0.16.
