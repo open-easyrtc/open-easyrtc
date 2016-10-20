@@ -1,6 +1,15 @@
 EasyRTC: Change Log
 ===================
 
+v1.1.1-beta
+-------
+New Features:
+
+Changes:
+
+Fixes:
+
+
 v1.1.0
 -------
 New Features:
@@ -21,7 +30,7 @@ Changes:
  - Documentation - Updated link to EasyRTC forum.
  - Documentation - Updated README to include bower install step.
  - Documentation - Updated docs to reflect the ../ reference in server.js and the need to run https servers.
-  
+
 Fixes:
  - JS Client - Fixed file sharing demo.
  - JS Client - Put a guard on onPeerClosed.
