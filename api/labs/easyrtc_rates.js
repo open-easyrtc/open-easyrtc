@@ -288,8 +288,9 @@
         else {
             return function(insdp) {
                 console.log("modifying remote sdp");
-                var sdp = maybePreferAudioSendCodec(insdp);
-                var sdp = maybePreferVideoSendCodec(insdp);
+                var sdp;
+                sdp = maybePreferAudioSendCodec(insdp);
+                sdp = maybePreferVideoSendCodec(insdp);
                 sdp = maybeSetAudioSendBitRate(sdp);
                 sdp = maybeSetVideoSendBitRate(sdp);
                 sdp = maybeSetVideoSendInitialBitRate(sdp);
