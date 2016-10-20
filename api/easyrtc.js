@@ -5931,24 +5931,21 @@ var Easyrtc = function() {
     // and the name of the stream.
     //
     function emitOnStreamClosed(easyrtcid, stream) {
+        
         if (!peerConns[easyrtcid]) {
             return;
         }
-        var streamName;
-        var id;
-        if (stream.id) {
-            id = stream.id;
-        }
-        else {
-            id = "default";
-        }
-        streamName = peerConns[easyrtcid].remoteStreamIdToName[id] || "default";
-        if (peerConns[easyrtcid].liveRemoteStreams[streamName] &&
-            self.onStreamClosed) {
+
+        var streamId = stream.id || "default",
+            streamName = getNameOfRemoteStream(easyrtcid, streamId) || "default";
+
+        if (peerConns[easyrtcid].liveRemoteStreams[streamName]) {
             delete peerConns[easyrtcid].liveRemoteStreams[streamName];
-            self.onStreamClosed(easyrtcid, stream, streamName);
+            if (self.onStreamClosed) {
+                self.onStreamClosed(easyrtcid, stream, streamName);   
+            }
         }
-        delete peerConns[easyrtcid].remoteStreamIdToName[id];
+        delete peerConns[easyrtcid].remoteStreamIdToName[streamId];
     }
 
     /** @private */
@@ -6135,6 +6132,7 @@ var Easyrtc = function() {
     }
 
     function processAddedStream(otherUser, theStream) {
+
         if (!peerConns[otherUser] ||  peerConns[otherUser].cancelled) {
             return;
         }
@@ -6156,20 +6154,23 @@ var Easyrtc = function() {
             }
         }
 
-        var remoteName = getNameOfRemoteStream(otherUser, theStream.id || "default");
-        if (!remoteName) {
-            remoteName = "default";
-        }
-        peerConn.remoteStreamIdToName[theStream.id || "default"] = remoteName;
-        peerConn.liveRemoteStreams[remoteName] = true;
-        theStream.streamName = remoteName;
-        if (self.streamAcceptor) {
-            self.streamAcceptor(otherUser, theStream, remoteName);
-            //
-            // Inform the other user that the stream they provided has been received.
-            // This should be moved into signalling at some point
-            //
-            self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
+        var streamId = theStream.id || "default";
+            remoteName = getNameOfRemoteStream(otherUser, streamId) || "default";
+
+        if (!peerConn.liveRemoteStreams[remoteName]) {
+
+            peerConn.remoteStreamIdToName[streamId] = remoteName;
+            peerConn.liveRemoteStreams[remoteName] = true;
+            theStream.streamName = remoteName;
+
+            if (self.streamAcceptor) {
+                self.streamAcceptor(otherUser, theStream, remoteName);
+                //
+                // Inform the other user that the stream they provided has been received.
+                // This should be moved into signalling at some point
+                //
+                self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
+            }
         }
     }
 
@@ -6368,6 +6369,7 @@ var Easyrtc = function() {
 
             pc.onaddstream = function(event) {
                 logDebug("empty onaddstream method invoked, which is expected");
+                processAddedStream(otherUser, event.stream);
             };
 
             pc.onremovestream = function(event) {
@@ -6848,16 +6850,10 @@ var Easyrtc = function() {
         //
         if (offersPending[otherUser]) {
 
-            try {
-
-                wasAcceptedCB(true, otherUser);
-                doAnswer(otherUser, offersPending[otherUser], streamNames);
-                self.callCancelled(otherUser, false);
-
-            } catch (err) {
-                callFailureCB(self.errCodes.CALL_ERR, err);
-            }
-
+            wasAcceptedCB(true, otherUser);
+            doAnswer(otherUser, offersPending[otherUser], streamNames);
+            self.callCancelled(otherUser, false);
+         
         // do we already have a pending call?
         } else if (typeof acceptancePending[otherUser] !== 'undefined') {
             message = "Call already pending acceptance";
@@ -7175,6 +7171,7 @@ var Easyrtc = function() {
             pc.setRemoteDescription(new RTCSessionDescription(sdp), function(){},
                     function(message) {
                        self.showError(self.errCodes.INTERNAL_ERR, "gotAddedMediaStream setRemoteDescription failed: " + message);
+                       // TODO sendSignaling reject/failure
                     });
         }
 
