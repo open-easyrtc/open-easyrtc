@@ -3472,7 +3472,7 @@ var Easyrtc = function() {
         }
 
         var streamId = theStream.id || "default";
-            remoteName = getNameOfRemoteStream(otherUser, streamId) || "default";
+        var remoteName = getNameOfRemoteStream(otherUser, streamId) || "default";
 
         if (!peerConn.liveRemoteStreams[remoteName]) {
 
