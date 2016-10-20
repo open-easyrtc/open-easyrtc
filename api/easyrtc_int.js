@@ -1712,16 +1712,25 @@ var Easyrtc = function() {
 
         for (roomName in self.roomData) {
             if (self.roomData.hasOwnProperty(roomName)) {
+
                 mediaIds = self.getRoomApiField(roomName, easyrtcId, "mediaIds");
+                
                 if (!mediaIds) {
                     continue;
                 }
+                
                 for (streamName in mediaIds) {
-                    if (mediaIds.hasOwnProperty(streamName) &&
-                            mediaIds[streamName] === webrtcStreamId) {
+                    if (
+                        mediaIds.hasOwnProperty(streamName) && (
+                            mediaIds[streamName] === webrtcStreamId || // Full match
+                                webrtcStreamId.indexOf(mediaIds[streamName]) === 0 || // Partial match 
+                                  mediaIds[streamName].indexOf(webrtcStreamId) === 0 // Partial match
+                        )
+                    ) {
                         return streamName;
                     }
                 }
+
                 //
                 // a stream from chrome to firefox will be missing it's id/label.
                 // there is no correct solution.
@@ -3492,9 +3501,7 @@ var Easyrtc = function() {
             var peerStream = peerStreams[i],
                 streamId = peerStream.id || "default";
             clearTimeout(peerConn.trackTimers[streamId]);
-            peerConn.trackTimers[streamId] = setTimeout(function(peerStream) {
-               processAddedStream(peerConn, otherUser, peerStream);
-            }.bind(peerStream), 100); // Bind peerStream
+            peerConn.trackTimers[streamId] = setTimeout(processAddedStream.bind(null, otherUser, peerStream), 100); // Bind peerStream
         }
     }
 
@@ -3665,13 +3672,12 @@ var Easyrtc = function() {
             };
 
             pc.ontrack = function(event) {
-                logDebug("empty ontrack method invoked, which is expected");
+                logDebug("saw ontrack method invoked, which is expected");
                 processAddedTrack(otherUser, event.streams);
             };
 
             pc.onaddstream = function(event) {
                 logDebug("empty onaddstream method invoked, which is expected");
-                processAddedStream(otherUser, event.stream);
             };
 
             pc.onremovestream = function(event) {
@@ -3990,11 +3996,13 @@ var Easyrtc = function() {
                 sd.sdp = sdpRemoteFilter(sd.sdp);
             }
             pc.setRemoteDescription(sd, invokeCreateAnswer, function(message) {
-                self.showError(self.errCodes.INTERNAL_ERR, "set-remote-description: " + message);
+                self.showError(self.errCodes.INTERNAL_ERR, "doAnswerBody setRemoteDescription failed: " + message);
+                // TODO sendSignaling reject/failure
             });
         } catch (srdError) {
             logDebug("set remote description failed");
-            self.showError(self.errCodes.INTERNAL_ERR, "setRemoteDescription failed: " + srdError.message);
+            self.showError(self.errCodes.INTERNAL_ERR, "doAnswerBody setRemoteDescription error: " + srdError.message);
+            // TODO sendSignaling reject/failure
         }
     }
 
@@ -4149,27 +4157,22 @@ var Easyrtc = function() {
         // call B as a positive offer to B's offer.
         //
         if (offersPending[otherUser]) {
+
             wasAcceptedCB(true, otherUser);
             doAnswer(otherUser, offersPending[otherUser], streamNames);
-            delete offersPending[otherUser];
             self.callCancelled(otherUser, false);
-            return;
-        }
-
+         
         // do we already have a pending call?
-        if (typeof acceptancePending[otherUser] !== 'undefined') {
+        } else if (typeof acceptancePending[otherUser] !== 'undefined') {
             message = "Call already pending acceptance";
             logDebug(message);
             callFailureCB(self.errCodes.ALREADY_CONNECTED, message);
-            return;
-        }
 
-        if (use_fresh_ice_each_peer) {
+        } else if (use_fresh_ice_each_peer) {
             self.getFreshIceConfig(function(succeeded) {
                 if (succeeded) {
                     callBody(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB, streamNames);
-                }
-                else {
+                } else {
                     callFailureCB(self.errCodes.CALL_ERR, "Attempt to get fresh ice configuration failed");
                 }
             });
@@ -4443,7 +4446,7 @@ var Easyrtc = function() {
                self.sendPeerMessage(easyrtcid, "__gotAddedMediaStream", {sdp: sdp});
             };
 
-            logDebug("about to call setRemoteDescription in doAnswer");
+            logDebug("about to call setRemoteDescription in addedMediaStream");
 
             try {
 
@@ -4452,11 +4455,13 @@ var Easyrtc = function() {
                 }
                 pc.setRemoteDescription(new RTCSessionDescription(sdp),
                    invokeCreateAnswer, function(message) {
-                    self.showError(self.errCodes.INTERNAL_ERR, "set-remote-description: " + message);
+                    self.showError(self.errCodes.INTERNAL_ERR, "addedMediaStream setRemoteDescription failed: " + message);
+                    // TODO sendSignaling reject/failure
                 });
             } catch (srdError) {
                 logDebug("saw exception in setRemoteDescription", srdError);
-                self.showError(self.errCodes.INTERNAL_ERR, "setRemoteDescription failed: " + srdError.message);
+                self.showError(self.errCodes.INTERNAL_ERR, "addedMediaStream setRemoteDescription error: " + srdError.message);
+                // TODO sendSignaling reject/failure
             }
         }
     }, "__addedMediaStream");
@@ -4473,7 +4478,8 @@ var Easyrtc = function() {
             var pc = peerConns[easyrtcid].pc;
             pc.setRemoteDescription(new RTCSessionDescription(sdp), function(){},
                     function(message) {
-                       self.showError(self.errCodes.INTERNAL_ERR, "set-remote-description: " + message);
+                       self.showError(self.errCodes.INTERNAL_ERR, "gotAddedMediaStream setRemoteDescription failed: " + message);
+                       // TODO sendSignaling reject/failure
                     });
         }
 
@@ -5030,11 +5036,14 @@ var Easyrtc = function() {
                         pc.connectDataConnection(5001, 5002); // these are like ids for data channels
                     }
                 }, function(message){
-                     logDebug("setRemoteDescription failed ", message);
+                     logDebug("processAnswer setRemoteDescription failed: ", message);
+                    // TODO sendSignaling reject/failure
                  });
             } catch (smdException) {
-                logDebug("setRemoteDescription failed ", smdException);
+                logDebug("processAnswer setRemoteDescription error: ", smdException);
+                // TODO sendSignaling reject/failure
             }
+
             flushCachedCandidates(caller);
         }
 
