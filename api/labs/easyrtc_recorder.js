@@ -1,4 +1,4 @@
-/* global define, module, require, console */
+/* global define, module, require, console, MediaRecorder */
 /*!
   Script: easyrtc_recorder.js
 
@@ -31,8 +31,6 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
-"use strict";
-
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         //RequireJS (AMD) build system
@@ -48,6 +46,8 @@
         root.easyrtc = factory(window.easyrtc);
   }
 }(this, function (easyrtc, undefined) {
+
+"use strict";
 
     /**
      * Provides methods for building MediaStream recorders.
@@ -141,22 +141,22 @@
 
         mediaRecorder.onerror = function(e) {
            console.log("Media recording error:", e);
-        }
+        };
 
         mediaRecorder.onwarning = function(e) {
            console.log("Media recording error:", e);
-        }
+        };
     
         mediaRecorder.onstart = function(e) {
            console.log("Media recording started");
-        }
+        };
 
         mediaRecorder.onstop = function(e) {
            console.log("Media recording stopped");
-        }
+        };
 
         return mediaRecorder;
-   };
+   }
 
    /** This method creates a media recorder and populates it's ondataavailable
      * method so that your own callback gets called with the data.
@@ -172,9 +172,11 @@
        if( !mediaRecorder) {
            return null;
        }
+
        mediaRecorder.ondataavailable = function(e) {
            dataCallback(e.data);
-       }
+       };
+
        return mediaRecorder;
    };
 
@@ -204,7 +206,8 @@
        mediaRecorder.onstop = function() {
             blobCallback( new Blob(chunks, {type:"video/webm"}));
             chunks = [];
-       }
+       };
+       
        return mediaRecorder;
    };
 

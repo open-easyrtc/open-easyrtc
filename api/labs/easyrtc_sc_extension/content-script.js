@@ -1,4 +1,6 @@
-﻿// this content-script plays role of medium to publish/subscribe messages from webpage to the background script
+﻿/* global chrome */
+
+// this content-script plays role of medium to publish/subscribe messages from webpage to the background script
 
 // this object is used to make sure our extension isn't conflicted with irrelevant messages!
 var rtcmulticonnectionMessages = {
@@ -20,20 +22,22 @@ port.onMessage.addListener(function (message) {
 window.addEventListener('message', function (event) {
 
     // if invalid source
-    if (event.source != window) {
+    if (event.source !== window) {
         return;
     }
         
     // it is 3rd party message
-    if(!rtcmulticonnectionMessages[event.data]) return;
+    if (!rtcmulticonnectionMessages[event.data]) {
+        return;
+    }
         
     // if browser is asking whether extension is available
-    if(event.data == 'is-extension-loaded') {
+    if (event.data === 'is-extension-loaded') {
         return window.postMessage('extension-loaded', '*');
     }
 
     // if it is something that need to be shared with background script
-    if(event.data == 'get-sourceId') {
+    if (event.data === 'get-sourceId') {
         // forward message to background script
         port.postMessage(event.data);
     }
