@@ -1911,6 +1911,12 @@ var Easyrtc = function() {
      *
      */
     this.clearMediaStream = function(element) {
+
+        // Prevent The play() request was interrupted by a new load request.
+        if (element && element.pause) {
+            element.pause();
+        }
+
         if (typeof element.src !== 'undefined') {
             //noinspection JSUndefinedPropertyAssignment
             element.src = "";
