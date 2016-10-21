@@ -105,6 +105,7 @@ EasyRTC comes with a number of demo's which work immediately after installation.
  * Text Messaging with or without Data Channels
  * Screen and tab sharing
  * File transfer
+ * Client side video recording
 
 
 Links for help and information
