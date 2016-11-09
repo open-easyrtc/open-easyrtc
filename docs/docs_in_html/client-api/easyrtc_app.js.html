@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>EasyRTC Documentation</title>
+  <script src="scripts/prettify/prettify.js"> </script>
+  <script src="scripts/prettify/lang-css.js"> </script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+  <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+  <link href="../assets/easyrtc-docs-jsdoc-styles-1.css" media="all" rel="stylesheet" />
+</head>
+<body>
+<header class="template">
+	<div class="wrapper-content">
+    <a href="../index.html"><img src="../assets/easyrtc-logo.png" alt="EasyRTC Documentation"></a>
+		<h1 title="EasyRTC Documentation">Documentation</h1>
+	</div>
+</header>
+<div class="wrapper-docs">
+<nav>
+	<h2><a href="../index.html">Docs Home</a></h2>
+	<h3>EasyRTC Guides</h3>
+	<ul>
+		<li><a href="../easyrtc_faq.html">FAQ</a></li>
+		<li><a href="../easyrtc_gettingStarted.html">Getting Started</a></li>
+		<li><a href="../easyrtc_server_install.html">EasyRTC Server: Installation</a></li>
+		<li><a href="../easyrtc_client_tutorial.html">EasyRTC Framework Tutorial</a></li>
+		<li><a href="../easyrtc_rooms.html">Rooms</a></li>
+		<li><a href="../easyrtc_server_configuration.html">EasyRTC Server: Configuration</a></li>
+		<li><a href="../easyrtc_server_events.html">EasyRTC Server: Events</a></li>
+		<li><a href="../easyrtc_server_ice.html">EasyRTC Server: ICE Configuration</a></li>
+		<li><a href="../easyrtc_with_other_servers.html">Using Alongside Other Servers</a></li>
+		<li><a href="../easyrtc_server_ssl.html">EasyRTC Server: Using SSL</a></li>
+		<li><a href="../easyrtc_webrtc_problems.html">WebRTC Problems and Possible Fixes</a></li>
+		<li><a href="../easyrtc_upcoming_features.html">Upcoming Features</a></li>
+		<li><a href="../easyrtc_changelog.html">Change Log</a></li>
+	</ul>
+	<h3>EasyRTC Client Classes</h3>
+	<ul>
+		<li><a href="../client-api/Easyrtc.html">Easyrtc</a></li>
+		<li><a href="../client-api/Easyrtc_App.html">Easyrtc_App</a></li>
+		<li><a href="../client-api/Easyrtc_ft.html">Easyrtc_ft</a></li>
+		<li><a href="../client-api/Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_Rates.html">Easyrtc_Rates</a></li>
+		<li><a href="../client-api/Easyrtc_Recorder.html">Easyrtc_Recorder</a></li>
+	</ul>
+	<h3>EasyRTC Server Modules</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li>
+		<li><a href="../server-api/module-easyrtc_default_options.html">easyrtc_default_options</a></li>
+		<li><a href="../server-api/module-easyrtc_private_obj.html">easyrtc_private_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj.html">easyrtc_public_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_util.html">easyrtc_util</a></li>
+		<li><a href="../server-api/module-general_util.html">general_util</a></li>
+	</ul>
+	<h3>EasyRTC Server Classes</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.html">pub</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.events.html">events</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.util.html">util</a></li>
+		<li><a href="../server-api/module-easyrtc_util-eu.html">eu</a></li>
+		<li><a href="../server-api/module-general_util-g.html">g</a></li>
+		<li><a href="../server-api/pub.appObj.html">appObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.html">connectionObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li>
+		<li><a href="../server-api/pub.appObj.roomObj.html">roomObj</a></li>
+		<li><a href="../server-api/pub.appObj.sessionObj.html">sessionObj</a></li>
+	</ul>
+</nav>
+<div class="easyrtc-docs-content">
+<div id="main">
+<h1 class="page-title">Source: easyrtc_app.js</h1>
+<section>
+<article>
+<pre class="prettyprint source linenums easyrtc"><code><a name="line1"></a><div class="linenumber">1</div><div style="width:0em;display:inline-block"></div>/*&nbsp;global&nbsp;define,&nbsp;module,&nbsp;require,&nbsp;console&nbsp;*/
+<a name="line2"></a><div class="linenumber">2</div><div style="width:0em;display:inline-block"></div>/*!
+<a name="line3"></a><div class="linenumber">3</div><div style="width:1em;display:inline-block"></div>Script:&nbsp;easyrtc_app.js
+<a name="line4"></a><div class="linenumber">4</div>
+<a name="line5"></a><div class="linenumber">5</div><div style="width:2em;display:inline-block"></div>Provides&nbsp;support&nbsp;file&nbsp;and&nbsp;data&nbsp;transfer&nbsp;support&nbsp;to&nbsp;easyrtc.
+<a name="line6"></a><div class="linenumber">6</div>
+<a name="line7"></a><div class="linenumber">7</div><div style="width:1em;display:inline-block"></div>About:&nbsp;License
+<a name="line8"></a><div class="linenumber">8</div>
+<a name="line9"></a><div class="linenumber">9</div><div style="width:2em;display:inline-block"></div>Copyright&nbsp;(c)&nbsp;2016,&nbsp;Priologic&nbsp;Software&nbsp;Inc.
+<a name="line10"></a><div class="linenumber">10</div><div style="width:2em;display:inline-block"></div>All&nbsp;rights&nbsp;reserved.
+<a name="line11"></a><div class="linenumber">11</div>
+<a name="line12"></a><div class="linenumber">12</div><div style="width:2em;display:inline-block"></div>Redistribution&nbsp;and&nbsp;use&nbsp;in&nbsp;source&nbsp;and&nbsp;binary&nbsp;forms,&nbsp;with&nbsp;or&nbsp;without
+<a name="line13"></a><div class="linenumber">13</div><div style="width:2em;display:inline-block"></div>modification,&nbsp;are&nbsp;permitted&nbsp;provided&nbsp;that&nbsp;the&nbsp;following&nbsp;conditions&nbsp;are&nbsp;met:
+<a name="line14"></a><div class="linenumber">14</div>
+<a name="line15"></a><div class="linenumber">15</div><div style="width:4em;display:inline-block"></div>*&nbsp;Redistributions&nbsp;of&nbsp;source&nbsp;code&nbsp;must&nbsp;retain&nbsp;the&nbsp;above&nbsp;copyright&nbsp;notice,
+<a name="line16"></a><div class="linenumber">16</div><div style="width:5em;display:inline-block"></div>this&nbsp;list&nbsp;of&nbsp;conditions&nbsp;and&nbsp;the&nbsp;following&nbsp;disclaimer.
+<a name="line17"></a><div class="linenumber">17</div><div style="width:4em;display:inline-block"></div>*&nbsp;Redistributions&nbsp;in&nbsp;binary&nbsp;form&nbsp;must&nbsp;reproduce&nbsp;the&nbsp;above&nbsp;copyright
+<a name="line18"></a><div class="linenumber">18</div><div style="width:5em;display:inline-block"></div>notice,&nbsp;this&nbsp;list&nbsp;of&nbsp;conditions&nbsp;and&nbsp;the&nbsp;following&nbsp;disclaimer&nbsp;in&nbsp;the
+<a name="line19"></a><div class="linenumber">19</div><div style="width:5em;display:inline-block"></div>documentation&nbsp;and/or&nbsp;other&nbsp;materials&nbsp;provided&nbsp;with&nbsp;the&nbsp;distribution.
+<a name="line20"></a><div class="linenumber">20</div>
+<a name="line21"></a><div class="linenumber">21</div><div style="width:2em;display:inline-block"></div>THIS&nbsp;SOFTWARE&nbsp;IS&nbsp;PROVIDED&nbsp;BY&nbsp;THE&nbsp;COPYRIGHT&nbsp;HOLDERS&nbsp;AND&nbsp;CONTRIBUTORS&nbsp;"AS&nbsp;IS"
+<a name="line22"></a><div class="linenumber">22</div><div style="width:2em;display:inline-block"></div>AND&nbsp;ANY&nbsp;EXPRESS&nbsp;OR&nbsp;IMPLIED&nbsp;WARRANTIES,&nbsp;INCLUDING,&nbsp;BUT&nbsp;NOT&nbsp;LIMITED&nbsp;TO,&nbsp;THE
+<a name="line23"></a><div class="linenumber">23</div><div style="width:2em;display:inline-block"></div>IMPLIED&nbsp;WARRANTIES&nbsp;OF&nbsp;MERCHANTABILITY&nbsp;AND&nbsp;FITNESS&nbsp;FOR&nbsp;A&nbsp;PARTICULAR&nbsp;PURPOSE
+<a name="line24"></a><div class="linenumber">24</div><div style="width:2em;display:inline-block"></div>ARE&nbsp;DISCLAIMED.&nbsp;IN&nbsp;NO&nbsp;EVENT&nbsp;SHALL&nbsp;THE&nbsp;COPYRIGHT&nbsp;HOLDER&nbsp;OR&nbsp;CONTRIBUTORS&nbsp;BE
+<a name="line25"></a><div class="linenumber">25</div><div style="width:2em;display:inline-block"></div>LIABLE&nbsp;FOR&nbsp;ANY&nbsp;DIRECT,&nbsp;INDIRECT,&nbsp;INCIDENTAL,&nbsp;SPECIAL,&nbsp;EXEMPLARY,&nbsp;OR
+<a name="line26"></a><div class="linenumber">26</div><div style="width:2em;display:inline-block"></div>CONSEQUENTIAL&nbsp;DAMAGES&nbsp;(INCLUDING,&nbsp;BUT&nbsp;NOT&nbsp;LIMITED&nbsp;TO,&nbsp;PROCUREMENT&nbsp;OF
+<a name="line27"></a><div class="linenumber">27</div><div style="width:2em;display:inline-block"></div>SUBSTITUTE&nbsp;GOODS&nbsp;OR&nbsp;SERVICES;&nbsp;LOSS&nbsp;OF&nbsp;USE,&nbsp;DATA,&nbsp;OR&nbsp;PROFITS;&nbsp;OR&nbsp;BUSINESS
+<a name="line28"></a><div class="linenumber">28</div><div style="width:2em;display:inline-block"></div>INTERRUPTION)&nbsp;HOWEVER&nbsp;CAUSED&nbsp;AND&nbsp;ON&nbsp;ANY&nbsp;THEORY&nbsp;OF&nbsp;LIABILITY,&nbsp;WHETHER&nbsp;IN
+<a name="line29"></a><div class="linenumber">29</div><div style="width:2em;display:inline-block"></div>CONTRACT,&nbsp;STRICT&nbsp;LIABILITY,&nbsp;OR&nbsp;TORT&nbsp;(INCLUDING&nbsp;NEGLIGENCE&nbsp;OR&nbsp;OTHERWISE)
+<a name="line30"></a><div class="linenumber">30</div><div style="width:2em;display:inline-block"></div>ARISING&nbsp;IN&nbsp;ANY&nbsp;WAY&nbsp;OUT&nbsp;OF&nbsp;THE&nbsp;USE&nbsp;OF&nbsp;THIS&nbsp;SOFTWARE,&nbsp;EVEN&nbsp;IF&nbsp;ADVISED&nbsp;OF&nbsp;THE
+<a name="line31"></a><div class="linenumber">31</div><div style="width:2em;display:inline-block"></div>POSSIBILITY&nbsp;OF&nbsp;SUCH&nbsp;DAMAGE.
+<a name="line32"></a><div class="linenumber">32</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line33"></a><div class="linenumber">33</div>
+<a name="line34"></a><div class="linenumber">34</div><div style="width:0em;display:inline-block"></div>(function&nbsp;(root,&nbsp;factory)&nbsp;{
+<a name="line35"></a><div class="linenumber">35</div><div style="width:2em;display:inline-block"></div>if&nbsp;(typeof&nbsp;define&nbsp;===&nbsp;'function'&nbsp;&amp;&amp;&nbsp;define.amd)&nbsp;{
+<a name="line36"></a><div class="linenumber">36</div><div style="width:4em;display:inline-block"></div>//RequireJS&nbsp;(AMD)&nbsp;build&nbsp;system
+<a name="line37"></a><div class="linenumber">37</div><div style="width:4em;display:inline-block"></div>define(['easyrtc'],&nbsp;factory);
+<a name="line38"></a><div class="linenumber">38</div><div style="width:2em;display:inline-block"></div>}&nbsp;else&nbsp;if&nbsp;(typeof&nbsp;module&nbsp;===&nbsp;'object'&nbsp;&amp;&amp;&nbsp;module.exports)&nbsp;{
+<a name="line39"></a><div class="linenumber">39</div><div style="width:4em;display:inline-block"></div>//CommonJS&nbsp;build&nbsp;system
+<a name="line40"></a><div class="linenumber">40</div><div style="width:4em;display:inline-block"></div>module.exports&nbsp;=&nbsp;factory(require('easyrtc'));
+<a name="line41"></a><div class="linenumber">41</div><div style="width:2em;display:inline-block"></div>}&nbsp;else&nbsp;{
+<a name="line42"></a><div class="linenumber">42</div><div style="width:4em;display:inline-block"></div>//Vanilla&nbsp;JS,&nbsp;ensure&nbsp;dependencies&nbsp;are&nbsp;loaded&nbsp;correctly
+<a name="line43"></a><div class="linenumber">43</div><div style="width:4em;display:inline-block"></div>if&nbsp;(typeof&nbsp;window.easyrtc&nbsp;!==&nbsp;'object'&nbsp;||&nbsp;!window.easyrtc)&nbsp;{
+<a name="line44"></a><div class="linenumber">44</div><div style="width:6em;display:inline-block"></div>throw&nbsp;new&nbsp;Error("easyrtc_app&nbsp;requires&nbsp;easyrtc");
+<a name="line45"></a><div class="linenumber">45</div><div style="width:4em;display:inline-block"></div>}
+<a name="line46"></a><div class="linenumber">46</div><div style="width:4em;display:inline-block"></div>root.easyrtc&nbsp;=&nbsp;factory(window.easyrtc);
+<a name="line47"></a><div class="linenumber">47</div><div style="width:1em;display:inline-block"></div>}
+<a name="line48"></a><div class="linenumber">48</div><div style="width:0em;display:inline-block"></div>}(this,&nbsp;function&nbsp;(easyrtc,&nbsp;undefined)&nbsp;{
+<a name="line49"></a><div class="linenumber">49</div>
+<a name="line50"></a><div class="linenumber">50</div><div style="width:2em;display:inline-block"></div>"use&nbsp;strict";
+<a name="line51"></a><div class="linenumber">51</div>
+<a name="line52"></a><div class="linenumber">52</div><div style="width:2em;display:inline-block"></div>/**
+<a name="line53"></a><div class="linenumber">53</div><div style="width:2em;display:inline-block"></div>*&nbsp;This&nbsp;file&nbsp;adds&nbsp;additional&nbsp;methods&nbsp;to&nbsp;Easyrtc&nbsp;for&nbsp;simplifying&nbsp;the&nbsp;
+<a name="line54"></a><div class="linenumber">54</div><div style="width:2em;display:inline-block"></div>*&nbsp;management&nbsp;of&nbsp;video-mediastream&nbsp;assignment.
+<a name="line55"></a><div class="linenumber">55</div><div style="width:2em;display:inline-block"></div>*&nbsp;@class&nbsp;Easyrtc_App
+<a name="line56"></a><div class="linenumber">56</div><div style="width:2em;display:inline-block"></div>*/
+<a name="line57"></a><div class="linenumber">57</div>
+<a name="line58"></a><div class="linenumber">58</div><div style="width:2em;display:inline-block"></div>/**&nbsp;@private&nbsp;*/
+<a name="line59"></a><div class="linenumber">59</div><div style="width:2em;display:inline-block"></div>var&nbsp;autoAddCloseButtons&nbsp;=&nbsp;true;
+<a name="line60"></a><div class="linenumber">60</div>
+<a name="line61"></a><div class="linenumber">61</div><div style="width:2em;display:inline-block"></div>/**&nbsp;By&nbsp;default,&nbsp;the&nbsp;easyApp&nbsp;routine&nbsp;sticks&nbsp;a&nbsp;"close"&nbsp;button&nbsp;on&nbsp;top&nbsp;of&nbsp;each&nbsp;caller
+<a name="line62"></a><div class="linenumber">62</div><div style="width:2em;display:inline-block"></div>*&nbsp;video&nbsp;object&nbsp;that&nbsp;it&nbsp;manages.&nbsp;Call&nbsp;this&nbsp;function(before&nbsp;calling&nbsp;easyApp)&nbsp;to&nbsp;disable&nbsp;that&nbsp;particular&nbsp;feature.
+<a name="line63"></a><div class="linenumber">63</div><div style="width:2em;display:inline-block"></div>*&nbsp;@function
+<a name="line64"></a><div class="linenumber">64</div><div style="width:2em;display:inline-block"></div>*&nbsp;@memberOf&nbsp;Easyrtc_App
+<a name="line65"></a><div class="linenumber">65</div><div style="width:2em;display:inline-block"></div>*&nbsp;@example
+<a name="line66"></a><div class="linenumber">66</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;easyrtc.dontAddCloseButtons();
+<a name="line67"></a><div class="linenumber">67</div><div style="width:2em;display:inline-block"></div>*/
+<a name="line68"></a><div class="linenumber">68</div><div style="width:2em;display:inline-block"></div>easyrtc.dontAddCloseButtons&nbsp;=&nbsp;function()&nbsp;{
+<a name="line69"></a><div class="linenumber">69</div><div style="width:4em;display:inline-block"></div>autoAddCloseButtons&nbsp;=&nbsp;false;
+<a name="line70"></a><div class="linenumber">70</div><div style="width:2em;display:inline-block"></div>};
+<a name="line71"></a><div class="linenumber">71</div>
+<a name="line72"></a><div class="linenumber">72</div><div style="width:2em;display:inline-block"></div>/**
+<a name="line73"></a><div class="linenumber">73</div><div style="width:2em;display:inline-block"></div>*&nbsp;This&nbsp;is&nbsp;a&nbsp;helper&nbsp;function&nbsp;for&nbsp;the&nbsp;easyApp&nbsp;method.&nbsp;It&nbsp;manages&nbsp;the&nbsp;assignment&nbsp;of&nbsp;video&nbsp;streams
+<a name="line74"></a><div class="linenumber">74</div><div style="width:2em;display:inline-block"></div>*&nbsp;to&nbsp;video&nbsp;objects.&nbsp;It&nbsp;assumes
+<a name="line75"></a><div class="linenumber">75</div><div style="width:2em;display:inline-block"></div>*&nbsp;@param&nbsp;{String}&nbsp;monitorVideoId&nbsp;is&nbsp;the&nbsp;id&nbsp;of&nbsp;the&nbsp;mirror&nbsp;video&nbsp;tag.
+<a name="line76"></a><div class="linenumber">76</div><div style="width:2em;display:inline-block"></div>*&nbsp;@param&nbsp;{Array}&nbsp;videoIds&nbsp;is&nbsp;an&nbsp;array&nbsp;of&nbsp;ids&nbsp;of&nbsp;the&nbsp;caller&nbsp;video&nbsp;tags.
+<a name="line77"></a><div class="linenumber">77</div><div style="width:2em;display:inline-block"></div>*&nbsp;@private
+<a name="line78"></a><div class="linenumber">78</div><div style="width:2em;display:inline-block"></div>*/
+<a name="line79"></a><div class="linenumber">79</div><div style="width:2em;display:inline-block"></div>function&nbsp;easyAppBody(monitorVideoId,&nbsp;videoIds)&nbsp;{
+<a name="line80"></a><div class="linenumber">80</div>
+<a name="line81"></a><div class="linenumber">81</div><div style="width:4em;display:inline-block"></div>var&nbsp;videoIdsP&nbsp;=&nbsp;videoIds&nbsp;||&nbsp;[],
+<a name="line82"></a><div class="linenumber">82</div><div style="width:6em;display:inline-block"></div>numPEOPLE&nbsp;=&nbsp;videoIds.length,
+<a name="line83"></a><div class="linenumber">83</div><div style="width:6em;display:inline-block"></div>videoIdToCallerMap&nbsp;=&nbsp;{},
+<a name="line84"></a><div class="linenumber">84</div><div style="width:6em;display:inline-block"></div>onCall&nbsp;=&nbsp;null,&nbsp;
+<a name="line85"></a><div class="linenumber">85</div><div style="width:6em;display:inline-block"></div>onHangup&nbsp;=&nbsp;null;
+<a name="line86"></a><div class="linenumber">86</div>
+<a name="line87"></a><div class="linenumber">87</div><div style="width:4em;display:inline-block"></div>/**
+<a name="line88"></a><div class="linenumber">88</div><div style="width:4em;display:inline-block"></div>*&nbsp;Validates&nbsp;that&nbsp;the&nbsp;video&nbsp;ids&nbsp;correspond&nbsp;to&nbsp;dom&nbsp;objects.
+<a name="line89"></a><div class="linenumber">89</div><div style="width:4em;display:inline-block"></div>*&nbsp;@param&nbsp;{String}&nbsp;monitorVideoId
+<a name="line90"></a><div class="linenumber">90</div><div style="width:4em;display:inline-block"></div>*&nbsp;@param&nbsp;{Array}&nbsp;videoIds
+<a name="line91"></a><div class="linenumber">91</div><div style="width:4em;display:inline-block"></div>*&nbsp;@returns&nbsp;{Boolean}
+<a name="line92"></a><div class="linenumber">92</div><div style="width:4em;display:inline-block"></div>*&nbsp;@private
+<a name="line93"></a><div class="linenumber">93</div><div style="width:4em;display:inline-block"></div>*/
+<a name="line94"></a><div class="linenumber">94</div><div style="width:4em;display:inline-block"></div>function&nbsp;validateVideoIds(monitorVideoId,&nbsp;videoIds)&nbsp;{
+<a name="line95"></a><div class="linenumber">95</div><div style="width:6em;display:inline-block"></div>var&nbsp;i;
+<a name="line96"></a><div class="linenumber">96</div><div style="width:6em;display:inline-block"></div>//&nbsp;verify&nbsp;that&nbsp;video&nbsp;ids&nbsp;were&nbsp;not&nbsp;typos.
+<a name="line97"></a><div class="linenumber">97</div><div style="width:6em;display:inline-block"></div>if&nbsp;(monitorVideoId&nbsp;&amp;&amp;&nbsp;!document.getElementById(monitorVideoId))&nbsp;{
+<a name="line98"></a><div class="linenumber">98</div><div style="width:8em;display:inline-block"></div>easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR,&nbsp;"The&nbsp;monitor&nbsp;video&nbsp;id&nbsp;passed&nbsp;to&nbsp;easyApp&nbsp;was&nbsp;bad,&nbsp;saw&nbsp;"&nbsp;+&nbsp;monitorVideoId);
+<a name="line99"></a><div class="linenumber">99</div><div style="width:8em;display:inline-block"></div>return&nbsp;false;
+<a name="line100"></a><div class="linenumber">100</div><div style="width:6em;display:inline-block"></div>}
+<a name="line101"></a><div class="linenumber">101</div>
+<a name="line102"></a><div class="linenumber">102</div><div style="width:6em;display:inline-block"></div>for&nbsp;(i&nbsp;in&nbsp;videoIds)&nbsp;{
+<a name="line103"></a><div class="linenumber">103</div><div style="width:8em;display:inline-block"></div>if&nbsp;(!videoIds.hasOwnProperty(i))&nbsp;{
+<a name="line104"></a><div class="linenumber">104</div><div style="width:10em;display:inline-block"></div>continue;
+<a name="line105"></a><div class="linenumber">105</div><div style="width:8em;display:inline-block"></div>}
+<a name="line106"></a><div class="linenumber">106</div><div style="width:8em;display:inline-block"></div>var&nbsp;name&nbsp;=&nbsp;videoIds[i];
+<a name="line107"></a><div class="linenumber">107</div><div style="width:8em;display:inline-block"></div>if&nbsp;(!document.getElementById(name))&nbsp;{
+<a name="line108"></a><div class="linenumber">108</div><div style="width:10em;display:inline-block"></div>easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR,&nbsp;"The&nbsp;caller&nbsp;video&nbsp;id&nbsp;'"&nbsp;+&nbsp;name&nbsp;+&nbsp;"'&nbsp;passed&nbsp;to&nbsp;easyApp&nbsp;was&nbsp;bad.");
+<a name="line109"></a><div class="linenumber">109</div><div style="width:10em;display:inline-block"></div>return&nbsp;false;
+<a name="line110"></a><div class="linenumber">110</div><div style="width:8em;display:inline-block"></div>}
+<a name="line111"></a><div class="linenumber">111</div><div style="width:6em;display:inline-block"></div>}
+<a name="line112"></a><div class="linenumber">112</div><div style="width:6em;display:inline-block"></div>return&nbsp;true;
+<a name="line113"></a><div class="linenumber">113</div><div style="width:4em;display:inline-block"></div>}
+<a name="line114"></a><div class="linenumber">114</div>
+<a name="line115"></a><div class="linenumber">115</div>
+<a name="line116"></a><div class="linenumber">116</div><div style="width:4em;display:inline-block"></div>function&nbsp;getCallerOfVideo(videoObject)&nbsp;{
+<a name="line117"></a><div class="linenumber">117</div><div style="width:6em;display:inline-block"></div>return&nbsp;videoIdToCallerMap[videoObject.id];
+<a name="line118"></a><div class="linenumber">118</div><div style="width:4em;display:inline-block"></div>}
+<a name="line119"></a><div class="linenumber">119</div>
+<a name="line120"></a><div class="linenumber">120</div><div style="width:4em;display:inline-block"></div>function&nbsp;setCallerOfVideo(videoObject,&nbsp;callerEasyrtcId)&nbsp;{
+<a name="line121"></a><div class="linenumber">121</div><div style="width:6em;display:inline-block"></div>videoIdToCallerMap[videoObject.id]&nbsp;=&nbsp;callerEasyrtcId;
+<a name="line122"></a><div class="linenumber">122</div><div style="width:4em;display:inline-block"></div>}
+<a name="line123"></a><div class="linenumber">123</div>
+<a name="line124"></a><div class="linenumber">124</div><div style="width:4em;display:inline-block"></div>function&nbsp;videoIsFree(obj)&nbsp;{
+<a name="line125"></a><div class="linenumber">125</div><div style="width:6em;display:inline-block"></div>var&nbsp;caller&nbsp;=&nbsp;getCallerOfVideo(obj);
+<a name="line126"></a><div class="linenumber">126</div><div style="width:6em;display:inline-block"></div>return&nbsp;(caller&nbsp;===&nbsp;""&nbsp;||&nbsp;caller&nbsp;===&nbsp;null&nbsp;||&nbsp;caller&nbsp;===&nbsp;undefined);
+<a name="line127"></a><div class="linenumber">127</div><div style="width:4em;display:inline-block"></div>}
+<a name="line128"></a><div class="linenumber">128</div>
+<a name="line129"></a><div class="linenumber">129</div><div style="width:4em;display:inline-block"></div>function&nbsp;getIthVideo(i)&nbsp;{
+<a name="line130"></a><div class="linenumber">130</div><div style="width:6em;display:inline-block"></div>if&nbsp;(videoIdsP[i])&nbsp;{
+<a name="line131"></a><div class="linenumber">131</div><div style="width:8em;display:inline-block"></div>return&nbsp;document.getElementById(videoIdsP[i]);
+<a name="line132"></a><div class="linenumber">132</div><div style="width:6em;display:inline-block"></div>}
+<a name="line133"></a><div class="linenumber">133</div><div style="width:6em;display:inline-block"></div>else&nbsp;{
+<a name="line134"></a><div class="linenumber">134</div><div style="width:8em;display:inline-block"></div>return&nbsp;null;
+<a name="line135"></a><div class="linenumber">135</div><div style="width:6em;display:inline-block"></div>}
+<a name="line136"></a><div class="linenumber">136</div><div style="width:4em;display:inline-block"></div>}
+<a name="line137"></a><div class="linenumber">137</div>
+<a name="line138"></a><div class="linenumber">138</div><div style="width:4em;display:inline-block"></div>function&nbsp;showVideo(video,&nbsp;stream)&nbsp;{
+<a name="line139"></a><div class="linenumber">139</div><div style="width:6em;display:inline-block"></div>easyrtc.setVideoObjectSrc(video,&nbsp;stream);
+<a name="line140"></a><div class="linenumber">140</div><div style="width:6em;display:inline-block"></div>if&nbsp;(video.style.visibility)&nbsp;{
+<a name="line141"></a><div class="linenumber">141</div><div style="width:8em;display:inline-block"></div>video.style.visibility&nbsp;=&nbsp;'visible';
+<a name="line142"></a><div class="linenumber">142</div><div style="width:6em;display:inline-block"></div>}
+<a name="line143"></a><div class="linenumber">143</div><div style="width:4em;display:inline-block"></div>}
+<a name="line144"></a><div class="linenumber">144</div>
+<a name="line145"></a><div class="linenumber">145</div><div style="width:4em;display:inline-block"></div>function&nbsp;hideVideo(video)&nbsp;{
+<a name="line146"></a><div class="linenumber">146</div><div style="width:6em;display:inline-block"></div>easyrtc.setVideoObjectSrc(video,&nbsp;"");
+<a name="line147"></a><div class="linenumber">147</div><div style="width:6em;display:inline-block"></div>video.style.visibility&nbsp;=&nbsp;"hidden";
+<a name="line148"></a><div class="linenumber">148</div><div style="width:4em;display:inline-block"></div>}
+<a name="line149"></a><div class="linenumber">149</div>
+<a name="line150"></a><div class="linenumber">150</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!validateVideoIds(monitorVideoId,&nbsp;videoIdsP))&nbsp;{
+<a name="line151"></a><div class="linenumber">151</div><div style="width:6em;display:inline-block"></div>throw&nbsp;"bad&nbsp;video&nbsp;element&nbsp;id";
+<a name="line152"></a><div class="linenumber">152</div><div style="width:4em;display:inline-block"></div>}
+<a name="line153"></a><div class="linenumber">153</div>
+<a name="line154"></a><div class="linenumber">154</div><div style="width:4em;display:inline-block"></div>if&nbsp;(monitorVideoId)&nbsp;{
+<a name="line155"></a><div class="linenumber">155</div><div style="width:6em;display:inline-block"></div>document.getElementById(monitorVideoId).muted&nbsp;=&nbsp;"muted";
+<a name="line156"></a><div class="linenumber">156</div><div style="width:4em;display:inline-block"></div>}
+<a name="line157"></a><div class="linenumber">157</div>
+<a name="line158"></a><div class="linenumber">158</div><div style="width:4em;display:inline-block"></div>easyrtc.addEventListener("roomOccupants",&nbsp;
+<a name="line159"></a><div class="linenumber">159</div><div style="width:6em;display:inline-block"></div>function(eventName,&nbsp;eventData)&nbsp;{
+<a name="line160"></a><div class="linenumber">160</div><div style="width:8em;display:inline-block"></div>var&nbsp;i;
+<a name="line161"></a><div class="linenumber">161</div><div style="width:8em;display:inline-block"></div>for&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;numPEOPLE;&nbsp;i++)&nbsp;{
+<a name="line162"></a><div class="linenumber">162</div><div style="width:10em;display:inline-block"></div>var&nbsp;video&nbsp;=&nbsp;getIthVideo(i);
+<a name="line163"></a><div class="linenumber">163</div><div style="width:10em;display:inline-block"></div>if&nbsp;(!videoIsFree(video))&nbsp;{
+<a name="line164"></a><div class="linenumber">164</div><div style="width:8em;display:inline-block"></div>if(&nbsp;!easyrtc.isPeerInAnyRoom(getCallerOfVideo(video))){
+<a name="line165"></a><div class="linenumber">165</div><div style="width:13em;display:inline-block"></div>if(&nbsp;onHangup&nbsp;)&nbsp;{
+<a name="line166"></a><div class="linenumber">166</div><div style="width:15em;display:inline-block"></div>onHangup(getCallerOfVideo(video),&nbsp;i);
+<a name="line167"></a><div class="linenumber">167</div><div style="width:13em;display:inline-block"></div>}
+<a name="line168"></a><div class="linenumber">168</div><div style="width:13em;display:inline-block"></div>setCallerOfVideo(video,&nbsp;null);
+<a name="line169"></a><div class="linenumber">169</div><div style="width:12em;display:inline-block"></div>}
+<a name="line170"></a><div class="linenumber">170</div><div style="width:10em;display:inline-block"></div>}
+<a name="line171"></a><div class="linenumber">171</div><div style="width:8em;display:inline-block"></div>}
+<a name="line172"></a><div class="linenumber">172</div><div style="width:6em;display:inline-block"></div>}
+<a name="line173"></a><div class="linenumber">173</div><div style="width:4em;display:inline-block"></div>);
+<a name="line174"></a><div class="linenumber">174</div>
+<a name="line175"></a><div class="linenumber">175</div><div style="width:4em;display:inline-block"></div>/**&nbsp;Sets&nbsp;an&nbsp;event&nbsp;handler&nbsp;that&nbsp;gets&nbsp;called&nbsp;when&nbsp;an&nbsp;incoming&nbsp;MediaStream&nbsp;is&nbsp;assigned&nbsp;
+<a name="line176"></a><div class="linenumber">176</div><div style="width:4em;display:inline-block"></div>*&nbsp;to&nbsp;a&nbsp;video&nbsp;object.&nbsp;The&nbsp;name&nbsp;is&nbsp;poorly&nbsp;chosen&nbsp;and&nbsp;reflects&nbsp;a&nbsp;simpler&nbsp;era&nbsp;when&nbsp;you&nbsp;could
+<a name="line177"></a><div class="linenumber">177</div><div style="width:4em;display:inline-block"></div>*&nbsp;only&nbsp;have&nbsp;one&nbsp;media&nbsp;stream&nbsp;per&nbsp;peer&nbsp;connection.
+<a name="line178"></a><div class="linenumber">178</div><div style="width:4em;display:inline-block"></div>*&nbsp;@function
+<a name="line179"></a><div class="linenumber">179</div><div style="width:4em;display:inline-block"></div>*&nbsp;@memberOf&nbsp;Easyrtc_App
+<a name="line180"></a><div class="linenumber">180</div><div style="width:4em;display:inline-block"></div>*&nbsp;@param&nbsp;{Function}&nbsp;cb&nbsp;has&nbsp;the&nbsp;signature&nbsp;function(easyrtcid,&nbsp;slot){}
+<a name="line181"></a><div class="linenumber">181</div><div style="width:4em;display:inline-block"></div>*&nbsp;@example
+<a name="line182"></a><div class="linenumber">182</div><div style="width:4em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;easyrtc.setOnCall(&nbsp;function(easyrtcid,&nbsp;slot){
+<a name="line183"></a><div class="linenumber">183</div><div style="width:4em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.log("call&nbsp;with&nbsp;"&nbsp;+&nbsp;easyrtcid&nbsp;+&nbsp;"established");
+<a name="line184"></a><div class="linenumber">184</div><div style="width:4em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;});
+<a name="line185"></a><div class="linenumber">185</div><div style="width:4em;display:inline-block"></div>*/
+<a name="line186"></a><div class="linenumber">186</div><div style="width:4em;display:inline-block"></div>easyrtc.setOnCall&nbsp;=&nbsp;function(cb)&nbsp;{
+<a name="line187"></a><div class="linenumber">187</div><div style="width:6em;display:inline-block"></div>onCall&nbsp;=&nbsp;cb;
+<a name="line188"></a><div class="linenumber">188</div><div style="width:4em;display:inline-block"></div>};
+<a name="line189"></a><div class="linenumber">189</div>
+<a name="line190"></a><div class="linenumber">190</div><div style="width:4em;display:inline-block"></div>/**&nbsp;Sets&nbsp;an&nbsp;event&nbsp;handler&nbsp;that&nbsp;gets&nbsp;called&nbsp;when&nbsp;a&nbsp;call&nbsp;is&nbsp;ended.
+<a name="line191"></a><div class="linenumber">191</div><div style="width:4em;display:inline-block"></div>*&nbsp;it's&nbsp;only&nbsp;purpose&nbsp;(so&nbsp;far)&nbsp;is&nbsp;to&nbsp;support&nbsp;transitions&nbsp;on&nbsp;video&nbsp;elements.
+<a name="line192"></a><div class="linenumber">192</div><div style="width:4em;display:inline-block"></div>x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;this&nbsp;function&nbsp;is&nbsp;only&nbsp;defined&nbsp;after&nbsp;easyrtc.easyApp&nbsp;is&nbsp;called.
+<a name="line193"></a><div class="linenumber">193</div><div style="width:4em;display:inline-block"></div>*&nbsp;The&nbsp;slot&nbsp;is&nbsp;parameter&nbsp;is&nbsp;the&nbsp;index&nbsp;into&nbsp;the&nbsp;array&nbsp;of&nbsp;video&nbsp;ids.
+<a name="line194"></a><div class="linenumber">194</div><div style="width:4em;display:inline-block"></div>*&nbsp;Note:&nbsp;if&nbsp;you&nbsp;call&nbsp;easyrtc.getConnectionCount()&nbsp;from&nbsp;inside&nbsp;your&nbsp;callback
+<a name="line195"></a><div class="linenumber">195</div><div style="width:4em;display:inline-block"></div>*&nbsp;it's&nbsp;count&nbsp;will&nbsp;reflect&nbsp;the&nbsp;number&nbsp;of&nbsp;connections&nbsp;before&nbsp;the&nbsp;hangup&nbsp;started.
+<a name="line196"></a><div class="linenumber">196</div><div style="width:4em;display:inline-block"></div>*&nbsp;@function
+<a name="line197"></a><div class="linenumber">197</div><div style="width:4em;display:inline-block"></div>*&nbsp;@memberOf&nbsp;Easyrtc_App
+<a name="line198"></a><div class="linenumber">198</div><div style="width:4em;display:inline-block"></div>*&nbsp;@param&nbsp;{Function}&nbsp;cb&nbsp;has&nbsp;the&nbsp;signature&nbsp;function(easyrtcid,&nbsp;slot){}
+<a name="line199"></a><div class="linenumber">199</div><div style="width:4em;display:inline-block"></div>*&nbsp;@example
+<a name="line200"></a><div class="linenumber">200</div><div style="width:4em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;easyrtc.setOnHangup(&nbsp;function(easyrtcid,&nbsp;slot){
+<a name="line201"></a><div class="linenumber">201</div><div style="width:4em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.log("call&nbsp;with&nbsp;"&nbsp;+&nbsp;easyrtcid&nbsp;+&nbsp;"ended");
+<a name="line202"></a><div class="linenumber">202</div><div style="width:4em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;});
+<a name="line203"></a><div class="linenumber">203</div><div style="width:4em;display:inline-block"></div>*/
+<a name="line204"></a><div class="linenumber">204</div><div style="width:4em;display:inline-block"></div>easyrtc.setOnHangup&nbsp;=&nbsp;function(cb)&nbsp;{
+<a name="line205"></a><div class="linenumber">205</div><div style="width:6em;display:inline-block"></div>onHangup&nbsp;=&nbsp;cb;
+<a name="line206"></a><div class="linenumber">206</div><div style="width:4em;display:inline-block"></div>};
+<a name="line207"></a><div class="linenumber">207</div>
+<a name="line208"></a><div class="linenumber">208</div><div style="width:4em;display:inline-block"></div>/**&nbsp;
+<a name="line209"></a><div class="linenumber">209</div><div style="width:5em;display:inline-block"></div>*&nbsp;Get&nbsp;the&nbsp;easyrtcid&nbsp;of&nbsp;the&nbsp;ith&nbsp;caller,&nbsp;starting&nbsp;at&nbsp;0.
+<a name="line210"></a><div class="linenumber">210</div><div style="width:5em;display:inline-block"></div>*&nbsp;@function
+<a name="line211"></a><div class="linenumber">211</div><div style="width:5em;display:inline-block"></div>*&nbsp;@memberOf&nbsp;Easyrtc_App
+<a name="line212"></a><div class="linenumber">212</div><div style="width:5em;display:inline-block"></div>*&nbsp;@param&nbsp;{number}&nbsp;i
+<a name="line213"></a><div class="linenumber">213</div><div style="width:5em;display:inline-block"></div>*&nbsp;@returns&nbsp;{String}
+<a name="line214"></a><div class="linenumber">214</div><div style="width:5em;display:inline-block"></div>*/
+<a name="line215"></a><div class="linenumber">215</div><div style="width:4em;display:inline-block"></div>easyrtc.getIthCaller&nbsp;=&nbsp;function(i)&nbsp;{
+<a name="line216"></a><div class="linenumber">216</div><div style="width:6em;display:inline-block"></div>if&nbsp;(i&nbsp;&lt;&nbsp;0&nbsp;||&nbsp;i&nbsp;&gt;=&nbsp;videoIdsP.length)&nbsp;{
+<a name="line217"></a><div class="linenumber">217</div><div style="width:8em;display:inline-block"></div>return&nbsp;null;
+<a name="line218"></a><div class="linenumber">218</div><div style="width:6em;display:inline-block"></div>}
+<a name="line219"></a><div class="linenumber">219</div><div style="width:6em;display:inline-block"></div>var&nbsp;vid&nbsp;=&nbsp;getIthVideo(i);
+<a name="line220"></a><div class="linenumber">220</div><div style="width:6em;display:inline-block"></div>return&nbsp;getCallerOfVideo(vid);
+<a name="line221"></a><div class="linenumber">221</div><div style="width:4em;display:inline-block"></div>};
+<a name="line222"></a><div class="linenumber">222</div>
+<a name="line223"></a><div class="linenumber">223</div><div style="width:4em;display:inline-block"></div>/**&nbsp;
+<a name="line224"></a><div class="linenumber">224</div><div style="width:5em;display:inline-block"></div>*&nbsp;This&nbsp;is&nbsp;the&nbsp;complement&nbsp;of&nbsp;getIthCaller.&nbsp;Given&nbsp;an&nbsp;easyrtcid,
+<a name="line225"></a><div class="linenumber">225</div><div style="width:5em;display:inline-block"></div>*&nbsp;it&nbsp;determines&nbsp;which&nbsp;slot&nbsp;the&nbsp;easyrtc&nbsp;is&nbsp;in.
+<a name="line226"></a><div class="linenumber">226</div><div style="width:5em;display:inline-block"></div>*&nbsp;@function
+<a name="line227"></a><div class="linenumber">227</div><div style="width:5em;display:inline-block"></div>*&nbsp;@memberOf&nbsp;Easyrtc_App
+<a name="line228"></a><div class="linenumber">228</div><div style="width:5em;display:inline-block"></div>*&nbsp;@param&nbsp;{string}&nbsp;easyrtcid&nbsp;
+<a name="line229"></a><div class="linenumber">229</div><div style="width:5em;display:inline-block"></div>*&nbsp;@returns&nbsp;{number}&nbsp;or&nbsp;-1&nbsp;if&nbsp;the&nbsp;easyrtcid&nbsp;is&nbsp;not&nbsp;a&nbsp;caller.
+<a name="line230"></a><div class="linenumber">230</div><div style="width:5em;display:inline-block"></div>*/
+<a name="line231"></a><div class="linenumber">231</div><div style="width:4em;display:inline-block"></div>easyrtc.getSlotOfCaller&nbsp;=&nbsp;function(easyrtcid)&nbsp;{
+<a name="line232"></a><div class="linenumber">232</div><div style="width:6em;display:inline-block"></div>var&nbsp;i;
+<a name="line233"></a><div class="linenumber">233</div><div style="width:6em;display:inline-block"></div>for&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;numPEOPLE;&nbsp;i++)&nbsp;{
+<a name="line234"></a><div class="linenumber">234</div><div style="width:8em;display:inline-block"></div>if&nbsp;(easyrtc.getIthCaller(i)&nbsp;===&nbsp;easyrtcid)&nbsp;{
+<a name="line235"></a><div class="linenumber">235</div><div style="width:10em;display:inline-block"></div>return&nbsp;i;
+<a name="line236"></a><div class="linenumber">236</div><div style="width:8em;display:inline-block"></div>}
+<a name="line237"></a><div class="linenumber">237</div><div style="width:6em;display:inline-block"></div>}
+<a name="line238"></a><div class="linenumber">238</div><div style="width:6em;display:inline-block"></div>return&nbsp;-1;&nbsp;//&nbsp;caller&nbsp;not&nbsp;connected
+<a name="line239"></a><div class="linenumber">239</div><div style="width:4em;display:inline-block"></div>};
+<a name="line240"></a><div class="linenumber">240</div>
+<a name="line241"></a><div class="linenumber">241</div><div style="width:4em;display:inline-block"></div>easyrtc.setOnStreamClosed(function(caller)&nbsp;{
+<a name="line242"></a><div class="linenumber">242</div><div style="width:6em;display:inline-block"></div>var&nbsp;i;
+<a name="line243"></a><div class="linenumber">243</div><div style="width:6em;display:inline-block"></div>for&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;numPEOPLE;&nbsp;i++)&nbsp;{
+<a name="line244"></a><div class="linenumber">244</div><div style="width:8em;display:inline-block"></div>var&nbsp;video&nbsp;=&nbsp;getIthVideo(i);
+<a name="line245"></a><div class="linenumber">245</div><div style="width:8em;display:inline-block"></div>if&nbsp;(getCallerOfVideo(video)&nbsp;===&nbsp;caller)&nbsp;{
+<a name="line246"></a><div class="linenumber">246</div><div style="width:10em;display:inline-block"></div>hideVideo(video);
+<a name="line247"></a><div class="linenumber">247</div><div style="width:10em;display:inline-block"></div>setCallerOfVideo(video,&nbsp;"");
+<a name="line248"></a><div class="linenumber">248</div><div style="width:10em;display:inline-block"></div>if&nbsp;(onHangup)&nbsp;{
+<a name="line249"></a><div class="linenumber">249</div><div style="width:12em;display:inline-block"></div>onHangup(caller,&nbsp;i);
+<a name="line250"></a><div class="linenumber">250</div><div style="width:10em;display:inline-block"></div>}
+<a name="line251"></a><div class="linenumber">251</div><div style="width:8em;display:inline-block"></div>}
+<a name="line252"></a><div class="linenumber">252</div><div style="width:6em;display:inline-block"></div>}
+<a name="line253"></a><div class="linenumber">253</div><div style="width:4em;display:inline-block"></div>});
+<a name="line254"></a><div class="linenumber">254</div>
+<a name="line255"></a><div class="linenumber">255</div><div style="width:4em;display:inline-block"></div>//
+<a name="line256"></a><div class="linenumber">256</div><div style="width:4em;display:inline-block"></div>//&nbsp;Only&nbsp;accept&nbsp;incoming&nbsp;calls&nbsp;if&nbsp;we&nbsp;have&nbsp;a&nbsp;free&nbsp;video&nbsp;object&nbsp;to&nbsp;display
+<a name="line257"></a><div class="linenumber">257</div><div style="width:4em;display:inline-block"></div>//&nbsp;them&nbsp;in.
+<a name="line258"></a><div class="linenumber">258</div><div style="width:4em;display:inline-block"></div>//
+<a name="line259"></a><div class="linenumber">259</div><div style="width:4em;display:inline-block"></div>easyrtc.setAcceptChecker(function(caller,&nbsp;helper)&nbsp;{
+<a name="line260"></a><div class="linenumber">260</div><div style="width:6em;display:inline-block"></div>var&nbsp;i;
+<a name="line261"></a><div class="linenumber">261</div><div style="width:6em;display:inline-block"></div>for&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;numPEOPLE;&nbsp;i++)&nbsp;{
+<a name="line262"></a><div class="linenumber">262</div><div style="width:8em;display:inline-block"></div>var&nbsp;video&nbsp;=&nbsp;getIthVideo(i);
+<a name="line263"></a><div class="linenumber">263</div><div style="width:8em;display:inline-block"></div>if&nbsp;(videoIsFree(video))&nbsp;{
+<a name="line264"></a><div class="linenumber">264</div><div style="width:10em;display:inline-block"></div>helper(true);
+<a name="line265"></a><div class="linenumber">265</div><div style="width:10em;display:inline-block"></div>return;
+<a name="line266"></a><div class="linenumber">266</div><div style="width:8em;display:inline-block"></div>}
+<a name="line267"></a><div class="linenumber">267</div><div style="width:6em;display:inline-block"></div>}
+<a name="line268"></a><div class="linenumber">268</div><div style="width:6em;display:inline-block"></div>helper(false);
+<a name="line269"></a><div class="linenumber">269</div><div style="width:4em;display:inline-block"></div>});
+<a name="line270"></a><div class="linenumber">270</div>
+<a name="line271"></a><div class="linenumber">271</div><div style="width:4em;display:inline-block"></div>easyrtc.setStreamAcceptor(function(caller,&nbsp;stream)&nbsp;{
+<a name="line272"></a><div class="linenumber">272</div><div style="width:6em;display:inline-block"></div>var&nbsp;i;
+<a name="line273"></a><div class="linenumber">273</div><div style="width:6em;display:inline-block"></div>if&nbsp;(easyrtc.debugPrinter)&nbsp;{
+<a name="line274"></a><div class="linenumber">274</div><div style="width:8em;display:inline-block"></div>easyrtc.debugPrinter("stream&nbsp;acceptor&nbsp;called");
+<a name="line275"></a><div class="linenumber">275</div><div style="width:6em;display:inline-block"></div>}
+<a name="line276"></a><div class="linenumber">276</div>
+<a name="line277"></a><div class="linenumber">277</div><div style="width:6em;display:inline-block"></div>var&nbsp;video;
+<a name="line278"></a><div class="linenumber">278</div>
+<a name="line279"></a><div class="linenumber">279</div><div style="width:6em;display:inline-block"></div>for&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;numPEOPLE;&nbsp;i++)&nbsp;{
+<a name="line280"></a><div class="linenumber">280</div><div style="width:8em;display:inline-block"></div>video&nbsp;=&nbsp;getIthVideo(i);
+<a name="line281"></a><div class="linenumber">281</div><div style="width:8em;display:inline-block"></div>if&nbsp;(getCallerOfVideo(video)&nbsp;===&nbsp;caller)&nbsp;{
+<a name="line282"></a><div class="linenumber">282</div><div style="width:10em;display:inline-block"></div>showVideo(video,&nbsp;stream);
+<a name="line283"></a><div class="linenumber">283</div><div style="width:10em;display:inline-block"></div>if&nbsp;(onCall)&nbsp;{
+<a name="line284"></a><div class="linenumber">284</div><div style="width:12em;display:inline-block"></div>onCall(caller,&nbsp;i);
+<a name="line285"></a><div class="linenumber">285</div><div style="width:10em;display:inline-block"></div>}
+<a name="line286"></a><div class="linenumber">286</div><div style="width:10em;display:inline-block"></div>return;
+<a name="line287"></a><div class="linenumber">287</div><div style="width:8em;display:inline-block"></div>}
+<a name="line288"></a><div class="linenumber">288</div><div style="width:6em;display:inline-block"></div>}
+<a name="line289"></a><div class="linenumber">289</div>
+<a name="line290"></a><div class="linenumber">290</div><div style="width:6em;display:inline-block"></div>for&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;numPEOPLE;&nbsp;i++)&nbsp;{
+<a name="line291"></a><div class="linenumber">291</div><div style="width:8em;display:inline-block"></div>video&nbsp;=&nbsp;getIthVideo(i);
+<a name="line292"></a><div class="linenumber">292</div><div style="width:8em;display:inline-block"></div>if&nbsp;(videoIsFree(video))&nbsp;{
+<a name="line293"></a><div class="linenumber">293</div><div style="width:10em;display:inline-block"></div>setCallerOfVideo(video,&nbsp;caller);
+<a name="line294"></a><div class="linenumber">294</div><div style="width:10em;display:inline-block"></div>if&nbsp;(onCall)&nbsp;{
+<a name="line295"></a><div class="linenumber">295</div><div style="width:12em;display:inline-block"></div>onCall(caller,&nbsp;i);
+<a name="line296"></a><div class="linenumber">296</div><div style="width:10em;display:inline-block"></div>}
+<a name="line297"></a><div class="linenumber">297</div><div style="width:10em;display:inline-block"></div>showVideo(video,&nbsp;stream);
+<a name="line298"></a><div class="linenumber">298</div><div style="width:10em;display:inline-block"></div>return;
+<a name="line299"></a><div class="linenumber">299</div><div style="width:8em;display:inline-block"></div>}
+<a name="line300"></a><div class="linenumber">300</div><div style="width:6em;display:inline-block"></div>}
+<a name="line301"></a><div class="linenumber">301</div><div style="width:6em;display:inline-block"></div>//
+<a name="line302"></a><div class="linenumber">302</div><div style="width:6em;display:inline-block"></div>//&nbsp;no&nbsp;empty&nbsp;slots,&nbsp;so&nbsp;drop&nbsp;whatever&nbsp;caller&nbsp;we&nbsp;have&nbsp;in&nbsp;the&nbsp;first&nbsp;slot&nbsp;and&nbsp;use&nbsp;that&nbsp;one.
+<a name="line303"></a><div class="linenumber">303</div><div style="width:6em;display:inline-block"></div>//
+<a name="line304"></a><div class="linenumber">304</div><div style="width:6em;display:inline-block"></div>video&nbsp;=&nbsp;getIthVideo(0);
+<a name="line305"></a><div class="linenumber">305</div><div style="width:6em;display:inline-block"></div>if&nbsp;(video)&nbsp;{
+<a name="line306"></a><div class="linenumber">306</div><div style="width:8em;display:inline-block"></div>easyrtc.hangup(getCallerOfVideo(video));
+<a name="line307"></a><div class="linenumber">307</div><div style="width:8em;display:inline-block"></div>showVideo(video,&nbsp;stream);
+<a name="line308"></a><div class="linenumber">308</div><div style="width:8em;display:inline-block"></div>if&nbsp;(onCall)&nbsp;{
+<a name="line309"></a><div class="linenumber">309</div><div style="width:10em;display:inline-block"></div>onCall(caller,&nbsp;0);
+<a name="line310"></a><div class="linenumber">310</div><div style="width:8em;display:inline-block"></div>}
+<a name="line311"></a><div class="linenumber">311</div><div style="width:6em;display:inline-block"></div>}
+<a name="line312"></a><div class="linenumber">312</div>
+<a name="line313"></a><div class="linenumber">313</div><div style="width:6em;display:inline-block"></div>setCallerOfVideo(video,&nbsp;caller);
+<a name="line314"></a><div class="linenumber">314</div><div style="width:4em;display:inline-block"></div>});
+<a name="line315"></a><div class="linenumber">315</div>
+<a name="line316"></a><div class="linenumber">316</div><div style="width:4em;display:inline-block"></div>var&nbsp;addControls,&nbsp;parentDiv,&nbsp;closeButton,&nbsp;i;
+<a name="line317"></a><div class="linenumber">317</div><div style="width:4em;display:inline-block"></div>if&nbsp;(autoAddCloseButtons)&nbsp;{
+<a name="line318"></a><div class="linenumber">318</div>
+<a name="line319"></a><div class="linenumber">319</div><div style="width:6em;display:inline-block"></div>addControls&nbsp;=&nbsp;function(video)&nbsp;{
+<a name="line320"></a><div class="linenumber">320</div><div style="width:8em;display:inline-block"></div>parentDiv&nbsp;=&nbsp;video.parentNode;
+<a name="line321"></a><div class="linenumber">321</div><div style="width:8em;display:inline-block"></div>setCallerOfVideo(video,&nbsp;"");
+<a name="line322"></a><div class="linenumber">322</div><div style="width:8em;display:inline-block"></div>closeButton&nbsp;=&nbsp;document.createElement("div");
+<a name="line323"></a><div class="linenumber">323</div><div style="width:8em;display:inline-block"></div>closeButton.className&nbsp;=&nbsp;"easyrtc_closeButton";
+<a name="line324"></a><div class="linenumber">324</div><div style="width:8em;display:inline-block"></div>closeButton.onclick&nbsp;=&nbsp;function()&nbsp;{
+<a name="line325"></a><div class="linenumber">325</div><div style="width:10em;display:inline-block"></div>if&nbsp;(getCallerOfVideo(video))&nbsp;{
+<a name="line326"></a><div class="linenumber">326</div><div style="width:12em;display:inline-block"></div>easyrtc.hangup(getCallerOfVideo(video));
+<a name="line327"></a><div class="linenumber">327</div><div style="width:12em;display:inline-block"></div>hideVideo(video);
+<a name="line328"></a><div class="linenumber">328</div><div style="width:12em;display:inline-block"></div>setCallerOfVideo(video,&nbsp;"");
+<a name="line329"></a><div class="linenumber">329</div><div style="width:10em;display:inline-block"></div>}
+<a name="line330"></a><div class="linenumber">330</div><div style="width:8em;display:inline-block"></div>};
+<a name="line331"></a><div class="linenumber">331</div><div style="width:8em;display:inline-block"></div>parentDiv.appendChild(closeButton);
+<a name="line332"></a><div class="linenumber">332</div><div style="width:6em;display:inline-block"></div>};
+<a name="line333"></a><div class="linenumber">333</div>
+<a name="line334"></a><div class="linenumber">334</div><div style="width:6em;display:inline-block"></div>for&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;numPEOPLE;&nbsp;i++)&nbsp;{
+<a name="line335"></a><div class="linenumber">335</div><div style="width:8em;display:inline-block"></div>addControls(getIthVideo(i));
+<a name="line336"></a><div class="linenumber">336</div><div style="width:6em;display:inline-block"></div>}
+<a name="line337"></a><div class="linenumber">337</div><div style="width:4em;display:inline-block"></div>}
+<a name="line338"></a><div class="linenumber">338</div>
+<a name="line339"></a><div class="linenumber">339</div><div style="width:4em;display:inline-block"></div>var&nbsp;monitorVideo&nbsp;=&nbsp;null;
+<a name="line340"></a><div class="linenumber">340</div><div style="width:4em;display:inline-block"></div>if&nbsp;(easyrtc.videoEnabled&nbsp;&amp;&amp;&nbsp;monitorVideoId&nbsp;!==&nbsp;null)&nbsp;{
+<a name="line341"></a><div class="linenumber">341</div><div style="width:6em;display:inline-block"></div>monitorVideo&nbsp;=&nbsp;document.getElementById(monitorVideoId);
+<a name="line342"></a><div class="linenumber">342</div><div style="width:6em;display:inline-block"></div>if&nbsp;(!monitorVideo)&nbsp;{
+<a name="line343"></a><div class="linenumber">343</div><div style="width:8em;display:inline-block"></div>console.error("Programmer&nbsp;error:&nbsp;no&nbsp;object&nbsp;called&nbsp;"&nbsp;+&nbsp;monitorVideoId);
+<a name="line344"></a><div class="linenumber">344</div><div style="width:8em;display:inline-block"></div>return;
+<a name="line345"></a><div class="linenumber">345</div><div style="width:6em;display:inline-block"></div>}
+<a name="line346"></a><div class="linenumber">346</div><div style="width:6em;display:inline-block"></div>monitorVideo.muted&nbsp;=&nbsp;"muted";
+<a name="line347"></a><div class="linenumber">347</div><div style="width:6em;display:inline-block"></div>monitorVideo.defaultMuted&nbsp;=&nbsp;true;
+<a name="line348"></a><div class="linenumber">348</div><div style="width:4em;display:inline-block"></div>}
+<a name="line349"></a><div class="linenumber">349</div><div style="width:2em;display:inline-block"></div>}
+<a name="line350"></a><div class="linenumber">350</div>
+<a name="line351"></a><div class="linenumber">351</div><div style="width:2em;display:inline-block"></div>/**
+<a name="line352"></a><div class="linenumber">352</div><div style="width:2em;display:inline-block"></div>*&nbsp;Provides&nbsp;a&nbsp;layer&nbsp;on&nbsp;top&nbsp;of&nbsp;the&nbsp;easyrtc.initMediaSource&nbsp;and&nbsp;easyrtc.connect,&nbsp;assign&nbsp;the&nbsp;local&nbsp;media&nbsp;stream&nbsp;to
+<a name="line353"></a><div class="linenumber">353</div><div style="width:2em;display:inline-block"></div>*&nbsp;the&nbsp;video&nbsp;object&nbsp;identified&nbsp;by&nbsp;monitorVideoId,&nbsp;assign&nbsp;remote&nbsp;video&nbsp;streams&nbsp;to
+<a name="line354"></a><div class="linenumber">354</div><div style="width:2em;display:inline-block"></div>*&nbsp;the&nbsp;video&nbsp;objects&nbsp;identified&nbsp;by&nbsp;videoIds,&nbsp;and&nbsp;then&nbsp;call&nbsp;onReady.&nbsp;One&nbsp;of&nbsp;it's
+<a name="line355"></a><div class="linenumber">355</div><div style="width:2em;display:inline-block"></div>*&nbsp;side&nbsp;effects&nbsp;is&nbsp;to&nbsp;add&nbsp;hangup&nbsp;buttons&nbsp;to&nbsp;the&nbsp;remote&nbsp;video&nbsp;objects,&nbsp;buttons
+<a name="line356"></a><div class="linenumber">356</div><div style="width:2em;display:inline-block"></div>*&nbsp;that&nbsp;only&nbsp;appear&nbsp;when&nbsp;you&nbsp;hover&nbsp;over&nbsp;them&nbsp;with&nbsp;the&nbsp;mouse&nbsp;cursor.&nbsp;This&nbsp;method&nbsp;will&nbsp;also&nbsp;add&nbsp;the
+<a name="line357"></a><div class="linenumber">357</div><div style="width:2em;display:inline-block"></div>*&nbsp;easyrtcMirror&nbsp;class&nbsp;to&nbsp;the&nbsp;monitor&nbsp;video&nbsp;object&nbsp;so&nbsp;that&nbsp;it&nbsp;behaves&nbsp;like&nbsp;a&nbsp;mirror.
+<a name="line358"></a><div class="linenumber">358</div><div style="width:2em;display:inline-block"></div>*&nbsp;@function
+<a name="line359"></a><div class="linenumber">359</div><div style="width:2em;display:inline-block"></div>*&nbsp;@memberOf&nbsp;Easyrtc_App
+<a name="line360"></a><div class="linenumber">360</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;@param&nbsp;{String}&nbsp;applicationName&nbsp;-&nbsp;name&nbsp;of&nbsp;the&nbsp;application.
+<a name="line361"></a><div class="linenumber">361</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;@param&nbsp;{String}&nbsp;monitorVideoId&nbsp;-&nbsp;the&nbsp;id&nbsp;of&nbsp;the&nbsp;video&nbsp;object&nbsp;used&nbsp;for&nbsp;monitoring&nbsp;the&nbsp;local&nbsp;stream.
+<a name="line362"></a><div class="linenumber">362</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;@param&nbsp;{Array}&nbsp;videoIds&nbsp;-&nbsp;an&nbsp;array&nbsp;of&nbsp;video&nbsp;object&nbsp;ids&nbsp;(strings)
+<a name="line363"></a><div class="linenumber">363</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;@param&nbsp;{Function}&nbsp;onReady&nbsp;-&nbsp;a&nbsp;callback&nbsp;function&nbsp;used&nbsp;on&nbsp;success.&nbsp;It&nbsp;is&nbsp;called&nbsp;with&nbsp;the&nbsp;easyrtcId&nbsp;this&nbsp;peer&nbsp;is&nbsp;known&nbsp;to&nbsp;the&nbsp;server&nbsp;as.
+<a name="line364"></a><div class="linenumber">364</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;@param&nbsp;{Function}&nbsp;onFailure&nbsp;-&nbsp;a&nbsp;callback&nbsp;function&nbsp;used&nbsp;on&nbsp;failure&nbsp;(failed&nbsp;to&nbsp;get&nbsp;local&nbsp;media&nbsp;or&nbsp;a&nbsp;connection&nbsp;of&nbsp;the&nbsp;signaling&nbsp;server).
+<a name="line365"></a><div class="linenumber">365</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;@example
+<a name="line366"></a><div class="linenumber">366</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;easyrtc.easyApp('multiChat',&nbsp;'selfVideo',&nbsp;['remote1',&nbsp;'remote2',&nbsp;'remote3'],
+<a name="line367"></a><div class="linenumber">367</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function(easyrtcId){
+<a name="line368"></a><div class="linenumber">368</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.log("successfully&nbsp;connected,&nbsp;I&nbsp;am&nbsp;"&nbsp;+&nbsp;easyrtcId);
+<a name="line369"></a><div class="linenumber">369</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},
+<a name="line370"></a><div class="linenumber">370</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function(errorCode,&nbsp;errorText){
+<a name="line371"></a><div class="linenumber">371</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.log(errorText);
+<a name="line372"></a><div class="linenumber">372</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});
+<a name="line373"></a><div class="linenumber">373</div><div style="width:2em;display:inline-block"></div>*/
+<a name="line374"></a><div class="linenumber">374</div><div style="width:2em;display:inline-block"></div>easyrtc.easyApp&nbsp;=&nbsp;function(applicationName,&nbsp;monitorVideoId,&nbsp;videoIds,&nbsp;onReady,&nbsp;onFailure)&nbsp;{
+<a name="line375"></a><div class="linenumber">375</div>
+<a name="line376"></a><div class="linenumber">376</div><div style="width:4em;display:inline-block"></div>var&nbsp;gotMediaCallback&nbsp;=&nbsp;null,
+<a name="line377"></a><div class="linenumber">377</div><div style="width:6em;display:inline-block"></div>gotConnectionCallback&nbsp;=&nbsp;null;
+<a name="line378"></a><div class="linenumber">378</div>
+<a name="line379"></a><div class="linenumber">379</div><div style="width:4em;display:inline-block"></div>easyAppBody(monitorVideoId,&nbsp;videoIds);
+<a name="line380"></a><div class="linenumber">380</div>
+<a name="line381"></a><div class="linenumber">381</div><div style="width:4em;display:inline-block"></div>easyrtc.setGotMedia&nbsp;=&nbsp;function(gotMediaCB)&nbsp;{
+<a name="line382"></a><div class="linenumber">382</div><div style="width:6em;display:inline-block"></div>gotMediaCallback&nbsp;=&nbsp;gotMediaCB;
+<a name="line383"></a><div class="linenumber">383</div><div style="width:4em;display:inline-block"></div>};
+<a name="line384"></a><div class="linenumber">384</div>
+<a name="line385"></a><div class="linenumber">385</div><div style="width:4em;display:inline-block"></div>//
+<a name="line386"></a><div class="linenumber">386</div><div style="width:4em;display:inline-block"></div>//&nbsp;try&nbsp;to&nbsp;restablish&nbsp;broken&nbsp;connections&nbsp;that&nbsp;weren't&nbsp;caused&nbsp;by&nbsp;a&nbsp;hangup
+<a name="line387"></a><div class="linenumber">387</div><div style="width:4em;display:inline-block"></div>//
+<a name="line388"></a><div class="linenumber">388</div><div style="width:4em;display:inline-block"></div>easyrtc.setPeerClosedListener(&nbsp;function(easyrtcid)&nbsp;{
+<a name="line389"></a><div class="linenumber">389</div><div style="width:5em;display:inline-block"></div>setTimeout(&nbsp;function()&nbsp;{
+<a name="line390"></a><div class="linenumber">390</div><div style="width:7em;display:inline-block"></div>if(&nbsp;easyrtc.getSlotOfCaller(easyrtcid)&nbsp;&nbsp;&gt;=&nbsp;0&nbsp;&amp;&amp;&nbsp;easyrtc.isPeerInAnyRoom(easyrtcid))&nbsp;{
+<a name="line391"></a><div class="linenumber">391</div><div style="width:10em;display:inline-block"></div>easyrtc.call(easyrtcid,&nbsp;function(){},&nbsp;function()&nbsp;{},&nbsp;function(){});
+<a name="line392"></a><div class="linenumber">392</div><div style="width:7em;display:inline-block"></div>}
+<a name="line393"></a><div class="linenumber">393</div><div style="width:5em;display:inline-block"></div>},&nbsp;1000);
+<a name="line394"></a><div class="linenumber">394</div><div style="width:4em;display:inline-block"></div>});
+<a name="line395"></a><div class="linenumber">395</div>
+<a name="line396"></a><div class="linenumber">396</div><div style="width:4em;display:inline-block"></div>/**&nbsp;Sets&nbsp;an&nbsp;event&nbsp;handler&nbsp;that&nbsp;gets&nbsp;called&nbsp;when&nbsp;a&nbsp;connection&nbsp;to&nbsp;the&nbsp;signaling
+<a name="line397"></a><div class="linenumber">397</div><div style="width:4em;display:inline-block"></div>*&nbsp;server&nbsp;has&nbsp;or&nbsp;has&nbsp;not&nbsp;been&nbsp;made.&nbsp;Can&nbsp;only&nbsp;be&nbsp;called&nbsp;after&nbsp;calling&nbsp;easyrtc.easyApp.
+<a name="line398"></a><div class="linenumber">398</div><div style="width:4em;display:inline-block"></div>*&nbsp;@function
+<a name="line399"></a><div class="linenumber">399</div><div style="width:4em;display:inline-block"></div>*&nbsp;@memberOf&nbsp;Easyrtc_App
+<a name="line400"></a><div class="linenumber">400</div><div style="width:4em;display:inline-block"></div>*&nbsp;@param&nbsp;{Function}&nbsp;gotConnectionCB&nbsp;has&nbsp;the&nbsp;signature&nbsp;(gotConnection,&nbsp;errorText)
+<a name="line401"></a><div class="linenumber">401</div><div style="width:4em;display:inline-block"></div>*&nbsp;@example
+<a name="line402"></a><div class="linenumber">402</div><div style="width:4em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;easyrtc.setGotConnection(&nbsp;function(gotConnection,&nbsp;errorText){
+<a name="line403"></a><div class="linenumber">403</div><div style="width:4em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(&nbsp;gotConnection&nbsp;){
+<a name="line404"></a><div class="linenumber">404</div><div style="width:4em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.log("Successfully&nbsp;connected&nbsp;to&nbsp;signaling&nbsp;server");
+<a name="line405"></a><div class="linenumber">405</div><div style="width:4em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+<a name="line406"></a><div class="linenumber">406</div><div style="width:4em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else{
+<a name="line407"></a><div class="linenumber">407</div><div style="width:4em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.log("Failed&nbsp;to&nbsp;connect&nbsp;to&nbsp;signaling&nbsp;server&nbsp;because:&nbsp;"&nbsp;+&nbsp;errorText);
+<a name="line408"></a><div class="linenumber">408</div><div style="width:4em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+<a name="line409"></a><div class="linenumber">409</div><div style="width:4em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;});
+<a name="line410"></a><div class="linenumber">410</div><div style="width:4em;display:inline-block"></div>*/
+<a name="line411"></a><div class="linenumber">411</div><div style="width:4em;display:inline-block"></div>easyrtc.setGotConnection&nbsp;=&nbsp;function(gotConnectionCB)&nbsp;{
+<a name="line412"></a><div class="linenumber">412</div><div style="width:6em;display:inline-block"></div>gotConnectionCallback&nbsp;=&nbsp;gotConnectionCB;
+<a name="line413"></a><div class="linenumber">413</div><div style="width:4em;display:inline-block"></div>};
+<a name="line414"></a><div class="linenumber">414</div>
+<a name="line415"></a><div class="linenumber">415</div><div style="width:4em;display:inline-block"></div>function&nbsp;nextInitializationStep(/*&nbsp;token&nbsp;*/)&nbsp;{
+<a name="line416"></a><div class="linenumber">416</div><div style="width:6em;display:inline-block"></div>if&nbsp;(gotConnectionCallback)&nbsp;{
+<a name="line417"></a><div class="linenumber">417</div><div style="width:8em;display:inline-block"></div>gotConnectionCallback(true,&nbsp;"");
+<a name="line418"></a><div class="linenumber">418</div><div style="width:6em;display:inline-block"></div>}
+<a name="line419"></a><div class="linenumber">419</div><div style="width:6em;display:inline-block"></div>onReady(easyrtc.myEasyrtcid);
+<a name="line420"></a><div class="linenumber">420</div><div style="width:4em;display:inline-block"></div>}
+<a name="line421"></a><div class="linenumber">421</div>
+<a name="line422"></a><div class="linenumber">422</div><div style="width:4em;display:inline-block"></div>function&nbsp;postGetUserMedia()&nbsp;{
+<a name="line423"></a><div class="linenumber">423</div><div style="width:6em;display:inline-block"></div>if&nbsp;(gotMediaCallback)&nbsp;{
+<a name="line424"></a><div class="linenumber">424</div><div style="width:8em;display:inline-block"></div>gotMediaCallback(true,&nbsp;null);
+<a name="line425"></a><div class="linenumber">425</div><div style="width:6em;display:inline-block"></div>}
+<a name="line426"></a><div class="linenumber">426</div><div style="width:6em;display:inline-block"></div>if&nbsp;(monitorVideoId&nbsp;!==&nbsp;null)&nbsp;{
+<a name="line427"></a><div class="linenumber">427</div><div style="width:8em;display:inline-block"></div>easyrtc.setVideoObjectSrc(document.getElementById(monitorVideoId),&nbsp;easyrtc.getLocalStream());
+<a name="line428"></a><div class="linenumber">428</div><div style="width:6em;display:inline-block"></div>}
+<a name="line429"></a><div class="linenumber">429</div><div style="width:6em;display:inline-block"></div>function&nbsp;connectError(errorCode,&nbsp;errorText)&nbsp;{
+<a name="line430"></a><div class="linenumber">430</div><div style="width:8em;display:inline-block"></div>if&nbsp;(gotConnectionCallback)&nbsp;{
+<a name="line431"></a><div class="linenumber">431</div><div style="width:10em;display:inline-block"></div>gotConnectionCallback(false,&nbsp;errorText);
+<a name="line432"></a><div class="linenumber">432</div><div style="width:8em;display:inline-block"></div>}
+<a name="line433"></a><div class="linenumber">433</div><div style="width:8em;display:inline-block"></div>else&nbsp;if&nbsp;(onFailure)&nbsp;{
+<a name="line434"></a><div class="linenumber">434</div><div style="width:10em;display:inline-block"></div>onFailure(easyrtc.errCodes.CONNECT_ERR,&nbsp;errorText);
+<a name="line435"></a><div class="linenumber">435</div><div style="width:8em;display:inline-block"></div>}
+<a name="line436"></a><div class="linenumber">436</div><div style="width:8em;display:inline-block"></div>else&nbsp;{
+<a name="line437"></a><div class="linenumber">437</div><div style="width:10em;display:inline-block"></div>easyrtc.showError(easyrtc.errCodes.CONNECT_ERR,&nbsp;errorText);
+<a name="line438"></a><div class="linenumber">438</div><div style="width:8em;display:inline-block"></div>}
+<a name="line439"></a><div class="linenumber">439</div><div style="width:6em;display:inline-block"></div>}
+<a name="line440"></a><div class="linenumber">440</div>
+<a name="line441"></a><div class="linenumber">441</div><div style="width:6em;display:inline-block"></div>easyrtc.connect(applicationName,&nbsp;nextInitializationStep,&nbsp;connectError);
+<a name="line442"></a><div class="linenumber">442</div><div style="width:4em;display:inline-block"></div>}
+<a name="line443"></a><div class="linenumber">443</div>
+<a name="line444"></a><div class="linenumber">444</div><div style="width:4em;display:inline-block"></div>var&nbsp;stream&nbsp;=&nbsp;easyrtc.getLocalStream(null);
+<a name="line445"></a><div class="linenumber">445</div><div style="width:4em;display:inline-block"></div>if&nbsp;(stream)&nbsp;{
+<a name="line446"></a><div class="linenumber">446</div><div style="width:6em;display:inline-block"></div>postGetUserMedia();
+<a name="line447"></a><div class="linenumber">447</div><div style="width:4em;display:inline-block"></div>}
+<a name="line448"></a><div class="linenumber">448</div><div style="width:4em;display:inline-block"></div>else&nbsp;{
+<a name="line449"></a><div class="linenumber">449</div><div style="width:6em;display:inline-block"></div>easyrtc.initMediaSource(
+<a name="line450"></a><div class="linenumber">450</div><div style="width:10em;display:inline-block"></div>postGetUserMedia,
+<a name="line451"></a><div class="linenumber">451</div><div style="width:10em;display:inline-block"></div>function(errorCode,&nbsp;errorText)&nbsp;{
+<a name="line452"></a><div class="linenumber">452</div><div style="width:12em;display:inline-block"></div>if&nbsp;(gotMediaCallback)&nbsp;{
+<a name="line453"></a><div class="linenumber">453</div><div style="width:14em;display:inline-block"></div>gotMediaCallback(false,&nbsp;errorText);
+<a name="line454"></a><div class="linenumber">454</div><div style="width:12em;display:inline-block"></div>}
+<a name="line455"></a><div class="linenumber">455</div><div style="width:12em;display:inline-block"></div>else&nbsp;if&nbsp;(onFailure)&nbsp;{
+<a name="line456"></a><div class="linenumber">456</div><div style="width:14em;display:inline-block"></div>onFailure(easyrtc.errCodes.MEDIA_ERR,&nbsp;errorText);
+<a name="line457"></a><div class="linenumber">457</div><div style="width:12em;display:inline-block"></div>}
+<a name="line458"></a><div class="linenumber">458</div><div style="width:12em;display:inline-block"></div>else&nbsp;{
+<a name="line459"></a><div class="linenumber">459</div><div style="width:14em;display:inline-block"></div>easyrtc.showError(easyrtc.errCodes.MEDIA_ERR,&nbsp;errorText);
+<a name="line460"></a><div class="linenumber">460</div><div style="width:12em;display:inline-block"></div>}
+<a name="line461"></a><div class="linenumber">461</div><div style="width:10em;display:inline-block"></div>},
+<a name="line462"></a><div class="linenumber">462</div><div style="width:10em;display:inline-block"></div>null&nbsp;//&nbsp;default&nbsp;stream
+<a name="line463"></a><div class="linenumber">463</div><div style="width:8em;display:inline-block"></div>);
+<a name="line464"></a><div class="linenumber">464</div><div style="width:4em;display:inline-block"></div>}
+<a name="line465"></a><div class="linenumber">465</div><div style="width:2em;display:inline-block"></div>};
+<a name="line466"></a><div class="linenumber">466</div>
+<a name="line467"></a><div class="linenumber">467</div><div style="width:0em;display:inline-block"></div>return&nbsp;easyrtc;
+<a name="line468"></a><div class="linenumber">468</div>
+<a name="line469"></a><div class="linenumber">469</div><div style="width:0em;display:inline-block"></div>}));&nbsp;//&nbsp;end&nbsp;of&nbsp;module&nbsp;wrapper
+</code></pre>
+</article>
+</section>
+</div>
+		
+	</div>
+</div>
+<footer class="template">
+	<div class="wrapper-content">
+		<p>Copyright &copy;2016 EasyRTC</p>
+	</div>
+</footer>
+<!-- <script>prettyPrint();</script> -->
+<!-- <script src="scripts/linenumber.js"></script> -->
+</body>
+</html>

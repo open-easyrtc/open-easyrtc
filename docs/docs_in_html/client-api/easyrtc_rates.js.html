@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>EasyRTC Documentation</title>
+  <script src="scripts/prettify/prettify.js"> </script>
+  <script src="scripts/prettify/lang-css.js"> </script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+  <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+  <link href="../assets/easyrtc-docs-jsdoc-styles-1.css" media="all" rel="stylesheet" />
+</head>
+<body>
+<header class="template">
+	<div class="wrapper-content">
+    <a href="../index.html"><img src="../assets/easyrtc-logo.png" alt="EasyRTC Documentation"></a>
+		<h1 title="EasyRTC Documentation">Documentation</h1>
+	</div>
+</header>
+<div class="wrapper-docs">
+<nav>
+	<h2><a href="../index.html">Docs Home</a></h2>
+	<h3>EasyRTC Guides</h3>
+	<ul>
+		<li><a href="../easyrtc_faq.html">FAQ</a></li>
+		<li><a href="../easyrtc_gettingStarted.html">Getting Started</a></li>
+		<li><a href="../easyrtc_server_install.html">EasyRTC Server: Installation</a></li>
+		<li><a href="../easyrtc_client_tutorial.html">EasyRTC Framework Tutorial</a></li>
+		<li><a href="../easyrtc_rooms.html">Rooms</a></li>
+		<li><a href="../easyrtc_server_configuration.html">EasyRTC Server: Configuration</a></li>
+		<li><a href="../easyrtc_server_events.html">EasyRTC Server: Events</a></li>
+		<li><a href="../easyrtc_server_ice.html">EasyRTC Server: ICE Configuration</a></li>
+		<li><a href="../easyrtc_with_other_servers.html">Using Alongside Other Servers</a></li>
+		<li><a href="../easyrtc_server_ssl.html">EasyRTC Server: Using SSL</a></li>
+		<li><a href="../easyrtc_webrtc_problems.html">WebRTC Problems and Possible Fixes</a></li>
+		<li><a href="../easyrtc_upcoming_features.html">Upcoming Features</a></li>
+		<li><a href="../easyrtc_changelog.html">Change Log</a></li>
+	</ul>
+	<h3>EasyRTC Client Classes</h3>
+	<ul>
+		<li><a href="../client-api/Easyrtc.html">Easyrtc</a></li>
+		<li><a href="../client-api/Easyrtc_App.html">Easyrtc_App</a></li>
+		<li><a href="../client-api/Easyrtc_ft.html">Easyrtc_ft</a></li>
+		<li><a href="../client-api/Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_Rates.html">Easyrtc_Rates</a></li>
+		<li><a href="../client-api/Easyrtc_Recorder.html">Easyrtc_Recorder</a></li>
+	</ul>
+	<h3>EasyRTC Server Modules</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li>
+		<li><a href="../server-api/module-easyrtc_default_options.html">easyrtc_default_options</a></li>
+		<li><a href="../server-api/module-easyrtc_private_obj.html">easyrtc_private_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj.html">easyrtc_public_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_util.html">easyrtc_util</a></li>
+		<li><a href="../server-api/module-general_util.html">general_util</a></li>
+	</ul>
+	<h3>EasyRTC Server Classes</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.html">pub</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.events.html">events</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.util.html">util</a></li>
+		<li><a href="../server-api/module-easyrtc_util-eu.html">eu</a></li>
+		<li><a href="../server-api/module-general_util-g.html">g</a></li>
+		<li><a href="../server-api/pub.appObj.html">appObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.html">connectionObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li>
+		<li><a href="../server-api/pub.appObj.roomObj.html">roomObj</a></li>
+		<li><a href="../server-api/pub.appObj.sessionObj.html">sessionObj</a></li>
+	</ul>
+</nav>
+<div class="easyrtc-docs-content">
+<div id="main">
+<h1 class="page-title">Source: easyrtc_rates.js</h1>
+<section>
+<article>
+<pre class="prettyprint source linenums easyrtc"><code><a name="line1"></a><div class="linenumber">1</div><div style="width:0em;display:inline-block"></div>/*&nbsp;global&nbsp;define,&nbsp;module,&nbsp;require,&nbsp;console&nbsp;*/
+<a name="line2"></a><div class="linenumber">2</div><div style="width:0em;display:inline-block"></div>/*!
+<a name="line3"></a><div class="linenumber">3</div><div style="width:1em;display:inline-block"></div>Script:&nbsp;easyrtc_rates.js
+<a name="line4"></a><div class="linenumber">4</div>
+<a name="line5"></a><div class="linenumber">5</div><div style="width:2em;display:inline-block"></div>This&nbsp;code&nbsp;builds&nbsp;sdp&nbsp;filter&nbsp;functions
+<a name="line6"></a><div class="linenumber">6</div>
+<a name="line7"></a><div class="linenumber">7</div><div style="width:1em;display:inline-block"></div>About:&nbsp;License
+<a name="line8"></a><div class="linenumber">8</div>
+<a name="line9"></a><div class="linenumber">9</div><div style="width:2em;display:inline-block"></div>Copyright&nbsp;(c)&nbsp;2016,&nbsp;Priologic&nbsp;Software&nbsp;Inc.
+<a name="line10"></a><div class="linenumber">10</div><div style="width:2em;display:inline-block"></div>All&nbsp;rights&nbsp;reserved.
+<a name="line11"></a><div class="linenumber">11</div>
+<a name="line12"></a><div class="linenumber">12</div><div style="width:2em;display:inline-block"></div>Redistribution&nbsp;and&nbsp;use&nbsp;in&nbsp;source&nbsp;and&nbsp;binary&nbsp;forms,&nbsp;with&nbsp;or&nbsp;without
+<a name="line13"></a><div class="linenumber">13</div><div style="width:2em;display:inline-block"></div>modification,&nbsp;are&nbsp;permitted&nbsp;provided&nbsp;that&nbsp;the&nbsp;following&nbsp;conditions&nbsp;are&nbsp;met:
+<a name="line14"></a><div class="linenumber">14</div>
+<a name="line15"></a><div class="linenumber">15</div><div style="width:4em;display:inline-block"></div>*&nbsp;Redistributions&nbsp;of&nbsp;source&nbsp;code&nbsp;must&nbsp;retain&nbsp;the&nbsp;above&nbsp;copyright&nbsp;notice,
+<a name="line16"></a><div class="linenumber">16</div><div style="width:5em;display:inline-block"></div>this&nbsp;list&nbsp;of&nbsp;conditions&nbsp;and&nbsp;the&nbsp;following&nbsp;disclaimer.
+<a name="line17"></a><div class="linenumber">17</div><div style="width:4em;display:inline-block"></div>*&nbsp;Redistributions&nbsp;in&nbsp;binary&nbsp;form&nbsp;must&nbsp;reproduce&nbsp;the&nbsp;above&nbsp;copyright
+<a name="line18"></a><div class="linenumber">18</div><div style="width:5em;display:inline-block"></div>notice,&nbsp;this&nbsp;list&nbsp;of&nbsp;conditions&nbsp;and&nbsp;the&nbsp;following&nbsp;disclaimer&nbsp;in&nbsp;the
+<a name="line19"></a><div class="linenumber">19</div><div style="width:5em;display:inline-block"></div>documentation&nbsp;and/or&nbsp;other&nbsp;materials&nbsp;provided&nbsp;with&nbsp;the&nbsp;distribution.
+<a name="line20"></a><div class="linenumber">20</div>
+<a name="line21"></a><div class="linenumber">21</div><div style="width:2em;display:inline-block"></div>THIS&nbsp;SOFTWARE&nbsp;IS&nbsp;PROVIDED&nbsp;BY&nbsp;THE&nbsp;COPYRIGHT&nbsp;HOLDERS&nbsp;AND&nbsp;CONTRIBUTORS&nbsp;"AS&nbsp;IS"
+<a name="line22"></a><div class="linenumber">22</div><div style="width:2em;display:inline-block"></div>AND&nbsp;ANY&nbsp;EXPRESS&nbsp;OR&nbsp;IMPLIED&nbsp;WARRANTIES,&nbsp;INCLUDING,&nbsp;BUT&nbsp;NOT&nbsp;LIMITED&nbsp;TO,&nbsp;THE
+<a name="line23"></a><div class="linenumber">23</div><div style="width:2em;display:inline-block"></div>IMPLIED&nbsp;WARRANTIES&nbsp;OF&nbsp;MERCHANTABILITY&nbsp;AND&nbsp;FITNESS&nbsp;FOR&nbsp;A&nbsp;PARTICULAR&nbsp;PURPOSE
+<a name="line24"></a><div class="linenumber">24</div><div style="width:2em;display:inline-block"></div>ARE&nbsp;DISCLAIMED.&nbsp;IN&nbsp;NO&nbsp;EVENT&nbsp;SHALL&nbsp;THE&nbsp;COPYRIGHT&nbsp;HOLDER&nbsp;OR&nbsp;CONTRIBUTORS&nbsp;BE
+<a name="line25"></a><div class="linenumber">25</div><div style="width:2em;display:inline-block"></div>LIABLE&nbsp;FOR&nbsp;ANY&nbsp;DIRECT,&nbsp;INDIRECT,&nbsp;INCIDENTAL,&nbsp;SPECIAL,&nbsp;EXEMPLARY,&nbsp;OR
+<a name="line26"></a><div class="linenumber">26</div><div style="width:2em;display:inline-block"></div>CONSEQUENTIAL&nbsp;DAMAGES&nbsp;(INCLUDING,&nbsp;BUT&nbsp;NOT&nbsp;LIMITED&nbsp;TO,&nbsp;PROCUREMENT&nbsp;OF
+<a name="line27"></a><div class="linenumber">27</div><div style="width:2em;display:inline-block"></div>SUBSTITUTE&nbsp;GOODS&nbsp;OR&nbsp;SERVICES;&nbsp;LOSS&nbsp;OF&nbsp;USE,&nbsp;DATA,&nbsp;OR&nbsp;PROFITS;&nbsp;OR&nbsp;BUSINESS
+<a name="line28"></a><div class="linenumber">28</div><div style="width:2em;display:inline-block"></div>INTERRUPTION)&nbsp;HOWEVER&nbsp;CAUSED&nbsp;AND&nbsp;ON&nbsp;ANY&nbsp;THEORY&nbsp;OF&nbsp;LIABILITY,&nbsp;WHETHER&nbsp;IN
+<a name="line29"></a><div class="linenumber">29</div><div style="width:2em;display:inline-block"></div>CONTRACT,&nbsp;STRICT&nbsp;LIABILITY,&nbsp;OR&nbsp;TORT&nbsp;(INCLUDING&nbsp;NEGLIGENCE&nbsp;OR&nbsp;OTHERWISE)
+<a name="line30"></a><div class="linenumber">30</div><div style="width:2em;display:inline-block"></div>ARISING&nbsp;IN&nbsp;ANY&nbsp;WAY&nbsp;OUT&nbsp;OF&nbsp;THE&nbsp;USE&nbsp;OF&nbsp;THIS&nbsp;SOFTWARE,&nbsp;EVEN&nbsp;IF&nbsp;ADVISED&nbsp;OF&nbsp;THE
+<a name="line31"></a><div class="linenumber">31</div><div style="width:2em;display:inline-block"></div>POSSIBILITY&nbsp;OF&nbsp;SUCH&nbsp;DAMAGE.
+<a name="line32"></a><div class="linenumber">32</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line33"></a><div class="linenumber">33</div>
+<a name="line34"></a><div class="linenumber">34</div>
+<a name="line35"></a><div class="linenumber">35</div>
+<a name="line36"></a><div class="linenumber">36</div><div style="width:0em;display:inline-block"></div>(function&nbsp;(root,&nbsp;factory)&nbsp;{
+<a name="line37"></a><div class="linenumber">37</div><div style="width:2em;display:inline-block"></div>if&nbsp;(typeof&nbsp;define&nbsp;===&nbsp;'function'&nbsp;&amp;&amp;&nbsp;define.amd)&nbsp;{
+<a name="line38"></a><div class="linenumber">38</div><div style="width:4em;display:inline-block"></div>//RequireJS&nbsp;(AMD)&nbsp;build&nbsp;system
+<a name="line39"></a><div class="linenumber">39</div><div style="width:4em;display:inline-block"></div>define(['easyrtc'],&nbsp;factory);
+<a name="line40"></a><div class="linenumber">40</div><div style="width:2em;display:inline-block"></div>}&nbsp;else&nbsp;if&nbsp;(typeof&nbsp;module&nbsp;===&nbsp;'object'&nbsp;&amp;&amp;&nbsp;module.exports)&nbsp;{
+<a name="line41"></a><div class="linenumber">41</div><div style="width:4em;display:inline-block"></div>//CommonJS&nbsp;build&nbsp;system
+<a name="line42"></a><div class="linenumber">42</div><div style="width:4em;display:inline-block"></div>module.exports&nbsp;=&nbsp;factory(require('easyrtc'));
+<a name="line43"></a><div class="linenumber">43</div><div style="width:2em;display:inline-block"></div>}&nbsp;else&nbsp;{
+<a name="line44"></a><div class="linenumber">44</div><div style="width:4em;display:inline-block"></div>//Vanilla&nbsp;JS,&nbsp;ensure&nbsp;dependencies&nbsp;are&nbsp;loaded&nbsp;correctly
+<a name="line45"></a><div class="linenumber">45</div><div style="width:4em;display:inline-block"></div>if&nbsp;(typeof&nbsp;window.easyrtc&nbsp;!==&nbsp;'object'&nbsp;||&nbsp;!window.easyrtc)&nbsp;{
+<a name="line46"></a><div class="linenumber">46</div><div style="width:6em;display:inline-block"></div>throw&nbsp;new&nbsp;Error("easyrtc_rates&nbsp;requires&nbsp;easyrtc");
+<a name="line47"></a><div class="linenumber">47</div><div style="width:4em;display:inline-block"></div>}
+<a name="line48"></a><div class="linenumber">48</div><div style="width:4em;display:inline-block"></div>root.easyrtc&nbsp;=&nbsp;factory(window.easyrtc);
+<a name="line49"></a><div class="linenumber">49</div><div style="width:1em;display:inline-block"></div>}
+<a name="line50"></a><div class="linenumber">50</div><div style="width:0em;display:inline-block"></div>}(this,&nbsp;function&nbsp;(easyrtc,&nbsp;undefined)&nbsp;{
+<a name="line51"></a><div class="linenumber">51</div>
+<a name="line52"></a><div class="linenumber">52</div><div style="width:0em;display:inline-block"></div>"use&nbsp;strict";
+<a name="line53"></a><div class="linenumber">53</div><div style="width:2em;display:inline-block"></div>/**
+<a name="line54"></a><div class="linenumber">54</div><div style="width:2em;display:inline-block"></div>*&nbsp;Provides&nbsp;methods&nbsp;for&nbsp;building&nbsp;SDP&nbsp;filters.&nbsp;SDP&nbsp;filters&nbsp;can&nbsp;be&nbsp;used
+<a name="line55"></a><div class="linenumber">55</div><div style="width:2em;display:inline-block"></div>*&nbsp;to&nbsp;control&nbsp;bit&nbsp;rates.
+<a name="line56"></a><div class="linenumber">56</div><div style="width:2em;display:inline-block"></div>*&nbsp;@class&nbsp;Easyrtc_Rates
+<a name="line57"></a><div class="linenumber">57</div><div style="width:2em;display:inline-block"></div>*/
+<a name="line58"></a><div class="linenumber">58</div>
+<a name="line59"></a><div class="linenumber">59</div><div style="width:2em;display:inline-block"></div>function&nbsp;buildSdpFilter(options,&nbsp;isLocal)&nbsp;{
+<a name="line60"></a><div class="linenumber">60</div>
+<a name="line61"></a><div class="linenumber">61</div><div style="width:4em;display:inline-block"></div>var&nbsp;audioSendBitrate&nbsp;=&nbsp;options.audioSendBitrate;
+<a name="line62"></a><div class="linenumber">62</div><div style="width:4em;display:inline-block"></div>var&nbsp;audioRecvBitrate&nbsp;=&nbsp;options.audioRecvBitrate;
+<a name="line63"></a><div class="linenumber">63</div><div style="width:4em;display:inline-block"></div>var&nbsp;videoRecvBitrate&nbsp;=&nbsp;options.videoRecvBitrate;
+<a name="line64"></a><div class="linenumber">64</div><div style="width:4em;display:inline-block"></div>var&nbsp;videoSendBitrate&nbsp;=&nbsp;options.videoSendBitrate;
+<a name="line65"></a><div class="linenumber">65</div><div style="width:4em;display:inline-block"></div>var&nbsp;videoSendInitialBitrate&nbsp;=&nbsp;options.videoSendInitialBitrate;
+<a name="line66"></a><div class="linenumber">66</div><div style="width:4em;display:inline-block"></div>var&nbsp;audioSendCodec&nbsp;=&nbsp;options.audioSendCodec&nbsp;||&nbsp;'';
+<a name="line67"></a><div class="linenumber">67</div><div style="width:4em;display:inline-block"></div>var&nbsp;audioRecvCodec&nbsp;=&nbsp;options.audioRecvCodec&nbsp;||&nbsp;'';
+<a name="line68"></a><div class="linenumber">68</div><div style="width:4em;display:inline-block"></div>var&nbsp;videoSendCodec&nbsp;=&nbsp;options.videoSendCodec&nbsp;||&nbsp;'';
+<a name="line69"></a><div class="linenumber">69</div><div style="width:4em;display:inline-block"></div>var&nbsp;videoRecvCodec&nbsp;=&nbsp;options.videoRecvCodec&nbsp;||&nbsp;'';
+<a name="line70"></a><div class="linenumber">70</div><div style="width:4em;display:inline-block"></div>var&nbsp;stereo&nbsp;=&nbsp;options.stereo;
+<a name="line71"></a><div class="linenumber">71</div><div style="width:4em;display:inline-block"></div>function&nbsp;trace(arg)&nbsp;{
+<a name="line72"></a><div class="linenumber">72</div><div style="width:6em;display:inline-block"></div>console.log("trace:"&nbsp;+&nbsp;arg);
+<a name="line73"></a><div class="linenumber">73</div><div style="width:4em;display:inline-block"></div>}
+<a name="line74"></a><div class="linenumber">74</div><div style="width:4em;display:inline-block"></div>//&nbsp;these&nbsp;functions&nbsp;were&nbsp;cribbed&nbsp;from&nbsp;the&nbsp;google&nbsp;apprtc.appspot.com&nbsp;demo.
+<a name="line75"></a><div class="linenumber">75</div>
+<a name="line76"></a><div class="linenumber">76</div><div style="width:4em;display:inline-block"></div>function&nbsp;findLineInRange(sdpLines,&nbsp;startLine,&nbsp;endLine,&nbsp;prefix,&nbsp;substr)&nbsp;{
+<a name="line77"></a><div class="linenumber">77</div><div style="width:6em;display:inline-block"></div>var&nbsp;realEndLine&nbsp;=&nbsp;endLine&nbsp;!==&nbsp;-1&nbsp;?&nbsp;endLine&nbsp;:&nbsp;sdpLines.length;
+<a name="line78"></a><div class="linenumber">78</div><div style="width:6em;display:inline-block"></div>for&nbsp;(var&nbsp;i&nbsp;=&nbsp;startLine;&nbsp;i&nbsp;&lt;&nbsp;realEndLine;&nbsp;++i)&nbsp;{
+<a name="line79"></a><div class="linenumber">79</div><div style="width:8em;display:inline-block"></div>if&nbsp;(sdpLines[i].indexOf(prefix)&nbsp;===&nbsp;0)&nbsp;{
+<a name="line80"></a><div class="linenumber">80</div><div style="width:10em;display:inline-block"></div>if&nbsp;(!substr&nbsp;||&nbsp;sdpLines[i].toLowerCase().indexOf(substr.toLowerCase())&nbsp;!==&nbsp;-1)&nbsp;{
+<a name="line81"></a><div class="linenumber">81</div><div style="width:12em;display:inline-block"></div>return&nbsp;i;
+<a name="line82"></a><div class="linenumber">82</div><div style="width:10em;display:inline-block"></div>}
+<a name="line83"></a><div class="linenumber">83</div><div style="width:8em;display:inline-block"></div>}
+<a name="line84"></a><div class="linenumber">84</div><div style="width:6em;display:inline-block"></div>}
+<a name="line85"></a><div class="linenumber">85</div><div style="width:6em;display:inline-block"></div>return&nbsp;null;
+<a name="line86"></a><div class="linenumber">86</div><div style="width:4em;display:inline-block"></div>}
+<a name="line87"></a><div class="linenumber">87</div>
+<a name="line88"></a><div class="linenumber">88</div><div style="width:4em;display:inline-block"></div>function&nbsp;findLine(sdpLines,&nbsp;prefix,&nbsp;substr)&nbsp;{
+<a name="line89"></a><div class="linenumber">89</div><div style="width:6em;display:inline-block"></div>return&nbsp;findLineInRange(sdpLines,&nbsp;0,&nbsp;-1,&nbsp;prefix,&nbsp;substr);
+<a name="line90"></a><div class="linenumber">90</div><div style="width:4em;display:inline-block"></div>}
+<a name="line91"></a><div class="linenumber">91</div>
+<a name="line92"></a><div class="linenumber">92</div><div style="width:4em;display:inline-block"></div>function&nbsp;preferBitRate(sdp,&nbsp;bitrate,&nbsp;mediaType)&nbsp;{
+<a name="line93"></a><div class="linenumber">93</div><div style="width:6em;display:inline-block"></div>var&nbsp;sdpLines&nbsp;=&nbsp;sdp.split('\r\n');
+<a name="line94"></a><div class="linenumber">94</div><div style="width:6em;display:inline-block"></div>var&nbsp;mLineIndex&nbsp;=&nbsp;findLine(sdpLines,&nbsp;'m=',&nbsp;mediaType);
+<a name="line95"></a><div class="linenumber">95</div><div style="width:6em;display:inline-block"></div>if&nbsp;(mLineIndex&nbsp;===&nbsp;null)&nbsp;{
+<a name="line96"></a><div class="linenumber">96</div><div style="width:8em;display:inline-block"></div>trace('Failed&nbsp;to&nbsp;add&nbsp;bandwidth&nbsp;line&nbsp;to&nbsp;sdp,&nbsp;as&nbsp;no&nbsp;m-line&nbsp;found');
+<a name="line97"></a><div class="linenumber">97</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line98"></a><div class="linenumber">98</div><div style="width:6em;display:inline-block"></div>}
+<a name="line99"></a><div class="linenumber">99</div><div style="width:6em;display:inline-block"></div>var&nbsp;nextMLineIndex&nbsp;=&nbsp;findLineInRange(sdpLines,&nbsp;mLineIndex&nbsp;+&nbsp;1,&nbsp;-1,&nbsp;'m=');
+<a name="line100"></a><div class="linenumber">100</div><div style="width:6em;display:inline-block"></div>if&nbsp;(nextMLineIndex&nbsp;===&nbsp;null)&nbsp;{
+<a name="line101"></a><div class="linenumber">101</div><div style="width:8em;display:inline-block"></div>nextMLineIndex&nbsp;=&nbsp;sdpLines.length;
+<a name="line102"></a><div class="linenumber">102</div><div style="width:6em;display:inline-block"></div>}
+<a name="line103"></a><div class="linenumber">103</div><div style="width:6em;display:inline-block"></div>var&nbsp;cLineIndex&nbsp;=&nbsp;findLineInRange(sdpLines,&nbsp;mLineIndex&nbsp;+&nbsp;1,&nbsp;nextMLineIndex,&nbsp;'c=');
+<a name="line104"></a><div class="linenumber">104</div><div style="width:6em;display:inline-block"></div>if&nbsp;(cLineIndex&nbsp;===&nbsp;null)&nbsp;{
+<a name="line105"></a><div class="linenumber">105</div><div style="width:8em;display:inline-block"></div>trace('Failed&nbsp;to&nbsp;add&nbsp;bandwidth&nbsp;line&nbsp;to&nbsp;sdp,&nbsp;as&nbsp;no&nbsp;c-line&nbsp;found');
+<a name="line106"></a><div class="linenumber">106</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line107"></a><div class="linenumber">107</div><div style="width:6em;display:inline-block"></div>}
+<a name="line108"></a><div class="linenumber">108</div><div style="width:6em;display:inline-block"></div>var&nbsp;bLineIndex&nbsp;=&nbsp;findLineInRange(sdpLines,&nbsp;cLineIndex&nbsp;+&nbsp;1,&nbsp;nextMLineIndex,&nbsp;'b=AS');
+<a name="line109"></a><div class="linenumber">109</div><div style="width:6em;display:inline-block"></div>if&nbsp;(bLineIndex)&nbsp;{
+<a name="line110"></a><div class="linenumber">110</div><div style="width:8em;display:inline-block"></div>sdpLines.splice(bLineIndex,&nbsp;1);
+<a name="line111"></a><div class="linenumber">111</div><div style="width:6em;display:inline-block"></div>}
+<a name="line112"></a><div class="linenumber">112</div><div style="width:6em;display:inline-block"></div>var&nbsp;bwLine&nbsp;=&nbsp;'b=AS:'&nbsp;+&nbsp;bitrate;
+<a name="line113"></a><div class="linenumber">113</div><div style="width:6em;display:inline-block"></div>sdpLines.splice(cLineIndex&nbsp;+&nbsp;1,&nbsp;0,&nbsp;bwLine);
+<a name="line114"></a><div class="linenumber">114</div><div style="width:6em;display:inline-block"></div>sdp&nbsp;=&nbsp;sdpLines.join('\r\n');
+<a name="line115"></a><div class="linenumber">115</div><div style="width:6em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line116"></a><div class="linenumber">116</div><div style="width:4em;display:inline-block"></div>}
+<a name="line117"></a><div class="linenumber">117</div>
+<a name="line118"></a><div class="linenumber">118</div><div style="width:4em;display:inline-block"></div>function&nbsp;setDefaultCodec(mLine,&nbsp;payload)&nbsp;{
+<a name="line119"></a><div class="linenumber">119</div><div style="width:6em;display:inline-block"></div>var&nbsp;elements&nbsp;=&nbsp;mLine.split('&nbsp;');
+<a name="line120"></a><div class="linenumber">120</div><div style="width:6em;display:inline-block"></div>var&nbsp;newLine&nbsp;=&nbsp;[];
+<a name="line121"></a><div class="linenumber">121</div><div style="width:6em;display:inline-block"></div>var&nbsp;index&nbsp;=&nbsp;0;
+<a name="line122"></a><div class="linenumber">122</div><div style="width:6em;display:inline-block"></div>for&nbsp;(var&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;elements.length;&nbsp;i++)&nbsp;{
+<a name="line123"></a><div class="linenumber">123</div><div style="width:8em;display:inline-block"></div>if&nbsp;(index&nbsp;===&nbsp;3)&nbsp;{
+<a name="line124"></a><div class="linenumber">124</div><div style="width:10em;display:inline-block"></div>newLine[index++]&nbsp;=&nbsp;payload;
+<a name="line125"></a><div class="linenumber">125</div><div style="width:8em;display:inline-block"></div>}
+<a name="line126"></a><div class="linenumber">126</div><div style="width:8em;display:inline-block"></div>if&nbsp;(elements[i]&nbsp;!==&nbsp;payload)&nbsp;{
+<a name="line127"></a><div class="linenumber">127</div><div style="width:10em;display:inline-block"></div>newLine[index++]&nbsp;=&nbsp;elements[i];
+<a name="line128"></a><div class="linenumber">128</div><div style="width:8em;display:inline-block"></div>}
+<a name="line129"></a><div class="linenumber">129</div><div style="width:6em;display:inline-block"></div>}
+<a name="line130"></a><div class="linenumber">130</div><div style="width:6em;display:inline-block"></div>return&nbsp;newLine.join('&nbsp;');
+<a name="line131"></a><div class="linenumber">131</div><div style="width:4em;display:inline-block"></div>}
+<a name="line132"></a><div class="linenumber">132</div>
+<a name="line133"></a><div class="linenumber">133</div><div style="width:4em;display:inline-block"></div>function&nbsp;maybeSetAudioSendBitRate(sdp)&nbsp;{
+<a name="line134"></a><div class="linenumber">134</div><div style="width:6em;display:inline-block"></div>if&nbsp;(!audioSendBitrate)&nbsp;{
+<a name="line135"></a><div class="linenumber">135</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line136"></a><div class="linenumber">136</div><div style="width:6em;display:inline-block"></div>}
+<a name="line137"></a><div class="linenumber">137</div><div style="width:6em;display:inline-block"></div>trace('Prefer&nbsp;audio&nbsp;send&nbsp;bitrate:&nbsp;'&nbsp;+&nbsp;audioSendBitrate);
+<a name="line138"></a><div class="linenumber">138</div><div style="width:6em;display:inline-block"></div>return&nbsp;preferBitRate(sdp,&nbsp;audioSendBitrate,&nbsp;'audio');
+<a name="line139"></a><div class="linenumber">139</div><div style="width:4em;display:inline-block"></div>}
+<a name="line140"></a><div class="linenumber">140</div>
+<a name="line141"></a><div class="linenumber">141</div><div style="width:4em;display:inline-block"></div>function&nbsp;maybeSetAudioReceiveBitRate(sdp)&nbsp;{
+<a name="line142"></a><div class="linenumber">142</div><div style="width:6em;display:inline-block"></div>if&nbsp;(!audioRecvBitrate)&nbsp;{
+<a name="line143"></a><div class="linenumber">143</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line144"></a><div class="linenumber">144</div><div style="width:6em;display:inline-block"></div>}
+<a name="line145"></a><div class="linenumber">145</div><div style="width:6em;display:inline-block"></div>trace('Prefer&nbsp;audio&nbsp;receive&nbsp;bitrate:&nbsp;'&nbsp;+&nbsp;audioRecvBitrate);
+<a name="line146"></a><div class="linenumber">146</div><div style="width:6em;display:inline-block"></div>return&nbsp;preferBitRate(sdp,&nbsp;audioRecvBitrate,&nbsp;'audio');
+<a name="line147"></a><div class="linenumber">147</div><div style="width:4em;display:inline-block"></div>}
+<a name="line148"></a><div class="linenumber">148</div>
+<a name="line149"></a><div class="linenumber">149</div><div style="width:4em;display:inline-block"></div>function&nbsp;maybeSetVideoSendBitRate(sdp)&nbsp;{
+<a name="line150"></a><div class="linenumber">150</div><div style="width:6em;display:inline-block"></div>if&nbsp;(!videoSendBitrate)&nbsp;{
+<a name="line151"></a><div class="linenumber">151</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line152"></a><div class="linenumber">152</div><div style="width:6em;display:inline-block"></div>}
+<a name="line153"></a><div class="linenumber">153</div><div style="width:6em;display:inline-block"></div>trace('Prefer&nbsp;video&nbsp;send&nbsp;bitrate:&nbsp;'&nbsp;+&nbsp;videoSendBitrate);
+<a name="line154"></a><div class="linenumber">154</div><div style="width:6em;display:inline-block"></div>return&nbsp;preferBitRate(sdp,&nbsp;videoSendBitrate,&nbsp;'video');
+<a name="line155"></a><div class="linenumber">155</div><div style="width:4em;display:inline-block"></div>}
+<a name="line156"></a><div class="linenumber">156</div>
+<a name="line157"></a><div class="linenumber">157</div><div style="width:4em;display:inline-block"></div>function&nbsp;maybeSetVideoReceiveBitRate(sdp)&nbsp;{
+<a name="line158"></a><div class="linenumber">158</div><div style="width:6em;display:inline-block"></div>if&nbsp;(!videoRecvBitrate)&nbsp;{
+<a name="line159"></a><div class="linenumber">159</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line160"></a><div class="linenumber">160</div><div style="width:6em;display:inline-block"></div>}
+<a name="line161"></a><div class="linenumber">161</div><div style="width:6em;display:inline-block"></div>trace('Prefer&nbsp;video&nbsp;receive&nbsp;bitrate:&nbsp;'&nbsp;+&nbsp;videoRecvBitrate);
+<a name="line162"></a><div class="linenumber">162</div><div style="width:6em;display:inline-block"></div>return&nbsp;preferBitRate(sdp,&nbsp;videoRecvBitrate,&nbsp;'video');
+<a name="line163"></a><div class="linenumber">163</div><div style="width:4em;display:inline-block"></div>}
+<a name="line164"></a><div class="linenumber">164</div>
+<a name="line165"></a><div class="linenumber">165</div><div style="width:4em;display:inline-block"></div>function&nbsp;getCodecPayloadType(sdpLine)&nbsp;{
+<a name="line166"></a><div class="linenumber">166</div><div style="width:6em;display:inline-block"></div>var&nbsp;pattern&nbsp;=&nbsp;new&nbsp;RegExp('a=rtpmap:(\\d+)&nbsp;\\w+\\/\\d+');
+<a name="line167"></a><div class="linenumber">167</div><div style="width:6em;display:inline-block"></div>var&nbsp;result&nbsp;=&nbsp;sdpLine.match(pattern);
+<a name="line168"></a><div class="linenumber">168</div><div style="width:6em;display:inline-block"></div>return&nbsp;(result&nbsp;&amp;&amp;&nbsp;result.length&nbsp;===&nbsp;2)&nbsp;?&nbsp;result[1]&nbsp;:&nbsp;null;
+<a name="line169"></a><div class="linenumber">169</div><div style="width:4em;display:inline-block"></div>}
+<a name="line170"></a><div class="linenumber">170</div>
+<a name="line171"></a><div class="linenumber">171</div><div style="width:4em;display:inline-block"></div>function&nbsp;maybeSetVideoSendInitialBitRate(sdp)&nbsp;{
+<a name="line172"></a><div class="linenumber">172</div><div style="width:6em;display:inline-block"></div>if&nbsp;(!videoSendInitialBitrate)&nbsp;{
+<a name="line173"></a><div class="linenumber">173</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line174"></a><div class="linenumber">174</div><div style="width:6em;display:inline-block"></div>}
+<a name="line175"></a><div class="linenumber">175</div><div style="width:6em;display:inline-block"></div>var&nbsp;maxBitrate&nbsp;=&nbsp;videoSendInitialBitrate;
+<a name="line176"></a><div class="linenumber">176</div><div style="width:6em;display:inline-block"></div>if&nbsp;(videoSendBitrate)&nbsp;{
+<a name="line177"></a><div class="linenumber">177</div><div style="width:8em;display:inline-block"></div>if&nbsp;(videoSendInitialBitrate&nbsp;&gt;&nbsp;videoSendBitrate)&nbsp;{
+<a name="line178"></a><div class="linenumber">178</div><div style="width:10em;display:inline-block"></div>trace('Clamping&nbsp;initial&nbsp;bitrate&nbsp;to&nbsp;max&nbsp;bitrate&nbsp;of&nbsp;'&nbsp;+&nbsp;videoSendBitrate&nbsp;+&nbsp;'&nbsp;kbps.');
+<a name="line179"></a><div class="linenumber">179</div><div style="width:10em;display:inline-block"></div>videoSendInitialBitrate&nbsp;=&nbsp;videoSendBitrate;
+<a name="line180"></a><div class="linenumber">180</div><div style="width:8em;display:inline-block"></div>}
+<a name="line181"></a><div class="linenumber">181</div><div style="width:8em;display:inline-block"></div>maxBitrate&nbsp;=&nbsp;videoSendBitrate;
+<a name="line182"></a><div class="linenumber">182</div><div style="width:6em;display:inline-block"></div>}
+<a name="line183"></a><div class="linenumber">183</div><div style="width:6em;display:inline-block"></div>var&nbsp;sdpLines&nbsp;=&nbsp;sdp.split('\r\n');
+<a name="line184"></a><div class="linenumber">184</div><div style="width:6em;display:inline-block"></div>var&nbsp;mLineIndex&nbsp;=&nbsp;findLine(sdpLines,&nbsp;'m=',&nbsp;'video');
+<a name="line185"></a><div class="linenumber">185</div><div style="width:6em;display:inline-block"></div>if&nbsp;(mLineIndex&nbsp;===&nbsp;null)&nbsp;{
+<a name="line186"></a><div class="linenumber">186</div><div style="width:8em;display:inline-block"></div>trace('Failed&nbsp;to&nbsp;find&nbsp;video&nbsp;m-line');
+<a name="line187"></a><div class="linenumber">187</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line188"></a><div class="linenumber">188</div><div style="width:6em;display:inline-block"></div>}
+<a name="line189"></a><div class="linenumber">189</div><div style="width:6em;display:inline-block"></div>var&nbsp;vp8RtpmapIndex&nbsp;=&nbsp;findLine(sdpLines,&nbsp;'a=rtpmap',&nbsp;'VP8/90000');
+<a name="line190"></a><div class="linenumber">190</div><div style="width:6em;display:inline-block"></div>var&nbsp;vp8Payload&nbsp;=&nbsp;getCodecPayloadType(sdpLines[vp8RtpmapIndex]);
+<a name="line191"></a><div class="linenumber">191</div><div style="width:6em;display:inline-block"></div>var&nbsp;vp8Fmtp&nbsp;=&nbsp;'a=fmtp:'&nbsp;+&nbsp;vp8Payload&nbsp;+&nbsp;'&nbsp;x-google-min-bitrate='&nbsp;+&nbsp;videoSendInitialBitrate.toString()&nbsp;+&nbsp;';&nbsp;x-google-max-bitrate='&nbsp;+&nbsp;maxBitrate.toString();
+<a name="line192"></a><div class="linenumber">192</div><div style="width:6em;display:inline-block"></div>sdpLines.splice(vp8RtpmapIndex&nbsp;+&nbsp;1,&nbsp;0,&nbsp;vp8Fmtp);
+<a name="line193"></a><div class="linenumber">193</div><div style="width:6em;display:inline-block"></div>return&nbsp;sdpLines.join('\r\n');
+<a name="line194"></a><div class="linenumber">194</div><div style="width:4em;display:inline-block"></div>}
+<a name="line195"></a><div class="linenumber">195</div>
+<a name="line196"></a><div class="linenumber">196</div><div style="width:4em;display:inline-block"></div>function&nbsp;preferCodec(sdp,&nbsp;codec,&nbsp;codecType){
+<a name="line197"></a><div class="linenumber">197</div><div style="width:6em;display:inline-block"></div>var&nbsp;sdpLines&nbsp;=&nbsp;sdp.split('\r\n');
+<a name="line198"></a><div class="linenumber">198</div><div style="width:6em;display:inline-block"></div>var&nbsp;mLineIndex&nbsp;=&nbsp;findLine(sdpLines,&nbsp;'m=',&nbsp;codecType);
+<a name="line199"></a><div class="linenumber">199</div><div style="width:6em;display:inline-block"></div>if&nbsp;(mLineIndex&nbsp;===&nbsp;null)&nbsp;{
+<a name="line200"></a><div class="linenumber">200</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line201"></a><div class="linenumber">201</div><div style="width:6em;display:inline-block"></div>}
+<a name="line202"></a><div class="linenumber">202</div><div style="width:6em;display:inline-block"></div>//
+<a name="line203"></a><div class="linenumber">203</div><div style="width:6em;display:inline-block"></div>//&nbsp;there&nbsp;are&nbsp;two&nbsp;m=&nbsp;lines&nbsp;in&nbsp;the&nbsp;sdp,&nbsp;one&nbsp;for&nbsp;audio,&nbsp;one&nbsp;for&nbsp;video.
+<a name="line204"></a><div class="linenumber">204</div><div style="width:6em;display:inline-block"></div>//&nbsp;the&nbsp;audio&nbsp;one&nbsp;comes&nbsp;first.&nbsp;when&nbsp;we&nbsp;search&nbsp;for&nbsp;codecs&nbsp;for&nbsp;audio,&nbsp;we
+<a name="line205"></a><div class="linenumber">205</div><div style="width:6em;display:inline-block"></div>//&nbsp;want&nbsp;stop&nbsp;before&nbsp;we&nbsp;enter&nbsp;the&nbsp;section&nbsp;for&nbsp;video,&nbsp;hence&nbsp;we'll&nbsp;hunt&nbsp;
+<a name="line206"></a><div class="linenumber">206</div><div style="width:6em;display:inline-block"></div>//&nbsp;for&nbsp;that&nbsp;subsequent&nbsp;m=&nbsp;line&nbsp;before&nbsp;we&nbsp;look&nbsp;for&nbsp;codecs.&nbsp;Otherwise,
+<a name="line207"></a><div class="linenumber">207</div><div style="width:6em;display:inline-block"></div>//&nbsp;you&nbsp;could&nbsp;ask&nbsp;for&nbsp;a&nbsp;audio&nbsp;codec&nbsp;of&nbsp;VP9.
+<a name="line208"></a><div class="linenumber">208</div><div style="width:6em;display:inline-block"></div>//
+<a name="line209"></a><div class="linenumber">209</div><div style="width:6em;display:inline-block"></div>var&nbsp;mBottom&nbsp;=&nbsp;findLineInRange(sdpLines,&nbsp;mLineIndex+1,&nbsp;-1,&nbsp;"m=")&nbsp;||&nbsp;-1;
+<a name="line210"></a><div class="linenumber">210</div>
+<a name="line211"></a><div class="linenumber">211</div><div style="width:6em;display:inline-block"></div>var&nbsp;codecIndex&nbsp;=&nbsp;findLineInRange(sdpLines,&nbsp;mLineIndex,&nbsp;mBottom,&nbsp;'a=rtpmap',&nbsp;codec);
+<a name="line212"></a><div class="linenumber">212</div><div style="width:6em;display:inline-block"></div>if&nbsp;(codecIndex)&nbsp;{
+<a name="line213"></a><div class="linenumber">213</div><div style="width:8em;display:inline-block"></div>var&nbsp;payload&nbsp;=&nbsp;getCodecPayloadType(sdpLines[codecIndex]);
+<a name="line214"></a><div class="linenumber">214</div><div style="width:8em;display:inline-block"></div>if&nbsp;(payload)&nbsp;{
+<a name="line215"></a><div class="linenumber">215</div><div style="width:10em;display:inline-block"></div>sdpLines[mLineIndex]&nbsp;=&nbsp;setDefaultCodec(sdpLines[mLineIndex],&nbsp;payload);
+<a name="line216"></a><div class="linenumber">216</div><div style="width:8em;display:inline-block"></div>}
+<a name="line217"></a><div class="linenumber">217</div><div style="width:6em;display:inline-block"></div>}
+<a name="line218"></a><div class="linenumber">218</div><div style="width:6em;display:inline-block"></div>sdp&nbsp;=&nbsp;sdpLines.join('\r\n');
+<a name="line219"></a><div class="linenumber">219</div><div style="width:6em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line220"></a><div class="linenumber">220</div><div style="width:4em;display:inline-block"></div>}&nbsp;
+<a name="line221"></a><div class="linenumber">221</div>
+<a name="line222"></a><div class="linenumber">222</div><div style="width:4em;display:inline-block"></div>function&nbsp;maybePreferVideoSendCodec(sdp)&nbsp;{
+<a name="line223"></a><div class="linenumber">223</div><div style="width:6em;display:inline-block"></div>if&nbsp;(videoSendCodec&nbsp;===&nbsp;'')&nbsp;{
+<a name="line224"></a><div class="linenumber">224</div><div style="width:8em;display:inline-block"></div>trace('No&nbsp;preference&nbsp;on&nbsp;video&nbsp;send&nbsp;codec.');
+<a name="line225"></a><div class="linenumber">225</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line226"></a><div class="linenumber">226</div><div style="width:6em;display:inline-block"></div>}
+<a name="line227"></a><div class="linenumber">227</div><div style="width:6em;display:inline-block"></div>trace('Prefer&nbsp;video&nbsp;send&nbsp;codec:&nbsp;'&nbsp;+&nbsp;videoSendCodec);
+<a name="line228"></a><div class="linenumber">228</div><div style="width:6em;display:inline-block"></div>return&nbsp;preferCodec(sdp,&nbsp;videoSendCodec,&nbsp;'video');
+<a name="line229"></a><div class="linenumber">229</div><div style="width:4em;display:inline-block"></div>}
+<a name="line230"></a><div class="linenumber">230</div>
+<a name="line231"></a><div class="linenumber">231</div><div style="width:4em;display:inline-block"></div>function&nbsp;maybePreferVideoReceiveCodec(sdp)&nbsp;{
+<a name="line232"></a><div class="linenumber">232</div><div style="width:6em;display:inline-block"></div>if&nbsp;(videoRecvCodec&nbsp;===&nbsp;'')&nbsp;{
+<a name="line233"></a><div class="linenumber">233</div><div style="width:8em;display:inline-block"></div>trace('No&nbsp;preference&nbsp;on&nbsp;video&nbsp;receive&nbsp;codec.');
+<a name="line234"></a><div class="linenumber">234</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line235"></a><div class="linenumber">235</div><div style="width:6em;display:inline-block"></div>}
+<a name="line236"></a><div class="linenumber">236</div><div style="width:6em;display:inline-block"></div>trace('Prefer&nbsp;video&nbsp;receive&nbsp;codec:&nbsp;'&nbsp;+&nbsp;videoRecvCodec);
+<a name="line237"></a><div class="linenumber">237</div><div style="width:6em;display:inline-block"></div>return&nbsp;preferCodec(sdp,&nbsp;videoRecvCodec,'video');
+<a name="line238"></a><div class="linenumber">238</div><div style="width:4em;display:inline-block"></div>}&nbsp;
+<a name="line239"></a><div class="linenumber">239</div>
+<a name="line240"></a><div class="linenumber">240</div><div style="width:4em;display:inline-block"></div>function&nbsp;maybePreferAudioSendCodec(sdp)&nbsp;{
+<a name="line241"></a><div class="linenumber">241</div><div style="width:6em;display:inline-block"></div>if&nbsp;(audioSendCodec&nbsp;===&nbsp;'')&nbsp;{
+<a name="line242"></a><div class="linenumber">242</div><div style="width:8em;display:inline-block"></div>trace('No&nbsp;preference&nbsp;on&nbsp;audio&nbsp;send&nbsp;codec.');
+<a name="line243"></a><div class="linenumber">243</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line244"></a><div class="linenumber">244</div><div style="width:6em;display:inline-block"></div>}
+<a name="line245"></a><div class="linenumber">245</div><div style="width:6em;display:inline-block"></div>trace('Prefer&nbsp;audio&nbsp;send&nbsp;codec:&nbsp;'&nbsp;+&nbsp;audioSendCodec);
+<a name="line246"></a><div class="linenumber">246</div><div style="width:6em;display:inline-block"></div>return&nbsp;preferCodec(sdp,&nbsp;audioSendCodec,&nbsp;'audio');
+<a name="line247"></a><div class="linenumber">247</div><div style="width:4em;display:inline-block"></div>}
+<a name="line248"></a><div class="linenumber">248</div>
+<a name="line249"></a><div class="linenumber">249</div><div style="width:4em;display:inline-block"></div>function&nbsp;maybePreferAudioReceiveCodec(sdp)&nbsp;{
+<a name="line250"></a><div class="linenumber">250</div><div style="width:6em;display:inline-block"></div>if&nbsp;(audioRecvCodec&nbsp;===&nbsp;'')&nbsp;{
+<a name="line251"></a><div class="linenumber">251</div><div style="width:8em;display:inline-block"></div>trace('No&nbsp;preference&nbsp;on&nbsp;audio&nbsp;receive&nbsp;codec.');
+<a name="line252"></a><div class="linenumber">252</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line253"></a><div class="linenumber">253</div><div style="width:6em;display:inline-block"></div>}
+<a name="line254"></a><div class="linenumber">254</div><div style="width:6em;display:inline-block"></div>trace('Prefer&nbsp;audio&nbsp;receive&nbsp;codec:&nbsp;'&nbsp;+&nbsp;audioRecvCodec);
+<a name="line255"></a><div class="linenumber">255</div><div style="width:6em;display:inline-block"></div>return&nbsp;preferCodec(sdp,&nbsp;audioRecvCodec,&nbsp;'audio');
+<a name="line256"></a><div class="linenumber">256</div><div style="width:4em;display:inline-block"></div>}&nbsp;
+<a name="line257"></a><div class="linenumber">257</div>
+<a name="line258"></a><div class="linenumber">258</div><div style="width:4em;display:inline-block"></div>function&nbsp;addStereo(sdp)&nbsp;{
+<a name="line259"></a><div class="linenumber">259</div><div style="width:6em;display:inline-block"></div>var&nbsp;sdpLines&nbsp;=&nbsp;sdp.split('\r\n');
+<a name="line260"></a><div class="linenumber">260</div><div style="width:6em;display:inline-block"></div>var&nbsp;opusIndex&nbsp;=&nbsp;findLine(sdpLines,&nbsp;'a=rtpmap',&nbsp;'opus/48000');
+<a name="line261"></a><div class="linenumber">261</div><div style="width:6em;display:inline-block"></div>var&nbsp;opusPayload;
+<a name="line262"></a><div class="linenumber">262</div><div style="width:6em;display:inline-block"></div>if&nbsp;(opusIndex)&nbsp;{
+<a name="line263"></a><div class="linenumber">263</div><div style="width:8em;display:inline-block"></div>opusPayload&nbsp;=&nbsp;getCodecPayloadType(sdpLines[opusIndex]);
+<a name="line264"></a><div class="linenumber">264</div><div style="width:6em;display:inline-block"></div>}
+<a name="line265"></a><div class="linenumber">265</div><div style="width:6em;display:inline-block"></div>var&nbsp;fmtpLineIndex&nbsp;=&nbsp;findLine(sdpLines,&nbsp;'a=fmtp:'&nbsp;+&nbsp;opusPayload.toString());
+<a name="line266"></a><div class="linenumber">266</div><div style="width:6em;display:inline-block"></div>if&nbsp;(fmtpLineIndex&nbsp;===&nbsp;null)&nbsp;{
+<a name="line267"></a><div class="linenumber">267</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line268"></a><div class="linenumber">268</div><div style="width:6em;display:inline-block"></div>}
+<a name="line269"></a><div class="linenumber">269</div><div style="width:6em;display:inline-block"></div>sdpLines[fmtpLineIndex]&nbsp;=&nbsp;sdpLines[fmtpLineIndex].concat(';&nbsp;stereo=1');
+<a name="line270"></a><div class="linenumber">270</div><div style="width:6em;display:inline-block"></div>sdp&nbsp;=&nbsp;sdpLines.join('\r\n');
+<a name="line271"></a><div class="linenumber">271</div><div style="width:6em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line272"></a><div class="linenumber">272</div><div style="width:4em;display:inline-block"></div>}
+<a name="line273"></a><div class="linenumber">273</div>
+<a name="line274"></a><div class="linenumber">274</div><div style="width:4em;display:inline-block"></div>if(&nbsp;isLocal&nbsp;)&nbsp;{
+<a name="line275"></a><div class="linenumber">275</div><div style="width:6em;display:inline-block"></div>return&nbsp;function(insdp)&nbsp;{
+<a name="line276"></a><div class="linenumber">276</div><div style="width:8em;display:inline-block"></div>console.log("modifying&nbsp;local&nbsp;sdp");
+<a name="line277"></a><div class="linenumber">277</div><div style="width:8em;display:inline-block"></div>var&nbsp;sdp;
+<a name="line278"></a><div class="linenumber">278</div><div style="width:8em;display:inline-block"></div>sdp&nbsp;=&nbsp;maybePreferAudioReceiveCodec(insdp);
+<a name="line279"></a><div class="linenumber">279</div><div style="width:8em;display:inline-block"></div>sdp&nbsp;=&nbsp;maybePreferVideoReceiveCodec(insdp);
+<a name="line280"></a><div class="linenumber">280</div><div style="width:8em;display:inline-block"></div>sdp&nbsp;=&nbsp;maybeSetAudioReceiveBitRate(sdp);
+<a name="line281"></a><div class="linenumber">281</div><div style="width:8em;display:inline-block"></div>sdp&nbsp;=&nbsp;maybeSetVideoReceiveBitRate(sdp);
+<a name="line282"></a><div class="linenumber">282</div><div style="width:8em;display:inline-block"></div>//if(&nbsp;sdp&nbsp;!=&nbsp;insdp&nbsp;)&nbsp;{
+<a name="line283"></a><div class="linenumber">283</div><div style="width:8em;display:inline-block"></div>//&nbsp;&nbsp;&nbsp;&nbsp;console.log("changed&nbsp;the&nbsp;sdp&nbsp;from&nbsp;\n"&nbsp;+&nbsp;insdp&nbsp;+&nbsp;"\nto\n"&nbsp;+&nbsp;sdp);
+<a name="line284"></a><div class="linenumber">284</div><div style="width:8em;display:inline-block"></div>//}
+<a name="line285"></a><div class="linenumber">285</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line286"></a><div class="linenumber">286</div><div style="width:6em;display:inline-block"></div>};
+<a name="line287"></a><div class="linenumber">287</div><div style="width:4em;display:inline-block"></div>}
+<a name="line288"></a><div class="linenumber">288</div><div style="width:4em;display:inline-block"></div>else&nbsp;{
+<a name="line289"></a><div class="linenumber">289</div><div style="width:6em;display:inline-block"></div>return&nbsp;function(insdp)&nbsp;{
+<a name="line290"></a><div class="linenumber">290</div><div style="width:8em;display:inline-block"></div>console.log("modifying&nbsp;remote&nbsp;sdp");
+<a name="line291"></a><div class="linenumber">291</div><div style="width:8em;display:inline-block"></div>var&nbsp;sdp&nbsp;=&nbsp;maybePreferAudioSendCodec(insdp);
+<a name="line292"></a><div class="linenumber">292</div><div style="width:8em;display:inline-block"></div>var&nbsp;sdp&nbsp;=&nbsp;maybePreferVideoSendCodec(insdp);
+<a name="line293"></a><div class="linenumber">293</div><div style="width:8em;display:inline-block"></div>sdp&nbsp;=&nbsp;maybeSetAudioSendBitRate(sdp);
+<a name="line294"></a><div class="linenumber">294</div><div style="width:8em;display:inline-block"></div>sdp&nbsp;=&nbsp;maybeSetVideoSendBitRate(sdp);
+<a name="line295"></a><div class="linenumber">295</div><div style="width:8em;display:inline-block"></div>sdp&nbsp;=&nbsp;maybeSetVideoSendInitialBitRate(sdp);
+<a name="line296"></a><div class="linenumber">296</div><div style="width:8em;display:inline-block"></div>if&nbsp;(stereo)&nbsp;{
+<a name="line297"></a><div class="linenumber">297</div><div style="width:10em;display:inline-block"></div>sdp&nbsp;=&nbsp;addStereo(sdp);
+<a name="line298"></a><div class="linenumber">298</div><div style="width:8em;display:inline-block"></div>}
+<a name="line299"></a><div class="linenumber">299</div><div style="width:8em;display:inline-block"></div>//if(&nbsp;sdp&nbsp;!=&nbsp;insdp&nbsp;)&nbsp;{
+<a name="line300"></a><div class="linenumber">300</div><div style="width:8em;display:inline-block"></div>//&nbsp;&nbsp;&nbsp;&nbsp;console.log("changed&nbsp;the&nbsp;sdp&nbsp;from&nbsp;\n"&nbsp;+&nbsp;insdp&nbsp;+&nbsp;"\nto\n"&nbsp;+&nbsp;sdp);
+<a name="line301"></a><div class="linenumber">301</div><div style="width:8em;display:inline-block"></div>//}
+<a name="line302"></a><div class="linenumber">302</div><div style="width:8em;display:inline-block"></div>return&nbsp;sdp;
+<a name="line303"></a><div class="linenumber">303</div><div style="width:6em;display:inline-block"></div>};
+<a name="line304"></a><div class="linenumber">304</div><div style="width:4em;display:inline-block"></div>}
+<a name="line305"></a><div class="linenumber">305</div><div style="width:2em;display:inline-block"></div>}
+<a name="line306"></a><div class="linenumber">306</div>
+<a name="line307"></a><div class="linenumber">307</div><div style="width:2em;display:inline-block"></div>/**
+<a name="line308"></a><div class="linenumber">308</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;This&nbsp;function&nbsp;returns&nbsp;an&nbsp;sdp&nbsp;filter&nbsp;function.
+<a name="line309"></a><div class="linenumber">309</div><div style="width:2em;display:inline-block"></div>*&nbsp;@function
+<a name="line310"></a><div class="linenumber">310</div><div style="width:2em;display:inline-block"></div>*&nbsp;@memberOf&nbsp;Easyrtc_Rates
+<a name="line311"></a><div class="linenumber">311</div><div style="width:2em;display:inline-block"></div>*&nbsp;@param&nbsp;options&nbsp;A&nbsp;map&nbsp;that&nbsp;optionally&nbsp;includes&nbsp;values&nbsp;for&nbsp;the&nbsp;following&nbsp;keys:&nbsp;audioRecvCodec,&nbsp;audioRecvBitrate,&nbsp;videoRecvBitrate,&nbsp;videoRecvCodec
+<a name="line312"></a><div class="linenumber">312</div><div style="width:2em;display:inline-block"></div>*&nbsp;@returns&nbsp;{Function}&nbsp;which&nbsp;takes&nbsp;an&nbsp;SDP&nbsp;string&nbsp;and&nbsp;returns&nbsp;a&nbsp;modified&nbsp;SDP&nbsp;string.
+<a name="line313"></a><div class="linenumber">313</div><div style="width:2em;display:inline-block"></div>*/
+<a name="line314"></a><div class="linenumber">314</div><div style="width:2em;display:inline-block"></div>easyrtc.buildLocalSdpFilter&nbsp;=&nbsp;function&nbsp;(options)&nbsp;{
+<a name="line315"></a><div class="linenumber">315</div><div style="width:4em;display:inline-block"></div>return&nbsp;buildSdpFilter(options,&nbsp;true);
+<a name="line316"></a><div class="linenumber">316</div><div style="width:2em;display:inline-block"></div>};
+<a name="line317"></a><div class="linenumber">317</div>
+<a name="line318"></a><div class="linenumber">318</div><div style="width:2em;display:inline-block"></div>/**
+<a name="line319"></a><div class="linenumber">319</div><div style="width:2em;display:inline-block"></div>*&nbsp;This&nbsp;function&nbsp;returns&nbsp;an&nbsp;sdp&nbsp;filter&nbsp;function.
+<a name="line320"></a><div class="linenumber">320</div><div style="width:2em;display:inline-block"></div>*&nbsp;@function
+<a name="line321"></a><div class="linenumber">321</div><div style="width:2em;display:inline-block"></div>*&nbsp;@memberOf&nbsp;Easyrtc_Rates
+<a name="line322"></a><div class="linenumber">322</div><div style="width:2em;display:inline-block"></div>*&nbsp;@param&nbsp;options&nbsp;A&nbsp;map&nbsp;that&nbsp;optionally&nbsp;includes&nbsp;values&nbsp;for&nbsp;the&nbsp;following&nbsp;keys:&nbsp;stereo,&nbsp;audioSendCodec,&nbsp;audioSendBitrate,&nbsp;videoSendBitrate,&nbsp;videoSendInitialBitRate,&nbsp;videoRecvCodec
+<a name="line323"></a><div class="linenumber">323</div><div style="width:2em;display:inline-block"></div>*&nbsp;@returns&nbsp;{Function}&nbsp;which&nbsp;takes&nbsp;an&nbsp;SDP&nbsp;string&nbsp;and&nbsp;returns&nbsp;a&nbsp;modified&nbsp;SDP&nbsp;string.
+<a name="line324"></a><div class="linenumber">324</div><div style="width:2em;display:inline-block"></div>*/
+<a name="line325"></a><div class="linenumber">325</div><div style="width:2em;display:inline-block"></div>easyrtc.buildRemoteSdpFilter&nbsp;=&nbsp;function(options)&nbsp;{
+<a name="line326"></a><div class="linenumber">326</div><div style="width:4em;display:inline-block"></div>return&nbsp;buildSdpFilter(options,&nbsp;false);
+<a name="line327"></a><div class="linenumber">327</div><div style="width:2em;display:inline-block"></div>};
+<a name="line328"></a><div class="linenumber">328</div>
+<a name="line329"></a><div class="linenumber">329</div><div style="width:0em;display:inline-block"></div>return&nbsp;easyrtc;
+<a name="line330"></a><div class="linenumber">330</div>
+<a name="line331"></a><div class="linenumber">331</div><div style="width:0em;display:inline-block"></div>}));
+</code></pre>
+</article>
+</section>
+</div>
+		
+	</div>
+</div>
+<footer class="template">
+	<div class="wrapper-content">
+		<p>Copyright &copy;2016 EasyRTC</p>
+	</div>
+</footer>
+<!-- <script>prettyPrint();</script> -->
+<!-- <script src="scripts/linenumber.js"></script> -->
+</body>
+</html>

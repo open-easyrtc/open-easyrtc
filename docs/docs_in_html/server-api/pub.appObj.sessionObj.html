@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>EasyRTC Documentation</title>
+  <script src="scripts/prettify/prettify.js"> </script>
+  <script src="scripts/prettify/lang-css.js"> </script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+  <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+  <link href="../assets/easyrtc-docs-jsdoc-styles-1.css" media="all" rel="stylesheet" />
+</head>
+<body>
+<header class="template">
+	<div class="wrapper-content">
+    <a href="../index.html"><img src="../assets/easyrtc-logo.png" alt="EasyRTC Documentation"></a>
+		<h1 title="EasyRTC Documentation">Documentation</h1>
+	</div>
+</header>
+<div class="wrapper-docs">
+<nav>
+	<h2><a href="../index.html">Docs Home</a></h2>
+	<h3>EasyRTC Guides</h3>
+	<ul>
+		<li><a href="../easyrtc_faq.html">FAQ</a></li>
+		<li><a href="../easyrtc_gettingStarted.html">Getting Started</a></li>
+		<li><a href="../easyrtc_server_install.html">EasyRTC Server: Installation</a></li>
+		<li><a href="../easyrtc_client_tutorial.html">EasyRTC Framework Tutorial</a></li>
+		<li><a href="../easyrtc_rooms.html">Rooms</a></li>
+		<li><a href="../easyrtc_server_configuration.html">EasyRTC Server: Configuration</a></li>
+		<li><a href="../easyrtc_server_events.html">EasyRTC Server: Events</a></li>
+		<li><a href="../easyrtc_server_ice.html">EasyRTC Server: ICE Configuration</a></li>
+		<li><a href="../easyrtc_with_other_servers.html">Using Alongside Other Servers</a></li>
+		<li><a href="../easyrtc_server_ssl.html">EasyRTC Server: Using SSL</a></li>
+		<li><a href="../easyrtc_webrtc_problems.html">WebRTC Problems and Possible Fixes</a></li>
+		<li><a href="../easyrtc_upcoming_features.html">Upcoming Features</a></li>
+		<li><a href="../easyrtc_changelog.html">Change Log</a></li>
+	</ul>
+	<h3>EasyRTC Client Classes</h3>
+	<ul>
+		<li><a href="../client-api/Easyrtc.html">Easyrtc</a></li>
+		<li><a href="../client-api/Easyrtc_App.html">Easyrtc_App</a></li>
+		<li><a href="../client-api/Easyrtc_ft.html">Easyrtc_ft</a></li>
+		<li><a href="../client-api/Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_Rates.html">Easyrtc_Rates</a></li>
+		<li><a href="../client-api/Easyrtc_Recorder.html">Easyrtc_Recorder</a></li>
+	</ul>
+	<h3>EasyRTC Server Modules</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li>
+		<li><a href="../server-api/module-easyrtc_default_options.html">easyrtc_default_options</a></li>
+		<li><a href="../server-api/module-easyrtc_private_obj.html">easyrtc_private_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj.html">easyrtc_public_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_util.html">easyrtc_util</a></li>
+		<li><a href="../server-api/module-general_util.html">general_util</a></li>
+	</ul>
+	<h3>EasyRTC Server Classes</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.html">pub</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.events.html">events</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.util.html">util</a></li>
+		<li><a href="../server-api/module-easyrtc_util-eu.html">eu</a></li>
+		<li><a href="../server-api/module-general_util-g.html">g</a></li>
+		<li><a href="../server-api/pub.appObj.html">appObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.html">connectionObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li>
+		<li><a href="../server-api/pub.appObj.roomObj.html">roomObj</a></li>
+		<li><a href="../server-api/pub.appObj.sessionObj.html">sessionObj</a></li>
+	</ul>
+</nav>
+<div class="easyrtc-docs-content">
+<div id="main">
+  <h1 class="page-title">Class: sessionObj</h1>
+  
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+            <span class="ancestors"><a href="pub.appObj.html">.appObj</a>.</span>sessionObj</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+
+    <h4 class="name" id="sessionObj"><span class="type-signature"></span>new sessionObj<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    The primary method for interfacing with an EasyRTC session.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line3216">line 3216</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id=".sessionObj.events"><span class="type-signature">(static) </span>sessionObj.events<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Expose all event functions
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line3230">line 3230</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".sessionObj.util"><span class="type-signature">(static) </span>sessionObj.util<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Expose all utility functions
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line3238">line 3238</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id=".sessionObj.getApp"><span class="type-signature">(static) </span>sessionObj.getApp<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Returns the application object to which the session belongs. Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line3247">line 3247</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The application object
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".sessionObj.getAppName"><span class="type-signature">(static) </span>sessionObj.getAppName<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Returns the application name for the application to which the session belongs. Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line3258">line 3258</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The application name
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".sessionObj.getEasyrtcsid"><span class="type-signature">(static) </span>sessionObj.getEasyrtcsid<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Returns the easyrtcsid for the session.  Note that unlike most EasyRTC functions, this returns a value and does not use a callback.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line3269">line 3269</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns the easyrtcsid, which is the EasyRTC unique identifier for a session.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".sessionObj.getField"><span class="type-signature">(static) </span>sessionObj.getField<span class="signature">(fieldName, callback)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Returns session level field object for a given field name to a provided callback.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fieldName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Field name</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Callback with error and field value (any type)</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line3289">line 3289</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".sessionObj.getFields"><span class="type-signature">(static) </span>sessionObj.getFields<span class="signature">(limitToIsShared, callback)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Returns an object containing all field names and values within the session to a provided callback. Can be limited to fields with isShared option set to true.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>limitToIsShared</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Limits returned fields to those which have the isShared option set to true.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Callback with error and object containing field names and values.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line3336">line 3336</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".sessionObj.getFieldSync"><span class="type-signature">(static) </span>sessionObj.getFieldSync<span class="signature">(fieldName)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Returns session level field object for a given field name. If the field is not set, it will return a field object will a null field value.  This is a synchronous function, thus may not be available in custom cases where state is not kept in memory.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fieldName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Field name</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line3306">line 3306</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Field object
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".sessionObj.getFieldValueSync"><span class="type-signature">(static) </span>sessionObj.getFieldValueSync<span class="signature">(fieldName)</span><span class="type-signature"> &rarr; (nullable) {*}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Returns session level field value for a given field name. If the field is not set, it will return a null field value.  This is a synchronous function, thus may not be available in custom cases where state is not kept in memory.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fieldName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Field name</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line3321">line 3321</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Field value
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".sessionObj.setField"><span class="type-signature">(static) </span>sessionObj.setField<span class="signature">(fieldName, fieldValue, fieldOption<span class="signature-attributes">nullable</span>, next<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Sets session field value for a given field name.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fieldName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Must be formatted according to "fieldNameRegExp" option.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fieldValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fieldOption</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Field options (such as isShared which defaults to false)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>next</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">nextCallback</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">A success callback of form next(err). Possible err will be instanceof (ApplicationWarning).</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="easyrtc_public_obj.js.html">easyrtc_public_obj.js</a>, <a href="easyrtc_public_obj.js.html#line3359">line 3359</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+<nav class="hide"><h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li><li><a href="module-easyrtc_default_options.html">easyrtc_default_options</a></li><li><a href="module-easyrtc_private_obj.html">easyrtc_private_obj</a></li><li><a href="module-easyrtc_public_obj.html">easyrtc_public_obj</a></li><li><a href="module-easyrtc_util.html">easyrtc_util</a></li><li><a href="module-general_util.html">general_util</a></li></ul><h3>Classes</h3><ul><li><a href="module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li><li><a href="module-easyrtc_public_obj-pub.html">pub</a></li><li><a href="module-easyrtc_public_obj-pub.events.html">events</a></li><li><a href="module-easyrtc_public_obj-pub.util.html">util</a></li><li><a href="module-easyrtc_util-eu.html">eu</a></li><li><a href="module-general_util-g.html">g</a></li><li><a href="pub.appObj.html">appObj</a></li><li><a href="pub.appObj.connectionObj.html">connectionObj</a></li><li><a href="pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li><li><a href="pub.appObj.roomObj.html">roomObj</a></li><li><a href="pub.appObj.sessionObj.html">sessionObj</a></li></ul></nav>		
+	</div>
+</div>
+<footer class="template">
+	<div class="wrapper-content">
+		<p>Copyright &copy;2016 EasyRTC</p>
+	</div>
+</footer>
+<!-- <script>prettyPrint();</script> -->
+<!-- <script src="scripts/linenumber.js"></script> -->
+</body>
+</html>

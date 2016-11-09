@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>EasyRTC Documentation</title>
+  <script src="scripts/prettify/prettify.js"> </script>
+  <script src="scripts/prettify/lang-css.js"> </script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+  <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+  <link href="../assets/easyrtc-docs-jsdoc-styles-1.css" media="all" rel="stylesheet" />
+</head>
+<body>
+<header class="template">
+	<div class="wrapper-content">
+    <a href="../index.html"><img src="../assets/easyrtc-logo.png" alt="EasyRTC Documentation"></a>
+		<h1 title="EasyRTC Documentation">Documentation</h1>
+	</div>
+</header>
+<div class="wrapper-docs">
+<nav>
+	<h2><a href="../index.html">Docs Home</a></h2>
+	<h3>EasyRTC Guides</h3>
+	<ul>
+		<li><a href="../easyrtc_faq.html">FAQ</a></li>
+		<li><a href="../easyrtc_gettingStarted.html">Getting Started</a></li>
+		<li><a href="../easyrtc_server_install.html">EasyRTC Server: Installation</a></li>
+		<li><a href="../easyrtc_client_tutorial.html">EasyRTC Framework Tutorial</a></li>
+		<li><a href="../easyrtc_rooms.html">Rooms</a></li>
+		<li><a href="../easyrtc_server_configuration.html">EasyRTC Server: Configuration</a></li>
+		<li><a href="../easyrtc_server_events.html">EasyRTC Server: Events</a></li>
+		<li><a href="../easyrtc_server_ice.html">EasyRTC Server: ICE Configuration</a></li>
+		<li><a href="../easyrtc_with_other_servers.html">Using Alongside Other Servers</a></li>
+		<li><a href="../easyrtc_server_ssl.html">EasyRTC Server: Using SSL</a></li>
+		<li><a href="../easyrtc_webrtc_problems.html">WebRTC Problems and Possible Fixes</a></li>
+		<li><a href="../easyrtc_upcoming_features.html">Upcoming Features</a></li>
+		<li><a href="../easyrtc_changelog.html">Change Log</a></li>
+	</ul>
+	<h3>EasyRTC Client Classes</h3>
+	<ul>
+		<li><a href="../client-api/Easyrtc.html">Easyrtc</a></li>
+		<li><a href="../client-api/Easyrtc_App.html">Easyrtc_App</a></li>
+		<li><a href="../client-api/Easyrtc_ft.html">Easyrtc_ft</a></li>
+		<li><a href="../client-api/Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_Rates.html">Easyrtc_Rates</a></li>
+		<li><a href="../client-api/Easyrtc_Recorder.html">Easyrtc_Recorder</a></li>
+	</ul>
+	<h3>EasyRTC Server Modules</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li>
+		<li><a href="../server-api/module-easyrtc_default_options.html">easyrtc_default_options</a></li>
+		<li><a href="../server-api/module-easyrtc_private_obj.html">easyrtc_private_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj.html">easyrtc_public_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_util.html">easyrtc_util</a></li>
+		<li><a href="../server-api/module-general_util.html">general_util</a></li>
+	</ul>
+	<h3>EasyRTC Server Classes</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.html">pub</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.events.html">events</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.util.html">util</a></li>
+		<li><a href="../server-api/module-easyrtc_util-eu.html">eu</a></li>
+		<li><a href="../server-api/module-general_util-g.html">g</a></li>
+		<li><a href="../server-api/pub.appObj.html">appObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.html">connectionObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li>
+		<li><a href="../server-api/pub.appObj.roomObj.html">roomObj</a></li>
+		<li><a href="../server-api/pub.appObj.sessionObj.html">sessionObj</a></li>
+	</ul>
+</nav>
+<div class="easyrtc-docs-content">
+<div id="main">
+<h1 class="page-title">Source: desktop_capture_no_iframe_version.js</h1>
+<section>
+<article>
+<pre class="prettyprint source linenums easyrtc"><code><a name="line1"></a><div class="linenumber">1</div><div style="width:0em;display:inline-block"></div>//
+<a name="line2"></a><div class="linenumber">2</div><div style="width:0em;display:inline-block"></div>//&nbsp;This&nbsp;code&nbsp;was&nbsp;taken&nbsp;from:&nbsp;https://github.com/muaz-khan/WebRTC-Experiment/tree/master/Pluginfree-Screen-Sharing
+<a name="line3"></a><div class="linenumber">3</div><div style="width:0em;display:inline-block"></div>//&nbsp;and&nbsp;modified&nbsp;to&nbsp;fit&nbsp;with&nbsp;EasyRTC.
+<a name="line4"></a><div class="linenumber">4</div><div style="width:0em;display:inline-block"></div>//
+<a name="line5"></a><div class="linenumber">5</div>
+<a name="line6"></a><div class="linenumber">6</div><div style="width:0em;display:inline-block"></div>//&nbsp;todo:&nbsp;need&nbsp;to&nbsp;check&nbsp;exact&nbsp;chrome&nbsp;browser&nbsp;because&nbsp;opera/node-webkit&nbsp;also&nbsp;uses&nbsp;chromium&nbsp;framework
+<a name="line7"></a><div class="linenumber">7</div><div style="width:0em;display:inline-block"></div>var&nbsp;isChrome&nbsp;=&nbsp;!!navigator.webkitGetUserMedia;
+<a name="line8"></a><div class="linenumber">8</div>
+<a name="line9"></a><div class="linenumber">9</div><div style="width:0em;display:inline-block"></div>//&nbsp;DetectRTC.js&nbsp;-&nbsp;github.com/muaz-khan/WebRTC-Experiment/tree/master/DetectRTC
+<a name="line10"></a><div class="linenumber">10</div><div style="width:0em;display:inline-block"></div>//&nbsp;Below&nbsp;code&nbsp;is&nbsp;taken&nbsp;from&nbsp;RTCMultiConnection-v1.8.js&nbsp;(http://www.rtcmulticonnection.org/changes-log/#v1.8)
+<a name="line11"></a><div class="linenumber">11</div><div style="width:0em;display:inline-block"></div>//&nbsp;and&nbsp;modified.
+<a name="line12"></a><div class="linenumber">12</div><div style="width:0em;display:inline-block"></div>var&nbsp;DetectRTC&nbsp;=&nbsp;{};
+<a name="line13"></a><div class="linenumber">13</div>
+<a name="line14"></a><div class="linenumber">14</div>
+<a name="line15"></a><div class="linenumber">15</div><div style="width:0em;display:inline-block"></div>(function()&nbsp;{
+<a name="line16"></a><div class="linenumber">16</div>
+<a name="line17"></a><div class="linenumber">17</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line18"></a><div class="linenumber">18</div><div style="width:0em;display:inline-block"></div>*&nbsp;Provides&nbsp;a&nbsp;method&nbsp;for&nbsp;window/screen&nbsp;capture&nbsp;using&nbsp;an&nbsp;iframe.
+<a name="line19"></a><div class="linenumber">19</div><div style="width:0em;display:inline-block"></div>*&nbsp;Please&nbsp;read&nbsp;the&nbsp;comments&nbsp;in&nbsp;the&nbsp;source&nbsp;code&nbsp;about&nbsp;setting&nbsp;the&nbsp;
+<a name="line20"></a><div class="linenumber">20</div><div style="width:0em;display:inline-block"></div>*&nbsp;chrome&nbsp;extension&nbsp;that&nbsp;this&nbsp;requires&nbsp;to&nbsp;be&nbsp;installed&nbsp;in&nbsp;each&nbsp;browser.
+<a name="line21"></a><div class="linenumber">21</div><div style="width:0em;display:inline-block"></div>*&nbsp;@class&nbsp;Easyrtc_No_IframeCapture
+<a name="line22"></a><div class="linenumber">22</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line23"></a><div class="linenumber">23</div>
+<a name="line24"></a><div class="linenumber">24</div><div style="width:2em;display:inline-block"></div>var&nbsp;screenCallback;
+<a name="line25"></a><div class="linenumber">25</div>
+<a name="line26"></a><div class="linenumber">26</div><div style="width:2em;display:inline-block"></div>DetectRTC.screen&nbsp;=&nbsp;{
+<a name="line27"></a><div class="linenumber">27</div><div style="width:4em;display:inline-block"></div>supported:&nbsp;false,
+<a name="line28"></a><div class="linenumber">28</div><div style="width:4em;display:inline-block"></div>getSourceId:&nbsp;function(callback)&nbsp;{
+<a name="line29"></a><div class="linenumber">29</div><div style="width:6em;display:inline-block"></div>if&nbsp;(!callback)
+<a name="line30"></a><div class="linenumber">30</div><div style="width:8em;display:inline-block"></div>throw&nbsp;'"callback"&nbsp;parameter&nbsp;is&nbsp;mandatory.';
+<a name="line31"></a><div class="linenumber">31</div><div style="width:6em;display:inline-block"></div>screenCallback&nbsp;=&nbsp;callback;
+<a name="line32"></a><div class="linenumber">32</div><div style="width:6em;display:inline-block"></div>window.postMessage('desktopcapture-get-sourceId',&nbsp;'*');
+<a name="line33"></a><div class="linenumber">33</div><div style="width:4em;display:inline-block"></div>},
+<a name="line34"></a><div class="linenumber">34</div><div style="width:4em;display:inline-block"></div>isChromeExtensionAvailable:&nbsp;function(callback)&nbsp;{
+<a name="line35"></a><div class="linenumber">35</div><div style="width:6em;display:inline-block"></div>if&nbsp;(!callback)&nbsp;{
+<a name="line36"></a><div class="linenumber">36</div><div style="width:8em;display:inline-block"></div>return;
+<a name="line37"></a><div class="linenumber">37</div><div style="width:6em;display:inline-block"></div>}
+<a name="line38"></a><div class="linenumber">38</div>
+<a name="line39"></a><div class="linenumber">39</div><div style="width:6em;display:inline-block"></div>if&nbsp;(DetectRTC.screen.supported)&nbsp;{
+<a name="line40"></a><div class="linenumber">40</div><div style="width:8em;display:inline-block"></div>callback(true);
+<a name="line41"></a><div class="linenumber">41</div><div style="width:6em;display:inline-block"></div>}
+<a name="line42"></a><div class="linenumber">42</div>
+<a name="line43"></a><div class="linenumber">43</div><div style="width:6em;display:inline-block"></div>//&nbsp;ask&nbsp;extension&nbsp;if&nbsp;it&nbsp;is&nbsp;available
+<a name="line44"></a><div class="linenumber">44</div><div style="width:6em;display:inline-block"></div>window.postMessage('desktopcapture-are-you-there',&nbsp;'*');
+<a name="line45"></a><div class="linenumber">45</div>
+<a name="line46"></a><div class="linenumber">46</div><div style="width:6em;display:inline-block"></div>setTimeout(function()&nbsp;{
+<a name="line47"></a><div class="linenumber">47</div><div style="width:8em;display:inline-block"></div>callback(DetectRTC.screen.supported);
+<a name="line48"></a><div class="linenumber">48</div><div style="width:6em;display:inline-block"></div>},&nbsp;2000);
+<a name="line49"></a><div class="linenumber">49</div><div style="width:4em;display:inline-block"></div>},
+<a name="line50"></a><div class="linenumber">50</div><div style="width:4em;display:inline-block"></div>onMessageCallback:&nbsp;function(data)&nbsp;{
+<a name="line51"></a><div class="linenumber">51</div><div style="width:6em;display:inline-block"></div>//&nbsp;"cancel"&nbsp;button&nbsp;is&nbsp;clicked
+<a name="line52"></a><div class="linenumber">52</div><div style="width:6em;display:inline-block"></div>if&nbsp;(data&nbsp;==&nbsp;'PermissionDeniedError')&nbsp;{
+<a name="line53"></a><div class="linenumber">53</div><div style="width:8em;display:inline-block"></div>DetectRTC.screen.chromeMediaSource&nbsp;=&nbsp;'PermissionDeniedError';
+<a name="line54"></a><div class="linenumber">54</div><div style="width:8em;display:inline-block"></div>if&nbsp;(screenCallback)&nbsp;{
+<a name="line55"></a><div class="linenumber">55</div><div style="width:9em;display:inline-block"></div>return&nbsp;screenCallback('PermissionDeniedError');
+<a name="line56"></a><div class="linenumber">56</div><div style="width:8em;display:inline-block"></div>}
+<a name="line57"></a><div class="linenumber">57</div><div style="width:8em;display:inline-block"></div>else&nbsp;{
+<a name="line58"></a><div class="linenumber">58</div><div style="width:10em;display:inline-block"></div>throw&nbsp;new&nbsp;Error('PermissionDeniedError');
+<a name="line59"></a><div class="linenumber">59</div><div style="width:8em;display:inline-block"></div>}
+<a name="line60"></a><div class="linenumber">60</div><div style="width:6em;display:inline-block"></div>}
+<a name="line61"></a><div class="linenumber">61</div>
+<a name="line62"></a><div class="linenumber">62</div><div style="width:6em;display:inline-block"></div>//&nbsp;extension&nbsp;notified&nbsp;his&nbsp;presence
+<a name="line63"></a><div class="linenumber">63</div><div style="width:6em;display:inline-block"></div>if&nbsp;(data&nbsp;==&nbsp;'desktopcapture-loaded')&nbsp;{
+<a name="line64"></a><div class="linenumber">64</div><div style="width:8em;display:inline-block"></div>DetectRTC.screen.supported&nbsp;=&nbsp;true;
+<a name="line65"></a><div class="linenumber">65</div><div style="width:6em;display:inline-block"></div>}
+<a name="line66"></a><div class="linenumber">66</div>
+<a name="line67"></a><div class="linenumber">67</div><div style="width:6em;display:inline-block"></div>//&nbsp;extension&nbsp;shared&nbsp;temp&nbsp;sourceId
+<a name="line68"></a><div class="linenumber">68</div><div style="width:6em;display:inline-block"></div>if&nbsp;(data.sourceId)&nbsp;{
+<a name="line69"></a><div class="linenumber">69</div><div style="width:8em;display:inline-block"></div>DetectRTC.screen.sourceId&nbsp;=&nbsp;data.sourceId;
+<a name="line70"></a><div class="linenumber">70</div><div style="width:8em;display:inline-block"></div>if&nbsp;(screenCallback)&nbsp;{
+<a name="line71"></a><div class="linenumber">71</div><div style="width:10em;display:inline-block"></div>screenCallback(null);
+<a name="line72"></a><div class="linenumber">72</div><div style="width:8em;display:inline-block"></div>}
+<a name="line73"></a><div class="linenumber">73</div><div style="width:6em;display:inline-block"></div>}
+<a name="line74"></a><div class="linenumber">74</div><div style="width:4em;display:inline-block"></div>}
+<a name="line75"></a><div class="linenumber">75</div><div style="width:2em;display:inline-block"></div>};
+<a name="line76"></a><div class="linenumber">76</div>
+<a name="line77"></a><div class="linenumber">77</div><div style="width:2em;display:inline-block"></div>//&nbsp;check&nbsp;if&nbsp;desktop-capture&nbsp;extension&nbsp;installed.
+<a name="line78"></a><div class="linenumber">78</div><div style="width:2em;display:inline-block"></div>if&nbsp;(window.postMessage&nbsp;&amp;&amp;&nbsp;isChrome)&nbsp;{
+<a name="line79"></a><div class="linenumber">79</div><div style="width:4em;display:inline-block"></div>DetectRTC.screen.isChromeExtensionAvailable(function(){});
+<a name="line80"></a><div class="linenumber">80</div><div style="width:2em;display:inline-block"></div>}
+<a name="line81"></a><div class="linenumber">81</div><div style="width:0em;display:inline-block"></div>})();
+<a name="line82"></a><div class="linenumber">82</div>
+<a name="line83"></a><div class="linenumber">83</div><div style="width:0em;display:inline-block"></div>window.addEventListener('message',&nbsp;function(event)&nbsp;{
+<a name="line84"></a><div class="linenumber">84</div><div style="width:2em;display:inline-block"></div>if&nbsp;(event.origin&nbsp;!=&nbsp;window.location.origin)&nbsp;{
+<a name="line85"></a><div class="linenumber">85</div><div style="width:4em;display:inline-block"></div>return;
+<a name="line86"></a><div class="linenumber">86</div><div style="width:2em;display:inline-block"></div>}
+<a name="line87"></a><div class="linenumber">87</div>
+<a name="line88"></a><div class="linenumber">88</div><div style="width:2em;display:inline-block"></div>DetectRTC.screen.onMessageCallback(event.data);
+<a name="line89"></a><div class="linenumber">89</div><div style="width:0em;display:inline-block"></div>});
+<a name="line90"></a><div class="linenumber">90</div>
+<a name="line91"></a><div class="linenumber">91</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line92"></a><div class="linenumber">92</div><div style="width:1em;display:inline-block"></div>*&nbsp;Check&nbsp;if&nbsp;desktop&nbsp;capture&nbsp;installed
+<a name="line93"></a><div class="linenumber">93</div><div style="width:1em;display:inline-block"></div>*&nbsp;@function
+<a name="line94"></a><div class="linenumber">94</div><div style="width:1em;display:inline-block"></div>*&nbsp;@memberOf&nbsp;Easyrtc_No_IframeCapture
+<a name="line95"></a><div class="linenumber">95</div><div style="width:1em;display:inline-block"></div>*&nbsp;@return&nbsp;boolean
+<a name="line96"></a><div class="linenumber">96</div><div style="width:1em;display:inline-block"></div>*/&nbsp;
+<a name="line97"></a><div class="linenumber">97</div><div style="width:0em;display:inline-block"></div>easyrtc.isDesktopCaptureInstalled&nbsp;=&nbsp;function()&nbsp;{
+<a name="line98"></a><div class="linenumber">98</div><div style="width:2em;display:inline-block"></div>return&nbsp;DetectRTC.screen.supported;
+<a name="line99"></a><div class="linenumber">99</div><div style="width:0em;display:inline-block"></div>}
+<a name="line100"></a><div class="linenumber">100</div>
+<a name="line101"></a><div class="linenumber">101</div><div style="width:1em;display:inline-block"></div>/**&nbsp;Create&nbsp;a&nbsp;local&nbsp;media&nbsp;stream&nbsp;for&nbsp;desktop&nbsp;capture.
+<a name="line102"></a><div class="linenumber">102</div><div style="width:2em;display:inline-block"></div>*&nbsp;This&nbsp;will&nbsp;fail&nbsp;if&nbsp;a&nbsp;desktop&nbsp;capture&nbsp;extension&nbsp;is&nbsp;not&nbsp;installed.
+<a name="line103"></a><div class="linenumber">103</div><div style="width:2em;display:inline-block"></div>*&nbsp;not&nbsp;granting&nbsp;permission.
+<a name="line104"></a><div class="linenumber">104</div><div style="width:2em;display:inline-block"></div>*&nbsp;@function
+<a name="line105"></a><div class="linenumber">105</div><div style="width:2em;display:inline-block"></div>*&nbsp;@memberOf&nbsp;Easyrtc_No_IframeCapture
+<a name="line106"></a><div class="linenumber">106</div><div style="width:2em;display:inline-block"></div>*&nbsp;@param&nbsp;{function(HTMLMediaStream)}&nbsp;successCallback&nbsp;-&nbsp;will&nbsp;be&nbsp;called&nbsp;with&nbsp;localmedia&nbsp;stream&nbsp;on&nbsp;success.
+<a name="line107"></a><div class="linenumber">107</div><div style="width:2em;display:inline-block"></div>*&nbsp;@param&nbsp;{function(String,String)}&nbsp;errorCallback&nbsp;-&nbsp;is&nbsp;called&nbsp;with&nbsp;an&nbsp;error&nbsp;code&nbsp;and&nbsp;error&nbsp;description.
+<a name="line108"></a><div class="linenumber">108</div><div style="width:2em;display:inline-block"></div>*&nbsp;@param&nbsp;{String}&nbsp;streamName&nbsp;-&nbsp;an&nbsp;optional&nbsp;name&nbsp;for&nbsp;the&nbsp;media&nbsp;source&nbsp;so&nbsp;you&nbsp;can&nbsp;use&nbsp;multiple&nbsp;cameras&nbsp;and&nbsp;screen&nbsp;share&nbsp;simultaneously.
+<a name="line109"></a><div class="linenumber">109</div><div style="width:2em;display:inline-block"></div>*&nbsp;@param&nbsp;{String}&nbsp;iframeUrl&nbsp;-&nbsp;an&nbsp;optional&nbsp;url&nbsp;for&nbsp;the&nbsp;iframe.&nbsp;The&nbsp;default&nbsp;is&nbsp;to&nbsp;use&nbsp;Muaz&nbsp;Khan's.
+<a name="line110"></a><div class="linenumber">110</div><div style="width:2em;display:inline-block"></div>*&nbsp;@example
+<a name="line111"></a><div class="linenumber">111</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;easyrtc.initDesktopStream(
+<a name="line112"></a><div class="linenumber">112</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function(mediastream){
+<a name="line113"></a><div class="linenumber">113</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;easyrtc.setVideoObjectSrc(&nbsp;document.getElementById("mirrorVideo"),&nbsp;mediastream);
+<a name="line114"></a><div class="linenumber">114</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},
+<a name="line115"></a><div class="linenumber">115</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function(errorCode,&nbsp;errorText){
+<a name="line116"></a><div class="linenumber">116</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;easyrtc.showError(errorCode,&nbsp;errorText);
+<a name="line117"></a><div class="linenumber">117</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});
+<a name="line118"></a><div class="linenumber">118</div><div style="width:2em;display:inline-block"></div>*
+<a name="line119"></a><div class="linenumber">119</div><div style="width:2em;display:inline-block"></div>*/
+<a name="line120"></a><div class="linenumber">120</div><div style="width:0em;display:inline-block"></div>easyrtc.initDesktopStream&nbsp;=&nbsp;function(successCallback,&nbsp;failureCallback,&nbsp;streamName)&nbsp;{
+<a name="line121"></a><div class="linenumber">121</div><div style="width:2em;display:inline-block"></div>if&nbsp;(!easyrtc.isDesktopCaptureInstalled())&nbsp;{
+<a name="line122"></a><div class="linenumber">122</div><div style="width:4em;display:inline-block"></div>failureCallback(easyrtc.errCodes.DEVELOPER_ERR,&nbsp;"Desktop&nbsp;capture&nbsp;plugin&nbsp;not&nbsp;installed").
+<a name="line123"></a><div class="linenumber">123</div><div style="width:8em;display:inline-block"></div>return;
+<a name="line124"></a><div class="linenumber">124</div><div style="width:2em;display:inline-block"></div>}
+<a name="line125"></a><div class="linenumber">125</div>
+<a name="line126"></a><div class="linenumber">126</div><div style="width:2em;display:inline-block"></div>DetectRTC.screen.getSourceId(function(error)&nbsp;{
+<a name="line127"></a><div class="linenumber">127</div><div style="width:4em;display:inline-block"></div>if(&nbsp;error)&nbsp;{
+<a name="line128"></a><div class="linenumber">128</div><div style="width:6em;display:inline-block"></div>failureCallback(easyrtc.errCodes.MEDIA_ERR,&nbsp;error);
+<a name="line129"></a><div class="linenumber">129</div><div style="width:4em;display:inline-block"></div>}
+<a name="line130"></a><div class="linenumber">130</div><div style="width:4em;display:inline-block"></div>else&nbsp;if&nbsp;(DetectRTC.screen.sourceId)&nbsp;{
+<a name="line131"></a><div class="linenumber">131</div><div style="width:6em;display:inline-block"></div>easyrtc._presetMediaConstraints&nbsp;=&nbsp;{
+<a name="line132"></a><div class="linenumber">132</div><div style="width:8em;display:inline-block"></div>video:&nbsp;{
+<a name="line133"></a><div class="linenumber">133</div><div style="width:10em;display:inline-block"></div>mandatory:&nbsp;{
+<a name="line134"></a><div class="linenumber">134</div><div style="width:12em;display:inline-block"></div>chromeMediaSource:&nbsp;'desktop',
+<a name="line135"></a><div class="linenumber">135</div><div style="width:12em;display:inline-block"></div>chromeMediaSourceId:&nbsp;DetectRTC.screen.sourceId,
+<a name="line136"></a><div class="linenumber">136</div><div style="width:12em;display:inline-block"></div>maxWidth:&nbsp;1920,
+<a name="line137"></a><div class="linenumber">137</div><div style="width:12em;display:inline-block"></div>maxHeight:&nbsp;1080,
+<a name="line138"></a><div class="linenumber">138</div><div style="width:12em;display:inline-block"></div>minAspectRatio:&nbsp;1.77
+<a name="line139"></a><div class="linenumber">139</div><div style="width:10em;display:inline-block"></div>}
+<a name="line140"></a><div class="linenumber">140</div><div style="width:8em;display:inline-block"></div>},
+<a name="line141"></a><div class="linenumber">141</div><div style="width:8em;display:inline-block"></div>audio:&nbsp;false
+<a name="line142"></a><div class="linenumber">142</div><div style="width:6em;display:inline-block"></div>}
+<a name="line143"></a><div class="linenumber">143</div><div style="width:6em;display:inline-block"></div>easyrtc.initMediaSource(successCallback,&nbsp;failureCallback,&nbsp;streamName);
+<a name="line144"></a><div class="linenumber">144</div><div style="width:4em;display:inline-block"></div>}
+<a name="line145"></a><div class="linenumber">145</div><div style="width:4em;display:inline-block"></div>else&nbsp;{
+<a name="line146"></a><div class="linenumber">146</div><div style="width:6em;display:inline-block"></div>failureCallback(easyrtc.errCodes.MEDIA_CANCELLED,&nbsp;"Desktop&nbsp;capture&nbsp;plugin&nbsp;not&nbsp;installed");
+<a name="line147"></a><div class="linenumber">147</div><div style="width:4em;display:inline-block"></div>}
+<a name="line148"></a><div class="linenumber">148</div><div style="width:2em;display:inline-block"></div>});
+<a name="line149"></a><div class="linenumber">149</div><div style="width:0em;display:inline-block"></div>}
+<a name="line150"></a><div class="linenumber">150</div>
+<a name="line151"></a><div class="linenumber">151</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line152"></a><div class="linenumber">152</div><div style="width:0em;display:inline-block"></div>*&nbsp;This&nbsp;method&nbsp;builds&nbsp;a&nbsp;function&nbsp;that&nbsp;can&nbsp;be&nbsp;attached&nbsp;to&nbsp;a&nbsp;button&nbsp;to&nbsp;install&nbsp;an&nbsp;extension.
+<a name="line153"></a><div class="linenumber">153</div><div style="width:0em;display:inline-block"></div>*&nbsp;The&nbsp;install&nbsp;will&nbsp;only&nbsp;work&nbsp;on&nbsp;a&nbsp;{@link&nbsp;https://support.google.com/webmasters/answer/34592?hl=en|Google&nbsp;Verified&nbsp;Website}
+<a name="line154"></a><div class="linenumber">154</div><div style="width:0em;display:inline-block"></div>*&nbsp;with&nbsp;a&nbsp;`link`&nbsp;tag&nbsp;pointing&nbsp;to&nbsp;the&nbsp;extension,&nbsp;which&nbsp;is&nbsp;required&nbsp;by&nbsp;chrome&nbsp;for
+<a name="line155"></a><div class="linenumber">155</div><div style="width:0em;display:inline-block"></div>*&nbsp;{@link&nbsp;https://developer.chrome.com/webstore/inline_installation|Inline&nbsp;Installations}.
+<a name="line156"></a><div class="linenumber">156</div><div style="width:0em;display:inline-block"></div>*
+<a name="line157"></a><div class="linenumber">157</div><div style="width:0em;display:inline-block"></div>*&nbsp;@function
+<a name="line158"></a><div class="linenumber">158</div><div style="width:0em;display:inline-block"></div>*&nbsp;@memberOf&nbsp;Easyrtc_No_IframeCapture
+<a name="line159"></a><div class="linenumber">159</div><div style="width:0em;display:inline-block"></div>*&nbsp;@example
+<a name="line160"></a><div class="linenumber">160</div><div style="width:0em;display:inline-block"></div>*
+<a name="line161"></a><div class="linenumber">161</div><div style="width:0em;display:inline-block"></div>*&nbsp;&lt;link&nbsp;rel="chrome-webstore-item"&nbsp;href="https://chrome.google.com/webstore/detail/bemabaogbdfpbkkganibcmhbgjogabfj"&nbsp;id="custom-app-id"&nbsp;/&gt;
+<a name="line162"></a><div class="linenumber">162</div><div style="width:0em;display:inline-block"></div>*
+<a name="line163"></a><div class="linenumber">163</div><div style="width:0em;display:inline-block"></div>*&nbsp;easyrtc.chromeInstall("custom-app_id",&nbsp;function()&nbsp;{
+<a name="line164"></a><div class="linenumber">164</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;success
+<a name="line165"></a><div class="linenumber">165</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},
+<a name="line166"></a><div class="linenumber">166</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function(errorCode,&nbsp;errorText)&nbsp;{
+<a name="line167"></a><div class="linenumber">167</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;failure
+<a name="line168"></a><div class="linenumber">168</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});
+<a name="line169"></a><div class="linenumber">169</div><div style="width:0em;display:inline-block"></div>*
+<a name="line170"></a><div class="linenumber">170</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;{String}&nbsp;extensionId&nbsp;The&nbsp;id&nbsp;of&nbsp;the&nbsp;`link`&nbsp;tag&nbsp;pointing&nbsp;to&nbsp;your&nbsp;extension.
+<a name="line171"></a><div class="linenumber">171</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;{Function}&nbsp;successCallback&nbsp;Function&nbsp;to&nbsp;call&nbsp;on&nbsp;success.
+<a name="line172"></a><div class="linenumber">172</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;{Function}&nbsp;failureCallback&nbsp;Function&nbsp;to&nbsp;call&nbsp;on&nbsp;failure.&nbsp;&nbsp;Will&nbsp;pass&nbsp;argument&nbsp;`errorCode`&nbsp;and&nbsp;`errorMessage`.
+<a name="line173"></a><div class="linenumber">173</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line174"></a><div class="linenumber">174</div><div style="width:0em;display:inline-block"></div>easyrtc.chromeInstaller&nbsp;=&nbsp;function(extensionId,&nbsp;successCallback,&nbsp;failureCallback)&nbsp;{
+<a name="line175"></a><div class="linenumber">175</div><div style="width:2em;display:inline-block"></div>return&nbsp;function()&nbsp;{
+<a name="line176"></a><div class="linenumber">176</div><div style="width:4em;display:inline-block"></div>var&nbsp;el,&nbsp;url;
+<a name="line177"></a><div class="linenumber">177</div><div style="width:4em;display:inline-block"></div>if(&nbsp;!navigator.webkitGetUserMedia&nbsp;||
+<a name="line178"></a><div class="linenumber">178</div><div style="width:6em;display:inline-block"></div>!window.chrome&nbsp;||
+<a name="line179"></a><div class="linenumber">179</div><div style="width:6em;display:inline-block"></div>!chrome.webstore&nbsp;||
+<a name="line180"></a><div class="linenumber">180</div><div style="width:6em;display:inline-block"></div>!chrome.webstore.install&nbsp;)&nbsp;{
+<a name="line181"></a><div class="linenumber">181</div><div style="width:6em;display:inline-block"></div>failureCallback(easyrtc.errCodes.DEVELOPER_ERR,&nbsp;"Can't&nbsp;install&nbsp;plugin&nbsp;on&nbsp;non-chrome&nbsp;browsers");
+<a name="line182"></a><div class="linenumber">182</div><div style="width:4em;display:inline-block"></div>}
+<a name="line183"></a><div class="linenumber">183</div><div style="width:4em;display:inline-block"></div>else&nbsp;{
+<a name="line184"></a><div class="linenumber">184</div><div style="width:6em;display:inline-block"></div>try&nbsp;{
+<a name="line185"></a><div class="linenumber">185</div><div style="width:8em;display:inline-block"></div>var&nbsp;el&nbsp;=&nbsp;document.querySelector('head&nbsp;link#'&nbsp;+&nbsp;extensionId);
+<a name="line186"></a><div class="linenumber">186</div>
+<a name="line187"></a><div class="linenumber">187</div><div style="width:8em;display:inline-block"></div>if&nbsp;(&nbsp;!&nbsp;el)&nbsp;throw&nbsp;new&nbsp;Error("Can't&nbsp;find&nbsp;a&nbsp;`link`&nbsp;element&nbsp;in&nbsp;`head`&nbsp;with&nbsp;id&nbsp;`"+extensionId+"`");
+<a name="line188"></a><div class="linenumber">188</div>
+<a name="line189"></a><div class="linenumber">189</div><div style="width:8em;display:inline-block"></div>//&nbsp;get&nbsp;the&nbsp;chrome&nbsp;extension&nbsp;url&nbsp;from&nbsp;the&nbsp;link's&nbsp;href&nbsp;attribute
+<a name="line190"></a><div class="linenumber">190</div><div style="width:8em;display:inline-block"></div>var&nbsp;url&nbsp;=&nbsp;el.attributes.href.value;
+<a name="line191"></a><div class="linenumber">191</div>
+<a name="line192"></a><div class="linenumber">192</div><div style="width:8em;display:inline-block"></div>chrome.webstore.install(url,&nbsp;successCallback,&nbsp;function(error)&nbsp;{
+<a name="line193"></a><div class="linenumber">193</div><div style="width:10em;display:inline-block"></div>failureCallback(easyrtc.errCodes.DEVELOPER_ERR,&nbsp;error);
+<a name="line194"></a><div class="linenumber">194</div><div style="width:8em;display:inline-block"></div>});
+<a name="line195"></a><div class="linenumber">195</div>
+<a name="line196"></a><div class="linenumber">196</div><div style="width:6em;display:inline-block"></div>}
+<a name="line197"></a><div class="linenumber">197</div><div style="width:6em;display:inline-block"></div>catch&nbsp;(error)&nbsp;{
+<a name="line198"></a><div class="linenumber">198</div><div style="width:8em;display:inline-block"></div>failureCallback(easyrtc.errCodes.DEVELOPER_ERR,&nbsp;error.message);
+<a name="line199"></a><div class="linenumber">199</div><div style="width:6em;display:inline-block"></div>}
+<a name="line200"></a><div class="linenumber">200</div><div style="width:4em;display:inline-block"></div>}
+<a name="line201"></a><div class="linenumber">201</div><div style="width:2em;display:inline-block"></div>}
+<a name="line202"></a><div class="linenumber">202</div><div style="width:0em;display:inline-block"></div>}
+</code></pre>
+</article>
+</section>
+</div>
+		
+	</div>
+</div>
+<footer class="template">
+	<div class="wrapper-content">
+		<p>Copyright &copy;2016 EasyRTC</p>
+	</div>
+</footer>
+<!-- <script>prettyPrint();</script> -->
+<!-- <script src="scripts/linenumber.js"></script> -->
+</body>
+</html>

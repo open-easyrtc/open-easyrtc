@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>EasyRTC Documentation</title>
+  <script src="scripts/prettify/prettify.js"> </script>
+  <script src="scripts/prettify/lang-css.js"> </script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+  <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+  <link href="../assets/easyrtc-docs-jsdoc-styles-1.css" media="all" rel="stylesheet" />
+</head>
+<body>
+<header class="template">
+	<div class="wrapper-content">
+    <a href="../index.html"><img src="../assets/easyrtc-logo.png" alt="EasyRTC Documentation"></a>
+		<h1 title="EasyRTC Documentation">Documentation</h1>
+	</div>
+</header>
+<div class="wrapper-docs">
+<nav>
+	<h2><a href="../index.html">Docs Home</a></h2>
+	<h3>EasyRTC Guides</h3>
+	<ul>
+		<li><a href="../easyrtc_faq.html">FAQ</a></li>
+		<li><a href="../easyrtc_gettingStarted.html">Getting Started</a></li>
+		<li><a href="../easyrtc_server_install.html">EasyRTC Server: Installation</a></li>
+		<li><a href="../easyrtc_client_tutorial.html">EasyRTC Framework Tutorial</a></li>
+		<li><a href="../easyrtc_rooms.html">Rooms</a></li>
+		<li><a href="../easyrtc_server_configuration.html">EasyRTC Server: Configuration</a></li>
+		<li><a href="../easyrtc_server_events.html">EasyRTC Server: Events</a></li>
+		<li><a href="../easyrtc_server_ice.html">EasyRTC Server: ICE Configuration</a></li>
+		<li><a href="../easyrtc_with_other_servers.html">Using Alongside Other Servers</a></li>
+		<li><a href="../easyrtc_server_ssl.html">EasyRTC Server: Using SSL</a></li>
+		<li><a href="../easyrtc_webrtc_problems.html">WebRTC Problems and Possible Fixes</a></li>
+		<li><a href="../easyrtc_upcoming_features.html">Upcoming Features</a></li>
+		<li><a href="../easyrtc_changelog.html">Change Log</a></li>
+	</ul>
+	<h3>EasyRTC Client Classes</h3>
+	<ul>
+		<li><a href="../client-api/Easyrtc.html">Easyrtc</a></li>
+		<li><a href="../client-api/Easyrtc_App.html">Easyrtc_App</a></li>
+		<li><a href="../client-api/Easyrtc_ft.html">Easyrtc_ft</a></li>
+		<li><a href="../client-api/Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_Rates.html">Easyrtc_Rates</a></li>
+		<li><a href="../client-api/Easyrtc_Recorder.html">Easyrtc_Recorder</a></li>
+	</ul>
+	<h3>EasyRTC Server Modules</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li>
+		<li><a href="../server-api/module-easyrtc_default_options.html">easyrtc_default_options</a></li>
+		<li><a href="../server-api/module-easyrtc_private_obj.html">easyrtc_private_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj.html">easyrtc_public_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_util.html">easyrtc_util</a></li>
+		<li><a href="../server-api/module-general_util.html">general_util</a></li>
+	</ul>
+	<h3>EasyRTC Server Classes</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.html">pub</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.events.html">events</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.util.html">util</a></li>
+		<li><a href="../server-api/module-easyrtc_util-eu.html">eu</a></li>
+		<li><a href="../server-api/module-general_util-g.html">g</a></li>
+		<li><a href="../server-api/pub.appObj.html">appObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.html">connectionObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li>
+		<li><a href="../server-api/pub.appObj.roomObj.html">roomObj</a></li>
+		<li><a href="../server-api/pub.appObj.sessionObj.html">sessionObj</a></li>
+	</ul>
+</nav>
+<div class="easyrtc-docs-content">
+<div id="main">
+<h1 class="page-title">Source: easyrtc_ft.js</h1>
+<section>
+<article>
+<pre class="prettyprint source linenums easyrtc"><code><a name="line1"></a><div class="linenumber">1</div><div style="width:0em;display:inline-block"></div>/*&nbsp;global&nbsp;define,&nbsp;module,&nbsp;require,&nbsp;console&nbsp;*/
+<a name="line2"></a><div class="linenumber">2</div><div style="width:0em;display:inline-block"></div>/*!
+<a name="line3"></a><div class="linenumber">3</div><div style="width:1em;display:inline-block"></div>Script:&nbsp;easyrtc_ft.js
+<a name="line4"></a><div class="linenumber">4</div>
+<a name="line5"></a><div class="linenumber">5</div><div style="width:2em;display:inline-block"></div>Provides&nbsp;support&nbsp;file&nbsp;and&nbsp;data&nbsp;transfer&nbsp;support&nbsp;to&nbsp;easyrtc.
+<a name="line6"></a><div class="linenumber">6</div>
+<a name="line7"></a><div class="linenumber">7</div><div style="width:1em;display:inline-block"></div>About:&nbsp;License
+<a name="line8"></a><div class="linenumber">8</div>
+<a name="line9"></a><div class="linenumber">9</div><div style="width:2em;display:inline-block"></div>Copyright&nbsp;(c)&nbsp;2016,&nbsp;Priologic&nbsp;Software&nbsp;Inc.
+<a name="line10"></a><div class="linenumber">10</div><div style="width:2em;display:inline-block"></div>All&nbsp;rights&nbsp;reserved.
+<a name="line11"></a><div class="linenumber">11</div>
+<a name="line12"></a><div class="linenumber">12</div><div style="width:2em;display:inline-block"></div>Redistribution&nbsp;and&nbsp;use&nbsp;in&nbsp;source&nbsp;and&nbsp;binary&nbsp;forms,&nbsp;with&nbsp;or&nbsp;without
+<a name="line13"></a><div class="linenumber">13</div><div style="width:2em;display:inline-block"></div>modification,&nbsp;are&nbsp;permitted&nbsp;provided&nbsp;that&nbsp;the&nbsp;following&nbsp;conditions&nbsp;are&nbsp;met:
+<a name="line14"></a><div class="linenumber">14</div>
+<a name="line15"></a><div class="linenumber">15</div><div style="width:4em;display:inline-block"></div>*&nbsp;Redistributions&nbsp;of&nbsp;source&nbsp;code&nbsp;must&nbsp;retain&nbsp;the&nbsp;above&nbsp;copyright&nbsp;notice,
+<a name="line16"></a><div class="linenumber">16</div><div style="width:5em;display:inline-block"></div>this&nbsp;list&nbsp;of&nbsp;conditions&nbsp;and&nbsp;the&nbsp;following&nbsp;disclaimer.
+<a name="line17"></a><div class="linenumber">17</div><div style="width:4em;display:inline-block"></div>*&nbsp;Redistributions&nbsp;in&nbsp;binary&nbsp;form&nbsp;must&nbsp;reproduce&nbsp;the&nbsp;above&nbsp;copyright
+<a name="line18"></a><div class="linenumber">18</div><div style="width:5em;display:inline-block"></div>notice,&nbsp;this&nbsp;list&nbsp;of&nbsp;conditions&nbsp;and&nbsp;the&nbsp;following&nbsp;disclaimer&nbsp;in&nbsp;the
+<a name="line19"></a><div class="linenumber">19</div><div style="width:5em;display:inline-block"></div>documentation&nbsp;and/or&nbsp;other&nbsp;materials&nbsp;provided&nbsp;with&nbsp;the&nbsp;distribution.
+<a name="line20"></a><div class="linenumber">20</div>
+<a name="line21"></a><div class="linenumber">21</div><div style="width:2em;display:inline-block"></div>THIS&nbsp;SOFTWARE&nbsp;IS&nbsp;PROVIDED&nbsp;BY&nbsp;THE&nbsp;COPYRIGHT&nbsp;HOLDERS&nbsp;AND&nbsp;CONTRIBUTORS&nbsp;"AS&nbsp;IS"
+<a name="line22"></a><div class="linenumber">22</div><div style="width:2em;display:inline-block"></div>AND&nbsp;ANY&nbsp;EXPRESS&nbsp;OR&nbsp;IMPLIED&nbsp;WARRANTIES,&nbsp;INCLUDING,&nbsp;BUT&nbsp;NOT&nbsp;LIMITED&nbsp;TO,&nbsp;THE
+<a name="line23"></a><div class="linenumber">23</div><div style="width:2em;display:inline-block"></div>IMPLIED&nbsp;WARRANTIES&nbsp;OF&nbsp;MERCHANTABILITY&nbsp;AND&nbsp;FITNESS&nbsp;FOR&nbsp;A&nbsp;PARTICULAR&nbsp;PURPOSE
+<a name="line24"></a><div class="linenumber">24</div><div style="width:2em;display:inline-block"></div>ARE&nbsp;DISCLAIMED.&nbsp;IN&nbsp;NO&nbsp;EVENT&nbsp;SHALL&nbsp;THE&nbsp;COPYRIGHT&nbsp;HOLDER&nbsp;OR&nbsp;CONTRIBUTORS&nbsp;BE
+<a name="line25"></a><div class="linenumber">25</div><div style="width:2em;display:inline-block"></div>LIABLE&nbsp;FOR&nbsp;ANY&nbsp;DIRECT,&nbsp;INDIRECT,&nbsp;INCIDENTAL,&nbsp;SPECIAL,&nbsp;EXEMPLARY,&nbsp;OR
+<a name="line26"></a><div class="linenumber">26</div><div style="width:2em;display:inline-block"></div>CONSEQUENTIAL&nbsp;DAMAGES&nbsp;(INCLUDING,&nbsp;BUT&nbsp;NOT&nbsp;LIMITED&nbsp;TO,&nbsp;PROCUREMENT&nbsp;OF
+<a name="line27"></a><div class="linenumber">27</div><div style="width:2em;display:inline-block"></div>SUBSTITUTE&nbsp;GOODS&nbsp;OR&nbsp;SERVICES;&nbsp;LOSS&nbsp;OF&nbsp;USE,&nbsp;DATA,&nbsp;OR&nbsp;PROFITS;&nbsp;OR&nbsp;BUSINESS
+<a name="line28"></a><div class="linenumber">28</div><div style="width:2em;display:inline-block"></div>INTERRUPTION)&nbsp;HOWEVER&nbsp;CAUSED&nbsp;AND&nbsp;ON&nbsp;ANY&nbsp;THEORY&nbsp;OF&nbsp;LIABILITY,&nbsp;WHETHER&nbsp;IN
+<a name="line29"></a><div class="linenumber">29</div><div style="width:2em;display:inline-block"></div>CONTRACT,&nbsp;STRICT&nbsp;LIABILITY,&nbsp;OR&nbsp;TORT&nbsp;(INCLUDING&nbsp;NEGLIGENCE&nbsp;OR&nbsp;OTHERWISE)
+<a name="line30"></a><div class="linenumber">30</div><div style="width:2em;display:inline-block"></div>ARISING&nbsp;IN&nbsp;ANY&nbsp;WAY&nbsp;OUT&nbsp;OF&nbsp;THE&nbsp;USE&nbsp;OF&nbsp;THIS&nbsp;SOFTWARE,&nbsp;EVEN&nbsp;IF&nbsp;ADVISED&nbsp;OF&nbsp;THE
+<a name="line31"></a><div class="linenumber">31</div><div style="width:2em;display:inline-block"></div>POSSIBILITY&nbsp;OF&nbsp;SUCH&nbsp;DAMAGE.
+<a name="line32"></a><div class="linenumber">32</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line33"></a><div class="linenumber">33</div>
+<a name="line34"></a><div class="linenumber">34</div><div style="width:0em;display:inline-block"></div>(function&nbsp;(root,&nbsp;factory)&nbsp;{
+<a name="line35"></a><div class="linenumber">35</div><div style="width:2em;display:inline-block"></div>if&nbsp;(typeof&nbsp;define&nbsp;===&nbsp;'function'&nbsp;&amp;&amp;&nbsp;define.amd)&nbsp;{
+<a name="line36"></a><div class="linenumber">36</div><div style="width:4em;display:inline-block"></div>//RequireJS&nbsp;(AMD)&nbsp;build&nbsp;system
+<a name="line37"></a><div class="linenumber">37</div><div style="width:4em;display:inline-block"></div>define(['easyrtc'],&nbsp;factory);
+<a name="line38"></a><div class="linenumber">38</div><div style="width:2em;display:inline-block"></div>}&nbsp;else&nbsp;if&nbsp;(typeof&nbsp;module&nbsp;===&nbsp;'object'&nbsp;&amp;&amp;&nbsp;module.exports)&nbsp;{
+<a name="line39"></a><div class="linenumber">39</div><div style="width:4em;display:inline-block"></div>//CommonJS&nbsp;build&nbsp;system
+<a name="line40"></a><div class="linenumber">40</div><div style="width:4em;display:inline-block"></div>module.exports&nbsp;=&nbsp;factory(require('easyrtc'));
+<a name="line41"></a><div class="linenumber">41</div><div style="width:2em;display:inline-block"></div>}&nbsp;else&nbsp;{
+<a name="line42"></a><div class="linenumber">42</div><div style="width:4em;display:inline-block"></div>//Vanilla&nbsp;JS,&nbsp;ensure&nbsp;dependencies&nbsp;are&nbsp;loaded&nbsp;correctly
+<a name="line43"></a><div class="linenumber">43</div><div style="width:4em;display:inline-block"></div>if&nbsp;(typeof&nbsp;window.easyrtc&nbsp;!==&nbsp;'object'&nbsp;||&nbsp;!window.easyrtc)&nbsp;{
+<a name="line44"></a><div class="linenumber">44</div><div style="width:6em;display:inline-block"></div>throw&nbsp;new&nbsp;Error("easyrtc_ft&nbsp;requires&nbsp;easyrtc");
+<a name="line45"></a><div class="linenumber">45</div><div style="width:4em;display:inline-block"></div>}
+<a name="line46"></a><div class="linenumber">46</div><div style="width:4em;display:inline-block"></div>root.easyrtc_ft&nbsp;=&nbsp;factory(window.easyrtc);
+<a name="line47"></a><div class="linenumber">47</div><div style="width:1em;display:inline-block"></div>}
+<a name="line48"></a><div class="linenumber">48</div><div style="width:0em;display:inline-block"></div>}(this,&nbsp;function&nbsp;(easyrtc,&nbsp;undefined)&nbsp;{
+<a name="line49"></a><div class="linenumber">49</div>
+<a name="line50"></a><div class="linenumber">50</div><div style="width:0em;display:inline-block"></div>"use&nbsp;strict";
+<a name="line51"></a><div class="linenumber">51</div>
+<a name="line52"></a><div class="linenumber">52</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line53"></a><div class="linenumber">53</div><div style="width:0em;display:inline-block"></div>*&nbsp;@class&nbsp;Easyrtc_ft.
+<a name="line54"></a><div class="linenumber">54</div><div style="width:0em;display:inline-block"></div>*
+<a name="line55"></a><div class="linenumber">55</div><div style="width:0em;display:inline-block"></div>*&nbsp;@returns&nbsp;{Easyrtc_ft}&nbsp;the&nbsp;new&nbsp;easyrtc&nbsp;instance.
+<a name="line56"></a><div class="linenumber">56</div><div style="width:0em;display:inline-block"></div>*
+<a name="line57"></a><div class="linenumber">57</div><div style="width:0em;display:inline-block"></div>*&nbsp;@constructs&nbsp;Easyrtc_ft
+<a name="line58"></a><div class="linenumber">58</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line59"></a><div class="linenumber">59</div>
+<a name="line60"></a><div class="linenumber">60</div><div style="width:0em;display:inline-block"></div>var&nbsp;easyrtc_ft&nbsp;=&nbsp;{};
+<a name="line61"></a><div class="linenumber">61</div>
+<a name="line62"></a><div class="linenumber">62</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line63"></a><div class="linenumber">63</div><div style="width:0em;display:inline-block"></div>*&nbsp;Error&nbsp;codes&nbsp;that&nbsp;the&nbsp;EasyRTC&nbsp;will&nbsp;use&nbsp;in&nbsp;the&nbsp;errorCode&nbsp;field&nbsp;of&nbsp;error&nbsp;object&nbsp;passed
+<a name="line64"></a><div class="linenumber">64</div><div style="width:0em;display:inline-block"></div>*&nbsp;to&nbsp;error&nbsp;handler&nbsp;set&nbsp;by&nbsp;easyrtc.setOnError.&nbsp;The&nbsp;error&nbsp;codes&nbsp;are&nbsp;short&nbsp;printable&nbsp;strings.
+<a name="line65"></a><div class="linenumber">65</div><div style="width:0em;display:inline-block"></div>*&nbsp;@type&nbsp;Object
+<a name="line66"></a><div class="linenumber">66</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line67"></a><div class="linenumber">67</div><div style="width:0em;display:inline-block"></div>easyrtc_ft.errCodes&nbsp;=&nbsp;{
+<a name="line68"></a><div class="linenumber">68</div><div style="width:2em;display:inline-block"></div>DATA_LOST:&nbsp;"DATA_LOST",
+<a name="line69"></a><div class="linenumber">69</div><div style="width:2em;display:inline-block"></div>INVALID_DATA:&nbsp;"INVALID_DATA",
+<a name="line70"></a><div class="linenumber">70</div><div style="width:2em;display:inline-block"></div>DROP_FILE:&nbsp;"DROP_FILE"
+<a name="line71"></a><div class="linenumber">71</div><div style="width:0em;display:inline-block"></div>};
+<a name="line72"></a><div class="linenumber">72</div>
+<a name="line73"></a><div class="linenumber">73</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line74"></a><div class="linenumber">74</div><div style="width:0em;display:inline-block"></div>*&nbsp;Establish&nbsp;an&nbsp;area&nbsp;as&nbsp;a&nbsp;drag-n-drop&nbsp;drop&nbsp;site&nbsp;for&nbsp;files.
+<a name="line75"></a><div class="linenumber">75</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;{DOMString}&nbsp;droptargetName&nbsp;-&nbsp;the&nbsp;id&nbsp;of&nbsp;the&nbsp;drag-and-drop&nbsp;site&nbsp;or&nbsp;the&nbsp;actual&nbsp;DOM&nbsp;object.
+<a name="line76"></a><div class="linenumber">76</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;{Function}&nbsp;filesHandler&nbsp;-&nbsp;function&nbsp;that&nbsp;accepts&nbsp;an&nbsp;array&nbsp;of&nbsp;File's.
+<a name="line77"></a><div class="linenumber">77</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line78"></a><div class="linenumber">78</div><div style="width:0em;display:inline-block"></div>easyrtc_ft.buildDragNDropRegion&nbsp;=&nbsp;function(droptargetName,&nbsp;filesHandler)&nbsp;{
+<a name="line79"></a><div class="linenumber">79</div><div style="width:2em;display:inline-block"></div>var&nbsp;droptarget;
+<a name="line80"></a><div class="linenumber">80</div><div style="width:2em;display:inline-block"></div>if&nbsp;(typeof&nbsp;droptargetName&nbsp;===&nbsp;'string')&nbsp;{
+<a name="line81"></a><div class="linenumber">81</div><div style="width:4em;display:inline-block"></div>droptarget&nbsp;=&nbsp;document.getElementById(droptargetName);
+<a name="line82"></a><div class="linenumber">82</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!droptarget)&nbsp;{
+<a name="line83"></a><div class="linenumber">83</div><div style="width:6em;display:inline-block"></div>throw&nbsp;("unknown&nbsp;object&nbsp;"&nbsp;+&nbsp;droptargetName);
+<a name="line84"></a><div class="linenumber">84</div><div style="width:4em;display:inline-block"></div>}
+<a name="line85"></a><div class="linenumber">85</div><div style="width:2em;display:inline-block"></div>}
+<a name="line86"></a><div class="linenumber">86</div><div style="width:2em;display:inline-block"></div>else&nbsp;{
+<a name="line87"></a><div class="linenumber">87</div><div style="width:4em;display:inline-block"></div>droptarget&nbsp;=&nbsp;droptargetName;
+<a name="line88"></a><div class="linenumber">88</div><div style="width:2em;display:inline-block"></div>}
+<a name="line89"></a><div class="linenumber">89</div>
+<a name="line90"></a><div class="linenumber">90</div><div style="width:2em;display:inline-block"></div>function&nbsp;addClass(target,&nbsp;classname)&nbsp;{
+<a name="line91"></a><div class="linenumber">91</div><div style="width:4em;display:inline-block"></div>if&nbsp;(target.className)&nbsp;{
+<a name="line92"></a><div class="linenumber">92</div><div style="width:6em;display:inline-block"></div>if&nbsp;(target.className.indexOf(classname,&nbsp;0)&nbsp;&gt;=&nbsp;0)&nbsp;{
+<a name="line93"></a><div class="linenumber">93</div><div style="width:8em;display:inline-block"></div>return;
+<a name="line94"></a><div class="linenumber">94</div><div style="width:6em;display:inline-block"></div>}
+<a name="line95"></a><div class="linenumber">95</div><div style="width:6em;display:inline-block"></div>else&nbsp;{
+<a name="line96"></a><div class="linenumber">96</div><div style="width:8em;display:inline-block"></div>target.className&nbsp;=&nbsp;target.className&nbsp;+&nbsp;"&nbsp;"&nbsp;+&nbsp;classname;
+<a name="line97"></a><div class="linenumber">97</div><div style="width:6em;display:inline-block"></div>}
+<a name="line98"></a><div class="linenumber">98</div><div style="width:4em;display:inline-block"></div>}
+<a name="line99"></a><div class="linenumber">99</div><div style="width:4em;display:inline-block"></div>else&nbsp;{
+<a name="line100"></a><div class="linenumber">100</div><div style="width:6em;display:inline-block"></div>target.className&nbsp;=&nbsp;classname;
+<a name="line101"></a><div class="linenumber">101</div><div style="width:4em;display:inline-block"></div>}
+<a name="line102"></a><div class="linenumber">102</div><div style="width:4em;display:inline-block"></div>target.className&nbsp;=&nbsp;target.className.replace("&nbsp;&nbsp;",&nbsp;"&nbsp;");
+<a name="line103"></a><div class="linenumber">103</div><div style="width:2em;display:inline-block"></div>}
+<a name="line104"></a><div class="linenumber">104</div>
+<a name="line105"></a><div class="linenumber">105</div><div style="width:2em;display:inline-block"></div>function&nbsp;removeClass(target,&nbsp;classname)&nbsp;{
+<a name="line106"></a><div class="linenumber">106</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!target.className)&nbsp;{
+<a name="line107"></a><div class="linenumber">107</div><div style="width:6em;display:inline-block"></div>return;
+<a name="line108"></a><div class="linenumber">108</div><div style="width:4em;display:inline-block"></div>}
+<a name="line109"></a><div class="linenumber">109</div><div style="width:4em;display:inline-block"></div>target.className&nbsp;=&nbsp;target.className.replace(classname,&nbsp;"").replace("&nbsp;&nbsp;",&nbsp;"&nbsp;");
+<a name="line110"></a><div class="linenumber">110</div><div style="width:2em;display:inline-block"></div>}
+<a name="line111"></a><div class="linenumber">111</div>
+<a name="line112"></a><div class="linenumber">112</div><div style="width:2em;display:inline-block"></div>function&nbsp;ignore(e)&nbsp;{
+<a name="line113"></a><div class="linenumber">113</div><div style="width:4em;display:inline-block"></div>e.stopPropagation();
+<a name="line114"></a><div class="linenumber">114</div><div style="width:4em;display:inline-block"></div>e.preventDefault();
+<a name="line115"></a><div class="linenumber">115</div><div style="width:4em;display:inline-block"></div>return&nbsp;false;
+<a name="line116"></a><div class="linenumber">116</div><div style="width:2em;display:inline-block"></div>}
+<a name="line117"></a><div class="linenumber">117</div>
+<a name="line118"></a><div class="linenumber">118</div><div style="width:2em;display:inline-block"></div>function&nbsp;drageventcancel(e)&nbsp;{
+<a name="line119"></a><div class="linenumber">119</div><div style="width:4em;display:inline-block"></div>if&nbsp;(e.preventDefault)&nbsp;{
+<a name="line120"></a><div class="linenumber">120</div><div style="width:6em;display:inline-block"></div>e.preventDefault();&nbsp;//&nbsp;required&nbsp;by&nbsp;FF&nbsp;+&nbsp;Safari
+<a name="line121"></a><div class="linenumber">121</div><div style="width:4em;display:inline-block"></div>}
+<a name="line122"></a><div class="linenumber">122</div><div style="width:4em;display:inline-block"></div>e.dataTransfer.dropEffect&nbsp;=&nbsp;'copy';&nbsp;//&nbsp;tells&nbsp;the&nbsp;browser&nbsp;what&nbsp;drop&nbsp;effect&nbsp;is&nbsp;allowed&nbsp;here
+<a name="line123"></a><div class="linenumber">123</div><div style="width:4em;display:inline-block"></div>return&nbsp;false;&nbsp;//&nbsp;required&nbsp;by&nbsp;IE
+<a name="line124"></a><div class="linenumber">124</div><div style="width:2em;display:inline-block"></div>}
+<a name="line125"></a><div class="linenumber">125</div>
+<a name="line126"></a><div class="linenumber">126</div><div style="width:2em;display:inline-block"></div>var&nbsp;dropCueClass&nbsp;=&nbsp;"easyrtcfiledrop";
+<a name="line127"></a><div class="linenumber">127</div>
+<a name="line128"></a><div class="linenumber">128</div><div style="width:2em;display:inline-block"></div>function&nbsp;dropHandler(e)&nbsp;{
+<a name="line129"></a><div class="linenumber">129</div><div style="width:4em;display:inline-block"></div>removeClass(droptarget,&nbsp;dropCueClass);
+<a name="line130"></a><div class="linenumber">130</div><div style="width:4em;display:inline-block"></div>var&nbsp;dt&nbsp;=&nbsp;e.dataTransfer;
+<a name="line131"></a><div class="linenumber">131</div><div style="width:4em;display:inline-block"></div>var&nbsp;files&nbsp;=&nbsp;dt.files;
+<a name="line132"></a><div class="linenumber">132</div><div style="width:4em;display:inline-block"></div>if&nbsp;(dt.files.length&nbsp;&gt;&nbsp;0)&nbsp;{
+<a name="line133"></a><div class="linenumber">133</div><div style="width:6em;display:inline-block"></div>try&nbsp;{
+<a name="line134"></a><div class="linenumber">134</div><div style="width:8em;display:inline-block"></div>filesHandler(files);
+<a name="line135"></a><div class="linenumber">135</div><div style="width:6em;display:inline-block"></div>}&nbsp;catch&nbsp;(errorEvent)&nbsp;{
+<a name="line136"></a><div class="linenumber">136</div><div style="width:8em;display:inline-block"></div>easyrtc.showError(easyrtc_ft.errCodes.DROP_FILE,&nbsp;errorEvent);
+<a name="line137"></a><div class="linenumber">137</div><div style="width:6em;display:inline-block"></div>}
+<a name="line138"></a><div class="linenumber">138</div><div style="width:4em;display:inline-block"></div>}
+<a name="line139"></a><div class="linenumber">139</div><div style="width:4em;display:inline-block"></div>return&nbsp;ignore(e);
+<a name="line140"></a><div class="linenumber">140</div><div style="width:2em;display:inline-block"></div>}
+<a name="line141"></a><div class="linenumber">141</div>
+<a name="line142"></a><div class="linenumber">142</div><div style="width:2em;display:inline-block"></div>function&nbsp;dragEnterHandler(e)&nbsp;{
+<a name="line143"></a><div class="linenumber">143</div><div style="width:4em;display:inline-block"></div>addClass(droptarget,&nbsp;dropCueClass);
+<a name="line144"></a><div class="linenumber">144</div><div style="width:4em;display:inline-block"></div>return&nbsp;drageventcancel(e);
+<a name="line145"></a><div class="linenumber">145</div><div style="width:2em;display:inline-block"></div>}
+<a name="line146"></a><div class="linenumber">146</div>
+<a name="line147"></a><div class="linenumber">147</div><div style="width:2em;display:inline-block"></div>function&nbsp;dragLeaveHandler(e)&nbsp;{
+<a name="line148"></a><div class="linenumber">148</div><div style="width:4em;display:inline-block"></div>removeClass(droptarget,&nbsp;dropCueClass);
+<a name="line149"></a><div class="linenumber">149</div><div style="width:4em;display:inline-block"></div>return&nbsp;drageventcancel(e);
+<a name="line150"></a><div class="linenumber">150</div><div style="width:2em;display:inline-block"></div>}
+<a name="line151"></a><div class="linenumber">151</div>
+<a name="line152"></a><div class="linenumber">152</div><div style="width:2em;display:inline-block"></div>var&nbsp;addEvent&nbsp;=&nbsp;(function()&nbsp;{
+<a name="line153"></a><div class="linenumber">153</div><div style="width:4em;display:inline-block"></div>if&nbsp;(document.addEventListener)&nbsp;{
+<a name="line154"></a><div class="linenumber">154</div><div style="width:6em;display:inline-block"></div>return&nbsp;function(el,&nbsp;type,&nbsp;fn)&nbsp;{
+<a name="line155"></a><div class="linenumber">155</div><div style="width:8em;display:inline-block"></div>if&nbsp;(el&nbsp;&amp;&amp;&nbsp;el.nodeName&nbsp;||&nbsp;el&nbsp;===&nbsp;window)&nbsp;{
+<a name="line156"></a><div class="linenumber">156</div><div style="width:10em;display:inline-block"></div>el.addEventListener(type,&nbsp;fn,&nbsp;false);
+<a name="line157"></a><div class="linenumber">157</div><div style="width:8em;display:inline-block"></div>}&nbsp;else&nbsp;if&nbsp;(el&nbsp;&amp;&amp;&nbsp;el.length)&nbsp;{
+<a name="line158"></a><div class="linenumber">158</div><div style="width:10em;display:inline-block"></div>for&nbsp;(var&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;el.length;&nbsp;i++)&nbsp;{
+<a name="line159"></a><div class="linenumber">159</div><div style="width:12em;display:inline-block"></div>addEvent(el[i],&nbsp;type,&nbsp;fn);
+<a name="line160"></a><div class="linenumber">160</div><div style="width:10em;display:inline-block"></div>}
+<a name="line161"></a><div class="linenumber">161</div><div style="width:8em;display:inline-block"></div>}
+<a name="line162"></a><div class="linenumber">162</div><div style="width:6em;display:inline-block"></div>};
+<a name="line163"></a><div class="linenumber">163</div><div style="width:4em;display:inline-block"></div>}&nbsp;else&nbsp;{
+<a name="line164"></a><div class="linenumber">164</div><div style="width:6em;display:inline-block"></div>return&nbsp;function(el,&nbsp;type,&nbsp;fn)&nbsp;{
+<a name="line165"></a><div class="linenumber">165</div><div style="width:8em;display:inline-block"></div>if&nbsp;(el&nbsp;&amp;&amp;&nbsp;el.nodeName&nbsp;||&nbsp;el&nbsp;===&nbsp;window)&nbsp;{
+<a name="line166"></a><div class="linenumber">166</div><div style="width:10em;display:inline-block"></div>el.attachEvent('on'&nbsp;+&nbsp;type,&nbsp;function()&nbsp;{
+<a name="line167"></a><div class="linenumber">167</div><div style="width:12em;display:inline-block"></div>return&nbsp;fn.call(el,&nbsp;window.event);
+<a name="line168"></a><div class="linenumber">168</div><div style="width:10em;display:inline-block"></div>});
+<a name="line169"></a><div class="linenumber">169</div><div style="width:8em;display:inline-block"></div>}&nbsp;else&nbsp;if&nbsp;(el&nbsp;&amp;&amp;&nbsp;el.length)&nbsp;{
+<a name="line170"></a><div class="linenumber">170</div><div style="width:10em;display:inline-block"></div>for&nbsp;(var&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;el.length;&nbsp;i++)&nbsp;{
+<a name="line171"></a><div class="linenumber">171</div><div style="width:12em;display:inline-block"></div>addEvent(el[i],&nbsp;type,&nbsp;fn);
+<a name="line172"></a><div class="linenumber">172</div><div style="width:10em;display:inline-block"></div>}
+<a name="line173"></a><div class="linenumber">173</div><div style="width:8em;display:inline-block"></div>}
+<a name="line174"></a><div class="linenumber">174</div><div style="width:6em;display:inline-block"></div>};
+<a name="line175"></a><div class="linenumber">175</div><div style="width:4em;display:inline-block"></div>}
+<a name="line176"></a><div class="linenumber">176</div><div style="width:2em;display:inline-block"></div>})();
+<a name="line177"></a><div class="linenumber">177</div>
+<a name="line178"></a><div class="linenumber">178</div><div style="width:2em;display:inline-block"></div>droptarget.ondrop&nbsp;=&nbsp;dropHandler;
+<a name="line179"></a><div class="linenumber">179</div><div style="width:2em;display:inline-block"></div>droptarget.ondragenter&nbsp;=&nbsp;dragEnterHandler;
+<a name="line180"></a><div class="linenumber">180</div><div style="width:2em;display:inline-block"></div>droptarget.ondragleave&nbsp;=&nbsp;dragLeaveHandler;
+<a name="line181"></a><div class="linenumber">181</div><div style="width:2em;display:inline-block"></div>droptarget.ondragover&nbsp;=&nbsp;drageventcancel;
+<a name="line182"></a><div class="linenumber">182</div><div style="width:0em;display:inline-block"></div>};
+<a name="line183"></a><div class="linenumber">183</div>
+<a name="line184"></a><div class="linenumber">184</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line185"></a><div class="linenumber">185</div><div style="width:0em;display:inline-block"></div>*&nbsp;Builds&nbsp;a&nbsp;function&nbsp;that&nbsp;can&nbsp;be&nbsp;used&nbsp;to&nbsp;send&nbsp;a&nbsp;group&nbsp;of&nbsp;files&nbsp;to&nbsp;a&nbsp;peer.
+<a name="line186"></a><div class="linenumber">186</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;{String}&nbsp;destUser&nbsp;easyrtcid&nbsp;of&nbsp;the&nbsp;person&nbsp;being&nbsp;sent&nbsp;to.
+<a name="line187"></a><div class="linenumber">187</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;{Function}&nbsp;progressListener&nbsp;-&nbsp;if&nbsp;provided,&nbsp;is&nbsp;called&nbsp;with&nbsp;the&nbsp;following&nbsp;objects:
+<a name="line188"></a><div class="linenumber">188</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;{status:"waiting"}&nbsp;&nbsp;//&nbsp;once&nbsp;a&nbsp;file&nbsp;offer&nbsp;has&nbsp;been&nbsp;sent&nbsp;but&nbsp;not&nbsp;accepted&nbsp;or&nbsp;rejected&nbsp;yet
+<a name="line189"></a><div class="linenumber">189</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;{status:"started_file",&nbsp;name:&nbsp;filename}
+<a name="line190"></a><div class="linenumber">190</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;{status:"working",&nbsp;name:filename,&nbsp;position:position_in_file,&nbsp;size:size_of_current_file,&nbsp;numFiles:number_of_files_left}
+<a name="line191"></a><div class="linenumber">191</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;{status:"cancelled"}&nbsp;&nbsp;//&nbsp;if&nbsp;the&nbsp;remote&nbsp;user&nbsp;cancels&nbsp;the&nbsp;sending
+<a name="line192"></a><div class="linenumber">192</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;{status:"done"}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;when&nbsp;the&nbsp;file&nbsp;is&nbsp;done
+<a name="line193"></a><div class="linenumber">193</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;progressListener&nbsp;should&nbsp;always&nbsp;return&nbsp;true&nbsp;for&nbsp;normal&nbsp;operation,&nbsp;false&nbsp;to&nbsp;cancel&nbsp;a&nbsp;filetransfer.
+<a name="line194"></a><div class="linenumber">194</div><div style="width:0em;display:inline-block"></div>*&nbsp;@return&nbsp;{Function}&nbsp;an&nbsp;object&nbsp;that&nbsp;accepts&nbsp;an&nbsp;array&nbsp;of&nbsp;File&nbsp;(the&nbsp;Files&nbsp;to&nbsp;be&nbsp;sent),&nbsp;and&nbsp;a&nbsp;boolean
+<a name="line195"></a><div class="linenumber">195</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;{Object}&nbsp;options&nbsp;-&nbsp;overide&nbsp;default&nbsp;file&nbsp;transfer&nbsp;settings
+<a name="line196"></a><div class="linenumber">196</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;maxPacketSize&nbsp;is&nbsp;the&nbsp;size&nbsp;(before&nbsp;base64&nbsp;encoding)&nbsp;that&nbsp;is&nbsp;sent&nbsp;in&nbsp;a
+<a name="line197"></a><div class="linenumber">197</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;single&nbsp;data&nbsp;channel&nbsp;message,&nbsp;in&nbsp;bytes.
+<a name="line198"></a><div class="linenumber">198</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;maxChunkSize&nbsp;is&nbsp;the&nbsp;amount&nbsp;read&nbsp;from&nbsp;a&nbsp;file&nbsp;at&nbsp;a&nbsp;time,&nbsp;in&nbsp;bytes.
+<a name="line199"></a><div class="linenumber">199</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;ackThreshold&nbsp;is&nbsp;the&nbsp;amount&nbsp;of&nbsp;data&nbsp;that&nbsp;can&nbsp;be&nbsp;sent&nbsp;before&nbsp;an&nbsp;ack&nbsp;is
+<a name="line200"></a><div class="linenumber">200</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;received&nbsp;from&nbsp;the&nbsp;party&nbsp;we're&nbsp;sending&nbsp;to,&nbsp;bytes.
+<a name="line201"></a><div class="linenumber">201</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;maxChunkSize&nbsp;should&nbsp;be&nbsp;a&nbsp;multiple&nbsp;of&nbsp;maxPacketSize.
+<a name="line202"></a><div class="linenumber">202</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;ackThreshold&nbsp;should&nbsp;be&nbsp;several&nbsp;times&nbsp;larger&nbsp;than&nbsp;maxChunkSize.&nbsp;For
+<a name="line203"></a><div class="linenumber">203</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;network&nbsp;paths&nbsp;that&nbsp;have&nbsp;greater&nbsp;latency,&nbsp;increase
+<a name="line204"></a><div class="linenumber">204</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ackThreshold&nbsp;further.
+<a name="line205"></a><div class="linenumber">205</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line206"></a><div class="linenumber">206</div><div style="width:0em;display:inline-block"></div>easyrtc_ft.buildFileSender&nbsp;=&nbsp;function(destUser,&nbsp;progressListener,&nbsp;options)&nbsp;{
+<a name="line207"></a><div class="linenumber">207</div><div style="width:2em;display:inline-block"></div>options&nbsp;=&nbsp;options&nbsp;||&nbsp;{};
+<a name="line208"></a><div class="linenumber">208</div><div style="width:2em;display:inline-block"></div>var&nbsp;droptarget;
+<a name="line209"></a><div class="linenumber">209</div><div style="width:2em;display:inline-block"></div>var&nbsp;seq&nbsp;=&nbsp;0;
+<a name="line210"></a><div class="linenumber">210</div><div style="width:2em;display:inline-block"></div>var&nbsp;positionAcked&nbsp;=&nbsp;0;
+<a name="line211"></a><div class="linenumber">211</div><div style="width:2em;display:inline-block"></div>var&nbsp;filePosition&nbsp;=&nbsp;0;
+<a name="line212"></a><div class="linenumber">212</div><div style="width:2em;display:inline-block"></div>var&nbsp;filesOffered&nbsp;=&nbsp;[];&nbsp;//&nbsp;TODO&nbsp;ARray&nbsp;vs&nbsp;Object&nbsp;look&nbsp;weird&nbsp;here&nbsp;but&nbsp;seq&nbsp;is&nbsp;Number&nbsp;
+<a name="line213"></a><div class="linenumber">213</div><div style="width:2em;display:inline-block"></div>var&nbsp;filesBeingSent&nbsp;=&nbsp;[];
+<a name="line214"></a><div class="linenumber">214</div><div style="width:2em;display:inline-block"></div>var&nbsp;curFile&nbsp;=&nbsp;null;
+<a name="line215"></a><div class="linenumber">215</div><div style="width:2em;display:inline-block"></div>var&nbsp;curSeq&nbsp;=&nbsp;null;
+<a name="line216"></a><div class="linenumber">216</div><div style="width:2em;display:inline-block"></div>var&nbsp;curFileSize;
+<a name="line217"></a><div class="linenumber">217</div><div style="width:2em;display:inline-block"></div>var&nbsp;filesAreBinary;
+<a name="line218"></a><div class="linenumber">218</div><div style="width:2em;display:inline-block"></div>var&nbsp;maxPacketSize&nbsp;=&nbsp;options.maxPacketSize&nbsp;||&nbsp;(10&nbsp;*&nbsp;1024);&nbsp;//&nbsp;max&nbsp;bytes&nbsp;per&nbsp;packet,&nbsp;before&nbsp;base64&nbsp;encoding
+<a name="line219"></a><div class="linenumber">219</div><div style="width:2em;display:inline-block"></div>var&nbsp;maxChunkSize&nbsp;=&nbsp;options.maxPacketSize&nbsp;||&nbsp;(maxPacketSize&nbsp;*&nbsp;10);&nbsp;//&nbsp;max&nbsp;binary&nbsp;bytes&nbsp;read&nbsp;at&nbsp;a&nbsp;time.
+<a name="line220"></a><div class="linenumber">220</div><div style="width:2em;display:inline-block"></div>var&nbsp;ackThreshold&nbsp;=&nbsp;options.maxPacketSize&nbsp;||&nbsp;(maxChunkSize&nbsp;*&nbsp;4);&nbsp;//&nbsp;send&nbsp;is&nbsp;allowed&nbsp;to&nbsp;be&nbsp;400KB&nbsp;ahead&nbsp;of&nbsp;receiver
+<a name="line221"></a><div class="linenumber">221</div>
+<a name="line222"></a><div class="linenumber">222</div><div style="width:2em;display:inline-block"></div>var&nbsp;waitingForAck&nbsp;=&nbsp;false;
+<a name="line223"></a><div class="linenumber">223</div><div style="width:2em;display:inline-block"></div>var&nbsp;offersWaiting&nbsp;=&nbsp;[];
+<a name="line224"></a><div class="linenumber">224</div><div style="width:2em;display:inline-block"></div>var&nbsp;outseq&nbsp;=&nbsp;0;
+<a name="line225"></a><div class="linenumber">225</div>
+<a name="line226"></a><div class="linenumber">226</div><div style="width:2em;display:inline-block"></div>function&nbsp;fileCancelReceived(sender,&nbsp;msgType,&nbsp;msgData,&nbsp;targeting)&nbsp;{
+<a name="line227"></a><div class="linenumber">227</div>
+<a name="line228"></a><div class="linenumber">228</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!msgData.seq&nbsp;||&nbsp;!filesOffered[msgData.seq]){
+<a name="line229"></a><div class="linenumber">229</div><div style="width:6em;display:inline-block"></div>return;
+<a name="line230"></a><div class="linenumber">230</div><div style="width:4em;display:inline-block"></div>}
+<a name="line231"></a><div class="linenumber">231</div>
+<a name="line232"></a><div class="linenumber">232</div><div style="width:4em;display:inline-block"></div>progressListener({
+<a name="line233"></a><div class="linenumber">233</div><div style="width:6em;display:inline-block"></div>seq:&nbsp;msgData.seq,
+<a name="line234"></a><div class="linenumber">234</div><div style="width:6em;display:inline-block"></div>status:&nbsp;"cancelled"
+<a name="line235"></a><div class="linenumber">235</div><div style="width:4em;display:inline-block"></div>});
+<a name="line236"></a><div class="linenumber">236</div>
+<a name="line237"></a><div class="linenumber">237</div><div style="width:4em;display:inline-block"></div>//&nbsp;Offer&nbsp;can&nbsp;be&nbsp;offered&nbsp;only&nbsp;once
+<a name="line238"></a><div class="linenumber">238</div><div style="width:4em;display:inline-block"></div>delete&nbsp;filesOffered[msgData.seq];
+<a name="line239"></a><div class="linenumber">239</div><div style="width:2em;display:inline-block"></div>}
+<a name="line240"></a><div class="linenumber">240</div>
+<a name="line241"></a><div class="linenumber">241</div><div style="width:2em;display:inline-block"></div>function&nbsp;cancelFilesOffer(offerSeq)&nbsp;{
+<a name="line242"></a><div class="linenumber">242</div>
+<a name="line243"></a><div class="linenumber">243</div><div style="width:4em;display:inline-block"></div>//&nbsp;Clear&nbsp;from&nbsp;of
+<a name="line244"></a><div class="linenumber">244</div><div style="width:4em;display:inline-block"></div>if&nbsp;(filesOffered[offerSeq])&nbsp;{
+<a name="line245"></a><div class="linenumber">245</div>
+<a name="line246"></a><div class="linenumber">246</div><div style="width:6em;display:inline-block"></div>fileCancelReceived(destUser,&nbsp;'filesCancel',&nbsp;filesOffered[offerSeq]);&nbsp;&nbsp;
+<a name="line247"></a><div class="linenumber">247</div>
+<a name="line248"></a><div class="linenumber">248</div><div style="width:6em;display:inline-block"></div>delete&nbsp;filesOffered[offerSeq];&nbsp;
+<a name="line249"></a><div class="linenumber">249</div><div style="width:4em;display:inline-block"></div>}&nbsp;else&nbsp;{
+<a name="line250"></a><div class="linenumber">250</div>
+<a name="line251"></a><div class="linenumber">251</div><div style="width:6em;display:inline-block"></div>//&nbsp;Clear&nbsp;from&nbsp;waiting&nbsp;queue
+<a name="line252"></a><div class="linenumber">252</div><div style="width:6em;display:inline-block"></div>offersWaiting&nbsp;=&nbsp;offersWaiting.filter(function(offersWaiting)&nbsp;{
+<a name="line253"></a><div class="linenumber">253</div><div style="width:8em;display:inline-block"></div>var&nbsp;isOfferToCancel&nbsp;=&nbsp;offersWaiting.seq&nbsp;===&nbsp;offerSeq;
+<a name="line254"></a><div class="linenumber">254</div><div style="width:8em;display:inline-block"></div>if&nbsp;(isOfferToCancel)&nbsp;{
+<a name="line255"></a><div class="linenumber">255</div><div style="width:10em;display:inline-block"></div>fileCancelReceived(destUser,&nbsp;'filesCancel',&nbsp;offersWaiting);&nbsp;&nbsp;
+<a name="line256"></a><div class="linenumber">256</div><div style="width:8em;display:inline-block"></div>}
+<a name="line257"></a><div class="linenumber">257</div><div style="width:8em;display:inline-block"></div>return&nbsp;!isOfferToCancel;
+<a name="line258"></a><div class="linenumber">258</div><div style="width:6em;display:inline-block"></div>});&nbsp;
+<a name="line259"></a><div class="linenumber">259</div><div style="width:4em;display:inline-block"></div>}
+<a name="line260"></a><div class="linenumber">260</div>
+<a name="line261"></a><div class="linenumber">261</div><div style="width:4em;display:inline-block"></div>easyrtc.sendData(destUser,&nbsp;"filesChunk",&nbsp;{
+<a name="line262"></a><div class="linenumber">262</div><div style="width:6em;display:inline-block"></div>seq:&nbsp;offerSeq,
+<a name="line263"></a><div class="linenumber">263</div><div style="width:6em;display:inline-block"></div>done:&nbsp;"cancelled"
+<a name="line264"></a><div class="linenumber">264</div><div style="width:4em;display:inline-block"></div>});
+<a name="line265"></a><div class="linenumber">265</div><div style="width:2em;display:inline-block"></div>}
+<a name="line266"></a><div class="linenumber">266</div>
+<a name="line267"></a><div class="linenumber">267</div><div style="width:2em;display:inline-block"></div>function&nbsp;sendFilesOffer(files,&nbsp;areBinary)&nbsp;{
+<a name="line268"></a><div class="linenumber">268</div>
+<a name="line269"></a><div class="linenumber">269</div><div style="width:4em;display:inline-block"></div>var&nbsp;fileNameList&nbsp;=&nbsp;[];
+<a name="line270"></a><div class="linenumber">270</div><div style="width:4em;display:inline-block"></div>for&nbsp;(var&nbsp;i&nbsp;=&nbsp;0,&nbsp;l&nbsp;=&nbsp;files.length;&nbsp;i&nbsp;&lt;&nbsp;l;&nbsp;i++)&nbsp;{
+<a name="line271"></a><div class="linenumber">271</div><div style="width:6em;display:inline-block"></div>fileNameList[i]&nbsp;=&nbsp;{
+<a name="line272"></a><div class="linenumber">272</div><div style="width:8em;display:inline-block"></div>name:&nbsp;files[i].name,&nbsp;
+<a name="line273"></a><div class="linenumber">273</div><div style="width:8em;display:inline-block"></div>size:&nbsp;files[i].size
+<a name="line274"></a><div class="linenumber">274</div><div style="width:6em;display:inline-block"></div>};
+<a name="line275"></a><div class="linenumber">275</div><div style="width:4em;display:inline-block"></div>}
+<a name="line276"></a><div class="linenumber">276</div>
+<a name="line277"></a><div class="linenumber">277</div><div style="width:4em;display:inline-block"></div>seq++;
+<a name="line278"></a><div class="linenumber">278</div><div style="width:4em;display:inline-block"></div>filesOffered[seq]&nbsp;=&nbsp;{
+<a name="line279"></a><div class="linenumber">279</div><div style="width:6em;display:inline-block"></div>seq:&nbsp;seq,
+<a name="line280"></a><div class="linenumber">280</div><div style="width:6em;display:inline-block"></div>files:&nbsp;files,
+<a name="line281"></a><div class="linenumber">281</div><div style="width:6em;display:inline-block"></div>areBinary:&nbsp;areBinary
+<a name="line282"></a><div class="linenumber">282</div><div style="width:4em;display:inline-block"></div>};
+<a name="line283"></a><div class="linenumber">283</div>
+<a name="line284"></a><div class="linenumber">284</div><div style="width:4em;display:inline-block"></div>easyrtc.sendDataWS(destUser,&nbsp;"filesOffer",&nbsp;{
+<a name="line285"></a><div class="linenumber">285</div><div style="width:6em;display:inline-block"></div>seq:&nbsp;seq,&nbsp;
+<a name="line286"></a><div class="linenumber">286</div><div style="width:6em;display:inline-block"></div>fileNameList:&nbsp;fileNameList
+<a name="line287"></a><div class="linenumber">287</div><div style="width:4em;display:inline-block"></div>});
+<a name="line288"></a><div class="linenumber">288</div>
+<a name="line289"></a><div class="linenumber">289</div><div style="width:4em;display:inline-block"></div>progressListener({
+<a name="line290"></a><div class="linenumber">290</div><div style="width:6em;display:inline-block"></div>seq:&nbsp;seq,
+<a name="line291"></a><div class="linenumber">291</div><div style="width:6em;display:inline-block"></div>status:&nbsp;"waiting"
+<a name="line292"></a><div class="linenumber">292</div><div style="width:4em;display:inline-block"></div>});
+<a name="line293"></a><div class="linenumber">293</div>
+<a name="line294"></a><div class="linenumber">294</div><div style="width:4em;display:inline-block"></div>return&nbsp;cancelFilesOffer.bind(null,&nbsp;seq);
+<a name="line295"></a><div class="linenumber">295</div><div style="width:2em;display:inline-block"></div>}
+<a name="line296"></a><div class="linenumber">296</div>
+<a name="line297"></a><div class="linenumber">297</div><div style="width:2em;display:inline-block"></div>function&nbsp;addOfferToWaitingList(offer)&nbsp;{
+<a name="line298"></a><div class="linenumber">298</div><div style="width:4em;display:inline-block"></div>offersWaiting.push(offer);
+<a name="line299"></a><div class="linenumber">299</div><div style="width:2em;display:inline-block"></div>}
+<a name="line300"></a><div class="linenumber">300</div>
+<a name="line301"></a><div class="linenumber">301</div><div style="width:2em;display:inline-block"></div>function&nbsp;processOfferWaiting()&nbsp;{
+<a name="line302"></a><div class="linenumber">302</div><div style="width:4em;display:inline-block"></div>if&nbsp;(offersWaiting.length&nbsp;&gt;&nbsp;0)&nbsp;{
+<a name="line303"></a><div class="linenumber">303</div><div style="width:6em;display:inline-block"></div>setTimeout(function()&nbsp;{
+<a name="line304"></a><div class="linenumber">304</div><div style="width:8em;display:inline-block"></div>var&nbsp;fileset&nbsp;=&nbsp;offersWaiting.shift();
+<a name="line305"></a><div class="linenumber">305</div><div style="width:8em;display:inline-block"></div>sendOffer(fileset);
+<a name="line306"></a><div class="linenumber">306</div><div style="width:6em;display:inline-block"></div>},&nbsp;240);
+<a name="line307"></a><div class="linenumber">307</div><div style="width:4em;display:inline-block"></div>}
+<a name="line308"></a><div class="linenumber">308</div><div style="width:2em;display:inline-block"></div>}
+<a name="line309"></a><div class="linenumber">309</div>
+<a name="line310"></a><div class="linenumber">310</div><div style="width:2em;display:inline-block"></div>function&nbsp;sendChunk()&nbsp;{
+<a name="line311"></a><div class="linenumber">311</div>
+<a name="line312"></a><div class="linenumber">312</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!curSeq)&nbsp;{
+<a name="line313"></a><div class="linenumber">313</div><div style="width:6em;display:inline-block"></div>return;
+<a name="line314"></a><div class="linenumber">314</div><div style="width:4em;display:inline-block"></div>}
+<a name="line315"></a><div class="linenumber">315</div>
+<a name="line316"></a><div class="linenumber">316</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!curFile)&nbsp;{
+<a name="line317"></a><div class="linenumber">317</div><div style="width:6em;display:inline-block"></div>if&nbsp;(filesBeingSent.length&nbsp;===&nbsp;0)&nbsp;{
+<a name="line318"></a><div class="linenumber">318</div>
+<a name="line319"></a><div class="linenumber">319</div><div style="width:8em;display:inline-block"></div>outseq&nbsp;=&nbsp;0;
+<a name="line320"></a><div class="linenumber">320</div><div style="width:8em;display:inline-block"></div>easyrtc.sendData(destUser,&nbsp;"filesChunk",&nbsp;{
+<a name="line321"></a><div class="linenumber">321</div><div style="width:10em;display:inline-block"></div>seq:&nbsp;curSeq,
+<a name="line322"></a><div class="linenumber">322</div><div style="width:10em;display:inline-block"></div>done:&nbsp;"all"
+<a name="line323"></a><div class="linenumber">323</div><div style="width:8em;display:inline-block"></div>});
+<a name="line324"></a><div class="linenumber">324</div>
+<a name="line325"></a><div class="linenumber">325</div><div style="width:8em;display:inline-block"></div>progressListener({
+<a name="line326"></a><div class="linenumber">326</div><div style="width:10em;display:inline-block"></div>seq:&nbsp;curSeq,
+<a name="line327"></a><div class="linenumber">327</div><div style="width:10em;display:inline-block"></div>status:&nbsp;"done"
+<a name="line328"></a><div class="linenumber">328</div><div style="width:8em;display:inline-block"></div>});
+<a name="line329"></a><div class="linenumber">329</div>
+<a name="line330"></a><div class="linenumber">330</div><div style="width:8em;display:inline-block"></div>curSeq&nbsp;=&nbsp;null;
+<a name="line331"></a><div class="linenumber">331</div><div style="width:8em;display:inline-block"></div>processOfferWaiting();
+<a name="line332"></a><div class="linenumber">332</div><div style="width:8em;display:inline-block"></div>return;
+<a name="line333"></a><div class="linenumber">333</div><div style="width:6em;display:inline-block"></div>}
+<a name="line334"></a><div class="linenumber">334</div><div style="width:6em;display:inline-block"></div>else&nbsp;{
+<a name="line335"></a><div class="linenumber">335</div><div style="width:8em;display:inline-block"></div>curFile&nbsp;=&nbsp;filesBeingSent.shift();
+<a name="line336"></a><div class="linenumber">336</div><div style="width:8em;display:inline-block"></div>curFileSize&nbsp;=&nbsp;curFile.size;
+<a name="line337"></a><div class="linenumber">337</div><div style="width:8em;display:inline-block"></div>positionAcked&nbsp;=&nbsp;0;
+<a name="line338"></a><div class="linenumber">338</div><div style="width:8em;display:inline-block"></div>waitingForAck&nbsp;=&nbsp;false;
+<a name="line339"></a><div class="linenumber">339</div><div style="width:8em;display:inline-block"></div>easyrtc.sendData(destUser,&nbsp;"filesChunk",&nbsp;{
+<a name="line340"></a><div class="linenumber">340</div><div style="width:10em;display:inline-block"></div>seq:&nbsp;curSeq,
+<a name="line341"></a><div class="linenumber">341</div><div style="width:10em;display:inline-block"></div>name:&nbsp;curFile.name,&nbsp;
+<a name="line342"></a><div class="linenumber">342</div><div style="width:10em;display:inline-block"></div>type:&nbsp;curFile.type,&nbsp;
+<a name="line343"></a><div class="linenumber">343</div><div style="width:10em;display:inline-block"></div>outseq:&nbsp;outseq,&nbsp;
+<a name="line344"></a><div class="linenumber">344</div><div style="width:10em;display:inline-block"></div>size:&nbsp;curFile.size
+<a name="line345"></a><div class="linenumber">345</div><div style="width:8em;display:inline-block"></div>});
+<a name="line346"></a><div class="linenumber">346</div><div style="width:8em;display:inline-block"></div>outseq++;
+<a name="line347"></a><div class="linenumber">347</div>
+<a name="line348"></a><div class="linenumber">348</div><div style="width:8em;display:inline-block"></div>progressListener({
+<a name="line349"></a><div class="linenumber">349</div><div style="width:10em;display:inline-block"></div>seq:&nbsp;curSeq,
+<a name="line350"></a><div class="linenumber">350</div><div style="width:10em;display:inline-block"></div>status:&nbsp;"started_file",&nbsp;
+<a name="line351"></a><div class="linenumber">351</div><div style="width:10em;display:inline-block"></div>name:&nbsp;curFile.name
+<a name="line352"></a><div class="linenumber">352</div><div style="width:8em;display:inline-block"></div>});
+<a name="line353"></a><div class="linenumber">353</div><div style="width:6em;display:inline-block"></div>}
+<a name="line354"></a><div class="linenumber">354</div><div style="width:4em;display:inline-block"></div>}
+<a name="line355"></a><div class="linenumber">355</div>
+<a name="line356"></a><div class="linenumber">356</div><div style="width:4em;display:inline-block"></div>var&nbsp;amountToRead&nbsp;=&nbsp;Math.min(maxChunkSize,&nbsp;curFileSize&nbsp;-&nbsp;filePosition);
+<a name="line357"></a><div class="linenumber">357</div><div style="width:4em;display:inline-block"></div>var&nbsp;progressAck&nbsp;=&nbsp;progressListener({
+<a name="line358"></a><div class="linenumber">358</div><div style="width:6em;display:inline-block"></div>seq:&nbsp;curSeq,
+<a name="line359"></a><div class="linenumber">359</div><div style="width:6em;display:inline-block"></div>status:&nbsp;"working",&nbsp;
+<a name="line360"></a><div class="linenumber">360</div><div style="width:6em;display:inline-block"></div>name:&nbsp;curFile.name,&nbsp;
+<a name="line361"></a><div class="linenumber">361</div><div style="width:6em;display:inline-block"></div>position:&nbsp;filePosition,&nbsp;
+<a name="line362"></a><div class="linenumber">362</div><div style="width:6em;display:inline-block"></div>size:&nbsp;curFileSize,&nbsp;
+<a name="line363"></a><div class="linenumber">363</div><div style="width:6em;display:inline-block"></div>numFiles:&nbsp;filesBeingSent.length&nbsp;+&nbsp;1
+<a name="line364"></a><div class="linenumber">364</div><div style="width:4em;display:inline-block"></div>});
+<a name="line365"></a><div class="linenumber">365</div>
+<a name="line366"></a><div class="linenumber">366</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!progressAck)&nbsp;{
+<a name="line367"></a><div class="linenumber">367</div><div style="width:6em;display:inline-block"></div>curSeq&nbsp;=&nbsp;null;
+<a name="line368"></a><div class="linenumber">368</div><div style="width:6em;display:inline-block"></div>curFile&nbsp;=&nbsp;null;
+<a name="line369"></a><div class="linenumber">369</div><div style="width:6em;display:inline-block"></div>filePosition&nbsp;=&nbsp;0;
+<a name="line370"></a><div class="linenumber">370</div><div style="width:6em;display:inline-block"></div>cancelFilesOffer(curSeq);
+<a name="line371"></a><div class="linenumber">371</div><div style="width:6em;display:inline-block"></div>processOfferWaiting();
+<a name="line372"></a><div class="linenumber">372</div><div style="width:6em;display:inline-block"></div>return;
+<a name="line373"></a><div class="linenumber">373</div><div style="width:4em;display:inline-block"></div>}
+<a name="line374"></a><div class="linenumber">374</div>
+<a name="line375"></a><div class="linenumber">375</div><div style="width:4em;display:inline-block"></div>var&nbsp;nextLocation&nbsp;=&nbsp;filePosition&nbsp;+&nbsp;amountToRead;
+<a name="line376"></a><div class="linenumber">376</div><div style="width:4em;display:inline-block"></div>var&nbsp;blobSlice&nbsp;=&nbsp;curFile.slice(filePosition,&nbsp;nextLocation);
+<a name="line377"></a><div class="linenumber">377</div>
+<a name="line378"></a><div class="linenumber">378</div><div style="width:4em;display:inline-block"></div>var&nbsp;reader&nbsp;=&nbsp;new&nbsp;FileReader();
+<a name="line379"></a><div class="linenumber">379</div><div style="width:4em;display:inline-block"></div>reader.onloadend&nbsp;=&nbsp;function(evt)&nbsp;{
+<a name="line380"></a><div class="linenumber">380</div><div style="width:6em;display:inline-block"></div>if&nbsp;(evt.target.readyState&nbsp;===&nbsp;FileReader.DONE)&nbsp;{&nbsp;//&nbsp;DONE&nbsp;==&nbsp;2
+<a name="line381"></a><div class="linenumber">381</div>
+<a name="line382"></a><div class="linenumber">382</div><div style="width:8em;display:inline-block"></div>var&nbsp;binaryString&nbsp;=&nbsp;"";
+<a name="line383"></a><div class="linenumber">383</div><div style="width:8em;display:inline-block"></div>var&nbsp;bytes&nbsp;=&nbsp;new&nbsp;Uint8Array(evt.target.result);
+<a name="line384"></a><div class="linenumber">384</div><div style="width:8em;display:inline-block"></div>var&nbsp;length&nbsp;=&nbsp;bytes.length;
+<a name="line385"></a><div class="linenumber">385</div>
+<a name="line386"></a><div class="linenumber">386</div><div style="width:8em;display:inline-block"></div>for(&nbsp;var&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;length;&nbsp;i++&nbsp;)&nbsp;{
+<a name="line387"></a><div class="linenumber">387</div><div style="width:9em;display:inline-block"></div>binaryString&nbsp;+=&nbsp;String.fromCharCode(bytes[i]);
+<a name="line388"></a><div class="linenumber">388</div><div style="width:8em;display:inline-block"></div>}
+<a name="line389"></a><div class="linenumber">389</div>
+<a name="line390"></a><div class="linenumber">390</div><div style="width:8em;display:inline-block"></div>for&nbsp;(var&nbsp;pp&nbsp;=&nbsp;0;&nbsp;pp&nbsp;&lt;&nbsp;binaryString.length;&nbsp;pp++)&nbsp;{
+<a name="line391"></a><div class="linenumber">391</div><div style="width:10em;display:inline-block"></div>var&nbsp;oneChar&nbsp;=&nbsp;binaryString.charCodeAt(pp);
+<a name="line392"></a><div class="linenumber">392</div><div style="width:8em;display:inline-block"></div>}
+<a name="line393"></a><div class="linenumber">393</div>
+<a name="line394"></a><div class="linenumber">394</div><div style="width:8em;display:inline-block"></div>for&nbsp;(var&nbsp;pos&nbsp;=&nbsp;0;&nbsp;pos&nbsp;&lt;&nbsp;binaryString.length;&nbsp;pos&nbsp;+=&nbsp;maxPacketSize)&nbsp;{
+<a name="line395"></a><div class="linenumber">395</div>
+<a name="line396"></a><div class="linenumber">396</div><div style="width:10em;display:inline-block"></div>var&nbsp;packetLen&nbsp;=&nbsp;Math.min(maxPacketSize,&nbsp;amountToRead&nbsp;-&nbsp;pos);
+<a name="line397"></a><div class="linenumber">397</div><div style="width:10em;display:inline-block"></div>var&nbsp;packetData&nbsp;=&nbsp;binaryString.substring(pos,&nbsp;pos&nbsp;+&nbsp;packetLen);
+<a name="line398"></a><div class="linenumber">398</div><div style="width:10em;display:inline-block"></div>var&nbsp;packetObject&nbsp;=&nbsp;{
+<a name="line399"></a><div class="linenumber">399</div><div style="width:12em;display:inline-block"></div>seq:&nbsp;curSeq,
+<a name="line400"></a><div class="linenumber">400</div><div style="width:12em;display:inline-block"></div>outseq:&nbsp;outseq
+<a name="line401"></a><div class="linenumber">401</div><div style="width:10em;display:inline-block"></div>};
+<a name="line402"></a><div class="linenumber">402</div>
+<a name="line403"></a><div class="linenumber">403</div><div style="width:10em;display:inline-block"></div>if&nbsp;(filesAreBinary)&nbsp;{
+<a name="line404"></a><div class="linenumber">404</div><div style="width:12em;display:inline-block"></div>packetObject.data64&nbsp;=&nbsp;btoa(packetData);
+<a name="line405"></a><div class="linenumber">405</div><div style="width:10em;display:inline-block"></div>}&nbsp;else&nbsp;{
+<a name="line406"></a><div class="linenumber">406</div><div style="width:12em;display:inline-block"></div>packetObject.datatxt&nbsp;=&nbsp;packetData;
+<a name="line407"></a><div class="linenumber">407</div><div style="width:10em;display:inline-block"></div>}
+<a name="line408"></a><div class="linenumber">408</div>
+<a name="line409"></a><div class="linenumber">409</div><div style="width:10em;display:inline-block"></div>easyrtc.sendData(destUser,&nbsp;"filesChunk",&nbsp;packetObject);
+<a name="line410"></a><div class="linenumber">410</div><div style="width:10em;display:inline-block"></div>outseq++;
+<a name="line411"></a><div class="linenumber">411</div><div style="width:8em;display:inline-block"></div>}
+<a name="line412"></a><div class="linenumber">412</div>
+<a name="line413"></a><div class="linenumber">413</div><div style="width:8em;display:inline-block"></div>if&nbsp;(nextLocation&nbsp;&gt;=&nbsp;curFileSize)&nbsp;{
+<a name="line414"></a><div class="linenumber">414</div><div style="width:10em;display:inline-block"></div>easyrtc.sendData(destUser,&nbsp;"filesChunk",&nbsp;{
+<a name="line415"></a><div class="linenumber">415</div><div style="width:12em;display:inline-block"></div>seq:&nbsp;curSeq,
+<a name="line416"></a><div class="linenumber">416</div><div style="width:12em;display:inline-block"></div>done:&nbsp;"file"
+<a name="line417"></a><div class="linenumber">417</div><div style="width:10em;display:inline-block"></div>});
+<a name="line418"></a><div class="linenumber">418</div><div style="width:8em;display:inline-block"></div>}
+<a name="line419"></a><div class="linenumber">419</div>
+<a name="line420"></a><div class="linenumber">420</div><div style="width:8em;display:inline-block"></div>if&nbsp;(filePosition&nbsp;&lt;&nbsp;positionAcked&nbsp;+&nbsp;ackThreshold)&nbsp;{
+<a name="line421"></a><div class="linenumber">421</div><div style="width:10em;display:inline-block"></div>sendChunk();
+<a name="line422"></a><div class="linenumber">422</div><div style="width:8em;display:inline-block"></div>}&nbsp;else&nbsp;{
+<a name="line423"></a><div class="linenumber">423</div><div style="width:10em;display:inline-block"></div>waitingForAck&nbsp;=&nbsp;true;
+<a name="line424"></a><div class="linenumber">424</div><div style="width:8em;display:inline-block"></div>}
+<a name="line425"></a><div class="linenumber">425</div><div style="width:6em;display:inline-block"></div>}
+<a name="line426"></a><div class="linenumber">426</div><div style="width:4em;display:inline-block"></div>};
+<a name="line427"></a><div class="linenumber">427</div>
+<a name="line428"></a><div class="linenumber">428</div><div style="width:4em;display:inline-block"></div>reader.readAsArrayBuffer(blobSlice);
+<a name="line429"></a><div class="linenumber">429</div><div style="width:4em;display:inline-block"></div>filePosition&nbsp;=&nbsp;nextLocation;
+<a name="line430"></a><div class="linenumber">430</div>
+<a name="line431"></a><div class="linenumber">431</div><div style="width:4em;display:inline-block"></div>//&nbsp;&nbsp;advance&nbsp;to&nbsp;the&nbsp;next&nbsp;file&nbsp;if&nbsp;we've&nbsp;read&nbsp;all&nbsp;of&nbsp;this&nbsp;file
+<a name="line432"></a><div class="linenumber">432</div><div style="width:4em;display:inline-block"></div>if&nbsp;(nextLocation&nbsp;&gt;=&nbsp;curFileSize)&nbsp;{
+<a name="line433"></a><div class="linenumber">433</div><div style="width:6em;display:inline-block"></div>curFile&nbsp;=&nbsp;null;
+<a name="line434"></a><div class="linenumber">434</div><div style="width:6em;display:inline-block"></div>filePosition&nbsp;=&nbsp;0;
+<a name="line435"></a><div class="linenumber">435</div><div style="width:4em;display:inline-block"></div>}
+<a name="line436"></a><div class="linenumber">436</div><div style="width:2em;display:inline-block"></div>}
+<a name="line437"></a><div class="linenumber">437</div>
+<a name="line438"></a><div class="linenumber">438</div><div style="width:2em;display:inline-block"></div>if&nbsp;(!progressListener)&nbsp;{
+<a name="line439"></a><div class="linenumber">439</div><div style="width:4em;display:inline-block"></div>progressListener&nbsp;=&nbsp;function()&nbsp;{
+<a name="line440"></a><div class="linenumber">440</div><div style="width:6em;display:inline-block"></div>return&nbsp;true;
+<a name="line441"></a><div class="linenumber">441</div><div style="width:4em;display:inline-block"></div>};
+<a name="line442"></a><div class="linenumber">442</div><div style="width:2em;display:inline-block"></div>}
+<a name="line443"></a><div class="linenumber">443</div>
+<a name="line444"></a><div class="linenumber">444</div><div style="width:2em;display:inline-block"></div>var&nbsp;roomOccupantListener&nbsp;=&nbsp;function(eventType,&nbsp;eventData)&nbsp;{
+<a name="line445"></a><div class="linenumber">445</div><div style="width:4em;display:inline-block"></div>var&nbsp;roomName;
+<a name="line446"></a><div class="linenumber">446</div><div style="width:4em;display:inline-block"></div>var&nbsp;foundUser&nbsp;=&nbsp;false;
+<a name="line447"></a><div class="linenumber">447</div><div style="width:4em;display:inline-block"></div>for&nbsp;(roomName&nbsp;in&nbsp;eventData)&nbsp;{
+<a name="line448"></a><div class="linenumber">448</div><div style="width:6em;display:inline-block"></div>if&nbsp;(eventData[roomName][destUser])&nbsp;{
+<a name="line449"></a><div class="linenumber">449</div><div style="width:8em;display:inline-block"></div>foundUser&nbsp;=&nbsp;true;
+<a name="line450"></a><div class="linenumber">450</div><div style="width:6em;display:inline-block"></div>}
+<a name="line451"></a><div class="linenumber">451</div><div style="width:4em;display:inline-block"></div>}
+<a name="line452"></a><div class="linenumber">452</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!foundUser)&nbsp;{
+<a name="line453"></a><div class="linenumber">453</div><div style="width:6em;display:inline-block"></div>easyrtc.removeEventListener("roomOccupant",&nbsp;roomOccupantListener);
+<a name="line454"></a><div class="linenumber">454</div>
+<a name="line455"></a><div class="linenumber">455</div><div style="width:6em;display:inline-block"></div>if&nbsp;(filesBeingSent.length&nbsp;&gt;&nbsp;0)&nbsp;{
+<a name="line456"></a><div class="linenumber">456</div><div style="width:8em;display:inline-block"></div>cancelFilesOffer(curSeq);
+<a name="line457"></a><div class="linenumber">457</div><div style="width:6em;display:inline-block"></div>}
+<a name="line458"></a><div class="linenumber">458</div>
+<a name="line459"></a><div class="linenumber">459</div><div style="width:6em;display:inline-block"></div>if&nbsp;(filesOffered.length&nbsp;&gt;&nbsp;0)&nbsp;{
+<a name="line460"></a><div class="linenumber">460</div><div style="width:8em;display:inline-block"></div>filesOffered.forEach(function&nbsp;(filesOffered,&nbsp;seq)&nbsp;{
+<a name="line461"></a><div class="linenumber">461</div><div style="width:10em;display:inline-block"></div>cancelFilesOffer(seq);
+<a name="line462"></a><div class="linenumber">462</div><div style="width:8em;display:inline-block"></div>});
+<a name="line463"></a><div class="linenumber">463</div><div style="width:6em;display:inline-block"></div>}
+<a name="line464"></a><div class="linenumber">464</div><div style="width:4em;display:inline-block"></div>}
+<a name="line465"></a><div class="linenumber">465</div><div style="width:2em;display:inline-block"></div>};
+<a name="line466"></a><div class="linenumber">466</div>
+<a name="line467"></a><div class="linenumber">467</div><div style="width:2em;display:inline-block"></div>easyrtc.addEventListener("roomOccupant",&nbsp;roomOccupantListener);
+<a name="line468"></a><div class="linenumber">468</div>
+<a name="line469"></a><div class="linenumber">469</div><div style="width:2em;display:inline-block"></div>function&nbsp;sendOffer(offer)&nbsp;{
+<a name="line470"></a><div class="linenumber">470</div>
+<a name="line471"></a><div class="linenumber">471</div><div style="width:4em;display:inline-block"></div>curSeq&nbsp;=&nbsp;offer.seq;
+<a name="line472"></a><div class="linenumber">472</div><div style="width:4em;display:inline-block"></div>for&nbsp;(var&nbsp;i&nbsp;=&nbsp;0,&nbsp;l&nbsp;=&nbsp;offer.files.length;&nbsp;i&nbsp;&lt;&nbsp;l;&nbsp;i++)&nbsp;{
+<a name="line473"></a><div class="linenumber">473</div><div style="width:6em;display:inline-block"></div>filesBeingSent.push(offer.files[i]);
+<a name="line474"></a><div class="linenumber">474</div><div style="width:4em;display:inline-block"></div>}
+<a name="line475"></a><div class="linenumber">475</div><div style="width:4em;display:inline-block"></div>filesAreBinary&nbsp;=&nbsp;offer.filesAreBinary;
+<a name="line476"></a><div class="linenumber">476</div><div style="width:4em;display:inline-block"></div>filePosition&nbsp;=&nbsp;0;
+<a name="line477"></a><div class="linenumber">477</div>
+<a name="line478"></a><div class="linenumber">478</div><div style="width:4em;display:inline-block"></div>progressListener({
+<a name="line479"></a><div class="linenumber">479</div><div style="width:6em;display:inline-block"></div>seq:&nbsp;curSeq,
+<a name="line480"></a><div class="linenumber">480</div><div style="width:6em;display:inline-block"></div>status:&nbsp;"started"
+<a name="line481"></a><div class="linenumber">481</div><div style="width:4em;display:inline-block"></div>});
+<a name="line482"></a><div class="linenumber">482</div>
+<a name="line483"></a><div class="linenumber">483</div><div style="width:4em;display:inline-block"></div>sendChunk();&nbsp;//&nbsp;this&nbsp;starts&nbsp;the&nbsp;file&nbsp;reading
+<a name="line484"></a><div class="linenumber">484</div><div style="width:2em;display:inline-block"></div>}
+<a name="line485"></a><div class="linenumber">485</div>
+<a name="line486"></a><div class="linenumber">486</div><div style="width:2em;display:inline-block"></div>//
+<a name="line487"></a><div class="linenumber">487</div><div style="width:2em;display:inline-block"></div>//&nbsp;if&nbsp;a&nbsp;file&nbsp;offer&nbsp;is&nbsp;rejected,&nbsp;we&nbsp;delete&nbsp;references&nbsp;to&nbsp;it.
+<a name="line488"></a><div class="linenumber">488</div><div style="width:2em;display:inline-block"></div>//
+<a name="line489"></a><div class="linenumber">489</div><div style="width:2em;display:inline-block"></div>function&nbsp;fileOfferRejected(sender,&nbsp;msgType,&nbsp;msgData,&nbsp;targeting)&nbsp;{
+<a name="line490"></a><div class="linenumber">490</div>
+<a name="line491"></a><div class="linenumber">491</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!msgData.seq&nbsp;||&nbsp;!filesOffered[msgData.seq]){
+<a name="line492"></a><div class="linenumber">492</div><div style="width:6em;display:inline-block"></div>return;
+<a name="line493"></a><div class="linenumber">493</div><div style="width:4em;display:inline-block"></div>}
+<a name="line494"></a><div class="linenumber">494</div>
+<a name="line495"></a><div class="linenumber">495</div><div style="width:4em;display:inline-block"></div>progressListener({
+<a name="line496"></a><div class="linenumber">496</div><div style="width:6em;display:inline-block"></div>seq:&nbsp;msgData.seq,
+<a name="line497"></a><div class="linenumber">497</div><div style="width:6em;display:inline-block"></div>status:&nbsp;"rejected"
+<a name="line498"></a><div class="linenumber">498</div><div style="width:4em;display:inline-block"></div>});
+<a name="line499"></a><div class="linenumber">499</div>
+<a name="line500"></a><div class="linenumber">500</div><div style="width:4em;display:inline-block"></div>delete&nbsp;filesOffered[msgData.seq];
+<a name="line501"></a><div class="linenumber">501</div><div style="width:2em;display:inline-block"></div>}
+<a name="line502"></a><div class="linenumber">502</div><div style="width:2em;display:inline-block"></div>//
+<a name="line503"></a><div class="linenumber">503</div><div style="width:2em;display:inline-block"></div>//&nbsp;if&nbsp;a&nbsp;file&nbsp;offer&nbsp;is&nbsp;accepted,&nbsp;initiate&nbsp;sending&nbsp;of&nbsp;files.
+<a name="line504"></a><div class="linenumber">504</div><div style="width:2em;display:inline-block"></div>//
+<a name="line505"></a><div class="linenumber">505</div><div style="width:2em;display:inline-block"></div>function&nbsp;fileOfferAccepted(sender,&nbsp;msgType,&nbsp;msgData,&nbsp;targeting)&nbsp;{
+<a name="line506"></a><div class="linenumber">506</div>
+<a name="line507"></a><div class="linenumber">507</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!msgData.seq&nbsp;||&nbsp;!filesOffered[msgData.seq]){
+<a name="line508"></a><div class="linenumber">508</div><div style="width:6em;display:inline-block"></div>return;
+<a name="line509"></a><div class="linenumber">509</div><div style="width:4em;display:inline-block"></div>}
+<a name="line510"></a><div class="linenumber">510</div>
+<a name="line511"></a><div class="linenumber">511</div><div style="width:4em;display:inline-block"></div>var&nbsp;alreadySending&nbsp;=&nbsp;filesBeingSent.length&nbsp;&gt;&nbsp;0;
+<a name="line512"></a><div class="linenumber">512</div><div style="width:4em;display:inline-block"></div>var&nbsp;offer&nbsp;=&nbsp;filesOffered[msgData.seq];
+<a name="line513"></a><div class="linenumber">513</div>
+<a name="line514"></a><div class="linenumber">514</div><div style="width:4em;display:inline-block"></div>//&nbsp;Offer&nbsp;can&nbsp;be&nbsp;offered&nbsp;only&nbsp;once
+<a name="line515"></a><div class="linenumber">515</div><div style="width:4em;display:inline-block"></div>delete&nbsp;filesOffered[msgData.seq];
+<a name="line516"></a><div class="linenumber">516</div>
+<a name="line517"></a><div class="linenumber">517</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!alreadySending&nbsp;&amp;&amp;&nbsp;!curFile)&nbsp;{
+<a name="line518"></a><div class="linenumber">518</div><div style="width:6em;display:inline-block"></div>sendOffer(offer);
+<a name="line519"></a><div class="linenumber">519</div><div style="width:4em;display:inline-block"></div>}&nbsp;else&nbsp;{
+<a name="line520"></a><div class="linenumber">520</div><div style="width:6em;display:inline-block"></div>addOfferToWaitingList(offer);
+<a name="line521"></a><div class="linenumber">521</div><div style="width:4em;display:inline-block"></div>}
+<a name="line522"></a><div class="linenumber">522</div><div style="width:2em;display:inline-block"></div>}
+<a name="line523"></a><div class="linenumber">523</div>
+<a name="line524"></a><div class="linenumber">524</div><div style="width:2em;display:inline-block"></div>function&nbsp;packageAckReceived(sender,&nbsp;msgType,&nbsp;msgData)&nbsp;{
+<a name="line525"></a><div class="linenumber">525</div><div style="width:4em;display:inline-block"></div>positionAcked&nbsp;=&nbsp;msgData.positionAck;
+<a name="line526"></a><div class="linenumber">526</div><div style="width:4em;display:inline-block"></div>if&nbsp;(waitingForAck&nbsp;&amp;&amp;&nbsp;filePosition&nbsp;&lt;&nbsp;positionAcked&nbsp;+&nbsp;ackThreshold)&nbsp;{
+<a name="line527"></a><div class="linenumber">527</div><div style="width:6em;display:inline-block"></div>waitingForAck&nbsp;=&nbsp;false;
+<a name="line528"></a><div class="linenumber">528</div><div style="width:6em;display:inline-block"></div>sendChunk();
+<a name="line529"></a><div class="linenumber">529</div><div style="width:4em;display:inline-block"></div>}
+<a name="line530"></a><div class="linenumber">530</div><div style="width:2em;display:inline-block"></div>}
+<a name="line531"></a><div class="linenumber">531</div>
+<a name="line532"></a><div class="linenumber">532</div><div style="width:2em;display:inline-block"></div>easyrtc.setPeerListener(fileOfferRejected,&nbsp;"filesReject",&nbsp;destUser);
+<a name="line533"></a><div class="linenumber">533</div><div style="width:2em;display:inline-block"></div>easyrtc.setPeerListener(fileOfferAccepted,&nbsp;"filesAccept",&nbsp;destUser);
+<a name="line534"></a><div class="linenumber">534</div><div style="width:2em;display:inline-block"></div>easyrtc.setPeerListener(fileCancelReceived,&nbsp;"filesCancel",&nbsp;destUser);
+<a name="line535"></a><div class="linenumber">535</div><div style="width:2em;display:inline-block"></div>easyrtc.setPeerListener(packageAckReceived,&nbsp;"filesAck",&nbsp;destUser);
+<a name="line536"></a><div class="linenumber">536</div>
+<a name="line537"></a><div class="linenumber">537</div><div style="width:2em;display:inline-block"></div>return&nbsp;sendFilesOffer;
+<a name="line538"></a><div class="linenumber">538</div><div style="width:0em;display:inline-block"></div>};
+<a name="line539"></a><div class="linenumber">539</div>
+<a name="line540"></a><div class="linenumber">540</div>
+<a name="line541"></a><div class="linenumber">541</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line542"></a><div class="linenumber">542</div><div style="width:0em;display:inline-block"></div>*&nbsp;Enable&nbsp;datachannel&nbsp;based&nbsp;file&nbsp;receiving.&nbsp;The&nbsp;received&nbsp;blobs&nbsp;get&nbsp;passed&nbsp;to&nbsp;the&nbsp;statusCB&nbsp;in&nbsp;the&nbsp;'eof'&nbsp;typed&nbsp;message.
+<a name="line543"></a><div class="linenumber">543</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;{Function(otherGuy,fileNameList,&nbsp;wasAccepted)}&nbsp;acceptRejectCB&nbsp;-&nbsp;this&nbsp;function&nbsp;is&nbsp;called&nbsp;when&nbsp;another&nbsp;peer
+<a name="line544"></a><div class="linenumber">544</div><div style="width:0em;display:inline-block"></div>*&nbsp;(otherGuy)&nbsp;offers&nbsp;to&nbsp;send&nbsp;you&nbsp;a&nbsp;list&nbsp;of&nbsp;files.&nbsp;this&nbsp;function&nbsp;should&nbsp;call&nbsp;it's&nbsp;wasAccepted&nbsp;function&nbsp;with&nbsp;true&nbsp;to
+<a name="line545"></a><div class="linenumber">545</div><div style="width:0em;display:inline-block"></div>*&nbsp;allow&nbsp;those&nbsp;files&nbsp;to&nbsp;be&nbsp;sent,&nbsp;or&nbsp;false&nbsp;to&nbsp;disallow&nbsp;them.
+<a name="line546"></a><div class="linenumber">546</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;{Function}&nbsp;blobAcceptor&nbsp;-&nbsp;this&nbsp;function&nbsp;is&nbsp;called&nbsp;three&nbsp;arguments&nbsp;arguments:&nbsp;the&nbsp;suppliers&nbsp;easyrtcid,&nbsp;a&nbsp;blob&nbsp;and&nbsp;a&nbsp;filename.&nbsp;It&nbsp;is&nbsp;responsible&nbsp;for
+<a name="line547"></a><div class="linenumber">547</div><div style="width:0em;display:inline-block"></div>*&nbsp;saving&nbsp;the&nbsp;blob&nbsp;to&nbsp;the&nbsp;file,&nbsp;usually&nbsp;using&nbsp;easyrtc_ft.saveAs.
+<a name="line548"></a><div class="linenumber">548</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;{type}&nbsp;statusCB&nbsp;&nbsp;-&nbsp;this&nbsp;function&nbsp;is&nbsp;called&nbsp;with&nbsp;the&nbsp;current&nbsp;state&nbsp;of&nbsp;file&nbsp;receiving.&nbsp;It&nbsp;is&nbsp;passed&nbsp;two&nbsp;arguments:
+<a name="line549"></a><div class="linenumber">549</div><div style="width:0em;display:inline-block"></div>*&nbsp;otherGuy&nbsp;-&nbsp;the&nbsp;easyrtcid&nbsp;of&nbsp;the&nbsp;person&nbsp;sending&nbsp;the&nbsp;files.&nbsp;*
+<a name="line550"></a><div class="linenumber">550</div><div style="width:0em;display:inline-block"></div>*&nbsp;msg&nbsp;-&nbsp;one&nbsp;of&nbsp;the&nbsp;following&nbsp;structures:
+<a name="line551"></a><div class="linenumber">551</div><div style="width:0em;display:inline-block"></div>*&nbsp;{status:"done",&nbsp;reason:"accept_failed"}
+<a name="line552"></a><div class="linenumber">552</div><div style="width:0em;display:inline-block"></div>*&nbsp;{status:"done",&nbsp;reason:"success"}
+<a name="line553"></a><div class="linenumber">553</div><div style="width:0em;display:inline-block"></div>*&nbsp;{status:"done",&nbsp;reason:"cancelled"}
+<a name="line554"></a><div class="linenumber">554</div><div style="width:0em;display:inline-block"></div>*&nbsp;{status:"eof"},
+<a name="line555"></a><div class="linenumber">555</div><div style="width:0em;display:inline-block"></div>*&nbsp;{status:"started_file,&nbsp;name:"filename"}
+<a name="line556"></a><div class="linenumber">556</div><div style="width:0em;display:inline-block"></div>*&nbsp;{status:"progress",&nbsp;name:filename,
+<a name="line557"></a><div class="linenumber">557</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;received:received_size_in_bytes,
+<a name="line558"></a><div class="linenumber">558</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;size:file_size_in_bytes&nbsp;}
+<a name="line559"></a><div class="linenumber">559</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;@example
+<a name="line560"></a><div class="linenumber">560</div><div style="width:0em;display:inline-block"></div>*
+<a name="line561"></a><div class="linenumber">561</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;easyrtc_ft(
+<a name="line562"></a><div class="linenumber">562</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function(otherGuy,&nbsp;filenamelist,&nbsp;wasAccepted)&nbsp;{&nbsp;&nbsp;wasAccepted(true);},
+<a name="line563"></a><div class="linenumber">563</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function(otherGuy,&nbsp;blob,&nbsp;filename)&nbsp;{&nbsp;easyrtc_ft(blob,&nbsp;filename);},
+<a name="line564"></a><div class="linenumber">564</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function(otherGuy,&nbsp;status)&nbsp;{&nbsp;&nbsp;console.log("status:"&nbsp;+&nbsp;JSON.stringify(status))}
+<a name="line565"></a><div class="linenumber">565</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);
+<a name="line566"></a><div class="linenumber">566</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line567"></a><div class="linenumber">567</div><div style="width:0em;display:inline-block"></div>easyrtc_ft.buildFileReceiver&nbsp;=&nbsp;function(acceptRejectCB,&nbsp;blobAcceptor,&nbsp;statusCB,&nbsp;options)&nbsp;{
+<a name="line568"></a><div class="linenumber">568</div><div style="width:2em;display:inline-block"></div>options&nbsp;=&nbsp;options&nbsp;||&nbsp;{};
+<a name="line569"></a><div class="linenumber">569</div>
+<a name="line570"></a><div class="linenumber">570</div><div style="width:2em;display:inline-block"></div>var&nbsp;usersOffers&nbsp;=&nbsp;{};
+<a name="line571"></a><div class="linenumber">571</div><div style="width:2em;display:inline-block"></div>var&nbsp;positionAcked&nbsp;=&nbsp;0;
+<a name="line572"></a><div class="linenumber">572</div><div style="width:2em;display:inline-block"></div>var&nbsp;ackThreshold&nbsp;=&nbsp;options.ackThreshold&nbsp;||&nbsp;10000;&nbsp;//&nbsp;receiver&nbsp;is&nbsp;allowed&nbsp;to&nbsp;be&nbsp;10KB&nbsp;behind&nbsp;of&nbsp;sender
+<a name="line573"></a><div class="linenumber">573</div>
+<a name="line574"></a><div class="linenumber">574</div><div style="width:2em;display:inline-block"></div>var&nbsp;roomOccupantListener&nbsp;=&nbsp;function(eventType,&nbsp;eventData)&nbsp;{
+<a name="line575"></a><div class="linenumber">575</div><div style="width:4em;display:inline-block"></div>var&nbsp;destUser;
+<a name="line576"></a><div class="linenumber">576</div><div style="width:4em;display:inline-block"></div>var&nbsp;foundUser;
+<a name="line577"></a><div class="linenumber">577</div><div style="width:4em;display:inline-block"></div>var&nbsp;roomName;
+<a name="line578"></a><div class="linenumber">578</div><div style="width:4em;display:inline-block"></div>var&nbsp;destOffer;
+<a name="line579"></a><div class="linenumber">579</div><div style="width:4em;display:inline-block"></div>for&nbsp;(destUser&nbsp;in&nbsp;usersOffers)&nbsp;{
+<a name="line580"></a><div class="linenumber">580</div><div style="width:6em;display:inline-block"></div>if&nbsp;(usersOffers.hasOwnProperty(destUser))&nbsp;{
+<a name="line581"></a><div class="linenumber">581</div>
+<a name="line582"></a><div class="linenumber">582</div><div style="width:8em;display:inline-block"></div>foundUser&nbsp;=&nbsp;false;
+<a name="line583"></a><div class="linenumber">583</div><div style="width:8em;display:inline-block"></div>for&nbsp;(roomName&nbsp;in&nbsp;eventData)&nbsp;{
+<a name="line584"></a><div class="linenumber">584</div><div style="width:10em;display:inline-block"></div>if&nbsp;(eventData[roomName][destUser])&nbsp;{
+<a name="line585"></a><div class="linenumber">585</div><div style="width:12em;display:inline-block"></div>foundUser&nbsp;=&nbsp;true;
+<a name="line586"></a><div class="linenumber">586</div><div style="width:10em;display:inline-block"></div>}
+<a name="line587"></a><div class="linenumber">587</div><div style="width:8em;display:inline-block"></div>}
+<a name="line588"></a><div class="linenumber">588</div>
+<a name="line589"></a><div class="linenumber">589</div><div style="width:8em;display:inline-block"></div>if&nbsp;(!foundUser)&nbsp;{&nbsp;&nbsp;&nbsp;
+<a name="line590"></a><div class="linenumber">590</div><div style="width:10em;display:inline-block"></div>var&nbsp;userOffers&nbsp;=&nbsp;usersOffers[destUser];
+<a name="line591"></a><div class="linenumber">591</div><div style="width:10em;display:inline-block"></div>for&nbsp;(var&nbsp;userOffer&nbsp;in&nbsp;userOffers[destUser])&nbsp;{
+<a name="line592"></a><div class="linenumber">592</div><div style="width:12em;display:inline-block"></div>if&nbsp;(userOffers.hasOwnProperty(userOffer))&nbsp;{
+<a name="line593"></a><div class="linenumber">593</div><div style="width:14em;display:inline-block"></div>delete&nbsp;userOffers[userOffer];
+<a name="line594"></a><div class="linenumber">594</div><div style="width:14em;display:inline-block"></div>statusCB(destUser,&nbsp;{
+<a name="line595"></a><div class="linenumber">595</div><div style="width:16em;display:inline-block"></div>seq:&nbsp;destOffer,
+<a name="line596"></a><div class="linenumber">596</div><div style="width:16em;display:inline-block"></div>status:&nbsp;"done",&nbsp;
+<a name="line597"></a><div class="linenumber">597</div><div style="width:16em;display:inline-block"></div>reason:&nbsp;"cancelled"
+<a name="line598"></a><div class="linenumber">598</div><div style="width:14em;display:inline-block"></div>});
+<a name="line599"></a><div class="linenumber">599</div><div style="width:12em;display:inline-block"></div>}
+<a name="line600"></a><div class="linenumber">600</div><div style="width:10em;display:inline-block"></div>}
+<a name="line601"></a><div class="linenumber">601</div>
+<a name="line602"></a><div class="linenumber">602</div><div style="width:10em;display:inline-block"></div>delete&nbsp;usersOffers[destUser];
+<a name="line603"></a><div class="linenumber">603</div><div style="width:8em;display:inline-block"></div>}
+<a name="line604"></a><div class="linenumber">604</div><div style="width:6em;display:inline-block"></div>}
+<a name="line605"></a><div class="linenumber">605</div><div style="width:4em;display:inline-block"></div>}
+<a name="line606"></a><div class="linenumber">606</div><div style="width:2em;display:inline-block"></div>};
+<a name="line607"></a><div class="linenumber">607</div>
+<a name="line608"></a><div class="linenumber">608</div><div style="width:2em;display:inline-block"></div>easyrtc.addEventListener("roomOccupant",&nbsp;roomOccupantListener);
+<a name="line609"></a><div class="linenumber">609</div>
+<a name="line610"></a><div class="linenumber">610</div><div style="width:2em;display:inline-block"></div>function&nbsp;fileOfferHandler(otherGuy,&nbsp;msgType,&nbsp;msgData)&nbsp;{
+<a name="line611"></a><div class="linenumber">611</div><div style="width:4em;display:inline-block"></div>var&nbsp;destOffer&nbsp;=&nbsp;msgData.seq;
+<a name="line612"></a><div class="linenumber">612</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!destOffer){
+<a name="line613"></a><div class="linenumber">613</div><div style="width:6em;display:inline-block"></div>return;
+<a name="line614"></a><div class="linenumber">614</div><div style="width:4em;display:inline-block"></div>}
+<a name="line615"></a><div class="linenumber">615</div><div style="width:4em;display:inline-block"></div>var&nbsp;userOffers&nbsp;=&nbsp;usersOffers[otherGuy]&nbsp;=&nbsp;usersOffers[otherGuy]&nbsp;||&nbsp;{};
+<a name="line616"></a><div class="linenumber">616</div><div style="width:4em;display:inline-block"></div>var&nbsp;userOffer&nbsp;=&nbsp;userOffers[destOffer]&nbsp;=&nbsp;{
+<a name="line617"></a><div class="linenumber">617</div><div style="width:6em;display:inline-block"></div>seq:&nbsp;destOffer,
+<a name="line618"></a><div class="linenumber">618</div><div style="width:6em;display:inline-block"></div>status:&nbsp;'pending'
+<a name="line619"></a><div class="linenumber">619</div><div style="width:4em;display:inline-block"></div>};
+<a name="line620"></a><div class="linenumber">620</div><div style="width:4em;display:inline-block"></div>acceptRejectCB(otherGuy,&nbsp;msgData.fileNameList,&nbsp;function(wasAccepted)&nbsp;{
+<a name="line621"></a><div class="linenumber">621</div><div style="width:6em;display:inline-block"></div>var&nbsp;ackHandler&nbsp;=&nbsp;function(ackMesg)&nbsp;{
+<a name="line622"></a><div class="linenumber">622</div>
+<a name="line623"></a><div class="linenumber">623</div><div style="width:8em;display:inline-block"></div>if&nbsp;(ackMesg.msgType&nbsp;===&nbsp;"error")&nbsp;{
+<a name="line624"></a><div class="linenumber">624</div><div style="width:10em;display:inline-block"></div>statusCB(otherGuy,&nbsp;{
+<a name="line625"></a><div class="linenumber">625</div><div style="width:12em;display:inline-block"></div>seq:&nbsp;destOffer,
+<a name="line626"></a><div class="linenumber">626</div><div style="width:12em;display:inline-block"></div>status:&nbsp;"done",&nbsp;
+<a name="line627"></a><div class="linenumber">627</div><div style="width:12em;display:inline-block"></div>reason:&nbsp;"accept_failed"
+<a name="line628"></a><div class="linenumber">628</div><div style="width:10em;display:inline-block"></div>});
+<a name="line629"></a><div class="linenumber">629</div><div style="width:10em;display:inline-block"></div>delete&nbsp;userOffers[destOffer];
+<a name="line630"></a><div class="linenumber">630</div><div style="width:8em;display:inline-block"></div>}
+<a name="line631"></a><div class="linenumber">631</div><div style="width:8em;display:inline-block"></div>else&nbsp;{
+<a name="line632"></a><div class="linenumber">632</div><div style="width:10em;display:inline-block"></div>statusCB(otherGuy,&nbsp;{
+<a name="line633"></a><div class="linenumber">633</div><div style="width:12em;display:inline-block"></div>seq:&nbsp;destOffer,
+<a name="line634"></a><div class="linenumber">634</div><div style="width:12em;display:inline-block"></div>status:&nbsp;"started"
+<a name="line635"></a><div class="linenumber">635</div><div style="width:10em;display:inline-block"></div>});
+<a name="line636"></a><div class="linenumber">636</div><div style="width:8em;display:inline-block"></div>}
+<a name="line637"></a><div class="linenumber">637</div><div style="width:6em;display:inline-block"></div>};
+<a name="line638"></a><div class="linenumber">638</div><div style="width:6em;display:inline-block"></div>if&nbsp;(wasAccepted)&nbsp;{
+<a name="line639"></a><div class="linenumber">639</div><div style="width:8em;display:inline-block"></div>userOffers[destOffer]&nbsp;=&nbsp;{
+<a name="line640"></a><div class="linenumber">640</div><div style="width:10em;display:inline-block"></div>seq:&nbsp;destOffer,
+<a name="line641"></a><div class="linenumber">641</div><div style="width:10em;display:inline-block"></div>status:&nbsp;"accepted",
+<a name="line642"></a><div class="linenumber">642</div><div style="width:10em;display:inline-block"></div>nextPacketSeq:&nbsp;0
+<a name="line643"></a><div class="linenumber">643</div><div style="width:8em;display:inline-block"></div>};
+<a name="line644"></a><div class="linenumber">644</div>
+<a name="line645"></a><div class="linenumber">645</div><div style="width:8em;display:inline-block"></div>easyrtc.sendDataWS(otherGuy,&nbsp;"filesAccept",&nbsp;{
+<a name="line646"></a><div class="linenumber">646</div><div style="width:10em;display:inline-block"></div>seq:&nbsp;destOffer
+<a name="line647"></a><div class="linenumber">647</div><div style="width:8em;display:inline-block"></div>},&nbsp;ackHandler);
+<a name="line648"></a><div class="linenumber">648</div><div style="width:6em;display:inline-block"></div>}
+<a name="line649"></a><div class="linenumber">649</div><div style="width:6em;display:inline-block"></div>else&nbsp;{
+<a name="line650"></a><div class="linenumber">650</div><div style="width:8em;display:inline-block"></div>easyrtc.sendDataWS(otherGuy,&nbsp;"filesReject",&nbsp;{
+<a name="line651"></a><div class="linenumber">651</div><div style="width:10em;display:inline-block"></div>seq:&nbsp;destOffer
+<a name="line652"></a><div class="linenumber">652</div><div style="width:8em;display:inline-block"></div>});
+<a name="line653"></a><div class="linenumber">653</div>
+<a name="line654"></a><div class="linenumber">654</div><div style="width:8em;display:inline-block"></div>statusCB(otherGuy,&nbsp;{
+<a name="line655"></a><div class="linenumber">655</div><div style="width:10em;display:inline-block"></div>seq:&nbsp;destOffer,
+<a name="line656"></a><div class="linenumber">656</div><div style="width:10em;display:inline-block"></div>status:&nbsp;"rejected"
+<a name="line657"></a><div class="linenumber">657</div><div style="width:8em;display:inline-block"></div>});
+<a name="line658"></a><div class="linenumber">658</div>
+<a name="line659"></a><div class="linenumber">659</div><div style="width:8em;display:inline-block"></div>delete&nbsp;userOffers[destOffer];
+<a name="line660"></a><div class="linenumber">660</div><div style="width:6em;display:inline-block"></div>}
+<a name="line661"></a><div class="linenumber">661</div><div style="width:4em;display:inline-block"></div>});
+<a name="line662"></a><div class="linenumber">662</div><div style="width:2em;display:inline-block"></div>}
+<a name="line663"></a><div class="linenumber">663</div>
+<a name="line664"></a><div class="linenumber">664</div><div style="width:2em;display:inline-block"></div>function&nbsp;fileChunkHandler(otherGuy,&nbsp;msgType,&nbsp;msgData)&nbsp;{
+<a name="line665"></a><div class="linenumber">665</div><div style="width:4em;display:inline-block"></div>var&nbsp;destOffer&nbsp;=&nbsp;msgData.seq;
+<a name="line666"></a><div class="linenumber">666</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!destOffer){
+<a name="line667"></a><div class="linenumber">667</div><div style="width:6em;display:inline-block"></div>return;
+<a name="line668"></a><div class="linenumber">668</div><div style="width:4em;display:inline-block"></div>}
+<a name="line669"></a><div class="linenumber">669</div><div style="width:4em;display:inline-block"></div>var&nbsp;userOffers&nbsp;=&nbsp;usersOffers[otherGuy];
+<a name="line670"></a><div class="linenumber">670</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!userOffers)&nbsp;{
+<a name="line671"></a><div class="linenumber">671</div><div style="width:6em;display:inline-block"></div>return;
+<a name="line672"></a><div class="linenumber">672</div><div style="width:4em;display:inline-block"></div>}
+<a name="line673"></a><div class="linenumber">673</div><div style="width:4em;display:inline-block"></div>var&nbsp;userOffer&nbsp;=&nbsp;userOffers[destOffer];
+<a name="line674"></a><div class="linenumber">674</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!userOffer)&nbsp;{
+<a name="line675"></a><div class="linenumber">675</div><div style="width:6em;display:inline-block"></div>return;
+<a name="line676"></a><div class="linenumber">676</div><div style="width:4em;display:inline-block"></div>}
+<a name="line677"></a><div class="linenumber">677</div><div style="width:4em;display:inline-block"></div>if&nbsp;(msgData.done)&nbsp;{
+<a name="line678"></a><div class="linenumber">678</div><div style="width:6em;display:inline-block"></div>switch&nbsp;(msgData.done)&nbsp;{
+<a name="line679"></a><div class="linenumber">679</div><div style="width:8em;display:inline-block"></div>case&nbsp;"file":
+<a name="line680"></a><div class="linenumber">680</div><div style="width:10em;display:inline-block"></div>var&nbsp;blob&nbsp;=&nbsp;new&nbsp;Blob(userOffer.currentData,&nbsp;{
+<a name="line681"></a><div class="linenumber">681</div><div style="width:12em;display:inline-block"></div>type:&nbsp;userOffer.currentFileType
+<a name="line682"></a><div class="linenumber">682</div><div style="width:10em;display:inline-block"></div>});
+<a name="line683"></a><div class="linenumber">683</div><div style="width:10em;display:inline-block"></div>blobAcceptor(otherGuy,&nbsp;blob,&nbsp;userOffer.currentFileName);
+<a name="line684"></a><div class="linenumber">684</div><div style="width:10em;display:inline-block"></div>statusCB(otherGuy,&nbsp;{
+<a name="line685"></a><div class="linenumber">685</div><div style="width:12em;display:inline-block"></div>seq:&nbsp;destOffer,
+<a name="line686"></a><div class="linenumber">686</div><div style="width:12em;display:inline-block"></div>status:&nbsp;"eof",&nbsp;
+<a name="line687"></a><div class="linenumber">687</div><div style="width:12em;display:inline-block"></div>name:&nbsp;userOffer.currentFileName
+<a name="line688"></a><div class="linenumber">688</div><div style="width:10em;display:inline-block"></div>});
+<a name="line689"></a><div class="linenumber">689</div>
+<a name="line690"></a><div class="linenumber">690</div><div style="width:10em;display:inline-block"></div>blob&nbsp;=&nbsp;null;
+<a name="line691"></a><div class="linenumber">691</div><div style="width:10em;display:inline-block"></div>positionAcked&nbsp;=&nbsp;0;
+<a name="line692"></a><div class="linenumber">692</div><div style="width:10em;display:inline-block"></div>userOffer.currentData&nbsp;=&nbsp;[];
+<a name="line693"></a><div class="linenumber">693</div><div style="width:10em;display:inline-block"></div>break;
+<a name="line694"></a><div class="linenumber">694</div><div style="width:8em;display:inline-block"></div>case&nbsp;"all":
+<a name="line695"></a><div class="linenumber">695</div><div style="width:10em;display:inline-block"></div>statusCB(otherGuy,&nbsp;{
+<a name="line696"></a><div class="linenumber">696</div><div style="width:12em;display:inline-block"></div>seq:&nbsp;destOffer,
+<a name="line697"></a><div class="linenumber">697</div><div style="width:12em;display:inline-block"></div>status:&nbsp;"done",&nbsp;
+<a name="line698"></a><div class="linenumber">698</div><div style="width:12em;display:inline-block"></div>reason:&nbsp;"success"
+<a name="line699"></a><div class="linenumber">699</div><div style="width:10em;display:inline-block"></div>});
+<a name="line700"></a><div class="linenumber">700</div><div style="width:10em;display:inline-block"></div>break;
+<a name="line701"></a><div class="linenumber">701</div><div style="width:8em;display:inline-block"></div>case&nbsp;"cancelled":
+<a name="line702"></a><div class="linenumber">702</div><div style="width:10em;display:inline-block"></div>delete&nbsp;userOffers[destOffer];
+<a name="line703"></a><div class="linenumber">703</div><div style="width:10em;display:inline-block"></div>statusCB(otherGuy,&nbsp;{
+<a name="line704"></a><div class="linenumber">704</div><div style="width:12em;display:inline-block"></div>seq:&nbsp;destOffer,
+<a name="line705"></a><div class="linenumber">705</div><div style="width:12em;display:inline-block"></div>status:&nbsp;"done",&nbsp;
+<a name="line706"></a><div class="linenumber">706</div><div style="width:12em;display:inline-block"></div>reason:&nbsp;"cancelled"
+<a name="line707"></a><div class="linenumber">707</div><div style="width:10em;display:inline-block"></div>});
+<a name="line708"></a><div class="linenumber">708</div><div style="width:10em;display:inline-block"></div>break;
+<a name="line709"></a><div class="linenumber">709</div><div style="width:6em;display:inline-block"></div>}
+<a name="line710"></a><div class="linenumber">710</div><div style="width:4em;display:inline-block"></div>}
+<a name="line711"></a><div class="linenumber">711</div><div style="width:4em;display:inline-block"></div>else&nbsp;if&nbsp;(msgData.name)&nbsp;{
+<a name="line712"></a><div class="linenumber">712</div><div style="width:6em;display:inline-block"></div>statusCB(otherGuy,&nbsp;{
+<a name="line713"></a><div class="linenumber">713</div><div style="width:8em;display:inline-block"></div>seq:&nbsp;destOffer,
+<a name="line714"></a><div class="linenumber">714</div><div style="width:8em;display:inline-block"></div>status:&nbsp;"started_file",&nbsp;
+<a name="line715"></a><div class="linenumber">715</div><div style="width:8em;display:inline-block"></div>name:&nbsp;msgData.name
+<a name="line716"></a><div class="linenumber">716</div><div style="width:6em;display:inline-block"></div>});
+<a name="line717"></a><div class="linenumber">717</div><div style="width:6em;display:inline-block"></div>userOffer.currentFileName&nbsp;=&nbsp;msgData.name;
+<a name="line718"></a><div class="linenumber">718</div><div style="width:6em;display:inline-block"></div>userOffer.currentFileType&nbsp;=&nbsp;msgData.type;
+<a name="line719"></a><div class="linenumber">719</div><div style="width:6em;display:inline-block"></div>userOffer.lengthReceived&nbsp;=&nbsp;0;
+<a name="line720"></a><div class="linenumber">720</div><div style="width:6em;display:inline-block"></div>userOffer.lengthExpected&nbsp;=&nbsp;msgData.size;
+<a name="line721"></a><div class="linenumber">721</div><div style="width:6em;display:inline-block"></div>userOffer.currentData&nbsp;=&nbsp;[];
+<a name="line722"></a><div class="linenumber">722</div><div style="width:4em;display:inline-block"></div>}
+<a name="line723"></a><div class="linenumber">723</div><div style="width:4em;display:inline-block"></div>else&nbsp;if&nbsp;(msgData.data64&nbsp;||&nbsp;msgData.datatxt)&nbsp;{
+<a name="line724"></a><div class="linenumber">724</div><div style="width:6em;display:inline-block"></div>var&nbsp;binData;
+<a name="line725"></a><div class="linenumber">725</div><div style="width:6em;display:inline-block"></div>if&nbsp;(msgData.data64)&nbsp;{
+<a name="line726"></a><div class="linenumber">726</div><div style="width:8em;display:inline-block"></div>binData&nbsp;=&nbsp;atob(msgData.data64);
+<a name="line727"></a><div class="linenumber">727</div><div style="width:6em;display:inline-block"></div>}
+<a name="line728"></a><div class="linenumber">728</div><div style="width:6em;display:inline-block"></div>else&nbsp;{
+<a name="line729"></a><div class="linenumber">729</div><div style="width:8em;display:inline-block"></div>binData&nbsp;=&nbsp;msgData.datatxt;
+<a name="line730"></a><div class="linenumber">730</div><div style="width:6em;display:inline-block"></div>}
+<a name="line731"></a><div class="linenumber">731</div><div style="width:6em;display:inline-block"></div>var&nbsp;i;
+<a name="line732"></a><div class="linenumber">732</div><div style="width:6em;display:inline-block"></div>var&nbsp;n&nbsp;=&nbsp;binData.length;
+<a name="line733"></a><div class="linenumber">733</div><div style="width:6em;display:inline-block"></div>var&nbsp;binheap&nbsp;=&nbsp;new&nbsp;Uint8Array(n);
+<a name="line734"></a><div class="linenumber">734</div><div style="width:6em;display:inline-block"></div>for&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;n;&nbsp;i&nbsp;+=&nbsp;1)&nbsp;{
+<a name="line735"></a><div class="linenumber">735</div><div style="width:8em;display:inline-block"></div>binheap[i]&nbsp;=&nbsp;binData.charCodeAt(i);
+<a name="line736"></a><div class="linenumber">736</div><div style="width:6em;display:inline-block"></div>}
+<a name="line737"></a><div class="linenumber">737</div><div style="width:6em;display:inline-block"></div>userOffer.lengthReceived&nbsp;+=&nbsp;n;
+<a name="line738"></a><div class="linenumber">738</div>
+<a name="line739"></a><div class="linenumber">739</div><div style="width:6em;display:inline-block"></div>if&nbsp;(!userOffer.currentData)&nbsp;{
+<a name="line740"></a><div class="linenumber">740</div><div style="width:8em;display:inline-block"></div>easyrtc.showError(easyrtc_ft.errCodes.DATA_LOST,&nbsp;"file&nbsp;tranfert&nbsp;data&nbsp;lost");
+<a name="line741"></a><div class="linenumber">741</div><div style="width:6em;display:inline-block"></div>}
+<a name="line742"></a><div class="linenumber">742</div>
+<a name="line743"></a><div class="linenumber">743</div><div style="width:6em;display:inline-block"></div>userOffer.currentData.push(binheap);
+<a name="line744"></a><div class="linenumber">744</div>
+<a name="line745"></a><div class="linenumber">745</div><div style="width:6em;display:inline-block"></div>statusCB(otherGuy,&nbsp;{
+<a name="line746"></a><div class="linenumber">746</div><div style="width:8em;display:inline-block"></div>seq:&nbsp;destOffer,
+<a name="line747"></a><div class="linenumber">747</div><div style="width:8em;display:inline-block"></div>status:&nbsp;"progress",
+<a name="line748"></a><div class="linenumber">748</div><div style="width:8em;display:inline-block"></div>name:&nbsp;userOffer.currentFileName,
+<a name="line749"></a><div class="linenumber">749</div><div style="width:8em;display:inline-block"></div>received:&nbsp;userOffer.lengthReceived,
+<a name="line750"></a><div class="linenumber">750</div><div style="width:8em;display:inline-block"></div>size:&nbsp;userOffer.lengthExpected});
+<a name="line751"></a><div class="linenumber">751</div>
+<a name="line752"></a><div class="linenumber">752</div><div style="width:6em;display:inline-block"></div>if&nbsp;(userOffer.lengthReceived&nbsp;&gt;&nbsp;positionAcked&nbsp;+&nbsp;ackThreshold)&nbsp;{
+<a name="line753"></a><div class="linenumber">753</div><div style="width:8em;display:inline-block"></div>positionAcked&nbsp;=&nbsp;userOffer.lengthReceived;
+<a name="line754"></a><div class="linenumber">754</div><div style="width:8em;display:inline-block"></div>easyrtc.sendData(otherGuy,&nbsp;"filesAck",&nbsp;{
+<a name="line755"></a><div class="linenumber">755</div><div style="width:10em;display:inline-block"></div>seq:&nbsp;destOffer,
+<a name="line756"></a><div class="linenumber">756</div><div style="width:10em;display:inline-block"></div>positionAck:&nbsp;positionAcked
+<a name="line757"></a><div class="linenumber">757</div><div style="width:8em;display:inline-block"></div>});
+<a name="line758"></a><div class="linenumber">758</div><div style="width:6em;display:inline-block"></div>}
+<a name="line759"></a><div class="linenumber">759</div><div style="width:4em;display:inline-block"></div>}
+<a name="line760"></a><div class="linenumber">760</div><div style="width:4em;display:inline-block"></div>else&nbsp;{
+<a name="line761"></a><div class="linenumber">761</div><div style="width:6em;display:inline-block"></div>easyrtc.showError(easyrtc.errCodes.INVALID_DATA,&nbsp;"Unexpected&nbsp;data&nbsp;structure&nbsp;in&nbsp;filesChunk");
+<a name="line762"></a><div class="linenumber">762</div><div style="width:4em;display:inline-block"></div>}
+<a name="line763"></a><div class="linenumber">763</div><div style="width:2em;display:inline-block"></div>}
+<a name="line764"></a><div class="linenumber">764</div>
+<a name="line765"></a><div class="linenumber">765</div><div style="width:2em;display:inline-block"></div>easyrtc.setPeerListener(fileOfferHandler,&nbsp;"filesOffer");
+<a name="line766"></a><div class="linenumber">766</div><div style="width:2em;display:inline-block"></div>easyrtc.setPeerListener(fileChunkHandler,&nbsp;"filesChunk");
+<a name="line767"></a><div class="linenumber">767</div><div style="width:0em;display:inline-block"></div>};
+<a name="line768"></a><div class="linenumber">768</div>
+<a name="line769"></a><div class="linenumber">769</div><div style="width:0em;display:inline-block"></div>/**&nbsp;This&nbsp;is&nbsp;a&nbsp;wrapper&nbsp;around&nbsp;Eli&nbsp;Grey's&nbsp;saveAs&nbsp;function.&nbsp;This&nbsp;saves&nbsp;to&nbsp;the&nbsp;browser's&nbsp;downloads&nbsp;directory.
+<a name="line770"></a><div class="linenumber">770</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;{Blob}&nbsp;Blob&nbsp;-&nbsp;the&nbsp;data&nbsp;to&nbsp;be&nbsp;saved.
+<a name="line771"></a><div class="linenumber">771</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;{String}&nbsp;filename&nbsp;-&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;file&nbsp;the&nbsp;blob&nbsp;should&nbsp;be&nbsp;written&nbsp;to.
+<a name="line772"></a><div class="linenumber">772</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line773"></a><div class="linenumber">773</div><div style="width:0em;display:inline-block"></div>easyrtc_ft.saveAs&nbsp;=&nbsp;(function()&nbsp;{
+<a name="line774"></a><div class="linenumber">774</div>
+<a name="line775"></a><div class="linenumber">775</div><div style="width:2em;display:inline-block"></div>/*&nbsp;FileSaver.js
+<a name="line776"></a><div class="linenumber">776</div><div style="width:2em;display:inline-block"></div>*&nbsp;A&nbsp;saveAs()&nbsp;FileSaver&nbsp;implementation.
+<a name="line777"></a><div class="linenumber">777</div><div style="width:2em;display:inline-block"></div>*&nbsp;2013-01-23
+<a name="line778"></a><div class="linenumber">778</div><div style="width:2em;display:inline-block"></div>*
+<a name="line779"></a><div class="linenumber">779</div><div style="width:2em;display:inline-block"></div>*&nbsp;By&nbsp;Eli&nbsp;Grey,&nbsp;http://eligrey.com
+<a name="line780"></a><div class="linenumber">780</div><div style="width:2em;display:inline-block"></div>*&nbsp;License:&nbsp;X11/MIT
+<a name="line781"></a><div class="linenumber">781</div><div style="width:2em;display:inline-block"></div>*&nbsp;&nbsp;&nbsp;See&nbsp;LICENSE.md
+<a name="line782"></a><div class="linenumber">782</div><div style="width:2em;display:inline-block"></div>*/
+<a name="line783"></a><div class="linenumber">783</div>
+<a name="line784"></a><div class="linenumber">784</div><div style="width:2em;display:inline-block"></div>/*global&nbsp;self&nbsp;*/
+<a name="line785"></a><div class="linenumber">785</div><div style="width:2em;display:inline-block"></div>/*jslint&nbsp;bitwise:&nbsp;true,&nbsp;regexp:&nbsp;true,&nbsp;confusion:&nbsp;true,&nbsp;es5:&nbsp;true,&nbsp;vars:&nbsp;true,&nbsp;white:&nbsp;true,
+<a name="line786"></a><div class="linenumber">786</div><div style="width:2em;display:inline-block"></div>plusplus:&nbsp;true&nbsp;*/
+<a name="line787"></a><div class="linenumber">787</div>
+<a name="line788"></a><div class="linenumber">788</div><div style="width:2em;display:inline-block"></div>/*!&nbsp;@source&nbsp;http://purl.eligrey.com/github/FileSaver.js/blob/master/FileSaver.js&nbsp;*/
+<a name="line789"></a><div class="linenumber">789</div><div style="width:2em;display:inline-block"></div>var&nbsp;saveAs&nbsp;=&nbsp;window.saveAs&nbsp;||&nbsp;(navigator.msSaveOrOpenBlob&nbsp;&amp;&amp;&nbsp;navigator.msSaveOrOpenBlob.bind(navigator))&nbsp;||&nbsp;(function(view)&nbsp;{
+<a name="line790"></a><div class="linenumber">790</div>
+<a name="line791"></a><div class="linenumber">791</div><div style="width:4em;display:inline-block"></div>var&nbsp;doc&nbsp;=&nbsp;view.document,
+<a name="line792"></a><div class="linenumber">792</div><div style="width:6em;display:inline-block"></div>//&nbsp;only&nbsp;get&nbsp;URL&nbsp;when&nbsp;necessary&nbsp;in&nbsp;case&nbsp;BlobBuilder.js&nbsp;hasn't&nbsp;overridden&nbsp;it&nbsp;yet
+<a name="line793"></a><div class="linenumber">793</div><div style="width:6em;display:inline-block"></div>get_URL&nbsp;=&nbsp;function&nbsp;()&nbsp;{
+<a name="line794"></a><div class="linenumber">794</div><div style="width:8em;display:inline-block"></div>return&nbsp;view.URL&nbsp;||&nbsp;view.webkitURL&nbsp;||&nbsp;view;
+<a name="line795"></a><div class="linenumber">795</div><div style="width:6em;display:inline-block"></div>},
+<a name="line796"></a><div class="linenumber">796</div><div style="width:6em;display:inline-block"></div>URL&nbsp;=&nbsp;view.URL&nbsp;||&nbsp;view.webkitURL&nbsp;||&nbsp;view,
+<a name="line797"></a><div class="linenumber">797</div><div style="width:6em;display:inline-block"></div>save_link&nbsp;=&nbsp;doc.createElementNS("http://www.w3.org/1999/xhtml",&nbsp;"a"),
+<a name="line798"></a><div class="linenumber">798</div><div style="width:6em;display:inline-block"></div>can_use_save_link&nbsp;=&nbsp;!view.externalHost&nbsp;&amp;&amp;&nbsp;"download"&nbsp;in&nbsp;save_link,
+<a name="line799"></a><div class="linenumber">799</div><div style="width:6em;display:inline-block"></div>click&nbsp;=&nbsp;function(node)&nbsp;{
+<a name="line800"></a><div class="linenumber">800</div><div style="width:8em;display:inline-block"></div>var&nbsp;event&nbsp;=&nbsp;doc.createEvent("MouseEvents");
+<a name="line801"></a><div class="linenumber">801</div><div style="width:8em;display:inline-block"></div>event.initMouseEvent(
+<a name="line802"></a><div class="linenumber">802</div><div style="width:10em;display:inline-block"></div>"click",&nbsp;true,&nbsp;false,&nbsp;view,&nbsp;0,&nbsp;0,&nbsp;0,&nbsp;0,&nbsp;0,
+<a name="line803"></a><div class="linenumber">803</div><div style="width:10em;display:inline-block"></div>false,&nbsp;false,&nbsp;false,&nbsp;false,&nbsp;0,&nbsp;null
+<a name="line804"></a><div class="linenumber">804</div><div style="width:8em;display:inline-block"></div>);
+<a name="line805"></a><div class="linenumber">805</div><div style="width:8em;display:inline-block"></div>node.dispatchEvent(event);
+<a name="line806"></a><div class="linenumber">806</div><div style="width:6em;display:inline-block"></div>},
+<a name="line807"></a><div class="linenumber">807</div><div style="width:6em;display:inline-block"></div>webkit_req_fs&nbsp;=&nbsp;view.webkitRequestFileSystem,
+<a name="line808"></a><div class="linenumber">808</div><div style="width:6em;display:inline-block"></div>req_fs&nbsp;=&nbsp;view.requestFileSystem&nbsp;||&nbsp;webkit_req_fs&nbsp;||&nbsp;view.mozRequestFileSystem,
+<a name="line809"></a><div class="linenumber">809</div><div style="width:6em;display:inline-block"></div>throw_outside&nbsp;=&nbsp;function(ex)&nbsp;{
+<a name="line810"></a><div class="linenumber">810</div><div style="width:8em;display:inline-block"></div>(view.setImmediate&nbsp;||&nbsp;view.setTimeout)(function()&nbsp;{
+<a name="line811"></a><div class="linenumber">811</div><div style="width:10em;display:inline-block"></div>throw&nbsp;ex;
+<a name="line812"></a><div class="linenumber">812</div><div style="width:8em;display:inline-block"></div>},&nbsp;0);
+<a name="line813"></a><div class="linenumber">813</div><div style="width:6em;display:inline-block"></div>},
+<a name="line814"></a><div class="linenumber">814</div><div style="width:6em;display:inline-block"></div>force_saveable_type&nbsp;=&nbsp;"application/octet-stream",
+<a name="line815"></a><div class="linenumber">815</div><div style="width:6em;display:inline-block"></div>fs_min_size&nbsp;=&nbsp;0,
+<a name="line816"></a><div class="linenumber">816</div><div style="width:6em;display:inline-block"></div>deletion_queue&nbsp;=&nbsp;[];
+<a name="line817"></a><div class="linenumber">817</div>
+<a name="line818"></a><div class="linenumber">818</div><div style="width:4em;display:inline-block"></div>function&nbsp;process_deletion_queue()&nbsp;{
+<a name="line819"></a><div class="linenumber">819</div><div style="width:6em;display:inline-block"></div>var&nbsp;i&nbsp;=&nbsp;deletion_queue.length;
+<a name="line820"></a><div class="linenumber">820</div><div style="width:6em;display:inline-block"></div>while&nbsp;(i--)&nbsp;{
+<a name="line821"></a><div class="linenumber">821</div><div style="width:8em;display:inline-block"></div>var&nbsp;file&nbsp;=&nbsp;deletion_queue[i];
+<a name="line822"></a><div class="linenumber">822</div><div style="width:8em;display:inline-block"></div>if&nbsp;(typeof&nbsp;file&nbsp;===&nbsp;"string")&nbsp;{&nbsp;//&nbsp;file&nbsp;is&nbsp;an&nbsp;object&nbsp;URL
+<a name="line823"></a><div class="linenumber">823</div><div style="width:10em;display:inline-block"></div>URL.revokeObjectURL(file);
+<a name="line824"></a><div class="linenumber">824</div><div style="width:8em;display:inline-block"></div>}&nbsp;else&nbsp;{&nbsp;//&nbsp;file&nbsp;is&nbsp;a&nbsp;File
+<a name="line825"></a><div class="linenumber">825</div><div style="width:10em;display:inline-block"></div>file.remove();
+<a name="line826"></a><div class="linenumber">826</div><div style="width:8em;display:inline-block"></div>}
+<a name="line827"></a><div class="linenumber">827</div><div style="width:6em;display:inline-block"></div>}
+<a name="line828"></a><div class="linenumber">828</div><div style="width:6em;display:inline-block"></div>deletion_queue.length&nbsp;=&nbsp;0;&nbsp;//&nbsp;clear&nbsp;queue
+<a name="line829"></a><div class="linenumber">829</div><div style="width:4em;display:inline-block"></div>}
+<a name="line830"></a><div class="linenumber">830</div>
+<a name="line831"></a><div class="linenumber">831</div><div style="width:4em;display:inline-block"></div>function&nbsp;dispatch(filesaver,&nbsp;event_types,&nbsp;event)&nbsp;{
+<a name="line832"></a><div class="linenumber">832</div><div style="width:6em;display:inline-block"></div>event_types&nbsp;=&nbsp;[].concat(event_types);
+<a name="line833"></a><div class="linenumber">833</div><div style="width:6em;display:inline-block"></div>var&nbsp;i&nbsp;=&nbsp;event_types.length;
+<a name="line834"></a><div class="linenumber">834</div><div style="width:6em;display:inline-block"></div>while&nbsp;(i--)&nbsp;{
+<a name="line835"></a><div class="linenumber">835</div><div style="width:8em;display:inline-block"></div>var&nbsp;listener&nbsp;=&nbsp;filesaver["on"&nbsp;+&nbsp;event_types[i]];
+<a name="line836"></a><div class="linenumber">836</div><div style="width:8em;display:inline-block"></div>if&nbsp;(typeof&nbsp;listener&nbsp;===&nbsp;"function")&nbsp;{
+<a name="line837"></a><div class="linenumber">837</div><div style="width:10em;display:inline-block"></div>try&nbsp;{
+<a name="line838"></a><div class="linenumber">838</div><div style="width:12em;display:inline-block"></div>listener.call(filesaver,&nbsp;event&nbsp;||&nbsp;filesaver);
+<a name="line839"></a><div class="linenumber">839</div><div style="width:10em;display:inline-block"></div>}&nbsp;catch&nbsp;(ex)&nbsp;{
+<a name="line840"></a><div class="linenumber">840</div><div style="width:12em;display:inline-block"></div>throw_outside(ex);
+<a name="line841"></a><div class="linenumber">841</div><div style="width:10em;display:inline-block"></div>}
+<a name="line842"></a><div class="linenumber">842</div><div style="width:8em;display:inline-block"></div>}
+<a name="line843"></a><div class="linenumber">843</div><div style="width:6em;display:inline-block"></div>}
+<a name="line844"></a><div class="linenumber">844</div><div style="width:4em;display:inline-block"></div>}
+<a name="line845"></a><div class="linenumber">845</div>
+<a name="line846"></a><div class="linenumber">846</div><div style="width:4em;display:inline-block"></div>function&nbsp;FileSaver(blob,&nbsp;name)&nbsp;{
+<a name="line847"></a><div class="linenumber">847</div><div style="width:6em;display:inline-block"></div>//&nbsp;First&nbsp;try&nbsp;a.download,&nbsp;then&nbsp;web&nbsp;filesystem,&nbsp;then&nbsp;object&nbsp;URLs
+<a name="line848"></a><div class="linenumber">848</div><div style="width:6em;display:inline-block"></div>var&nbsp;filesaver&nbsp;=&nbsp;this,
+<a name="line849"></a><div class="linenumber">849</div><div style="width:8em;display:inline-block"></div>type&nbsp;=&nbsp;blob.type,
+<a name="line850"></a><div class="linenumber">850</div><div style="width:8em;display:inline-block"></div>blob_changed&nbsp;=&nbsp;false,
+<a name="line851"></a><div class="linenumber">851</div><div style="width:8em;display:inline-block"></div>object_url,
+<a name="line852"></a><div class="linenumber">852</div><div style="width:8em;display:inline-block"></div>target_view,
+<a name="line853"></a><div class="linenumber">853</div><div style="width:8em;display:inline-block"></div>get_object_url&nbsp;=&nbsp;function()&nbsp;{
+<a name="line854"></a><div class="linenumber">854</div><div style="width:10em;display:inline-block"></div>var&nbsp;object_url&nbsp;=&nbsp;get_URL().createObjectURL(blob);
+<a name="line855"></a><div class="linenumber">855</div><div style="width:10em;display:inline-block"></div>deletion_queue.push(object_url);
+<a name="line856"></a><div class="linenumber">856</div><div style="width:10em;display:inline-block"></div>return&nbsp;object_url;
+<a name="line857"></a><div class="linenumber">857</div><div style="width:8em;display:inline-block"></div>},
+<a name="line858"></a><div class="linenumber">858</div><div style="width:8em;display:inline-block"></div>dispatch_all&nbsp;=&nbsp;function()&nbsp;{
+<a name="line859"></a><div class="linenumber">859</div><div style="width:10em;display:inline-block"></div>dispatch(filesaver,&nbsp;"writestart&nbsp;progress&nbsp;write&nbsp;writeend".split("&nbsp;"));
+<a name="line860"></a><div class="linenumber">860</div><div style="width:8em;display:inline-block"></div>},
+<a name="line861"></a><div class="linenumber">861</div><div style="width:8em;display:inline-block"></div>//&nbsp;on&nbsp;any&nbsp;filesys&nbsp;errors&nbsp;revert&nbsp;to&nbsp;saving&nbsp;with&nbsp;object&nbsp;URLs
+<a name="line862"></a><div class="linenumber">862</div><div style="width:8em;display:inline-block"></div>fs_error&nbsp;=&nbsp;function()&nbsp;{
+<a name="line863"></a><div class="linenumber">863</div><div style="width:10em;display:inline-block"></div>//&nbsp;don't&nbsp;create&nbsp;more&nbsp;object&nbsp;URLs&nbsp;than&nbsp;needed
+<a name="line864"></a><div class="linenumber">864</div><div style="width:10em;display:inline-block"></div>if&nbsp;(blob_changed&nbsp;||&nbsp;!object_url)&nbsp;{
+<a name="line865"></a><div class="linenumber">865</div><div style="width:12em;display:inline-block"></div>object_url&nbsp;=&nbsp;get_object_url(blob);
+<a name="line866"></a><div class="linenumber">866</div><div style="width:10em;display:inline-block"></div>}
+<a name="line867"></a><div class="linenumber">867</div><div style="width:10em;display:inline-block"></div>if&nbsp;(target_view)&nbsp;{
+<a name="line868"></a><div class="linenumber">868</div><div style="width:12em;display:inline-block"></div>target_view.location.href&nbsp;=&nbsp;object_url;
+<a name="line869"></a><div class="linenumber">869</div><div style="width:10em;display:inline-block"></div>}&nbsp;else&nbsp;{
+<a name="line870"></a><div class="linenumber">870</div><div style="width:12em;display:inline-block"></div>window.open(object_url,&nbsp;"_blank");
+<a name="line871"></a><div class="linenumber">871</div><div style="width:10em;display:inline-block"></div>}
+<a name="line872"></a><div class="linenumber">872</div><div style="width:10em;display:inline-block"></div>filesaver.readyState&nbsp;=&nbsp;filesaver.DONE;
+<a name="line873"></a><div class="linenumber">873</div><div style="width:10em;display:inline-block"></div>dispatch_all();
+<a name="line874"></a><div class="linenumber">874</div><div style="width:8em;display:inline-block"></div>},
+<a name="line875"></a><div class="linenumber">875</div><div style="width:8em;display:inline-block"></div>abortable&nbsp;=&nbsp;function(func)&nbsp;{
+<a name="line876"></a><div class="linenumber">876</div><div style="width:10em;display:inline-block"></div>return&nbsp;function()&nbsp;{
+<a name="line877"></a><div class="linenumber">877</div><div style="width:12em;display:inline-block"></div>if&nbsp;(filesaver.readyState&nbsp;!==&nbsp;filesaver.DONE)&nbsp;{
+<a name="line878"></a><div class="linenumber">878</div><div style="width:14em;display:inline-block"></div>return&nbsp;func.apply(this,&nbsp;arguments);
+<a name="line879"></a><div class="linenumber">879</div><div style="width:12em;display:inline-block"></div>}
+<a name="line880"></a><div class="linenumber">880</div><div style="width:12em;display:inline-block"></div>else&nbsp;{
+<a name="line881"></a><div class="linenumber">881</div><div style="width:14em;display:inline-block"></div>return&nbsp;null;
+<a name="line882"></a><div class="linenumber">882</div><div style="width:12em;display:inline-block"></div>}
+<a name="line883"></a><div class="linenumber">883</div><div style="width:10em;display:inline-block"></div>};
+<a name="line884"></a><div class="linenumber">884</div><div style="width:8em;display:inline-block"></div>},
+<a name="line885"></a><div class="linenumber">885</div><div style="width:8em;display:inline-block"></div>create_if_not_found&nbsp;=&nbsp;{create:&nbsp;true,&nbsp;exclusive:&nbsp;false},
+<a name="line886"></a><div class="linenumber">886</div><div style="width:8em;display:inline-block"></div>slice;
+<a name="line887"></a><div class="linenumber">887</div>
+<a name="line888"></a><div class="linenumber">888</div><div style="width:6em;display:inline-block"></div>filesaver.readyState&nbsp;=&nbsp;filesaver.INIT;
+<a name="line889"></a><div class="linenumber">889</div>
+<a name="line890"></a><div class="linenumber">890</div><div style="width:6em;display:inline-block"></div>if&nbsp;(!name)&nbsp;{
+<a name="line891"></a><div class="linenumber">891</div><div style="width:8em;display:inline-block"></div>name&nbsp;=&nbsp;"download";
+<a name="line892"></a><div class="linenumber">892</div><div style="width:6em;display:inline-block"></div>}
+<a name="line893"></a><div class="linenumber">893</div>
+<a name="line894"></a><div class="linenumber">894</div><div style="width:6em;display:inline-block"></div>if&nbsp;(can_use_save_link)&nbsp;{
+<a name="line895"></a><div class="linenumber">895</div><div style="width:8em;display:inline-block"></div>object_url&nbsp;=&nbsp;get_object_url(blob);
+<a name="line896"></a><div class="linenumber">896</div><div style="width:8em;display:inline-block"></div>save_link.href&nbsp;=&nbsp;object_url;
+<a name="line897"></a><div class="linenumber">897</div><div style="width:8em;display:inline-block"></div>save_link.download&nbsp;=&nbsp;name;
+<a name="line898"></a><div class="linenumber">898</div><div style="width:8em;display:inline-block"></div>click(save_link);
+<a name="line899"></a><div class="linenumber">899</div><div style="width:8em;display:inline-block"></div>filesaver.readyState&nbsp;=&nbsp;filesaver.DONE;
+<a name="line900"></a><div class="linenumber">900</div><div style="width:8em;display:inline-block"></div>dispatch_all();
+<a name="line901"></a><div class="linenumber">901</div><div style="width:8em;display:inline-block"></div>return;
+<a name="line902"></a><div class="linenumber">902</div><div style="width:6em;display:inline-block"></div>}
+<a name="line903"></a><div class="linenumber">903</div><div style="width:6em;display:inline-block"></div>//&nbsp;Object&nbsp;and&nbsp;web&nbsp;filesystem&nbsp;URLs&nbsp;have&nbsp;a&nbsp;problem&nbsp;saving&nbsp;in&nbsp;Google&nbsp;Chrome&nbsp;when
+<a name="line904"></a><div class="linenumber">904</div><div style="width:6em;display:inline-block"></div>//&nbsp;viewed&nbsp;in&nbsp;a&nbsp;tab,&nbsp;so&nbsp;I&nbsp;force&nbsp;save&nbsp;with&nbsp;application/octet-stream
+<a name="line905"></a><div class="linenumber">905</div><div style="width:6em;display:inline-block"></div>//&nbsp;http://code.google.com/p/chromium/issues/detail?id=91158
+<a name="line906"></a><div class="linenumber">906</div><div style="width:6em;display:inline-block"></div>if&nbsp;(view.chrome&nbsp;&amp;&amp;&nbsp;type&nbsp;&amp;&amp;&nbsp;type&nbsp;!==&nbsp;force_saveable_type)&nbsp;{
+<a name="line907"></a><div class="linenumber">907</div><div style="width:8em;display:inline-block"></div>slice&nbsp;=&nbsp;blob.slice&nbsp;||&nbsp;blob.webkitSlice;
+<a name="line908"></a><div class="linenumber">908</div><div style="width:8em;display:inline-block"></div>blob&nbsp;=&nbsp;slice.call(blob,&nbsp;0,&nbsp;blob.size,&nbsp;force_saveable_type);
+<a name="line909"></a><div class="linenumber">909</div><div style="width:8em;display:inline-block"></div>blob_changed&nbsp;=&nbsp;true;
+<a name="line910"></a><div class="linenumber">910</div><div style="width:6em;display:inline-block"></div>}
+<a name="line911"></a><div class="linenumber">911</div><div style="width:6em;display:inline-block"></div>//&nbsp;Since&nbsp;I&nbsp;can't&nbsp;be&nbsp;sure&nbsp;that&nbsp;the&nbsp;guessed&nbsp;media&nbsp;type&nbsp;will&nbsp;trigger&nbsp;a&nbsp;download
+<a name="line912"></a><div class="linenumber">912</div><div style="width:6em;display:inline-block"></div>//&nbsp;in&nbsp;WebKit,&nbsp;I&nbsp;append&nbsp;.download&nbsp;to&nbsp;the&nbsp;filename.
+<a name="line913"></a><div class="linenumber">913</div><div style="width:6em;display:inline-block"></div>//&nbsp;https://bugs.webkit.org/show_bug.cgi?id=65440
+<a name="line914"></a><div class="linenumber">914</div><div style="width:6em;display:inline-block"></div>if&nbsp;(webkit_req_fs&nbsp;&amp;&amp;&nbsp;name&nbsp;!==&nbsp;"download")&nbsp;{
+<a name="line915"></a><div class="linenumber">915</div><div style="width:8em;display:inline-block"></div>name&nbsp;+=&nbsp;".download";
+<a name="line916"></a><div class="linenumber">916</div><div style="width:6em;display:inline-block"></div>}
+<a name="line917"></a><div class="linenumber">917</div><div style="width:6em;display:inline-block"></div>if&nbsp;(type&nbsp;===&nbsp;force_saveable_type&nbsp;||&nbsp;webkit_req_fs)&nbsp;{
+<a name="line918"></a><div class="linenumber">918</div><div style="width:8em;display:inline-block"></div>target_view&nbsp;=&nbsp;view;
+<a name="line919"></a><div class="linenumber">919</div><div style="width:6em;display:inline-block"></div>}
+<a name="line920"></a><div class="linenumber">920</div><div style="width:6em;display:inline-block"></div>if&nbsp;(!req_fs)&nbsp;{
+<a name="line921"></a><div class="linenumber">921</div><div style="width:8em;display:inline-block"></div>fs_error();
+<a name="line922"></a><div class="linenumber">922</div><div style="width:8em;display:inline-block"></div>return;
+<a name="line923"></a><div class="linenumber">923</div><div style="width:6em;display:inline-block"></div>}
+<a name="line924"></a><div class="linenumber">924</div><div style="width:6em;display:inline-block"></div>fs_min_size&nbsp;+=&nbsp;blob.size;
+<a name="line925"></a><div class="linenumber">925</div><div style="width:6em;display:inline-block"></div>req_fs(view.TEMPORARY,&nbsp;fs_min_size,&nbsp;abortable(function(fs)&nbsp;{
+<a name="line926"></a><div class="linenumber">926</div><div style="width:8em;display:inline-block"></div>fs.root.getDirectory("saved",&nbsp;create_if_not_found,&nbsp;abortable(function(dir)&nbsp;{
+<a name="line927"></a><div class="linenumber">927</div><div style="width:10em;display:inline-block"></div>var&nbsp;save&nbsp;=&nbsp;function()&nbsp;{
+<a name="line928"></a><div class="linenumber">928</div><div style="width:12em;display:inline-block"></div>dir.getFile(name,&nbsp;create_if_not_found,&nbsp;abortable(function(file)&nbsp;{
+<a name="line929"></a><div class="linenumber">929</div><div style="width:14em;display:inline-block"></div>file.createWriter(abortable(function(writer)&nbsp;{
+<a name="line930"></a><div class="linenumber">930</div><div style="width:16em;display:inline-block"></div>writer.onwriteend&nbsp;=&nbsp;function(event)&nbsp;{
+<a name="line931"></a><div class="linenumber">931</div><div style="width:18em;display:inline-block"></div>target_view.location.href&nbsp;=&nbsp;file.toURL();
+<a name="line932"></a><div class="linenumber">932</div><div style="width:18em;display:inline-block"></div>deletion_queue.push(file);
+<a name="line933"></a><div class="linenumber">933</div><div style="width:18em;display:inline-block"></div>filesaver.readyState&nbsp;=&nbsp;filesaver.DONE;
+<a name="line934"></a><div class="linenumber">934</div><div style="width:18em;display:inline-block"></div>dispatch(filesaver,&nbsp;"writeend",&nbsp;event);
+<a name="line935"></a><div class="linenumber">935</div><div style="width:16em;display:inline-block"></div>};
+<a name="line936"></a><div class="linenumber">936</div><div style="width:16em;display:inline-block"></div>writer.onerror&nbsp;=&nbsp;function()&nbsp;{
+<a name="line937"></a><div class="linenumber">937</div><div style="width:18em;display:inline-block"></div>var&nbsp;error&nbsp;=&nbsp;writer.error;
+<a name="line938"></a><div class="linenumber">938</div><div style="width:18em;display:inline-block"></div>if&nbsp;(error.code&nbsp;!==&nbsp;error.ABORT_ERR)&nbsp;{
+<a name="line939"></a><div class="linenumber">939</div><div style="width:20em;display:inline-block"></div>fs_error();
+<a name="line940"></a><div class="linenumber">940</div><div style="width:18em;display:inline-block"></div>}
+<a name="line941"></a><div class="linenumber">941</div><div style="width:16em;display:inline-block"></div>};
+<a name="line942"></a><div class="linenumber">942</div><div style="width:16em;display:inline-block"></div>"writestart&nbsp;progress&nbsp;write&nbsp;abort".split("&nbsp;").forEach(function(event)&nbsp;{
+<a name="line943"></a><div class="linenumber">943</div><div style="width:18em;display:inline-block"></div>writer["on"&nbsp;+&nbsp;event]&nbsp;=&nbsp;filesaver["on"&nbsp;+&nbsp;event];
+<a name="line944"></a><div class="linenumber">944</div><div style="width:16em;display:inline-block"></div>});
+<a name="line945"></a><div class="linenumber">945</div><div style="width:16em;display:inline-block"></div>writer.write(blob);
+<a name="line946"></a><div class="linenumber">946</div><div style="width:16em;display:inline-block"></div>filesaver.abort&nbsp;=&nbsp;function()&nbsp;{
+<a name="line947"></a><div class="linenumber">947</div><div style="width:18em;display:inline-block"></div>writer.abort();
+<a name="line948"></a><div class="linenumber">948</div><div style="width:18em;display:inline-block"></div>filesaver.readyState&nbsp;=&nbsp;filesaver.DONE;
+<a name="line949"></a><div class="linenumber">949</div><div style="width:16em;display:inline-block"></div>};
+<a name="line950"></a><div class="linenumber">950</div><div style="width:16em;display:inline-block"></div>filesaver.readyState&nbsp;=&nbsp;filesaver.WRITING;
+<a name="line951"></a><div class="linenumber">951</div><div style="width:14em;display:inline-block"></div>}),&nbsp;fs_error);
+<a name="line952"></a><div class="linenumber">952</div><div style="width:12em;display:inline-block"></div>}),&nbsp;fs_error);
+<a name="line953"></a><div class="linenumber">953</div><div style="width:10em;display:inline-block"></div>};
+<a name="line954"></a><div class="linenumber">954</div><div style="width:10em;display:inline-block"></div>dir.getFile(name,&nbsp;{create:&nbsp;false},&nbsp;abortable(function(file)&nbsp;{
+<a name="line955"></a><div class="linenumber">955</div><div style="width:12em;display:inline-block"></div>//&nbsp;delete&nbsp;file&nbsp;if&nbsp;it&nbsp;already&nbsp;exists
+<a name="line956"></a><div class="linenumber">956</div><div style="width:12em;display:inline-block"></div>file.remove();
+<a name="line957"></a><div class="linenumber">957</div><div style="width:12em;display:inline-block"></div>save();
+<a name="line958"></a><div class="linenumber">958</div><div style="width:10em;display:inline-block"></div>}),&nbsp;abortable(function(ex)&nbsp;{
+<a name="line959"></a><div class="linenumber">959</div><div style="width:12em;display:inline-block"></div>if&nbsp;(ex.code&nbsp;===&nbsp;ex.NOT_FOUND_ERR)&nbsp;{
+<a name="line960"></a><div class="linenumber">960</div><div style="width:14em;display:inline-block"></div>save();
+<a name="line961"></a><div class="linenumber">961</div><div style="width:12em;display:inline-block"></div>}&nbsp;else&nbsp;{
+<a name="line962"></a><div class="linenumber">962</div><div style="width:14em;display:inline-block"></div>fs_error();
+<a name="line963"></a><div class="linenumber">963</div><div style="width:12em;display:inline-block"></div>}
+<a name="line964"></a><div class="linenumber">964</div><div style="width:10em;display:inline-block"></div>}));
+<a name="line965"></a><div class="linenumber">965</div><div style="width:8em;display:inline-block"></div>}),&nbsp;fs_error);
+<a name="line966"></a><div class="linenumber">966</div><div style="width:6em;display:inline-block"></div>}),&nbsp;fs_error);
+<a name="line967"></a><div class="linenumber">967</div><div style="width:4em;display:inline-block"></div>}
+<a name="line968"></a><div class="linenumber">968</div>
+<a name="line969"></a><div class="linenumber">969</div><div style="width:4em;display:inline-block"></div>function&nbsp;saveAs(blob,&nbsp;name)&nbsp;{
+<a name="line970"></a><div class="linenumber">970</div><div style="width:6em;display:inline-block"></div>return&nbsp;new&nbsp;FileSaver(blob,&nbsp;name);
+<a name="line971"></a><div class="linenumber">971</div><div style="width:4em;display:inline-block"></div>}
+<a name="line972"></a><div class="linenumber">972</div>
+<a name="line973"></a><div class="linenumber">973</div><div style="width:4em;display:inline-block"></div>var&nbsp;FS_proto&nbsp;=&nbsp;FileSaver.prototype;
+<a name="line974"></a><div class="linenumber">974</div>
+<a name="line975"></a><div class="linenumber">975</div><div style="width:4em;display:inline-block"></div>FS_proto.abort&nbsp;=&nbsp;function()&nbsp;{
+<a name="line976"></a><div class="linenumber">976</div><div style="width:6em;display:inline-block"></div>var&nbsp;filesaver&nbsp;=&nbsp;this;
+<a name="line977"></a><div class="linenumber">977</div><div style="width:6em;display:inline-block"></div>filesaver.readyState&nbsp;=&nbsp;filesaver.DONE;
+<a name="line978"></a><div class="linenumber">978</div><div style="width:6em;display:inline-block"></div>dispatch(filesaver,&nbsp;"abort");
+<a name="line979"></a><div class="linenumber">979</div><div style="width:4em;display:inline-block"></div>};
+<a name="line980"></a><div class="linenumber">980</div>
+<a name="line981"></a><div class="linenumber">981</div><div style="width:4em;display:inline-block"></div>FS_proto.readyState&nbsp;=&nbsp;FS_proto.INIT&nbsp;=&nbsp;0;
+<a name="line982"></a><div class="linenumber">982</div><div style="width:4em;display:inline-block"></div>FS_proto.WRITING&nbsp;=&nbsp;1;
+<a name="line983"></a><div class="linenumber">983</div><div style="width:4em;display:inline-block"></div>FS_proto.DONE&nbsp;=&nbsp;2;
+<a name="line984"></a><div class="linenumber">984</div><div style="width:4em;display:inline-block"></div>FS_proto.error&nbsp;=&nbsp;null;
+<a name="line985"></a><div class="linenumber">985</div><div style="width:4em;display:inline-block"></div>FS_proto.onwritestart&nbsp;=&nbsp;null;
+<a name="line986"></a><div class="linenumber">986</div><div style="width:4em;display:inline-block"></div>FS_proto.onprogress&nbsp;=&nbsp;null;
+<a name="line987"></a><div class="linenumber">987</div><div style="width:4em;display:inline-block"></div>FS_proto.onwrite&nbsp;=&nbsp;null;
+<a name="line988"></a><div class="linenumber">988</div><div style="width:4em;display:inline-block"></div>FS_proto.onabort&nbsp;=&nbsp;null;
+<a name="line989"></a><div class="linenumber">989</div><div style="width:4em;display:inline-block"></div>FS_proto.onerror&nbsp;=&nbsp;null;
+<a name="line990"></a><div class="linenumber">990</div><div style="width:4em;display:inline-block"></div>FS_proto.onwriteend&nbsp;=&nbsp;null;
+<a name="line991"></a><div class="linenumber">991</div>
+<a name="line992"></a><div class="linenumber">992</div><div style="width:4em;display:inline-block"></div>view.addEventListener("unload",&nbsp;process_deletion_queue,&nbsp;false);
+<a name="line993"></a><div class="linenumber">993</div>
+<a name="line994"></a><div class="linenumber">994</div><div style="width:4em;display:inline-block"></div>return&nbsp;saveAs;
+<a name="line995"></a><div class="linenumber">995</div>
+<a name="line996"></a><div class="linenumber">996</div><div style="width:2em;display:inline-block"></div>}(self));
+<a name="line997"></a><div class="linenumber">997</div>
+<a name="line998"></a><div class="linenumber">998</div><div style="width:2em;display:inline-block"></div>return&nbsp;saveAs;
+<a name="line999"></a><div class="linenumber">999</div><div style="width:0em;display:inline-block"></div>})();
+<a name="line1000"></a><div class="linenumber">1000</div>
+<a name="line1001"></a><div class="linenumber">1001</div><div style="width:0em;display:inline-block"></div>return&nbsp;easyrtc_ft;
+<a name="line1002"></a><div class="linenumber">1002</div>
+<a name="line1003"></a><div class="linenumber">1003</div><div style="width:0em;display:inline-block"></div>}));&nbsp;
+</code></pre>
+</article>
+</section>
+</div>
+		
+	</div>
+</div>
+<footer class="template">
+	<div class="wrapper-content">
+		<p>Copyright &copy;2016 EasyRTC</p>
+	</div>
+</footer>
+<!-- <script>prettyPrint();</script> -->
+<!-- <script src="scripts/linenumber.js"></script> -->
+</body>
+</html>
