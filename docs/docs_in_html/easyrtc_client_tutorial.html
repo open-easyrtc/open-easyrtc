@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EasyRTC Documentation</title>
+	<link href="assets/easyrtc-docs-styles-1.css" media="all" rel="stylesheet" />
+</head>
+<body>
+<header class="template">
+	<div class="wrapper-content">
+    <a href="./index.html"><img src="assets/easyrtc-logo.png" alt="EasyRTC Documentation"></a>
+		<h1 title="EasyRTC Documentation">Documentation</h1>
+	</div>
+</header>
+<div class="wrapper-docs">
+<nav>
+	<h2><a href="./index.html">Docs Home</a></h2>
+	<h3>EasyRTC Guides</h3>
+	<ul>
+		<li><a href="easyrtc_faq.html">FAQ</a></li>
+		<li><a href="easyrtc_gettingStarted.html">Getting Started</a></li>
+		<li><a href="easyrtc_server_install.html">EasyRTC Server: Installation</a></li>
+		<li><a href="easyrtc_client_tutorial.html">EasyRTC Framework Tutorial</a></li>
+		<li><a href="easyrtc_rooms.html">Rooms</a></li>
+		<li><a href="easyrtc_server_configuration.html">EasyRTC Server: Configuration</a></li>
+		<li><a href="easyrtc_server_events.html">EasyRTC Server: Events</a></li>
+		<li><a href="easyrtc_server_ice.html">EasyRTC Server: ICE Configuration</a></li>
+		<li><a href="easyrtc_with_other_servers.html">Using Alongside Other Servers</a></li>
+		<li><a href="easyrtc_server_ssl.html">EasyRTC Server: Using SSL</a></li>
+		<li><a href="easyrtc_webrtc_problems.html">WebRTC Problems and Possible Fixes</a></li>
+		<li><a href="easyrtc_upcoming_features.html">Upcoming Features</a></li>
+		<li><a href="easyrtc_changelog.html">Change Log</a></li>
+	</ul>
+
+	<h3>EasyRTC Client Classes</h3>
+	<ul>
+		<li><a href="client-api/Easyrtc.html">Easyrtc</a></li>
+		<li><a href="client-api/Easyrtc_App.html">Easyrtc_App</a></li>
+		<li><a href="client-api/Easyrtc_ft.html">Easyrtc_ft</a></li>
+		<li><a href="client-api/Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li>
+		<li><a href="client-api/Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li>
+		<li><a href="client-api/Easyrtc_Rates.html">Easyrtc_Rates</a></li>
+		<li><a href="client-api/Easyrtc_Recorder.html">Easyrtc_Recorder</a></li>
+	</ul>
+	<h3>EasyRTC Server Modules</h3>
+	<ul>
+		<li><a href="server-api/module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li>
+		<li><a href="server-api/module-easyrtc_default_options.html">easyrtc_default_options</a></li>
+		<li><a href="server-api/module-easyrtc_private_obj.html">easyrtc_private_obj</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj.html">easyrtc_public_obj</a></li>
+		<li><a href="server-api/module-easyrtc_util.html">easyrtc_util</a></li>
+		<li><a href="server-api/module-general_util.html">general_util</a></li>
+	</ul>
+	<h3>EasyRTC Server Classes</h3>
+	<ul>
+		<li><a href="server-api/module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj-pub.html">pub</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj-pub.events.html">events</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj-pub.util.html">util</a></li>
+		<li><a href="server-api/module-easyrtc_util-eu.html">eu</a></li>
+		<li><a href="server-api/module-general_util-g.html">g</a></li>
+		<li><a href="server-api/pub.appObj.html">appObj</a></li>
+		<li><a href="server-api/pub.appObj.connectionObj.html">connectionObj</a></li>
+		<li><a href="server-api/pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li>
+		<li><a href="server-api/pub.appObj.roomObj.html">roomObj</a></li>
+		<li><a href="server-api/pub.appObj.sessionObj.html">sessionObj</a></li>
+	</ul>
+</nav>
+<div class="easyrtc-docs-content">
+<h1>EasyRTC Framework Tutorial</h1>
+
+<h2>Overview</h2>
+
+<p>EasyRTC is a framework built on top of WebRTC, an emerging W3C/IETF standard for real time communication of audio, video, and data directly between web browsers.  WebRTC supports the transfer of audio, video and data on a peer-to-peer basis putting very little load on supporting servers.</p>
+
+<p>The EasyRTC framework consists of a client or browser-side JavaScript library and a backend JavaScript server built on top of a node.js.  Because the WebRTC libraries is built into each browser there is no need for a browser plug-in.</p>
+
+<p>Google&#39;s Chrome browser has the broadest support for the WebRTC API. Opera is now using the same engine as Chrome and hence mimics it&#39;s behavior. Firefox provides excellent support for data communications but only basic support for video chats (it lacks the ability to set the camera resolution, programmatically allow screen sharing, or do statistics gathering).</p>
+
+<p>WebRTC has the potential once it is fully standardized to support audio and video chats and conferencing, multiplayer games and many other audio, video and data-based applications.</p>
+
+<p>As is often the case with software, with power comes complexity. WebRTC has a learning curve that is likely to hamper its use by web developers. To hide that complexity, Priologic has built the EasyRTC framework.</p>
+
+<p>A WebRTC application usually needs to do most of the following steps.</p>
+
+<ul><li>Get access to the local camera and microphone in the form of a &quot;media stream&quot;.</li><li>Establish a connection to a signaling server.</li><li>Initiate a call to a person on another browser.</li><li>Connect media streams to video tags.</li></ul>
+
+<p>Using the EasyRTC framework, several of these steps can be collapsed into a single call,
+vastly simplifying the developers job, particularly if the web developer is
+trying to support multiple platforms.</p>
+
+<p>This document is a tutorial for writing applications with the EasyRTC framework. It does not cover the entire EasyRTC API.</p>
+
+<h2>Terminology</h2>
+
+<ul><li>Callback - A JavaScript function supplied to a library so that the library will call it when a particular event occurs.</li><li>Media Stream - An object encapsulating a video track and/or one or more audio tracks.</li><li>Peer Connection - A connection between two different browsers that enables peer to peer communication.</li><li>Server - The Node.js server plus some JavaScript code we supply provides the server side of the EasyRTC framework.</li></ul>
+
+<h2>Installing EasyRTC and Getting Help</h2>
+
+<p>The EasyRTC framework can be easily installed on most platforms in 10 minutes.  We have install  instructions for Windows, Mac and Linux available. The files that make up EasyRTC at [https://github.com/priologic/easyrtc] start with the README.md file. The docs directory of EasyRTC distribution has documentation in HTML for both server and client side components.</p>
+
+<p>If you find yourself running into problems installing check out the various sources for connecting with us and the community also listed in the README.md file.</p>
+
+<h2>Video Conferencing - Easy-Side Up</h2>
+
+<p>This section shows you how to build a page that supports two-way (person to person) audio/visual conversations with as little developer effort as possible.</p>
+
+<p>Include the below four lines in the &amp;lt;head&gt; section of your HTML file. The first two scripts are needed by EasyRTC, while the third will be your own application logic.
+The CSS file provides some styling for an error messages dialog.</p>
+
+<pre><code>&lt;head&gt;
+  ...
+    &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;/easyrtc/easyrtc.css&quot; /&gt;
+    &lt;script src=&quot;/socket.io/socket.io.js&quot;&gt;&lt;/script&gt;
+    &lt;script type=&quot;text/javascript&quot; src=&quot;/easyrtc/easyrtc.js&quot;&gt;&lt;/script&gt;
+    &lt;script type=&quot;text/javascript&quot; src=&quot;mylogic.js&quot;&gt;&lt;/script&gt;
+  ...
+&lt;/head&gt;</code></pre>
+
+<p>Put two video tags (one to display video from the local camera, one to display video from somebody else&#39;s camera)
+with id attributes in the &amp;lt;body&gt; section of your html file, like the below.
+The second video tag should be in a &amp;lt;div&gt; block with a CSS <em>position</em> value of &quot;relative&quot; to help position it&#39;s hangup button. There is no hangup button for the self video.</p>
+
+<pre><code>&lt;body&gt;
+   ...
+   &lt;video  style=&quot;float:left&quot; id=&quot;self&quot; width=&quot;300&quot; height=&quot;200&quot; muted=&quot;muted&quot;&gt;&lt;/video&gt;
+   &lt;div style=&quot;position:relative;float:left;width:300px&quot;&gt;
+       &lt;video id=&quot;caller&quot; width=&quot;300&quot; height=&quot;200&quot;&gt;&lt;/video&gt;
+   &lt;/div&gt;
+   ...
+&lt;/body&gt;</code></pre>
+
+<p>If you don&#39;t have the muted flag in the self video tag, you&#39;ll get a feedback loop from your speakers to your microphone.</p>
+
+<p>Now we have to start writing some application logic for the application.js file,
+starting with an initialization function that will be called when the page gets loaded.
+The primary responsibility of the initialization function is to call the EasyRTC.easyApp method. It takes the following arguments:</p>
+
+<ul><li>applicationName - some literal string like &quot;Company<em>Chat</em>Line&quot;.</li><li>self-video-id - a string containing the id of the first video tag.</li><li>array-of-caller-video-ids - an array containing the id of the second video tag.</li><li>successCallback - a function to call on successful connection.</li></ul>
+
+<p>The initialization function is also a good place to register a callback to
+find out who else is hooked up to the server. The callback is registered using EasyRTC.setRoomOccupantListener.</p>
+
+<p>Here is an example initialization function:</p>
+
+<pre><code> function my_init() {
+     easyrtc.setRoomOccupantListener( loggedInListener);
+     easyrtc.easyApp(&quot;Company_Chat_Line&quot;, &quot;self&quot;, [&quot;caller&quot;],
+         function(myId) {
+            console.log(&quot;My easyrtcid is &quot; + myId);
+         }
+     );
+ }</code></pre>
+
+<p>The callback will be called whenever somebody else connects to
+or disconnects from the &quot;Company<em>Chat</em>Line&quot;, and immediately after the call to easyrtc.easyApp.</p>
+
+<p>The callback is passed two arguments:</p>
+
+<ul><li>a room name </li><li>a map whose keys are the ids (easyrtcids) of the other people connected to the server using the same application name.</li></ul>
+
+<p>In our example, the callback will maintain a list of buttons
+to call the other people connected to the &quot;Company<em>Chat</em>Line&quot;.
+We&#39;ll add a &amp;lt;div&gt; to the &amp;lt;body&gt; to hold these buttons.</p>
+
+<pre><code> &lt;body&gt;
+    ...
+    &lt;div id=&quot;otherClients&quot;&gt; &lt;/div&gt;
+    ...
+ &lt;/body&gt;</code></pre>
+
+<p>The text for the loggedInListener is below:</p>
+
+<pre><code>function loggedInListener(roomName, otherPeers) {
+    var otherClientDiv = document.getElementById(&#39;otherClients&#39;);
+    while (otherClientDiv.hasChildNodes()) {
+        otherClientDiv.removeChild(otherClientDiv.lastChild);
+    }
+    for(var i in otherPeers) {
+        var button = document.createElement(&#39;button&#39;);
+        button.onclick = function(easyrtcid) {
+            return function() {
+                performCall(easyrtcid);
+            }
+        }(i);
+
+        label = document.createTextNode(i);
+        button.appendChild(label);
+        otherClientDiv.appendChild(button);
+    }
+}</code></pre>
+
+<p>Most applications can ignore the roomName parameter; it is only of interest if your application can access several rooms simultaneously.</p>
+
+<p>Of course, in a real application,
+we wouldn&#39;t be using the easyrtcids for button labels.
+Instead, we would have some application logic to map the easyrtcids
+to more permanent identifiers like name, job title, and profile picture.</p>
+
+<p>To actually initiate a call to a person, all we need to do is call the easyrtc.call method,
+passing it the easyrtcid of the person, and three callbacks:</p>
+
+<ul><li>function successCallback(easyrtcid) - called when the initiation succeeds.</li><li>function errorCallback(errorCode, errorText) - called on error.</li><li>function accepted(wasAccepted,easyrtcid) - called to indicate whether the call was accepted or not.</li></ul>
+
+<p>Here is some code for the actual call initiation:</p>
+
+<pre><code>    function performCall(easyrtcid) {
+        easyrtc.call(
+           easyrtcid,
+           function(easyrtcid) { console.log(&quot;completed call to &quot; + easyrtcid);},
+           function(errorMessage) { console.log(&quot;err:&quot; + errorMessage);},
+           function(accepted, bywho) {
+              console.log((accepted?&quot;accepted&quot;:&quot;rejected&quot;)+ &quot; by &quot; + bywho);
+           }
+       );
+    }</code></pre>
+
+<p>Now we just have to modify the body tag of our html file to actually call the my_init function.</p>
+
+<pre><code> &lt;body onload=&quot;my_init()&quot;&gt;</code></pre>
+
+<p>Here is the complete HTML and JavaScript for this solution.</p>
+
+<pre><code>The HTML file:
+    &lt;!DOCTYPE HTML&gt;
+    &lt;html&gt;
+        &lt;head&gt;
+            &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;/easyrtc/easyrtc.css&quot; /&gt;
+            &lt;script src=&quot;/socket.io/socket.io.js&quot;&gt;&lt;/script&gt;
+            &lt;script type=&quot;text/javascript&quot; src=&quot;/easyrtc/easyrtc.js&quot;&gt;&lt;/script&gt;
+            &lt;script type=&quot;text/javascript&quot; src=&quot;js/mylogic.js&quot;&gt;&lt;/script&gt;
+        &lt;/head&gt;
+         &lt;body onload=&quot;my_init()&quot;&gt;
+            &lt;div id=&quot;otherClients&quot;&gt; &lt;/div&gt;
+            &lt;video  style=&quot;float:left&quot; id=&quot;self&quot; width=&quot;300&quot; height=&quot;200&quot;&gt;&lt;/video&gt;
+            &lt;div style=&quot;position:relative;float:left;width:300px&quot;&gt;
+                &lt;video id=&quot;caller&quot; width=&quot;300&quot; height=&quot;200&quot;&gt;&lt;/video&gt;
+            &lt;/div&gt;
+        &lt;/body&gt;
+    &lt;/html&gt;
+
+The mylogic.js file:
+    function my_init() {
+         easyrtc.setRoomOccupantListener( loggedInListener);
+         easyrtc.easyApp(&quot;Company_Chat_Line&quot;, &quot;self&quot;, [&quot;caller&quot;],
+             function(myId) {
+                console.log(&quot;My easyrtcid is &quot; + myId);
+             }
+         );
+     }
+
+
+     function loggedInListener(roomName, otherPeers) {
+        var otherClientDiv = document.getElementById(&#39;otherClients&#39;);
+        while (otherClientDiv.hasChildNodes()) {
+            otherClientDiv.removeChild(otherClientDiv.lastChild);
+        }
+        for(var i in otherPeers) {
+            var button = document.createElement(&#39;button&#39;);
+            button.onclick = function(easyrtcid) {
+                return function() {
+                    performCall(easyrtcid);
+                }
+            }(i);
+
+            label = document.createTextNode(i);
+            button.appendChild(label);
+            otherClientDiv.appendChild(button);
+        }
+    }
+
+
+    function performCall(easyrtcid) {
+        easyrtc.call(
+           easyrtcid,
+           function(easyrtcid) { console.log(&quot;completed call to &quot; + easyrtcid);},
+           function(errorMessage) { console.log(&quot;err:&quot; + errorMessage);},
+           function(accepted, bywho) {
+              console.log((accepted?&quot;accepted&quot;:&quot;rejected&quot;)+ &quot; by &quot; + bywho);
+           }
+       );
+    }</code></pre>
+
+<h2>Video Conferencing - Trading Ease For Flexibility</h2>
+
+<p>In the previous section, we outlined the approach that maximized the ease of getting a video conference page up and running.
+In this section, we trade off some the ease for greater flexibility and control.</p>
+
+<p>Instead of calling easyrtc.easyApp, you can call easyrtc.initMediaSource
+to get access to the local media stream,
+followed by a call to easyrtc.connect once the call to
+easyrtc.initMediaSource finished. This (and a bit more) is what easyrtc.easyApp does internally.</p>
+
+<p>If you do it this way, you don&#39;t need the CSS file or the &amp;lt;div&gt; surrounding the second video
+because there won&#39;t be any automatically added hangup buttons. The HTML ends up looking like this:</p>
+
+<pre><code>&lt;!DOCTYPE HTML&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;/easyrtc/easyrtc.css&quot; /&gt;
+        &lt;script src=&quot;/socket.io/socket.io.js&quot;&gt;&lt;/script&gt;
+        &lt;script type=&quot;text/javascript&quot; src=&quot;/easyrtc/easyrtc.js&quot;&gt;&lt;/script&gt;
+        &lt;script type=&quot;text/javascript&quot; src=&quot;js/mylogic2.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
+     &lt;body onload=&quot;my_init()&quot;&gt;
+        &lt;div id=&quot;otherClients&quot;&gt; &lt;/div&gt;
+        &lt;video style=&quot;float:left&quot; id=&quot;self&quot; width=&quot;300&quot; height=&quot;200&quot;&gt;&lt;/video&gt;
+        &lt;video style=&quot;float:left&quot; id=&quot;caller&quot; width=&quot;300&quot; height=&quot;200&quot;&gt;/video&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+<p>The new initialization looks like:</p>
+
+<pre><code>function my_init() {
+    easyrtc.setRoomOccupantListener( loggedInListener);
+    var connectSuccess = function(myId) {
+        console.log(&quot;My easyrtcid is &quot; + myId);
+    }
+    var connectFailure = function(errmesg) {
+        console.log(errmesg);
+    }
+    easyrtc.initMediaSource(
+          function(){       // success callback
+              var selfVideo = document.getElementById(&quot;self&quot;);
+              easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
+              easyrtc.connect(&quot;Company_Chat_Line&quot;, connectSuccess, connectFailure);
+          },
+          connectFailure
+    );
+ }</code></pre>
+
+<p>Notice the call to easyrtc.getLocalStream and easyrtc.setVideoObjectSrc. The former gets a media stream object
+for the local camera and microphone, once the call to easyrtc.initMediaSource succeeds. The latter ties a video tag
+to a media stream object. Put together, it provides a mirror-like facility, allowing a user to monitor how their own image looks.</p>
+
+<p>We&#39;ll need two more calls for the involved version:</p>
+
+<ul><li><p>A callback for new media streams provided by remote peers. The callback&#39;s job is to tie another video tag to the incoming stream. It looks like:</p><pre><code>    easyrtc.setStreamAcceptor( function(callerEasyrtcid, stream) {
+        var video = document.getElementById(&#39;caller&#39;);
+        easyrtc.setVideoObjectSrc(video, stream);
+    });</code></pre></li><li><p>A callback to detect that a remote peer has hung-up. This callback&#39;s job is to clear the video tag.</p><pre><code>    easyrtc.setOnStreamClosed( function (callerEasyrtcid) {
+        easyrtc.setVideoObjectSrc(document.getElementById(&#39;caller&#39;), &quot;&quot;);
+    });</code></pre></li></ul>
+
+<p>The entire JavaScript looks like the below code:</p>
+
+<pre><code>The mylogic2.js file:
+     easyrtc.setStreamAcceptor( function(callerEasyrtcid, stream) {
+        var video = document.getElementById(&#39;caller&#39;);
+        easyrtc.setVideoObjectSrc(video, stream);
+    });
+
+     easyrtc.setOnStreamClosed( function (callerEasyrtcid) {
+        easyrtc.setVideoObjectSrc(document.getElementById(&#39;caller&#39;), &quot;&quot;);
+    });
+
+
+    function my_init() {
+        easyrtc.setRoomOccupantListener( loggedInListener);
+        var connectSuccess = function(myId) {
+            console.log(&quot;My easyrtcid is &quot; + myId);
+        }
+        var connectFailure = function(errorCode, errText) {
+            console.log(errText);
+        }
+        easyrtc.initMediaSource(
+              function(){        // success callback
+                  var selfVideo = document.getElementById(&quot;self&quot;);
+                  easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
+                  easyrtc.connect(&quot;Company_Chat_Line&quot;, connectSuccess, connectFailure);
+              },
+              connectFailure
+        );
+     }
+
+
+    function loggedInListener(roomName, otherPeers) {
+        var otherClientDiv = document.getElementById(&#39;otherClients&#39;);
+        while (otherClientDiv.hasChildNodes()) {
+            otherClientDiv.removeChild(otherClientDiv.lastChild);
+        }
+        for(var i in otherPeers) {
+            var button = document.createElement(&#39;button&#39;);
+            button.onclick = function(easyrtcid) {
+                return function() {
+                    performCall(easyrtcid);
+                }
+            }(i);
+
+            label = document.createTextNode(i);
+            button.appendChild(label);
+            otherClientDiv.appendChild(button);
+        }
+    }
+
+
+    function performCall(easyrtcid) {
+        easyrtc.call(
+           easyrtcid,
+           function(easyrtcid) { console.log(&quot;completed call to &quot; + easyrtcid);},
+           function(errorCode, errorText) { console.log(&quot;err:&quot; + errorText);},
+           function(accepted, bywho) {
+              console.log((accepted?&quot;accepted&quot;:&quot;rejected&quot;)+ &quot; by &quot; + bywho);
+           }
+       );
+    }</code></pre>
+
+<h2>Sharing Multiple Local Media Streams</h2>
+
+<p>The basis idea in using multiple local media streams is that you need to name them each stream
+when it is created. 
+When you call initMediaSource, pass it a third argument which is the name you want 
+assigned to the resulting media. Such as:</p>
+
+<pre><code>easyrtc.initMediaStream( success, failure, &quot;timesSquareCamera&quot;);</code></pre>
+
+<p>If you don&#39;t pass a name when creating the stream, it implicitly gets named &#39;default&#39;. 
+Usually you don&#39;t need to know this of course.</p>
+
+<p>You can get a list of the names of your local media streams using easyrtc.getLocalMediaIds.</p>
+
+<pre><code>var ids = easyrtc.getLocalMediaIds();
+var i;
+for( i = 0; i &lt; ids.length; i++ ) {
+    console.log(ids[i]);
+}</code></pre>
+
+<p>When you initiate a call, you can supply an array list of stream names as the fifth argument.
+Similarly, when you accept a call, you can pass a list of stream names as the 
+second argument to the accept callback.</p>
+
+<pre><code>easyrtc.call(otherEasyrtcId, successCB, failCB, wasAcceptedCB, [&quot;timesSquareCamera&quot;]);
+easyrtc.setAcceptChecker(function(otherGuy, acceptorCallback){
+    acceptorCallback(true, [ &quot;livingRoomCamera&quot;, [&quot;kitchenCamera&quot;]);
+});</code></pre>
+
+<p>You can also add a stream to an existing call using easyrtc.addStreamToCall. It takes a stream name
+and a stream name as arguments. If successful, the receiver&#39;s streamAcceptor callback gets called with 
+the media stream. The streamAcceptor gets passed three arguments: the peer&#39;s easyrtcid, the
+stream itself, and the name of the remote stream.</p>
+
+<p>Note: The EasyApp framework is not designed to work with multiple media streams. It&#39;s based on 
+the simplifying assumption that there is only one local media stream. 
+If you want to use multiple multiple media streams, you have to accept the effort of managing their assignment
+to video tags yourself.</p>
+
+<h2>Screen Sharing</h2>
+
+<p>The new way of desktop sharing is to first create a media stream using esayrtc.initScreenCapture.
+It takes the same arguments as easyrtc.initMediaSource.</p>
+
+<pre><code>easyrtc.initScreenCapture( successCB, failCB, &quot;myScreen&quot;);
+...
+easyrtc.call(otherEasyrtcId, successCB, failCB, wasAcceptedCB, [&quot;myScreen&quot;]);</code></pre>
+
+<h2>Useful Extras</h2>
+
+<h3>Sharing Audio Or Video Only</h3>
+
+<p>If you don&#39;t want to share your audio or your video, you can disable their transmission with one of the below calls.</p>
+
+<pre><code>easyrtc.enableAudio(false);
+
+easyrtc.enableVideo(false);</code></pre>
+
+<p>These calls determine the content of the local media stream initialized by easyrtc.initMediaSource, so you must call them before calling easyrtc.initMediaSource.</p>
+
+<h3>Ignoring Calls</h3>
+
+<p>In the examples above, the callee always accepted connections from the caller.
+In a production environment, a user would want control over which calls were accepted.
+The EasyRTC framework supports such by allowing you to register a callback that will be invoked
+each time a caller tries to establish a connection with you. The callback should expect to get
+the caller&#39;s easyrtcid as it&#39;s first argument, and a reporting function as it&#39;s second argument.
+The reporting function should be called with a value of true if the call should be accepted, false otherwise.</p>
+
+<p>In your HTML code, add:</p>
+
+<pre><code>    &lt;body ... &gt;
+        ...
+        &lt;div id=&quot;acceptCallBox&quot; style=&quot;display:none;z-index:2;position:absolute;padding:20px;left:20px;top:150px;border:red solid 2px;background-color:pink&quot;&gt;
+              &lt;div id=&quot;acceptCallLabel&quot;&gt;&lt;/div&gt;
+              &lt;button id=&quot;callAcceptButton&quot; &gt;Accept&lt;/button&gt; &lt;button id=&quot;callRejectButton&quot;&gt;Reject&lt;/button&gt;
+        &lt;/div&gt;
+        ....
+    &lt;/body&gt;</code></pre>
+
+<p>In your JavaScript, add the below:</p>
+
+<pre><code>    easyrtc.setAcceptChecker( function(callerId, reporterFunction) {
+            document.getElementById(&#39;acceptCallBox&#39;).style.display = &quot;block&quot;;
+            if( easyrtc.getConnectionCount() &gt; 0 ) {
+                document.getElementById(&#39;acceptCallLabel&#39;).innerHTML = &quot;Drop current call and accept new from &quot; + caller + &quot; ?&quot;;
+            }
+            else {
+                document.getElementById(&#39;acceptCallLabel&#39;).innerHTML = &quot;Accept incoming call from &quot; + caller + &quot; ?&quot;;
+            }
+            var acceptTheCall = function(wasAccepted) {
+               document.getElementById(&#39;acceptCallBox&#39;).style.display = &quot;none&quot;;
+               if( wasAccepted &amp;&amp; easyrtc.getConnectionCount() &gt; 0 ) {
+                    easyrtc.hangupAll();
+               }
+               cb(wasAccepted);
+            }
+            document.getElementById(&quot;callAcceptButton&quot;).onclick = function() { acceptTheCall(true);};
+            document.getElementById(&quot;callRejectButton&quot;).onclick =function() { acceptTheCall(false);};
+        }
+    );</code></pre>
+
+<p>While the above callback is fine for handling a single check, a real implementation would need to handle the case
+of a second check coming in before the first has been responded to.</p>
+
+<h3>Joining and Leaving Rooms</h3>
+
+<p>Rooms are a compartmentalizing feature of EasyRTC that are useful for setting up &quot;chat rooms&quot;.<br/>Their behavior is controlled by application logic you install in the EasyRTC server (see the server documentation for details of this). By default, this behavior is:</p>
+
+<ul><li>Unless a client specifies a room (or set of rooms) before it connects, it will be a member of the room named &quot;default&quot;.</li><li>A client can be a member of multiple rooms simultaneously.</li><li>A client&#39;s roomOccupantListener callback gets called whenever there are reported changes to a room that they are a member of.</li><li>Joining a nonexistent room creates it.</li></ul>
+
+<p>A client becomes a member of a room by calling</p>
+
+<pre><code>easyrtc.joinRoom(roomName, roomParameters, successCallback, failureCallback);</code></pre>
+
+<p>The roomParameters argument is application specific.</p>
+
+<p>For example:</p>
+
+<pre><code>easyrtc.joinRoom(&quot;ballroom&quot;, null,
+      function(roomName) {
+           console.log(&quot;I&#39;m now in room &quot; + roomName);
+      },
+      function(errorCode, errorText, roomName) {
+          console.log(&quot;had problems joining &quot; + roomName);
+      });</code></pre>
+
+<p>A client leaves a room by calling</p>
+
+<pre><code>easyrtc.leaveRoom(roomName, successCallback, failureCallback);</code></pre>
+
+<p>For example:</p>
+
+<pre><code>easyrtc.leaveRoom(&quot;ballroom&quot;, 
+      function(roomName) {
+           console.log(&quot;No longer in room &quot; + roomName);
+      },
+      function(errorCode, errorText, roomName) {
+          console.log(&quot;had problems leaving &quot; + roomName);
+      });</code></pre>
+
+<p>Both easyrtc.joinRoom and easyrtc.leaveRoom can be called before a connect, or after.
+If they are called before the connect, their successCallback and failureCallback functions
+won&#39;t be invoked.</p>
+
+<p>For more information about rooms, see the [easyrtc<em>rooms.md](easyrtc</em>rooms.md) file.</p>
+
+<h3>Listening For Errors</h3>
+
+<p>You can register an error callback to find out about errors using easyrtc.setOnError. The callback gets passed an object of the form {&quot;errorCode:errorCode&quot;, &quot;errorText&quot;:errorText}.
+Example usage:</p>
+
+<pre><code>easyrtc.setOnError( function(errEvent) { console.log(errEvent.errorText);}</code></pre>
+
+<p>The errorCode parameter is a short string that is more intended for programmatic use than human consumption.</p>
+
+<h3>Trading Notes</h3>
+
+<p>You can send data (via websockets) to someone by calling easyrtc.sendDataWS as below:</p>
+
+<pre><code>// easyrtc.sendDataWS( destination, messageType, messageData, ackHandler);
+easyrtc.sendDataWS( &#39;xkdkfhfde9d94&#39;, &#39;contactInfo&#39;, { firstName:&#39;john&#39;, lastName:&#39;smith&#39; }, function(ackMesg) {
+     if( ackMesg.msgType === &#39;error&#39; ) {
+         console.log(ackMesg.msgData.errorText);
+     }
+});</code></pre>
+
+<p>The destination is either a peer&#39;s easyrtcid or an object that may specify one or more of targetEasyrtcid, targetGroup, and targetRoom.
+The messageType is a short string you chose. The ackHandler gets called when the server receives your message, and does not
+constitute a reply from the other peer.</p>
+
+<p>The other peer must be connected to the server and it must have registered a peer listener (callback) as below:</p>
+
+<pre><code>easyrtc.setPeerListener( function(sendersEasyrtcid, msgType, msgData, targeting) {
+      if( msgType === &#39;contactInfo&#39; ) {
+          console.log( sendersEasyrtcid  + &#39; is named &#39; + msgData.firstName + &#39; &#39; + msgData.lastName);
+      }
+});</code></pre>
+
+<p>The targeting parameter is present if the destination was specified as an object by the sender.</p>
+
+<p>You can also have a peer listener that is specific to a particular message type, or a particular message type and sender. Only one peer listener will be called per message and the most specific peer listener takes priority.</p>
+
+<h3>Using Data Channels</h3>
+
+<p>To use data channels, each peer must enable data channels before calling (or accepting a call):
+    easyrtc.enableDataChannels(true);</p>
+
+<p>It&#39;s then a good idea to listen for the events telling you that the datachannel to a particular peer is ready to be used,
+or that it&#39;s been closed.
+    easyrtc.setDataChannelOpenListener(
+        function(sourceEasyrtcid) { console.log(&quot;channel is open&quot;);}
+    );</p>
+
+<pre><code>easyrtc.setDataChannelCloseListener(
+    function(sourceEasyrtcid) { console.log(&quot;channel has been closed&quot;);}
+);</code></pre>
+
+<p>Once your data channel open listener has been called, you can send a message using
+easyrtc.sendDataP2P:
+    easyrtc.sendDataP2P(targetEasyrtcid, &#39;contactInfo&#39;,
+            { firstName:&#39;john&#39;, lastName:&#39;smith&#39; });</p>
+
+<p>Listening is done with the same peerListener as used when sending message using websockets.</p>
+
+<p>Note: At this time, Data Channels are not working on Android.</p>
+
+<h3>Are You Connected</h3>
+
+<p>You can find out how many peer connections you have by calling easyrtc.getConnectionCount. Example use:</p>
+
+<pre><code>console.log(&quot;You are connected to &quot; + easyrtc.getConnectionCount() + &quot; people.&quot;);</code></pre>
+
+<p>Typically it will be 0 or 1 unless you are hooked up to multiple people.</p>
+
+<h3>Hanging Up</h3>
+
+<p>You can hang up on a someone using easyrtc.hangup as below:</p>
+
+<pre><code>easyrtc.hangup(peerEasyrtcid);</code></pre>
+
+<p>Alternatively, you can hang up on all the people you are connected to with:</p>
+
+<pre><code>easyrtc.hangupAll();</code></pre>
+
+<h3>Dropping Your Connection To The Server</h3>
+
+<p>You can disconnect from the server by calling easyrtc.disconnect. Example use:</p>
+
+<pre><code> easyrtc.disconnect();</code></pre>
+
+<h2>If You Run Into Problems</h2>
+
+<p>Please feel free to post on our discussion forum:</p>
+
+<ul><li><a href="https://groups.google.com/forum/?fromgroups#!forum/easyrtc">https://groups.google.com/forum/?fromgroups#!forum/easyrtc</a></li></ul>
+
+	</div>
+</div>
+<footer class="template">
+	<div class="wrapper-content">
+		<p>Copyright &copy;2016 EasyRTC</p>
+	</div>
+</footer>
+</body>
+</html>

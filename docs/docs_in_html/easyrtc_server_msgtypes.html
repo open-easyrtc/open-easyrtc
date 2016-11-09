@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EasyRTC Documentation</title>
+	<link href="assets/easyrtc-docs-styles-1.css" media="all" rel="stylesheet" />
+</head>
+<body>
+<header class="template">
+	<div class="wrapper-content">
+    <a href="./index.html"><img src="assets/easyrtc-logo.png" alt="EasyRTC Documentation"></a>
+		<h1 title="EasyRTC Documentation">Documentation</h1>
+	</div>
+</header>
+<div class="wrapper-docs">
+<nav>
+	<h2><a href="./index.html">Docs Home</a></h2>
+	<h3>EasyRTC Guides</h3>
+	<ul>
+		<li><a href="easyrtc_faq.html">FAQ</a></li>
+		<li><a href="easyrtc_gettingStarted.html">Getting Started</a></li>
+		<li><a href="easyrtc_server_install.html">EasyRTC Server: Installation</a></li>
+		<li><a href="easyrtc_client_tutorial.html">EasyRTC Framework Tutorial</a></li>
+		<li><a href="easyrtc_rooms.html">Rooms</a></li>
+		<li><a href="easyrtc_server_configuration.html">EasyRTC Server: Configuration</a></li>
+		<li><a href="easyrtc_server_events.html">EasyRTC Server: Events</a></li>
+		<li><a href="easyrtc_server_ice.html">EasyRTC Server: ICE Configuration</a></li>
+		<li><a href="easyrtc_with_other_servers.html">Using Alongside Other Servers</a></li>
+		<li><a href="easyrtc_server_ssl.html">EasyRTC Server: Using SSL</a></li>
+		<li><a href="easyrtc_webrtc_problems.html">WebRTC Problems and Possible Fixes</a></li>
+		<li><a href="easyrtc_upcoming_features.html">Upcoming Features</a></li>
+		<li><a href="easyrtc_changelog.html">Change Log</a></li>
+	</ul>
+
+	<h3>EasyRTC Client Classes</h3>
+	<ul>
+		<li><a href="client-api/Easyrtc.html">Easyrtc</a></li>
+		<li><a href="client-api/Easyrtc_App.html">Easyrtc_App</a></li>
+		<li><a href="client-api/Easyrtc_ft.html">Easyrtc_ft</a></li>
+		<li><a href="client-api/Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li>
+		<li><a href="client-api/Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li>
+		<li><a href="client-api/Easyrtc_Rates.html">Easyrtc_Rates</a></li>
+		<li><a href="client-api/Easyrtc_Recorder.html">Easyrtc_Recorder</a></li>
+	</ul>
+	<h3>EasyRTC Server Modules</h3>
+	<ul>
+		<li><a href="server-api/module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li>
+		<li><a href="server-api/module-easyrtc_default_options.html">easyrtc_default_options</a></li>
+		<li><a href="server-api/module-easyrtc_private_obj.html">easyrtc_private_obj</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj.html">easyrtc_public_obj</a></li>
+		<li><a href="server-api/module-easyrtc_util.html">easyrtc_util</a></li>
+		<li><a href="server-api/module-general_util.html">general_util</a></li>
+	</ul>
+	<h3>EasyRTC Server Classes</h3>
+	<ul>
+		<li><a href="server-api/module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj-pub.html">pub</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj-pub.events.html">events</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj-pub.util.html">util</a></li>
+		<li><a href="server-api/module-easyrtc_util-eu.html">eu</a></li>
+		<li><a href="server-api/module-general_util-g.html">g</a></li>
+		<li><a href="server-api/pub.appObj.html">appObj</a></li>
+		<li><a href="server-api/pub.appObj.connectionObj.html">connectionObj</a></li>
+		<li><a href="server-api/pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li>
+		<li><a href="server-api/pub.appObj.roomObj.html">roomObj</a></li>
+		<li><a href="server-api/pub.appObj.sessionObj.html">sessionObj</a></li>
+	</ul>
+</nav>
+<div class="easyrtc-docs-content">
+<h1>EasyRTC Server: API to/from Server Messages</h1>
+
+<p>EasyRTC socket messages are sent via socket.io using three custom emit types:</p>
+
+<ul><li><strong>easyrtcAuth</strong> - Initial negotiation and authentication</li><li><strong>easyrtcCmd</strong> - All standard EasyRTC communications including WebRTC messages</li><li><strong>easyrtcMsg</strong> - Custom application specific messages</li></ul>
+
+<hr/>
+
+<h1>easyrtcAuth</h1>
+
+<p>&quot;easyrtcAuth&quot; is the socket.io emit type which EasyRTC expects to initialize (or re-initialize) a connection. No other messages are handled by EasyRTC until a connection is authenticated.</p>
+
+<h2>Incoming (to server)</h2>
+
+<h3>msgType - &#39;authenticate&#39;</h3>
+
+<p>Includes fields needed for authentication. Sender and target must be online, authenticated, and in same application. Returns a message with msgType=&#39;token&#39; upon success.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>msgData</strong> (required)</li></ul>
+
+<p><strong>msgData Fields:</strong></p>
+
+<ul><li><strong>apiVersion</strong> (required) Api version string.</li><li><strong>applicationName</strong> (optional) Will default to the server default application.</li><li><strong>easyrtcsid</strong> (optional) The EasyRTC session ID which should be available in the browser cookie variables.</li><li><strong>username</strong> (optional) String containing the username for the client. May be shared to other clients in the room list.</li><li><strong>credential</strong> (optional) Can be any JSONable object.</li><li><strong>setUserCfg</strong> (optional) Contains all values from setUserCfg</li><li><strong>setPresence</strong> (optional) Contains all values from setPresence</li><li><strong>roomJoin</strong> (optional) Contains all values from roomJoin. Will default to application default room.</li></ul>
+
+<p><strong>Returns:</strong></p>
+
+<ul><li><strong>token</strong></li><li><strong>error</strong></li></ul>
+
+<hr/>
+
+<h1>easyrtcCmd</h1>
+
+<p>The easyrtcCmd is the core socket.io emit type which EasyRTC uses to send and receive commands.</p>
+
+<h2>Incoming (to server)</h2>
+
+<p>Unless specified, messages sent to the server will be returned with an <strong>ack</strong> or an <strong>error</strong>.</p>
+
+<h3>msgType - &#39;candidate&#39;</h3>
+
+<p>WebRTC signal. Transfer of WebRTC ICE candidate(s) for establishing peer-connection. Sender and target must be online, authenticated, and in same application.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>targetEasyrtcid</strong> (required)</li><li><strong>msgData</strong> (required)<ul><li>Contains candidate data (SDP&#39;s)</li><li>{type, label, id, candidate}</li></ul></li></ul>
+
+<h3>msgType - &#39;offer&#39;</h3>
+
+<p>WebRTC signal. Sends WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>targetEasyrtcid</strong> (required)</li><li><strong>msgData</strong> (required)<ul><li>Contains candidate data (SDP&#39;s)</li></ul></li></ul>
+
+<h3>msgType - &#39;answer&#39;</h3>
+
+<p>WebRTC signal. Accepts WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>targetEasyrtcid</strong> (required)</li><li><strong>msgData</strong> (required)<ul><li>Contains session description (SDP)</li></ul></li></ul>
+
+<h3>msgType - &#39;reject&#39;</h3>
+
+<p>WebRTC signal. Rejects WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>targetEasyrtcid</strong> (required)</li></ul>
+
+<h3>msgType - &#39;hangup&#39;</h3>
+
+<p>WebRTC signal. Instructs target to hangup WebRTC peer-connection. Sender and target must be online, authenticated, and in same application.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>targetEasyrtcid</strong> (required)</li></ul>
+
+<h3>msgType - &#39;getIceConfig&#39;</h3>
+
+<p>Requests a refreshed ICE configuration. This gives the ability to update STUN and TURN servers listing on a periodic basis for longer running connections.</p>
+
+<p><strong>Fields:</strong></p>
+
+<p><strong>Returns:</strong>
+  - <strong>iceConfig</strong>
+  - <strong>error</strong></p>
+
+<h3>msgType - &#39;getRoomList&#39;</h3>
+
+<p>Requests a list of all rooms which the client has access to. It has no fields. The server should return a message to the callback with msgType of &#39;roomList&#39;.</p>
+
+<p><strong>Fields:</strong></p>
+
+<p><strong>Returns:</strong>
+  - <strong>roomList</strong>
+  - <strong>error</strong></p>
+
+<h3>msgType - &#39;roomJoin&#39;</h3>
+
+<p>Enters a room. If room doesn&#39;t exist, a new room may be created.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>msgData</strong> (required)</li></ul>
+
+<p><strong>msgData Fields:</strong></p>
+
+<ul><li><strong>roomJoin</strong> (required) Map of room names<ul><li><strong>roomName</strong> (required) Room name (matches map key)</li><li><strong>roomParameter</strong> (optional) A map(dictionary) object with key/value pairs. The values can be any JSONable object. This field is not currently looked at by EasyRTC, however it is available for custom server applications. May be used for room options or authentication needs.</li></ul></li></ul>
+
+<p><strong>Returns:</strong>
+ - <strong>roomData</strong> (with roomStatus of <code>join</code>)
+ - <strong>error</strong></p>
+
+<h3>msgType - &#39;roomLeave&#39;</h3>
+
+<p>Leaves a room. Upon leaving a room, the API should remove all room info (incl. connection list) from memory.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>msgData</strong> (required)</li></ul>
+
+<p><strong>msgData Fields:</strong></p>
+
+<ul><li><strong>roomLeave</strong> (required) Map of room names<ul><li><strong>roomName</strong> (required) Room name (matches map key)</li></ul></li></ul>
+
+<p><strong>Returns:</strong>
+ - <strong>roomData</strong> (with roomStatus of <code>leave</code>)
+ - <strong>error</strong></p>
+
+<h3>msgType - &#39;setRoomApiField&#39;</h3>
+
+<p>Sets the apiField value for a connection. This apiField is sent to all other connections in the roomData. It is important to realize that this field is not unique to a room. Upon receiving an empty string, the field is removed.</p>
+
+<p><strong>Fields:</strong>
+ - <strong>msgData</strong> (required)</p>
+
+<p><strong>msgData Fields:</strong></p>
+
+<ul><li><strong>setRoomApiField</strong> <ul><li><strong>field</strong> (map of field names)<ul><li><strong>fieldName</strong> (required)</li><li><strong>fieldValue</strong> (required) Any JSONable object.</li></ul></li><li><strong>roomName</strong></li></ul></li></ul>
+
+<p><strong>Returns:</strong>
+ - <strong>roomData</strong> (with roomStatus of <code>update</code>)
+ - <strong>error</strong></p>
+
+<h3>msgType - &#39;setPresence&#39;</h3>
+
+<p>Sets user online presence which is re-broadcast as part of the list. User must be authenticated.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>msgData</strong> (required)</li></ul>
+
+<p><strong>msgData Fields:</strong></p>
+
+<ul><li><strong>setPresence</strong><ul><li><strong>show</strong> (optional) [<code>away</code>|<code>chat</code>|<code>dnd</code>|<code>xa</code>]</li><li><strong>status</strong> (optional) User configurable status string. TODO: Set regex for max length and allowed characters.</li></ul></li></ul>
+
+<p><strong>Returns:</strong>
+ - <strong>roomData</strong> (with roomStatus of <code>update</code>)
+ - <strong>error</strong></p>
+
+<h3>msgType - &#39;setUserCfg&#39;</h3>
+
+<p>Sets user configurable options. User must be authenticated.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>msgData</strong> (required)</li></ul>
+
+<p><strong>msgData Fields:</strong></p>
+
+<ul><li><strong>setUserCfg</strong><ul><li><strong>p2pList</strong> (optional) Map of all connections with their statistics. The map key is the easyrtcid&#39;s. Unlike userSettings and apiField, this field must contain all current connections. Any connections not mentioned will be removed.</li><li><strong>userSettings</strong> (optional) Map of fields related to the user&#39;s settings, WebRTC, browser, and OS capabilities/status. Any settings not mentioned will be left as-is. To remove a setting, give it a value of <code>null</code>.</li><li><strong>apiField</strong> (optional) Map of fields for the special appDefinedFields value which gets transferred in the broadcast list. Any fields not mentioned will be left as-is. To remove a field, give it a value of <code>null</code>.</li></ul></li></ul>
+
+<h2>Outgoing (from server)</h2>
+
+<h3>msgType - &#39;candidate&#39;</h3>
+
+<p>Transfer of WebRTC ICE candidate(s) for establishing peer-connection. Sender and target must be online, authenticated, and in same application.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>serverTime</strong> (required)</li><li><strong>senderEasyrtcid</strong> (required)</li><li><strong>msgData</strong> (required)<ul><li>Contains candidate data (SDP&#39;s)</li><li>{type, label, id, candidate}</li></ul></li></ul>
+
+<h3>msgType - &#39;offer&#39;</h3>
+
+<p>Sends WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>serverTime</strong> (required)</li><li><strong>senderEasyrtcid</strong> (required)</li><li><strong>msgData</strong> (required)<ul><li>Contains candidate data (SDP&#39;s)</li></ul></li></ul>
+
+<h3>msgType - &#39;answer&#39;</h3>
+
+<p>Accepts WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>serverTime</strong> (required)</li><li><strong>senderEasyrtcid</strong> (required)</li><li><strong>msgData</strong> (required)<ul><li>Contains session description (SDP)</li></ul></li></ul>
+
+<h3>msgType - &#39;reject&#39;</h3>
+
+<p>Rejects WebRTC offer for establishing peer-connection. Sender and target must be online, authenticated, and in same application.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>serverTime</strong> (required)</li><li><strong>senderEasyrtcid</strong> (required)</li></ul>
+
+<h3>msgType - &#39;hangup&#39;</h3>
+
+<p>Instructs target to hangup WebRTC peer-connection. Sender and target must be online, authenticated, and in same application.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>serverTime</strong> (required)</li><li><strong>senderEasyrtcid</strong> (required)</li></ul>
+
+<h3>msgType - &#39;iceConfig&#39;</h3>
+
+<p>ICE configuration object. This gives the ability to update the STUN and TURN server listing on a periodic basis for longer running connections. Upon reception, the client should refresh </p>
+
+<p><strong>Fields:</strong>
+ - <strong>iceConfig</strong>
+   - <strong>iceServers</strong> (array of objects)
+     - <strong>url</strong> (required) Format is <code>((stun|turn):ADDRESS:[PORT][?transport=tcp])</code>
+     - <strong>username</strong> (optional) May be used by TURN servers
+     - <strong>credential</strong> (optional) May be used by TURN servers</p>
+
+<p><strong>Returns:</strong>
+  - <strong>iceConfig</strong>
+  - <strong>error</strong></p>
+
+<h3>msgType - &#39;token&#39;</h3>
+
+<p>Initiates an authenticated EasyRTC application. Note this may be sent multiple times in a session upon configuration changes. The API should reset application, room, and list data.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>serverTime</strong> (required)</li><li><strong>msgData</strong> (required)</li></ul>
+
+<p><strong>msgData Fields:</strong></p>
+
+<ul><li><strong>easyrtcid</strong> (required)</li><li><strong>field</strong> (optional - map of connection fields)<ul><li><strong>fieldName</strong></li><li><strong>fieldValue</strong></li></ul></li><li><strong>iceConfig</strong> (required)</li><li><strong>groupList</strong> (optional - default to no group)</li><li><strong>roomData</strong> (required) See roomData msgType for contents</li><li><strong>sessionData</strong> (optional) See sessionData msgType for contents</li><li><strong>application</strong><ul><li><strong>applicationName</strong> (required - defaults to &#39;default&#39;)</li><li><strong>field</strong> (optional - map of application fields)<ul><li><strong>fieldName</strong></li><li><strong>fieldValue</strong></li></ul></li><li>May contain other application options which user is permitted to view.</li></ul></li></ul>
+
+<h3>msgType - &#39;roomData&#39;</h3>
+
+<p>Provides room information for all rooms the user is currently in. This includes a list of online users who the user is permitted to see. By default authenticated users can see all other users in the same application and room.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>serverTime</strong> (required)</li><li><strong>msgData</strong> (required)</li></ul>
+
+<p><strong>msgData Fields:</strong>
+ - <strong>roomData</strong> (required) Map of room names
+   - <strong>roomName</strong> (required) Room name (matches map key)
+   - <strong>roomStatus</strong> (required) Instruction to API as to whether to join, update, or leave a given room.  [join|update|leave]
+     - <code>join</code> - Client is considered to be joined to the given room. <code>clientList</code> field will may be present to show other users who are visible in the room.
+     - <code>update</code> - Client should update what it knows about the room. <code>field</code> or <code>clientList</code> or <code>clientListDelta</code> field may be present.
+     - <code>leave</code> - Client is considered to have left the room, and should delete everything it knows about the room including the ids of other users.
+   - <strong>clientList</strong> (optional) Map of easyrtcid&#39;s for users online in the same room. If present, this should overrule the current list in memory.
+     - <strong>easyrtcid</strong> (required) Matches map key
+     - <strong>username</strong> (optional)
+     - <strong>roomJoinTime</strong> (required) Timestamp of when client joined room
+     - <strong>presence</strong> (required) {show:[away|chat|dnd|xa],status:{String}}
+     - <strong>apiField</strong> (optional) Map of appDefinedFields and their values
+     - <strong>browserFamily</strong> (optional)
+     - <strong>browserMajor</strong> (optional)
+     - <strong>osFamily</strong> (optional)
+     - <strong>deviceFamily</strong> (optional)
+   - <strong>clientListDelta</strong> (optional)
+     - <strong>updateClient</strong> (optional) Map of easyrtcids to update. Will contain same fields as &#39;clientList&#39;
+     - <strong>removeClient</strong> (optional) Map of easyrtcids to remove from the client list.
+   - <strong>field</strong> (optional) - map of room fields. If this exists but is empty, than all fields should be removed.
+     - <strong>fieldName</strong>
+     - <strong>fieldValue</strong></p>
+
+<h3>msgType - &#39;roomList&#39;</h3>
+
+<p>Provides rooms which the client has access to. By default authenticated users can see all other rooms in the same application.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>serverTime</strong> (required)</li><li><strong>msgData</strong> (required)</li></ul>
+
+<p><strong>msgData Fields:</strong>
+ - <strong>roomList</strong> (required) Map of room names
+   - <strong>roomName</strong> (required) Room name (matches map key)
+   - <strong>numberClients</strong> (optional) The number of clients in the room. By default this is enabled.</p>
+
+<h3>msgType - &#39;sessionData&#39;</h3>
+
+<p>Provides session information for the user. This includes any session fields.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>serverTime</strong> (required)</li><li><strong>msgData</strong> (required)</li></ul>
+
+<p><strong>msgData Fields:</strong>
+ - <strong>sessionData</strong> (required) Object holding session information
+   - <strong>easyrtcsid</strong> (required) Session identifier
+   - <strong>field</strong> (optional) - map of room fields
+     - <strong>fieldName</strong>
+     - <strong>fieldValue</strong></p>
+
+<h3>msgType - &#39;forwardToUrl&#39;</h3>
+
+<p>Instructs API to forward user to specified URL. Useful for server handled error handling and user support techniques.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>serverTime</strong> (required)</li><li><strong>msgData</strong> (required)</li></ul>
+
+<p><strong>msgData Fields:</strong></p>
+
+<ul><li><strong>forwardToUrl</strong> (required)<ul><li><strong>url</strong> (required) URL to forward user to</li></ul></li></ul>
+
+<h3>msgType - &#39;error&#39;</h3>
+
+<p>Provides an error code to the API when an error occurs.</p>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>serverTime</strong> (required)</li></ul>
+
+<p><strong>msgData Fields:</strong></p>
+
+<ul><li><strong>errorCode</strong> (required)</li><li><strong>errorText</strong> (optional) User readable text explaining error.</li></ul>
+
+<hr/>
+
+<h1>easyrtcMsg</h1>
+
+<p>&quot;easyrtcMsg&quot; is the socket.io emit type which EasyRTC uses for custom application level messages.</p>
+
+<h2>Incoming (to server)</h2>
+
+<h3>General Message Format</h3>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>msgType</strong> (required) - String containing the message type.</li><li><strong>msgData</strong> (optional) - Can contain any JSON compatible object or primitive type.</li><li><strong>targetEasyrtcid</strong> (optional) - If present, will attempt to forward the message to the specific easyrtcid.</li><li><strong>targetGroup</strong> (optional) - If present, will attempt to forward the message to all clients in a specific group. Can work in conjunction with targetEasyrtcid and targetRoom to further restrict the recipient.</li><li><strong>targetRoom</strong> (optional) - If present, will attempt to forward the message to all clients in a specific room. Can work in conjunction with targetEasyrtcid and targetGroup to further restrict the recipient.</li></ul>
+
+<p><strong>Returns:</strong></p>
+
+<ul><li><strong>ack</strong></li><li><strong>error</strong></li></ul>
+
+<h2>Outgoing (to client)</h2>
+
+<h3>General Message Format</h3>
+
+<p><strong>Fields:</strong></p>
+
+<ul><li><strong>msgType</strong> (required) - String containing the message type.</li><li><strong>msgData</strong> (optional) - Can contain any JSON compatible object or primitive type.</li><li><strong>senderEasyrtcid</strong> (optional) - If present, indicates the message was sent by a specific user.</li><li><strong>targetEasyrtcid</strong> (optional) - If present, indicates the message was intended only for this specific easyrtcid.</li><li><strong>targetGroup</strong> (optional) - If present, indicates the message was intended only for clients in this specific group. Can work in conjunction with targetEasyrtcid and targetRoom to further restrict the recipient.</li><li><strong>targetRoom</strong> (optional) - If present, indicates the message was intended only for clients in this specific room. Can work in conjunction with targetEasyrtcid and targetGroup to further restrict the recipient.</li></ul>
+
+<p><strong>Returns:</strong></p>
+
+<ul><li><strong>ack</strong></li></ul>
+
+<h2>If You Run Into Problems</h2>
+
+<p>Please feel free to post on our discussion forum:</p>
+
+<ul><li><a href="https://groups.google.com/forum/?fromgroups#!forum/easyrtc">https://groups.google.com/forum/?fromgroups#!forum/easyrtc</a></li></ul>
+
+	</div>
+</div>
+<footer class="template">
+	<div class="wrapper-content">
+		<p>Copyright &copy;2016 EasyRTC</p>
+	</div>
+</footer>
+</body>
+</html>

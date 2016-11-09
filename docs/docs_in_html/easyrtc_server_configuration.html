@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EasyRTC Documentation</title>
+	<link href="assets/easyrtc-docs-styles-1.css" media="all" rel="stylesheet" />
+</head>
+<body>
+<header class="template">
+	<div class="wrapper-content">
+    <a href="./index.html"><img src="assets/easyrtc-logo.png" alt="EasyRTC Documentation"></a>
+		<h1 title="EasyRTC Documentation">Documentation</h1>
+	</div>
+</header>
+<div class="wrapper-docs">
+<nav>
+	<h2><a href="./index.html">Docs Home</a></h2>
+	<h3>EasyRTC Guides</h3>
+	<ul>
+		<li><a href="easyrtc_faq.html">FAQ</a></li>
+		<li><a href="easyrtc_gettingStarted.html">Getting Started</a></li>
+		<li><a href="easyrtc_server_install.html">EasyRTC Server: Installation</a></li>
+		<li><a href="easyrtc_client_tutorial.html">EasyRTC Framework Tutorial</a></li>
+		<li><a href="easyrtc_rooms.html">Rooms</a></li>
+		<li><a href="easyrtc_server_configuration.html">EasyRTC Server: Configuration</a></li>
+		<li><a href="easyrtc_server_events.html">EasyRTC Server: Events</a></li>
+		<li><a href="easyrtc_server_ice.html">EasyRTC Server: ICE Configuration</a></li>
+		<li><a href="easyrtc_with_other_servers.html">Using Alongside Other Servers</a></li>
+		<li><a href="easyrtc_server_ssl.html">EasyRTC Server: Using SSL</a></li>
+		<li><a href="easyrtc_webrtc_problems.html">WebRTC Problems and Possible Fixes</a></li>
+		<li><a href="easyrtc_upcoming_features.html">Upcoming Features</a></li>
+		<li><a href="easyrtc_changelog.html">Change Log</a></li>
+	</ul>
+
+	<h3>EasyRTC Client Classes</h3>
+	<ul>
+		<li><a href="client-api/Easyrtc.html">Easyrtc</a></li>
+		<li><a href="client-api/Easyrtc_App.html">Easyrtc_App</a></li>
+		<li><a href="client-api/Easyrtc_ft.html">Easyrtc_ft</a></li>
+		<li><a href="client-api/Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li>
+		<li><a href="client-api/Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li>
+		<li><a href="client-api/Easyrtc_Rates.html">Easyrtc_Rates</a></li>
+		<li><a href="client-api/Easyrtc_Recorder.html">Easyrtc_Recorder</a></li>
+	</ul>
+	<h3>EasyRTC Server Modules</h3>
+	<ul>
+		<li><a href="server-api/module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li>
+		<li><a href="server-api/module-easyrtc_default_options.html">easyrtc_default_options</a></li>
+		<li><a href="server-api/module-easyrtc_private_obj.html">easyrtc_private_obj</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj.html">easyrtc_public_obj</a></li>
+		<li><a href="server-api/module-easyrtc_util.html">easyrtc_util</a></li>
+		<li><a href="server-api/module-general_util.html">general_util</a></li>
+	</ul>
+	<h3>EasyRTC Server Classes</h3>
+	<ul>
+		<li><a href="server-api/module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj-pub.html">pub</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj-pub.events.html">events</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj-pub.util.html">util</a></li>
+		<li><a href="server-api/module-easyrtc_util-eu.html">eu</a></li>
+		<li><a href="server-api/module-general_util-g.html">g</a></li>
+		<li><a href="server-api/pub.appObj.html">appObj</a></li>
+		<li><a href="server-api/pub.appObj.connectionObj.html">connectionObj</a></li>
+		<li><a href="server-api/pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li>
+		<li><a href="server-api/pub.appObj.roomObj.html">roomObj</a></li>
+		<li><a href="server-api/pub.appObj.sessionObj.html">sessionObj</a></li>
+	</ul>
+</nav>
+<div class="easyrtc-docs-content">
+<h1>EasyRTC Server: Configuration</h1>
+
+<h2>Configuration levels - Server versus Application versus Room</h2>
+
+<p>EasyRTC allows management of configuration options at the server, application and room level. This will allow different rooms in the same application, or different applications in the same server to run with customized options.</p>
+
+<h2>Setting Server Options</h2>
+
+<p>Options can be set prior, during, or after the easyrtc.listen() function has been run.</p>
+
+<p><strong>Seperate</strong>
+ - easyrtc.setOption(optionName, optionValue)</p>
+
+<p><strong>Within Listen()</strong>
+ - easyrtc.listen(httpApp, socketServer, options, listenCallback)</p>
+
+<p><strong>Afterwards with resulting EasyRTC interface function</strong>
+ - ei.setOption(optionName, optionValue)</p>
+
+<p><em>note: Not all options will have an effect if changed after the server has started.</em></p>
+
+<h2>Setting Server Options Example</h2>
+
+<p>The following server.js code snippet includes three ways of setting EasyRTC options.</p>
+
+<pre><code>// Load required modules
+var http    = require(&quot;http&quot;);              // http server core module
+var express = require(&quot;express&quot;);           // web framework external module
+var io      = require(&quot;socket.io&quot;);         // web socket external module
+var easyrtc = require(&quot;easyrtc&quot;);           // EasyRTC external module
+
+
+// Setup and configure Express http server. Expect a subfolder called &quot;static&quot; to be the web root.
+var httpApp = express();
+httpApp.use(express.static(__dirname + &quot;/static/&quot;));
+
+// Start Express http server on port 8080
+var webServer = http.createServer(httpApp).listen(8080);
+
+// Start Socket.io so it attaches itself to Express server
+var socketServer = io.listen(webServer);
+
+// Configure EasyRTC to load demos from /easyrtcdemos/
+easyrtc.setOption(&quot;demosPublicFolder&quot;, &quot;/easyrtcdemos&quot;);
+
+// Start EasyRTC server with options to change the log level and add dates to the log.
+var easyrtcServer = easyrtc.listen(
+        httpApp,
+        socketServer,
+        {logLevel:&quot;debug&quot;, logDateEnable:true},
+        function(err, rtc) {
+
+            // After the server has started, we can still change the default room name
+            rtc.setOption(&quot;roomDefaultName&quot;, &quot;SectorZero&quot;);
+
+            // Creates a new application called MyApp with a default room named &quot;SectorOne&quot;.
+            rtc.createApp(
+                &quot;easyrtc.instantMessaging&quot;,
+                {&quot;roomDefaultName&quot;:&quot;SectorOne&quot;},
+                myEasyrtcApp
+            );
+        }
+);
+
+// Setting option for specific application
+var myEasyrtcApp = function(err, appObj) {
+    // All newly created rooms get a field called roomColor.
+    // Note this does not affect the room &quot;SectorOne&quot; as it was created already.
+    appObj.setOption(&quot;roomDefaultFieldObj&quot;,
+         {&quot;roomColor&quot;:{fieldValue:&quot;orange&quot;, fieldOption:{isShared:true}}}
+    );
+};</code></pre>
+
+<h2>Available Server Options</h2>
+
+<h3>Application Options</h3>
+
+<ul><li><strong>appAutoCreateEnable</strong><ul><li>Enables the creation of application from the API. Occurs when client joins a nonexistent application.</li><li>This should be set to false for production use.</li><li>Defaults to: true</li></ul></li><li><strong>appDefaultFieldObj</strong><ul><li>Default fields which are set when an application is created. In form of {&quot;fieldName&quot;:{fieldValue:&lt;JsonObj&gt;, fieldOption:{isShared:&lt;boolean&gt;}}[, ...]}</li><li>Defaults to: null</li></ul></li><li><strong>appDefaultName</strong><ul><li>The default application a connection belongs to if it is not initially specified.</li><li>Defaults to: &quot;default&quot;</li></ul></li><li><p><strong>appIceServers</strong></p><ul><li>ICE Servers object which identifies all STUN and TURN servers.</li><li>With new username field in TURN specification, this object may be updated soon.</li><li><p>Defaults to:</p><p>[{url: &quot;stun:stun.l.google.com:19302&quot;},
+{url: &quot;stun:stun.sipgate.net&quot;},
+{url: &quot;stun:217.10.68.152&quot;},
+{url: &quot;stun:stun.sipgate.net:10000&quot;},
+{url: &quot;stun:217.10.68.152:10000&quot;}]</p></li><li><p>The format for a TURN server is:</p><p>{&quot;url&quot;:&quot;turn:[ADDRESS]:[PORT]&quot;,&quot;username&quot;:&quot;[USERNAME]&quot;, &quot;credential&quot;:&quot;[CREDENTIAL]&quot;}</p></li></ul></li></ul>
+
+<h3>Room Options</h3>
+
+<ul><li><strong>roomAutoCreateEnable</strong><ul><li>Enables the creation of rooms from the API. Occurs when client joins a nonexistent room.</li><li>Defaults to: true</li></ul></li><li><strong>roomDefaultEnable</strong><ul><li>Enables connections joining a default room if it is not initially specified. If false, than a connection initially may be in no room.</li><li>Defaults to: true</li></ul></li><li><strong>roomDefaultFieldObj</strong><ul><li>Default fields which are set when a room is created. In form of {&quot;fieldName&quot;:{fieldValue:&lt;JsonObj&gt;, fieldOption:{isShared:&lt;boolean&gt;}}[, ...]}</li><li>Defaults to: null</li></ul></li><li><strong>roomDefaultName</strong><ul><li>The default room a connection joins if it is not initially specified.</li><li>Defaults to: &quot;default&quot;</li></ul></li></ul>
+
+<h3>Connection Options</h3>
+
+<ul><li><strong>connectionDefaultField</strong><ul><li>Default connection fields.</li><li>Defaults to: null</li></ul></li></ul>
+
+<h3>Session Options</h3>
+
+<ul><li><strong>sessionEnable</strong><ul><li>Enable sessions. If sessions are disabled, each socket connection from the same user will be the same. Relies on Express session handling also being enabled.</li><li>Defaults to: true</li></ul></li><li><strong>sessionCookieEnable</strong><ul><li>If enabled, the server will attempt to send a easyrtcsid cookie which matches the Express session id.</li><li>Defaults to: true</li></ul></li></ul>
+
+<h3>API Hosting Options</h3>
+
+<ul><li><strong>apiEnable</strong><ul><li>Enables hosting of the EasyRTC API files.</li><li>Defaults to: true</li></ul></li><li><strong>apiPublicFolder</strong><ul><li>Api public folder without trailing slash. Note that the demos expect this to be &#39;/easyrtc&#39;</li><li>Defaults to: &quot;/easyrtc&quot;</li></ul></li><li><strong>apiOldLocationEnable</strong><ul><li>[Depreciated] Listens for requests to core API files in old locations (in addition to the new standard locations)</li><li>Defaults to: false</li></ul></li></ul>
+
+<h3>Demo Options</h3>
+
+<ul><li><strong>demosEnable</strong><ul><li>Enables the various EasyRTC demos. For a production system, this should be disabled.</li><li>Defaults to: true</li></ul></li><li><strong>demosPublicFolder</strong><ul><li>Demos public folder without trailing slash.</li><li>This sets the public URL where where demos are hosted, such as http://yourdomain/demos/</li><li>Defaults to: &quot;/demos&quot;</li></ul></li></ul>
+
+<h3>Log options</h3>
+
+<p>Log options only apply if internal &#39;log&#39; event is used</p>
+
+<ul><li><strong>logLevel</strong><ul><li>The minimum log level to show. (debug|info|warning|error|none)</li><li>Defaults to: &quot;info&quot;</li></ul></li><li><strong>logDateEnable</strong><ul><li>Display timestamp in each entry</li><li>Defaults to: false</li></ul></li><li><strong>logErrorStackEnable</strong><ul><li>print the stack trace in logged errors when available</li><li>Defaults to: true</li></ul></li><li><strong>logWarningStackEnable</strong><ul><li>print the stack trace in logged warnings when available</li><li>Defaults to: true</li></ul></li><li><strong>logColorEnable</strong><ul><li>include console colors. Disable if forwarding logs to files or databases</li><li>Defaults to: true</li></ul></li><li><strong>logObjectDepth</strong><ul><li>When objects are included in the log, this is the max depth the log will display</li><li>Defaults to: 7</li></ul></li></ul>
+
+<h3>Miscellaneous Server Options</h3>
+
+<ul><li><strong>updateCheckEnable</strong><ul><li>Checks for updates to EasyRTC</li><li>Defaults to: true</li></ul></li></ul>
+
+<h3>Regular expressions for validating names and other input</h3>
+
+<ul><li><strong>apiVersionRegExp</strong><ul><li>API Version</li><li>Defaults to: /^[a-z0-9_.-]{1,32}$/i</li></ul></li><li><strong>appNameRegExp</strong><ul><li>Application name</li><li>Defaults to: /^[a-z0-9_.-]{1,32}$/i</li></ul></li><li><strong>easyrtcidRegExp</strong><ul><li>EasyRTC socket id (easyrtcid)</li><li>Defaults to: /^[a-z0-9_.-]{1,32}$/i</li></ul></li><li><strong>easyrtcsidRegExp</strong><ul><li>EasyRTC session id (easyrtcsid)</li><li>Defaults to: /^[a-z0-9_.-]{1,64}$/i</li></ul></li><li><strong>groupNameRegExp</strong><ul><li>Group name</li><li>Defaults to: /^[a-z0-9_.-]{1,32}$/i</li></ul></li><li><strong>fieldNameRegExp</strong><ul><li>Field names (for defining app and room custom fields)</li><li>Defaults to: /^[a-z0-9_. -]{1,32}$/i</li></ul></li><li><strong>optionNameRegExp</strong><ul><li>Option names (for defining server options)</li><li>Defaults to: /^[a-z0-9_. -]{1,32}$/i</li></ul></li><li><strong>presenceShowRegExp</strong><ul><li>Allowed presence &quot;show&quot; values (for setPresence command)</li><li>Can be set at application level</li><li>Defaults to: /^(away|chat|dnd|xa)$/</li></ul></li><li><strong>presenceStatusRegExp</strong><ul><li>Allowed presence &quot;status&quot; value</li><li>Can be set at application level</li><li>Defaults to: /^(.){0,255}$/</li></ul></li><li><strong>roomNameRegExp</strong><ul><li>Room name</li><li>Can be set at application level</li><li>Defaults to: /^[a-z0-9_.-]{1,32}$/i</li></ul></li><li><strong>usernameRegExp</strong><ul><li>Username</li><li>Can be set at application level</li><li>Defaults to: /^(.){1,64}$/i</li></ul></li></ul>
+
+<h2>If You Run Into Problems</h2>
+
+<p>Please feel free to post on our discussion forum:</p>
+
+<ul><li><a href="https://groups.google.com/forum/?fromgroups#!forum/easyrtc">https://groups.google.com/forum/?fromgroups#!forum/easyrtc</a></li></ul>
+
+	</div>
+</div>
+<footer class="template">
+	<div class="wrapper-content">
+		<p>Copyright &copy;2016 EasyRTC</p>
+	</div>
+</footer>
+</body>
+</html>

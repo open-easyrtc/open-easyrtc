@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EasyRTC Documentation</title>
+	<link href="assets/easyrtc-docs-styles-1.css" media="all" rel="stylesheet" />
+</head>
+<body>
+<header class="template">
+	<div class="wrapper-content">
+    <a href="./index.html"><img src="assets/easyrtc-logo.png" alt="EasyRTC Documentation"></a>
+		<h1 title="EasyRTC Documentation">Documentation</h1>
+	</div>
+</header>
+<div class="wrapper-docs">
+<nav>
+	<h2><a href="./index.html">Docs Home</a></h2>
+	<h3>EasyRTC Guides</h3>
+	<ul>
+		<li><a href="easyrtc_faq.html">FAQ</a></li>
+		<li><a href="easyrtc_gettingStarted.html">Getting Started</a></li>
+		<li><a href="easyrtc_server_install.html">EasyRTC Server: Installation</a></li>
+		<li><a href="easyrtc_client_tutorial.html">EasyRTC Framework Tutorial</a></li>
+		<li><a href="easyrtc_rooms.html">Rooms</a></li>
+		<li><a href="easyrtc_server_configuration.html">EasyRTC Server: Configuration</a></li>
+		<li><a href="easyrtc_server_events.html">EasyRTC Server: Events</a></li>
+		<li><a href="easyrtc_server_ice.html">EasyRTC Server: ICE Configuration</a></li>
+		<li><a href="easyrtc_with_other_servers.html">Using Alongside Other Servers</a></li>
+		<li><a href="easyrtc_server_ssl.html">EasyRTC Server: Using SSL</a></li>
+		<li><a href="easyrtc_webrtc_problems.html">WebRTC Problems and Possible Fixes</a></li>
+		<li><a href="easyrtc_upcoming_features.html">Upcoming Features</a></li>
+		<li><a href="easyrtc_changelog.html">Change Log</a></li>
+	</ul>
+
+	<h3>EasyRTC Client Classes</h3>
+	<ul>
+		<li><a href="client-api/Easyrtc.html">Easyrtc</a></li>
+		<li><a href="client-api/Easyrtc_App.html">Easyrtc_App</a></li>
+		<li><a href="client-api/Easyrtc_ft.html">Easyrtc_ft</a></li>
+		<li><a href="client-api/Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li>
+		<li><a href="client-api/Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li>
+		<li><a href="client-api/Easyrtc_Rates.html">Easyrtc_Rates</a></li>
+		<li><a href="client-api/Easyrtc_Recorder.html">Easyrtc_Recorder</a></li>
+	</ul>
+	<h3>EasyRTC Server Modules</h3>
+	<ul>
+		<li><a href="server-api/module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li>
+		<li><a href="server-api/module-easyrtc_default_options.html">easyrtc_default_options</a></li>
+		<li><a href="server-api/module-easyrtc_private_obj.html">easyrtc_private_obj</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj.html">easyrtc_public_obj</a></li>
+		<li><a href="server-api/module-easyrtc_util.html">easyrtc_util</a></li>
+		<li><a href="server-api/module-general_util.html">general_util</a></li>
+	</ul>
+	<h3>EasyRTC Server Classes</h3>
+	<ul>
+		<li><a href="server-api/module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj-pub.html">pub</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj-pub.events.html">events</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj-pub.util.html">util</a></li>
+		<li><a href="server-api/module-easyrtc_util-eu.html">eu</a></li>
+		<li><a href="server-api/module-general_util-g.html">g</a></li>
+		<li><a href="server-api/pub.appObj.html">appObj</a></li>
+		<li><a href="server-api/pub.appObj.connectionObj.html">connectionObj</a></li>
+		<li><a href="server-api/pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li>
+		<li><a href="server-api/pub.appObj.roomObj.html">roomObj</a></li>
+		<li><a href="server-api/pub.appObj.sessionObj.html">sessionObj</a></li>
+	</ul>
+</nav>
+<div class="easyrtc-docs-content">
+<h1>WebRTC Problems and Possible Fixes</h1>
+
+<p>Many of these issues are general WebRTC or browser issues and not specific to EasyRTC. Given time, many of these will become less frequent as the specification browsers are updated.</p>
+
+<h2>PermissionDeniedError When Creating A Local Media Stream</h2>
+
+<ul><li>If your page is not being served using https (instead of http), 
+chrome won&#39;t let your page access a local camera or microphone.</li><li>If you have previously disallowed camera or micrphone access from a 
+particular domain, the browser remembers this and refuses permission in 
+the future. If this is the case, you&#39;ll see a crossed-circle around the camera 
+icon in the title bar. Click it to bring up a dialog for controlling media 
+access, and reload the page after using the dialog. </li></ul>
+
+<h2>No Self Video</h2>
+
+<ul><li>Ensure no other program is using the camera (such as another brand of browser: Chrome and Firefox can&#39;t share a single camera on Windows).</li><li>Test camera in another application (such as Skype or WebEx)</li><li>Completely close the browser then reopen it.</li><li>Shutdown / reset camera and computer. Some cameras seem to freeze up (even Apple ones).</li><li>No hardware / driver support. WebRTC in Android isn&#39;t enabled for all devices.</li><li>HOPE: Browsers will do a better job of detecting and handling camera problems in the future.</li></ul>
+
+<h2>No Video Sent To Peer</h2>
+
+<ul><li>Firewall issues are the primary cause. For simple testing, be sure to use a simple single subnet network.</li><li>Production environment should allow direct, then STUN, then UDP-TURN, then TCP-TURN.</li><li>Even with TURN, some firewalls will still prevent WebRTC traffic.</li><li>Mobile networks (3G/4G) have differing restrictions.</li><li>We&#39;ve seen some Android devices unable to display remote video reliably. The Nexus devices seem to be the best tested.</li><li>HOPE: Network admins and firewall manufacturers recognize the upcoming importance of WebRTC and provide QOS and whitelist rules.</li></ul>
+
+<h2>Lag and slow connections</h2>
+
+<ul><li>The upload speed provided by most broadband providers is often much slower than the download.</li><li>WebRTC video is not covered by many firewall QOS rules.</li><li>Beef up your router. New routers are able handle faster connections and more concurrent traffic.</li><li>Adjust resolution and bandwidth settings (see Picture Quality section)</li><li>HOPE: The whole world gets fiber to the home :)</li></ul>
+
+<h2>Delays in Video or Audio</h2>
+
+<ul><li>Often hardware related, not connection.<ul><li>Frames get held up in buffer waiting to be displayed / transported.</li><li>Faster video / CPU processor are recommended.</li><li>Reduced resolution and fewer streams will often reduce effect.</li></ul></li><li>Using TURN server does introduce a slight delay.<ul><li>Best if TURN server is geographically nearer to callers.</li><li>Load balancing and beefier servers may be needed.</li></ul></li><li>HOPE: Support for hardware encoding / decoding will greatly reduce processor usage and video delay.</li></ul>
+
+<h2>Picture Quality</h2>
+
+<ul><li>Video resolution can be in set using:<ul><li>easyrtc.setVideoDims(width, height);</li></ul></li><li>Video camera hardware makes a big difference. When we upgraded from a 5yr old 720p camera to a new 1080p camera, the differences were remarkable. Even when just sending 640x480.</li><li>HOPE: Support for hardware encoding / decoding will allow higher resolution video.</li><li>HOPE: Support for adjusting bandwidth from within the JavaScript API.</li></ul>
+
+<h2>Sound Quality</h2>
+
+<ul><li>Reduce video resolution to allow more bandwidth for audio</li><li>Feedback?<ul><li>Especially common with laptops and tablets.</li><li>Don&#39;t run two clients in the same physical room (sound from the speaker on one computer enters the microphone of the other computer).</li><li>Reduce the speaker volume.</li><li>Use a headset.</li><li>Use a conference microphone/speaker with built-in noise cancelling.</li></ul></li><li>HOPE: Browsers implement (and expose) their own noise cancelling and feedback protection options.</li></ul>
+
+<h2>If You Run Into Problems</h2>
+
+<p>We have a dicussion forum you can find at:</p>
+
+<ul><li><a href="https://easyrtc.com/forum/">https://easyrtc.com/forum/</a></li></ul>
+
+<p>Note, if you are having trouble getting the demos to work on your own machine, here is a suite of easy tests for you to try before posting to our discussion forum.</p>
+
+<p>Which of the following tests work when you point your browsers at [http://demo.easyrtc.com/demos/demo<em>audio</em>video<em>simple.html] (http://demo.easyrtc.com/demos/demo</em>audio<em>video</em>simple.html)
+1. Two instances running on the same client computer (ie, two different windows or tabs on the same browser). This test verifies that your browser/hardware is capable of WebRTC.
+2. Two instances, each running on a different computer on the same subnet. 
+3. Two computers on different subnets.</p>
+
+<p>Which of the following tests work when you point your browsers at demo<em>audio</em>video_simple.html on your own instance of easyrtc?
+1. Two instances running on the same client computer (ie, two different windows or tabs on the same browser). If this test fails, your server probably isn&#39;t letting through websocket communication.
+2. Two instances, each running on a different computer on the same subnet. 
+3. Two computers on different subnets. If this is the only test that fails, then you need a TURN server because you are dealing with a tight firewall or a router enforcing symmetric NAT.</p>
+
+	</div>
+</div>
+<footer class="template">
+	<div class="wrapper-content">
+		<p>Copyright &copy;2016 EasyRTC</p>
+	</div>
+</footer>
+</body>
+</html>
