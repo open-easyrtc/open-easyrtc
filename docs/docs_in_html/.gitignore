@@ -1,0 +1,11 @@
+# Ignore everything in this directory
+*
+# Except these files
+!.gitignore
+!assets
+!assets/easyrtc-docs-jsdoc-styles-1.css
+!assets/easyrtc-docs-styles-1.css
+!assets/easyrtc-logo.png
+!client-api
+!server-api
+
