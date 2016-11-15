@@ -1068,7 +1068,11 @@ var Easyrtc = function() {
         "firefoxRemoteAddress": "remoteAddress"
     };
 
-    var standardStatsFilter = adapter && adapter.browserDetails &&
+    /**
+      * This is a basic statistics filter that keesp just the generally
+      * useful information. 
+      */
+    this.standardStatsFilter = adapter && adapter.browserDetails &&
                 adapter.browserDetails.browser === "firefox" ? firefoxStatsFilter : chromeStatsFilter;
 
     function getFirefoxPeerStatistics(peerId, callback, filter) {
