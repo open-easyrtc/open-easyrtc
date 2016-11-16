@@ -559,9 +559,9 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener, options) {
  * @param options is currently ignored.
  *  @example
  *
- *    easyrtc_ft(
+ *    easyrtc_ft.buildFileReceiver(
  *       function(otherGuy, filenamelist, wasAccepted) {  wasAccepted(true);},
- *       function(otherGuy, blob, filename) { easyrtc_ft(blob, filename);},
+ *       function(otherGuy, blob, filename) { easyrtc_ft.saveAs(blob, filename);},
  *       function(otherGuy, status) {  console.log("status:" + JSON.stringify(status))}
  *     );
  */
