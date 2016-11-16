@@ -556,6 +556,7 @@ easyrtc_ft.buildFileSender = function(destUser, progressListener, options) {
  * {status:"progress", name:filename,
  *    received:received_size_in_bytes,
  *    size:file_size_in_bytes }
+ * @param options is currently ignored.
  *  @example
  *
  *    easyrtc_ft(
