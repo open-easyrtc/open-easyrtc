@@ -1,0 +1,12 @@
+{ "compilerOptions": {
+  "target": "ES6",
+  "lib": ["dom", "es6","scripthost"],
+  "outDir": "./",
+  "module": "amd",
+  "noImplicitReturns": true
+   },
+  "files": [
+    "exerciseCalls.ts"
+  ]
+}
+
