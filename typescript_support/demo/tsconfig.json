@@ -6,7 +6,8 @@
   "noImplicitReturns": true
    },
   "files": [
-    "exerciseCalls.ts"
+    "exercise_easyrtc_d_ts.ts",
+    "exercise_easyrtc_ft_d_ts.ts"
   ]
 }
 
