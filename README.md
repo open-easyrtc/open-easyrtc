@@ -57,7 +57,7 @@ All documentation can be found within [the docs folder](./docs/).
 **General Development**
  * [Frequently asked questions](./docs/easyrtc_faq.md)
      * `/docs/easyrtc_faq.md`
- * [Authentication](./docseasyrtc_authentication.md/)
+ * [Authentication](./docs/easyrtc_authentication.md/)
      * `/docs/easyrtc_authentication.md`  
  * [ICE, TURN, STUN Configuration](./docs/easyrtc_server_ice.md)
      * `/docs/easyrtc_server_ice.md`  
