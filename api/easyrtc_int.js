@@ -4888,7 +4888,15 @@ var Easyrtc = function() {
         }
 
         var processCandidateBody = function(caller, msgData) {
+
             var candidate = null;
+
+            //
+            // if we've discarded the peer connection, ignore the candidate.
+            //
+            if (!peerConns[caller]) {
+                return;
+            }
 
             if( iceCandidateFilter ) {
                msgData = iceCandidateFilter(msgData, true);
