@@ -1,0 +1,442 @@
+/** EasyRTC Docs styles **/
+
+html
+{
+	font-size:10px;
+	padding:0;
+	margin:0;
+}
+
+body
+{
+	color:#4d4e53;
+	font-size:1.6rem;
+	line-height:2.4rem;
+	font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+	padding:0;
+	margin:0;
+}
+
+header.template,
+footer.template
+{
+	font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
+	display:block;
+	color:#fff;
+	background-color:#000;
+	margin:0;
+	padding:1rem 0 0.5rem 0;
+}
+
+header.template h1
+{
+	display:inline-block !important;
+	position:relative;
+	top:-1.3rem;
+	font-size:4.2rem;
+	font-weight:lighter;
+	letter-spacing:0;
+	font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
+	margin:0 0 0 1rem !important;
+	padding:0 !important;
+}
+
+header.template nav
+{
+	float:none;
+	margin:0;
+	text-align: left;
+	display:inline-block !important;
+}
+
+nav
+{
+	display:inline-block;
+}
+
+div.wrapper-docs
+{
+	display:flex;
+	flex-direction:row;
+	height:100%;
+	max-width:99.2rem;
+	border:1px solid #bbb;
+	border-top:none;
+	border-bottom:none;
+	border-style:0.3rem;
+	padding:0;
+	margin:0 auto;
+}
+
+div.wrapper-docs h1
+{
+	line-height:3.4rem;
+}
+
+div.wrapper-docs a,
+div.wrapper-docs a:link,
+div.wrapper-docs a:visited,
+div.wrapper-docs a:active,
+div.wrapper-docs a:hover
+{
+	color:#0095dd;
+	text-decoration:none;
+}
+
+div.wrapper-docs a:hover
+{
+	text-decoration:underline;
+}
+
+div.wrapper-docs nav
+{
+	flex: 1 0 0;
+	width:25.6rem;
+	border:none;
+	box-sizing: border-box;
+	border-right:1px solid #bbb;
+	padding:0.8rem 0.3rem 1.6rem 1.6rem;
+	margin:0;
+	background-color:#eee;
+}
+
+div.easyrtc-docs-content
+{
+	flex: 3 0 0;
+	max-width:70.2rem;
+	padding:0 1.2rem 1.2rem 1.2rem;
+}
+
+div.wrapper-docs nav h2
+{
+	font-size:2.2rem;
+	font-weight:normal;
+	line-height:2.4rem;
+	letter-spacing:0.1rem;
+}
+
+div.wrapper-docs nav h3
+{
+	font-size:2.1rem;
+	line-height:2.3rem;
+	font-weight:normal;
+	letter-spacing:0;
+	margin:1.8rem 0;
+}
+
+div.wrapper-docs nav ul
+{
+	margin:1.8rem 0 0 0;
+	padding:0;
+}
+
+div.wrapper-docs nav li
+{
+	font-family: Consolas, Monaco, 'Andale Mono', monospace;
+	line-height:2rem;
+	overflow: hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  margin-top: 0.5rem;
+  padding:0;
+}
+
+div.easyrtc-docs-content p.button
+{
+	margin:3.6rem 0;
+}
+
+div.wrapper-docs a.button.radius,
+div.wrapper-docs a.button.radius:link,
+div.wrapper-docs a.button.radius:visited,
+div.wrapper-docs a.button.radius:active,
+div.wrapper-docs a.button.radius:hover
+{
+	color:#fff !important;
+	text-decoration:none;
+	background-color:#f2622b;
+	padding:1.2rem;
+	border-radius:0.3rem;
+	transition: background-color 0.3s ease;
+}
+
+div.wrapper-docs a.button.radius:hover
+{
+	color:#fff !important;
+	text-decoration:none;
+	background-color:#ca4715;
+	padding:1.2rem;
+}
+
+div.wrapper-content
+{
+	max-width:98.2rem;
+	margin:0 auto;
+	padding:0;
+}
+
+h1
+{
+	line-height:3.2rem;
+}
+
+h2
+{
+	line-height:2.8rem;
+}
+
+h3
+{
+	line-height:2.4rem;
+}
+
+
+section.easyrtc-guides
+{
+	display:flex;
+	flex-direction:row;
+	flex-wrap: wrap;
+	justify-content:flex-start;
+	align-items: flex-start;
+	padding:0;
+	margin:0 0 3.8rem 0;
+	border-bottom:1px solid #bbb;
+}
+
+section.easyrtc-guides h3
+{
+	margin-top:0;
+}
+
+section.easyrtc-guides div.item
+{
+	flex:4 1 auto;
+	align-self: auto;
+	max-width:46%;
+	min-width:32rem;
+	margin:1.2rem 1.2rem 3.6rem 1.2rem;
+}
+
+section.easyrtc-guides div.item.last
+{
+	margin-bottom:4.2rem;
+}
+
+section.easyrtc-guides div.item p
+{
+	color:#4d4e53;
+	margin-bottom:0;
+}
+
+.clear,
+section.easyrtc-guides div.clear
+{
+	display:block;
+	width:100%;
+	clear:both;
+}
+
+section.easyrtc-guides div.clear
+{
+	
+}
+
+section.easyrtc-apis
+{
+	margin-top:1.6rem;
+}
+
+section.easyrtc-apis ul li
+{
+	font-family: Consolas, Monaco, 'Andale Mono', monospace;
+}
+
+
+/** Getting Started styles **/
+
+ul.nospace > li
+{
+  margin-bottom:0;
+}
+
+div.getting-started-wrapper
+{
+	max-width:71.2rem;
+}
+
+div.getting-started-wrapper code,
+div.getting-started-wrapper pre
+{
+  display:flex;
+  flex:1;
+  overflow: auto;
+  font-size:1.2rem;
+  font-weight:bold;
+  border:1px solid #ccc;
+  border-radius:3px;
+  background-color:#eee;
+  padding:0.8rem;
+  margin:1.6rem 0;
+}
+
+div.wrapper-docs code,
+div.wrapper-docs pre
+{
+	display:flex;
+  flex:1;
+  overflow: auto;
+  font-size:1.2rem;
+  font-weight:bold;
+  border:1px solid #ccc;
+  border-radius:3px;
+  background-color:#eee;
+  padding:0.8rem;
+  margin:1.6rem 0;
+}
+
+div.wrapper-docs pre code
+{
+	border:none;
+  border-radius:0;
+  background-color:transparent;
+  padding:0;
+  margin:0;
+}
+
+div.wrapper-docs p code,
+div.wrapper-docs ol li code,
+div.wrapper-docs ul li code,
+div.wrapper-docs table td code
+{
+	display:inline;
+	margin:0;
+	padding:1px 3px;
+}
+
+div.wrapper-docs ul,
+div.wrapper-docs ol,
+{
+	margin-bottom:1.4rem;
+}
+
+
+div.getting-started-wrapper div.diagram-wrapper
+{
+  max-width:80rem;
+  min-width:20rem;
+  
+  border:1px solid #000;
+  border-radius:0.3rem;
+  background-color:#fff;
+  padding:1.6rem;
+}
+
+div.getting-started-wrapper div.diagram
+{
+  padding:2.4rem 2.4rem 1.6rem 2.4rem;
+  border:1px solid #000;
+  border-radius:0.3rem;
+  background-color:#eee;
+  box-shadow:1px 1px 2px rgba(0,0,0,0.6);
+}
+
+div.getting-started-wrapper div.diagram-wrapper p
+{
+  text-align:center;
+  font-weight:bold;
+  margin:0;
+}
+
+div.getting-started-wrapper div.diagram-center
+{
+  text-align:center;
+}
+
+div.getting-started-wrapper div.diagram-level-0
+{
+  margin:0 0 1.6rem 0;
+}
+
+div.getting-started-wrapper div.diagram-level-1,
+div.getting-started-wrapper div.diagram-half
+{
+  text-align: center;
+  border:1px solid #000;
+  border-radius:0.3rem;
+  padding:0.8rem;
+  margin:0;
+  background-color:#fff;
+  box-shadow:1px 1px 2px rgba(0,0,0,0.6);
+}
+
+div.getting-started-wrapper div.diagram-level-1.diagram-head
+{
+  padding:2.4rem;
+}
+
+div.getting-started-wrapper div.diagram-third
+{
+  display:inline-block;
+  margin:1.6rem 0.5rem;
+  padding:1.6rem;
+  border:1px solid #000;
+  border-radius:0.3rem;
+  background-color:#eee;
+  box-shadow:1px 1px 2px rgba(0,0,0,0.6);
+}
+
+div.getting-started-wrapper div.diagram-half
+{
+  display:inline-block;
+  width:32%;
+  padding:1.6rem;
+  margin:0.6rem 0.8rem;
+}
+
+div.getting-started-wrapper div.diagram-external
+{
+  display:inline-block;
+  width:25%;
+  padding:1.6rem;
+  margin:0.6rem 0;
+  background-color:#eee;
+}
+
+div.getting-started-wrapper div.diagram-bidirectional
+{
+  float:center;
+  text-align:center;
+  margin:1.6rem 0 0.6rem 0;
+}
+
+div.getting-started-wrapper div.diagram-bidirectional.diagram-overlap
+{
+  text-align:center;
+  margin-top:-0.8rem;
+  padding:0 2.4rem;
+}
+
+div.getting-started-wrapper div.diagram-bidirectional-arrows
+{
+  display:inline-block;
+  width:40%;
+  color:#333;
+  font-size:6.2rem;
+  text-align:center;
+}
+
+div.getting-started-wrapper div.diagram-bidirectional-arrows-lr
+{
+  display:inline-block;
+  width:10%;
+  color:#333;
+  font-size:6.2rem;
+  text-align:center;
+  position:relative;
+  top:1rem;
+}
+
+div.getting-started-wrapper div.diagram-space
+{
+  margin-top:3.0rem;
+}

@@ -177,7 +177,7 @@ node_modules
 *.log
 config_override.js
 nbproject
-/.idea
+.idea
 desktopCapture
 /api/labs/desktopCapture
 test/reports/

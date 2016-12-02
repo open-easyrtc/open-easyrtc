@@ -388,7 +388,7 @@ var Easyrtc = function() {
         SIGNAL_ERR: "SIGNAL_ERR"
     };
 
-    this.apiVersion = "1.1.0";
+    this.apiVersion = "1.1.1-beta";
 
     /** Most basic message acknowledgment object */
     this.ackMessage = {msgType: "ack"};
@@ -1068,7 +1068,11 @@ var Easyrtc = function() {
         "firefoxRemoteAddress": "remoteAddress"
     };
 
-    var standardStatsFilter = adapter && adapter.browserDetails &&
+    /**
+      * This is a basic statistics filter that keesp just the generally
+      * useful information. 
+      */
+    this.standardStatsFilter = adapter && adapter.browserDetails &&
                 adapter.browserDetails.browser === "firefox" ? firefoxStatsFilter : chromeStatsFilter;
 
     function getFirefoxPeerStatistics(peerId, callback, filter) {
@@ -3472,7 +3476,7 @@ var Easyrtc = function() {
         }
 
         var streamId = theStream.id || "default";
-            remoteName = getNameOfRemoteStream(otherUser, streamId) || "default";
+        var remoteName = getNameOfRemoteStream(otherUser, streamId) || "default";
 
         if (!peerConn.liveRemoteStreams[remoteName]) {
 

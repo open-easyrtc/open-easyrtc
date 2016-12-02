@@ -57,7 +57,7 @@ All documentation can be found within [the docs folder](./docs/).
 **General Development**
  * [Frequently asked questions](./docs/easyrtc_faq.md)
      * `/docs/easyrtc_faq.md`
- * [Authentication](./docseasyrtc_authentication.md/)
+ * [Authentication](./docs/easyrtc_authentication.md/)
      * `/docs/easyrtc_authentication.md`  
  * [ICE, TURN, STUN Configuration](./docs/easyrtc_server_ice.md)
      * `/docs/easyrtc_server_ice.md`  
@@ -112,11 +112,11 @@ Links for help and information
 ------------------------------
 
 * The EasyRTC website is at:
-  * [http://www.easyrtc.com/](http://www.easyrtc.com/)
+  * [https://www.easyrtc.com/](https://www.easyrtc.com/)
 * Use our support forum is at:
-  * [https://easyrtc.com/forum/](https://easyrtc.com/forum/)
+  * [https://groups.google.com/forum/?fromgroups#!forum/easyrtc](https://groups.google.com/forum/?fromgroups#!forum/easyrtc)
 * Live demo site:
-  * [http://demo.easyrtc.com/](http://demo.easyrtc.com/)
+  * [https://demo.easyrtc.com/](https://demo.easyrtc.com/)
 * Bugs and requests can be filed on our github page or on the forum:
   * [https://github.com/priologic/easyrtc/issues](https://github.com/priologic/easyrtc/issues)
 * Our YouTube channel has live demo's:
