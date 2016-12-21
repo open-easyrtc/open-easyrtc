@@ -89,7 +89,7 @@
   <p>WebRTC is currently supported by several brands of browsers (Chrome, Firefox, Opera, maybe Edge, but not Safari yet). It is also possible to write native WebRTC clients, but that is a more advanced topic than covered in this document.</p>
   <p>The crucial thing to realize is that peer-to-peer doesn&apos;t mean that no servers are involved, it just means that the regular data doesn&apos;t go through them. At the bare minimum, a server is still needed for two clients to exchange some basic information (where am I on the network, what codecs do I support) so that they can establish that peer-to-peer connection. The information used to establish the peer to peer connection is called signaling, and the server is called a signaling server.</p>
   <p>WebRTC makes no specification of what you use for a signalling server or what protocol it uses. Websockets is the most common, but people have also used long polling and even email (twitter is possible but more painful due to the character length limitation).</p>
-  <p>When your product is in development, running your own server locally is very convenient; you can restart it wheneve you want so that its at a known state, it&apos;s easier to check the logs, you can customize it&apos;s behavior, and it doesn&apos;t cost you anything. However, when your product moves into production you&apos;ll eventually be more concerned with robustness and scalablity, which are full time jobs in their own right.</p>
+  <p>When your product is in development, running your own server locally is very convenient; you can restart it whenever you want so that its at a known state, it&apos;s easier to check the logs, you can customize it&apos;s behavior, and it doesn&apos;t cost you anything. However, when your product moves into production you&apos;ll eventually be more concerned with robustness and scalablity, which are full time jobs in their own right.</p>
 
   <a name="what-is-easyrtc-opensource"></a>
   <h2>What Is EasyRTC OpenSource</h2>
@@ -169,7 +169,7 @@
     Assuming you haven&apos;t gotten any nasty errors, you should be able to start the seserver by issuing the following command (while in the server_example directory):
     <br><code>node server.js</code>
   </p>
-  <p>By default, the server serves demo applications on port 8080, so if you run a compatible browser on the same machine, and point it at localhost:8080, it should take you to the demos page. Pick a demo to run (the simple audio video demo is a good choice). Open a new tag and point it at the same URL to have a second instance of the demo so you can try the two way communications.</p>
+  <p>By default, the server serves demo applications on port 8080, so if you run a compatible browser on the same machine, and point it at localhost:8080, it should take you to the demos page. Pick a demo to run (the simple audio video demo is a good choice). Open a new tab and point it at the same URL to have a second instance of the demo so you can try the two way communications.</p>
   <p>Warning: if you run two instances of the same webrtc application in the same physical room without using earphones, each will pick up the audio output of the other, resulting in a shrill feedback squeal. If there is anybody else in the same room, consider muting your speakers first.</p>
   <p>Note: the simple audio video demo displays the output of the local camera (it&apos;s a good reminder so you don&apos;t do anything uncouth while in a conference) and the output of a potentially remote camera. When you are running everything on the same machine you&apos;ll notice that one display is mirrored compared to the other. If you are wondering why this is done, try the following:</p>
   <ul>
@@ -349,18 +349,18 @@
 
   <a name="scaling-up"></a>
   <h2>Scaling Up</h2>
-  <p>The EasyRTC Open Source offering has scalability limitations in two different areas: the number of peers that can be in a video conference together, and the number of peers that can connect to the server.</p>
+  <p>The EasyRTC Open offering has scalability limitations in two different areas: the number of peers that can be in a video conference together, and the number of peers that can connect to the server.</p>
 
   <h3>The Video Conference Limitation</h3>
   <p>Any client using a purely peer-to-peer connection is limited in the number of media streams it can send and receive. That limit depends on the the processing power of the hardware the client is running on, and the upload speed of its connections to other peers. Typically, the later is encountered well before the former. We&apos;ve seen a 640x480 video successfully shared to 14 peers when all parties are on the same local network, but struggle with 3 peers when the peers were spread across the internet. The user observed effect is that the frame rate gets low, the picture gets grainy and pixelated, sound gets choppy, and connections can get dropped.</p>
   <p>There are two solutions for this general problem: Media Servers and Selective Forwarding Units (SFU&apos;s). The idea of a media server is that everybody sends their local media to the media server, and in return the media server sends everybody a single composite media stream. An SFU also receives the peers local media streams, but instead of combining them, it relays the received media streams to the other parties.</p>
-  <p>EasyRTC Open Source doesn&apos;t currently support SFU&apos;s and Media Servers.</p>
+  <p>EasyRTC doesn&apos;t currently support SFU&apos;s and Media Servers.</p>
 
   <h3>The Peer To Server Limitation</h3>
   <p>Currently, the EasyRTC server runs on a single Node.js instance. That means it is limited by the amount of memory and the number of ports the node.js instance has access to. It can also only send out and receive messages so fast. The number of clients it can support can range from hundreds to thousands, depending on how much demand your application puts on the server. This also means the EasyRTC server isn&apos;t as robust as you want for a production system. If the host running the server process goes down, the service fails.</p>
   <h3>An Upcoming Solution</h3>
-  <p>The upcoming EasyRTC Enterprise PAAS has a wrapper that will let most EasyRTC Open Source clients run with minimal (if any) changes, while providing scalibilty and robustness through a distributed system. See <a href="https://easyrtc.com/products/easyrtc-enterprise/" title="EasyRTC Enterprise">EasyRTC Enterprise</a> link for more details.</p>
-  <p>There are also plans to add MediaServer and/or SFU support to the EasyRTC Enterprise service.</p>
+  <p>The upcoming PlatformRTC PAAS has a wrapper that will let most EasyRTC clients run with minimal (if any) changes, while providing scalibilty and robustness through a distributed system. See <a href="https://easyrtc.com/products/easyrtc-enterprise/" title="EasyRTC Enterprise">EasyRTC Enterprise</a> link for more details.</p>
+  <p>There are also plans to add MediaServer and/or SFU support to the PlatformRTC service.</p>
 
 </div>
 	</div>
