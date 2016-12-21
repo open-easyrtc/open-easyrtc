@@ -713,8 +713,10 @@ var Easyrtc = function() {
             // Tested Firefox 49 and MS Edge require minFrameRate and maxFrameRate 
             // instead max,min,ideal that cause GetUserMedia failure.
             // Until confirmed both browser support idea,max and min we need this.
-            if ( adapter && adapter.browserDetails &&
-                    (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")){
+            if (
+                adapter && adapter.browserDetails &&
+                    (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
+            ) {
                 constraints.video = {};
                 if (self._desiredVideoProperties.width) {
                     constraints.video.width = self._desiredVideoProperties.width;
@@ -732,15 +734,8 @@ var Easyrtc = function() {
                     constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
                 }
 
-            } 
-            else if( cordova && cordova.plugins ) { 
-                //
-                // I haven't been able to make video constraints other than 640x480 work.
-                // So disabling this feature for ios-rtc.
-                constraints.video = true;
-            } 
-            else { 
-                // chrome and opera
+            // chrome and opera
+            } else { 
                 constraints.video = {};
                 if (self._desiredVideoProperties.width) {
                      constraints.video.width = { 
@@ -2156,13 +2151,6 @@ var Easyrtc = function() {
             registerLocalMediaStreamByName(stream, streamName);
             var videoObj, triesLeft, tryToGetSize, ele;
             if (haveAudioVideo.video) {
-                if( cordova && cordova.plugins ) { // cordova doesn't have video width and height properties visible
-                    updateConfigurationInfo();
-                    if (successCallback) {
-                        successCallback(stream);
-                    }
-                    return;
-                }
                 videoObj = document.createElement('video');
                 videoObj.muted = true;
                 triesLeft = 30;
