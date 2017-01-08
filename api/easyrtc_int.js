@@ -4436,8 +4436,7 @@ var Easyrtc = function() {
                        self.showError(errorCode, errorText);
                    }
 
-                   sendSignalling(easyrtcid, "answer", sessionDescription,
-                           onSignalSuccess, onSignalFailure);
+                   self.sendPeerMessage(easyrtcid, "__gotAddedMediaStream", sessionDescription);
                    peerConns[easyrtcid].connectionAccepted = true;
                    sendQueuedCandidates(easyrtcid, onSignalSuccess, onSignalFailure);
                };
@@ -4456,7 +4455,6 @@ var Easyrtc = function() {
                         self.showError(self.errCodes.INTERNAL_ERR, "create-answer: " + message);
                     },
                     receivedMediaConstraints);
-               self.sendPeerMessage(easyrtcid, "__gotAddedMediaStream", {sdp: sdp});
             };
 
             logDebug("about to call setRemoteDescription in addedMediaStream");
