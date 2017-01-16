@@ -1957,7 +1957,6 @@ var Easyrtc = function() {
             } else if (typeof element.mozSrcObject !== 'undefined') {
                 element.mozSrcObject = self.createObjectURL(stream);
             }
-            element.play();
         }
         else {
             self.clearMediaStream(element);
