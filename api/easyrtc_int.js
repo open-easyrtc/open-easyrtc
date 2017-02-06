@@ -60,6 +60,16 @@
 var Easyrtc = function() {
 
     var self = this;
+    var stillAliveTimer = null;
+    var stillAlivePeriod = 20*1000;
+
+    function stillAliveEmitter() {
+        if( stillAliveTimer ) {
+           clearTimeout(stillAliveTimer);
+        }
+        stillAliveTimer = setTimeout(stillAliveEmitter, 20*1000);
+        sendSignalling(null, "stillAlive", {}, null, null);
+    }
 
     function logDebug (message, obj) {
         if (self.debugPrinter) {
@@ -1495,6 +1505,9 @@ var Easyrtc = function() {
             '<': '&lt;',
             '>': '&gt;'
         };
+        if( !idString ) {
+            return "";
+        }
         return idString.replace(/[&<>]/g, function(c) {
             return MAP[c];
         });
@@ -2805,6 +2818,12 @@ var Easyrtc = function() {
         acceptancePending = {};
         self.disconnecting = true;
         closedChannel = self.webSocket;
+
+        if( stillAliveTimer ) {
+           clearTimeout(stillAliveTimer);
+           stillAliveTimer = null;
+        }
+
         if (self.webSocketConnected) {
             if (!preallocatedSocketIo) {
                 self.webSocket.close();
@@ -5577,15 +5596,21 @@ var Easyrtc = function() {
         });
 
         function connectHandler(event) {
-            self.webSocketConnected = true;
             if (!self.webSocket) {
                 self.showError(self.errCodes.CONNECT_ERR, self.getConstantString("badsocket"));
             }
+            self.webSocketConnected = true;
 
             logDebug("saw socket-server onconnect event");
 
             if (self.webSocketConnected) {
-                sendAuthenticate(successCallback, errorCallback);
+                sendAuthenticate(
+                  function(easyrtcid) { 
+                     stillAliveEmitter();
+                     successCallback(easyrtcid);
+                  }, 
+                  errorCallback);
+
             }
             else {
                 errorCallback(self.errCodes.SIGNAL_ERR, self.getConstantString("icf"));
