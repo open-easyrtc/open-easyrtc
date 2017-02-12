@@ -4207,7 +4207,8 @@ var Easyrtc = function() {
         if (stream.active === true || stream.ended === false)  {
             isActive = true;
         } else {
-            isActive = stream.getTracks().reduce(function (track) {
+            var tracks = stream.getTracks();
+            isActive = tracks.length > 0 && tracks.reduce(function (track) {
                 return track.enabled;
             });
         }
