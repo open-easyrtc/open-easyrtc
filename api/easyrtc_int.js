@@ -61,14 +61,28 @@ var Easyrtc = function() {
 
     var self = this;
     var stillAliveTimer = null;
-    var stillAlivePeriod = 20*1000;
+    var stillAlivePeriod = 0;
+    var missedAliveResponses = 0;
 
     function stillAliveEmitter() {
+        if( !stillAlivePeriod ) {
+            return;
+        }
         if( stillAliveTimer ) {
            clearTimeout(stillAliveTimer);
         }
+      
+        if( missedAliveResponses == 2 ) {
+            self.showError(self.errCodes.SYSTEM_ERR, "Timed out trying to talk to the server.");
+            self.disconnect(); 
+            return;
+        }
         stillAliveTimer = setTimeout(stillAliveEmitter, 20*1000);
-        sendSignalling(null, "stillAlive", {}, null, null);
+        missedAliveResponses++;
+        sendSignalling(null, "stillAlive", {}, function(msgType, msgData){
+             missedAliveResponses = 0;
+         }, function() {
+           });
     }
 
     function logDebug (message, obj) {
@@ -1963,10 +1977,10 @@ var Easyrtc = function() {
         if (stream && stream !== "") {
             element.autoplay = true;
 
-            if (typeof element.src !== 'undefined') {
-                element.src = self.createObjectURL(stream);
-            } else if (typeof element.srcObject !== 'undefined') {
+            if (typeof element.srcObject !== 'undefined') {
                 element.srcObject = stream;
+            } else if (typeof element.src !== 'undefined') {
+                element.src = self.createObjectURL(stream);
             } else if (typeof element.mozSrcObject !== 'undefined') {
                 element.mozSrcObject = self.createObjectURL(stream);
             }
@@ -5444,6 +5458,12 @@ var Easyrtc = function() {
         if (msgData.iceConfig) {
             processIceConfig(msgData.iceConfig);
         }
+        if( msgData.stillAliveInterval ) {
+            stillAlivePeriod = msgData.stillAliveInterval;
+            if( stillAlivePeriod > 0 ) {
+               stillAliveEmitter();
+            }
+        }
 
         if (msgData.sessionData) {
             processSessionData(msgData.sessionData);
@@ -5523,7 +5543,6 @@ var Easyrtc = function() {
                             }
                         }
                     }
-
                     if (successCallback) {
                         successCallback(self.myEasyrtcid);
                     }
@@ -5604,13 +5623,7 @@ var Easyrtc = function() {
             logDebug("saw socket-server onconnect event");
 
             if (self.webSocketConnected) {
-                sendAuthenticate(
-                  function(easyrtcid) { 
-                     stillAliveEmitter();
-                     successCallback(easyrtcid);
-                  }, 
-                  errorCallback);
-
+                sendAuthenticate( successCallback, errorCallback);
             }
             else {
                 errorCallback(self.errCodes.SIGNAL_ERR, self.getConstantString("icf"));
