@@ -2911,8 +2911,10 @@ var Easyrtc = function() {
            clearTimeout(stillAliveTimer);
         }
       
-        if( missedAliveResponses == 2 ) {
+        if( missedAliveResponses == 1 ) {
             self.showError(self.errCodes.SYSTEM_ERR, "Timed out trying to talk to the server.");
+            self.printpeerconns();
+            self.hangupAll();
             self.disconnect(); 
             return;
         }
@@ -3830,6 +3832,10 @@ var Easyrtc = function() {
     //     }
     //
     var peerConns = {};
+    this.printpeerconns = function() {
+        console.log("peerconns = ", peerConns);
+    };
+
     /** @private */
     //
     // a map keeping track of whom we've requested a call with so we don't try to
@@ -7288,7 +7294,8 @@ var Easyrtc = function() {
                   "Attempt to add additional stream before establishing the base call.");
         }
         else {
-            var sdp = msgData.sdp;
+            var sdp = msgData.sdp.sdp;
+            var type = msgData.sdp.type;
             var pc = peerConns[easyrtcid].pc;
 
             var setLocalAndSendMessage1 = function(sessionDescription) {
@@ -7333,9 +7340,9 @@ var Easyrtc = function() {
             try {
 
                 if (sdpRemoteFilter) {
-                    sdp.sdp = sdpRemoteFilter(sdp.sdp);
+                    sdp = sdpRemoteFilter(sdp);
                 }
-                pc.setRemoteDescription(new RTCSessionDescription(sdp),
+                pc.setRemoteDescription(new RTCSessionDescription({type:type, sdp:sdp}),
                    invokeCreateAnswer, function(message) {
                     self.showError(self.errCodes.INTERNAL_ERR, "addedMediaStream setRemoteDescription failed: " + message);
                     // TODO sendSignaling reject/failure
@@ -7354,11 +7361,15 @@ var Easyrtc = function() {
         }
         else {
             var sdp = msgData.sdp;
+            var type = msgData.type;
             if (sdpRemoteFilter) {
-                sdp.sdp = sdpRemoteFilter(sdp.sdp);
+               try {
+                sdp = sdpRemoteFilter(sdp);
+               } catch(UserError) {
+               }
             }
             var pc = peerConns[easyrtcid].pc;
-            pc.setRemoteDescription(new RTCSessionDescription(sdp), function(){},
+            pc.setRemoteDescription(new RTCSessionDescription({type:type, sdp:sdp}), function(){},
                     function(message) {
                        self.showError(self.errCodes.INTERNAL_ERR, "gotAddedMediaStream setRemoteDescription failed: " + message);
                        // TODO sendSignaling reject/failure
@@ -7776,6 +7787,7 @@ var Easyrtc = function() {
 
             candidate = new RTCIceCandidate({
                 sdpMLineIndex: msgData.label,
+                sdpMid: msgData.id,
                 candidate: msgData.candidate
             });
             pc = peerConns[caller].pc;
@@ -7908,7 +7920,20 @@ var Easyrtc = function() {
             // peerConns[caller].startedAV = true;
             sendQueuedCandidates(caller, onSignalSuccess, onSignalFailure);
             pc = peerConns[caller].pc;
-            var sd = new RTCSessionDescription(msgData);
+            var sdp;
+            try {
+               if( sdpRemoteFilter ) {
+                  sdp = sdpRemoteFilter(msgData.sdp);
+               }
+               else {
+                  sdp = msgData.sdp;
+               }
+            }
+            catch(userError) {
+                self.showError(self.errCodes.DEVELOPER_ERR,"sdpRemoteFilter failed");
+                console.log(userError);
+            }
+            var sd = new RTCSessionDescription({type:msgData.type, sdp:sdp});
             if (!sd) {
                 throw "Could not create the RTCSessionDescription";
             }
