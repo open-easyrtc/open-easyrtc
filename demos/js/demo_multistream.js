@@ -26,7 +26,7 @@
 var selfEasyrtcid = "";
 var haveSelfVideo = false;
 var otherEasyrtcid = null;
-
+var localStreamCount = 0;
 
 function disable(domId) {
     console.log("about to try disabling "  +domId);
@@ -47,6 +47,11 @@ function createLabelledButton(buttonLabel) {
     return button;
 }
 
+function removeStreamFromPeers(streamName) {
+  if( otherEasyrtcid ) {
+       easyrtc.removeStreamFromCall(otherEasyrtcid, streamName);
+  } 
+}
 
 function addMediaStreamToDiv(divId, stream, streamName, isLocal)
 {
@@ -79,7 +84,12 @@ function createLocalVideo(stream, streamName) {
         easyrtc.closeLocalStream(streamName);
         labelBlock.parentNode.parentNode.removeChild(labelBlock.parentNode);
     }
+    var removeButton = createLabelledButton("remove");
+    removeButton.onclick = function() {
+         removeStreamFromPeers(streamName);
+    }
     labelBlock.appendChild(closeButton);
+    labelBlock.appendChild(removeButton);
 
     console.log("created local video, stream.streamName = " + stream.streamName);
 }
@@ -88,18 +98,20 @@ function addSrcButton(buttonLabel, videoId) {
     var button = createLabelledButton(buttonLabel);
     button.onclick = function() {
         easyrtc.setVideoSource(videoId);
+        var streamName = buttonLabel + "_" + localStreamCount;
+        localStreamCount++;
         easyrtc.initMediaSource(
                 function(stream) {
-                    createLocalVideo(stream, buttonLabel);
+                    createLocalVideo(stream, streamName);
                     if( otherEasyrtcid) {
-                        easyrtc.addStreamToCall(otherEasyrtcid, buttonLabel, function(easyrtcid, streamName){
+                        easyrtc.addStreamToCall(otherEasyrtcid, streamName, function(easyrtcid, streamName){
                             easyrtc.showError("Informational", "other party " + easyrtcid + " acknowledges receiving " + streamName);
                         });
                     }
                 },
                 function(errCode, errText) {
                     easyrtc.showError(errCode, errText);
-                }, buttonLabel);
+                }, streamName);
     };
 }
 
