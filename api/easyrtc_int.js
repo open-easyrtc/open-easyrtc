@@ -686,20 +686,6 @@ var Easyrtc = function() {
         }
     };
 
-    /** This function requests that screen capturing be used to provide the local media source
-     * rather than a webcam. If you have multiple screens, they are composited side by side.
-     * Note: this functionality is not supported by Firefox, has to be called before calling initMediaSource (or easyApp), we don't currently supply a way to
-     * turn it off (once it's on), only works if the website is hosted SSL (https), and the image quality is rather
-     * poor going across a network because it tries to transmit so much data. In short, screen sharing
-     * through WebRTC isn't worth using at this point, but it is provided here so people can try it out.
-     * @example
-     *    easyrtc.setScreenCapture();
-     * @deprecated: use easyrtc.initScreenCapture (same parameters as easyrtc.initMediaSource.
-     */
-    this.setScreenCapture = function(enableScreenCapture) {
-        self._desiredVideoProperties.screenCapture = (enableScreenCapture !== false);
-    };
-
     /**
      * Builds the constraint object passed to getUserMedia.
      * @returns {Object} mediaConstraints
@@ -714,22 +700,6 @@ var Easyrtc = function() {
             constraints = self._presetMediaConstraints;
             delete self._presetMediaConstraints;
             return constraints;
-        }
-        else if (self._desiredVideoProperties.screenCapture) {
-            return {
-                video: {
-                    mandatory: {
-                        chromeMediaSource: 'screen',
-                        maxWidth: screen.width,
-                        maxHeight: screen.height,
-                        minWidth: screen.width,
-                        minHeight: screen.height,
-                        minFrameRate: 1,
-                        maxFrameRate: 5},
-                    optional: []
-                },
-                audio: false
-            };
         }
         else if (!self.videoEnabled) {
             constraints.video = false;
