@@ -3637,7 +3637,8 @@ var Easyrtc = function() {
                 isInitiator: isInitiator,
                 remoteStreamIdToName: {},
                 streamsAddedAcks: {},
-                liveRemoteStreams: {}
+                liveRemoteStreams: {},
+                supportHalfTrickleIce:false
             };
 
             pc.onicecandidate = function(event) {
@@ -3667,7 +3668,9 @@ var Easyrtc = function() {
                     //
                     processCandicate(event.candidate.candidate);
 
-                    if (peerConns[otherUser].connectionAccepted) {
+                    if (peerConns[otherUser].connectionAccepted && 
+                        peerConns[otherUser].supportHalfTrickleIce) {
+
                         sendSignalling(otherUser, "candidate", candidateData, null, function() {
                             failureCB(self.errCodes.PEER_GONE, "Candidate disappeared");
                         });
@@ -4802,6 +4805,238 @@ var Easyrtc = function() {
         self.emitEvent("roomOccupant", lastLoggedInList);
     }
 
+    var processCandidateBody = function(caller, msgData) {
+
+        var candidate = null;
+
+        //
+        // if we've discarded the peer connection, ignore the candidate.
+        //
+        if (!peerConns[caller]) {
+            return;
+        }
+
+        if( iceCandidateFilter ) {
+           msgData = iceCandidateFilter(msgData, true);
+           if( !msgData ) {
+              return;
+           }
+        }
+
+        candidate = new RTCIceCandidate({
+            sdpMLineIndex: msgData.label,
+            sdpMid: msgData.id,
+            candidate: msgData.candidate
+        });
+        pc = peerConns[caller].pc;
+
+        function iceAddSuccess() {
+            logDebug("iceAddSuccess: " +
+                JSON.stringify(candidate));
+            processCandicate(msgData.candidate);
+        }
+
+        function iceAddFailure(domError) {
+            self.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice candidate (" + domError.name + "): " +
+                JSON.stringify(candidate));
+        }
+
+        pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
+    };
+
+    var flushCachedCandidates = function(caller) {
+        var i;
+        if (queuedMessages[caller]) {
+            for (i = 0; i < queuedMessages[caller].candidates.length; i++) {
+                processCandidateBody(caller, queuedMessages[caller].candidates[i]);
+            }
+            delete queuedMessages[caller];
+        }
+    };
+
+    var processOffer = function(caller, msgData) {
+
+        //
+        // if we already have a peer connection in place, then we can bypass the whole
+        // acceptance thing and simply generate an offer.
+        //
+        if( peerConns[caller] ) {
+            doAnswer(caller, msgData, []);
+            return;
+        }
+
+        var helper = function(wasAccepted, streamNames) {
+
+            if (streamNames) {
+                if (typeof streamNames === "string") {
+                    streamNames = [streamNames];
+                }
+                else if (streamNames.length === undefined) {
+                    self.showError(self.errCodes.DEVELOPER_ERR, "accept callback passed invalid streamNames");
+                    return;
+                }
+            }
+
+            logDebug("offer accept=" + wasAccepted);
+
+            delete offersPending[caller];
+
+            if (wasAccepted) {
+                if (!self.supportsPeerConnections()) {
+                    self.showError(self.errCodes.CALL_ERR, self.getConstantString("noWebrtcSupport"));
+                    return;
+                }
+                doAnswer(caller, msgData, streamNames);
+                flushCachedCandidates(caller);
+            }
+            else {
+                sendSignalling(caller, "reject", null, null, null);
+                clearQueuedMessages(caller);
+            }
+        };
+        //
+        // There is a very rare case of two callers sending each other offers
+        // before receiving the others offer. In such a case, the caller with the
+        // greater valued easyrtcid will delete its pending call information and do a
+        // simple answer to the other caller's offer.
+        //
+        if (acceptancePending[caller] && caller < self.myEasyrtcid) {
+            delete acceptancePending[caller];
+            if (queuedMessages[caller]) {
+                delete queuedMessages[caller];
+            }
+            if (peerConns[caller]) {
+                if (peerConns[caller].wasAcceptedCB) {
+                    peerConns[caller].wasAcceptedCB(true, caller);
+                }
+                delete peerConns[caller];
+            }
+            helper(true);
+            return;
+        }
+
+        offersPending[caller] = msgData;
+        if (!self.acceptCheck) {
+            helper(true);
+        }
+        else {
+            self.acceptCheck(caller, helper);
+        }
+    };
+
+    function processReject(caller) {
+        delete acceptancePending[caller];
+        if (queuedMessages[caller]) {
+            delete queuedMessages[caller];
+        }
+        if (peerConns[caller]) {
+            if (peerConns[caller].wasAcceptedCB) {
+                peerConns[caller].wasAcceptedCB(false, caller);
+            }
+            delete peerConns[caller];
+        }
+    }
+
+    function processAnswer(caller, msgData) {
+
+        delete acceptancePending[caller];
+
+        //
+        // if we've discarded the peer connection, ignore the answer.
+        //
+        if (!peerConns[caller]) {
+            return;
+        }
+
+        var isInitialConnect = !peerConns[caller].connectionAccepted;
+        if( isInitialConnect ) {
+            peerConns[caller].connectionAccepted = true;
+            if (peerConns[caller].wasAcceptedCB) {
+                peerConns[caller].wasAcceptedCB(true, caller);
+            }
+        }
+        var onSignalSuccess = function() {
+
+        };
+        var onSignalFailure = function(errorCode, errorText) {
+            if (peerConns[caller]) {
+                delete peerConns[caller];
+            }
+            self.showError(errorCode, errorText);
+        };
+        // peerConns[caller].startedAV = true;
+        sendQueuedCandidates(caller, onSignalSuccess, onSignalFailure);
+        pc = peerConns[caller].pc;
+        var sdp;
+        try {
+           if( sdpRemoteFilter ) {
+              sdp = sdpRemoteFilter(msgData.sdp);
+           }
+           else {
+              sdp = msgData.sdp;
+           }
+        }
+        catch(userError) {
+            self.showError(self.errCodes.DEVELOPER_ERR,"sdpRemoteFilter failed");
+            console.log(userError);
+        }
+        var sd = new RTCSessionDescription({type:msgData.type, sdp:sdp});
+        if (!sd) {
+            throw "Could not create the RTCSessionDescription";
+        }
+
+        logDebug("about to call initiating setRemoteDescription");
+
+        try {
+            if (sdpRemoteFilter) {
+                sd.sdp = sdpRemoteFilter(sd.sdp);
+            }
+            pc.setRemoteDescription(sd, function() {
+                if (pc.connectDataConnection) {
+                    logDebug("calling connectDataConnection(5001,5002)");
+                    if( isInitialConnection ) {
+                        pc.connectDataConnection(5001, 5002); // these are like ids for data channels
+                    }
+                    try {
+                       var streamName;
+                       var acks = peerConns[caller].streamsAddedAcks || {};
+                       for( streamName in acks ) {
+                           acks[streamName](caller, streamName);
+                       }
+                       peerConns[caller].streamsAddedAcks = {};
+                    } 
+                    catch(userError) {
+                       easyrtc.showError(self.errCodes.DEVELOPER_ERR, "streamAdded receipt function failed");
+                    }
+                }
+            }, function(message){
+                 logDebug("processAnswer setRemoteDescription failed: ", message);
+                // TODO sendSignaling reject/failure
+             });
+        } catch (smdException) {
+            logDebug("processAnswer setRemoteDescription error: ", smdException);
+            // TODO sendSignaling reject/failure
+        }
+
+        flushCachedCandidates(caller);
+    }
+
+
+    function processCandidateQueue(caller, msgData) {
+        if (peerConns[caller] && peerConns[caller].pc) {
+            processCandidateBody(caller, msgData);
+        }
+        else {
+            if (!peerConns[caller]) {
+                queuedMessages[caller] = {
+                    candidates: []
+                };
+            }
+            queuedMessages[caller].candidates.push(msgData);
+        }
+    }
+
+
     /** @private */
     function onChannelCmd(msg, ackAcceptorFn) {
 
@@ -4817,236 +5052,6 @@ var Easyrtc = function() {
             clearQueuedMessages(caller);
         }
 
-        var processCandidateBody = function(caller, msgData) {
-
-            var candidate = null;
-
-            //
-            // if we've discarded the peer connection, ignore the candidate.
-            //
-            if (!peerConns[caller]) {
-                return;
-            }
-
-            if( iceCandidateFilter ) {
-               msgData = iceCandidateFilter(msgData, true);
-               if( !msgData ) {
-                  return;
-               }
-            }
-
-            candidate = new RTCIceCandidate({
-                sdpMLineIndex: msgData.label,
-                sdpMid: msgData.id,
-                candidate: msgData.candidate
-            });
-            pc = peerConns[caller].pc;
-
-            function iceAddSuccess() {
-                logDebug("iceAddSuccess: " +
-                    JSON.stringify(candidate));
-                processCandicate(msgData.candidate);
-            }
-
-            function iceAddFailure(domError) {
-                self.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice candidate (" + domError.name + "): " +
-                    JSON.stringify(candidate));
-            }
-
-            pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
-        };
-
-        var flushCachedCandidates = function(caller) {
-            var i;
-            if (queuedMessages[caller]) {
-                for (i = 0; i < queuedMessages[caller].candidates.length; i++) {
-                    processCandidateBody(caller, queuedMessages[caller].candidates[i]);
-                }
-                delete queuedMessages[caller];
-            }
-        };
-
-        var processOffer = function(caller, msgData) {
-
-            //
-            // if we already have a peer connection in place, then we can bypass the whole
-            // acceptance thing and simply generate an offer.
-            //
-            if( peerConns[caller] ) {
-                doAnswer(caller, msgData, []);
-                return;
-            }
-
-            var helper = function(wasAccepted, streamNames) {
-
-                if (streamNames) {
-                    if (typeof streamNames === "string") {
-                        streamNames = [streamNames];
-                    }
-                    else if (streamNames.length === undefined) {
-                        self.showError(self.errCodes.DEVELOPER_ERR, "accept callback passed invalid streamNames");
-                        return;
-                    }
-                }
-
-                logDebug("offer accept=" + wasAccepted);
-
-                delete offersPending[caller];
-
-                if (wasAccepted) {
-                    if (!self.supportsPeerConnections()) {
-                        self.showError(self.errCodes.CALL_ERR, self.getConstantString("noWebrtcSupport"));
-                        return;
-                    }
-                    doAnswer(caller, msgData, streamNames);
-                    flushCachedCandidates(caller);
-                }
-                else {
-                    sendSignalling(caller, "reject", null, null, null);
-                    clearQueuedMessages(caller);
-                }
-            };
-            //
-            // There is a very rare case of two callers sending each other offers
-            // before receiving the others offer. In such a case, the caller with the
-            // greater valued easyrtcid will delete its pending call information and do a
-            // simple answer to the other caller's offer.
-            //
-            if (acceptancePending[caller] && caller < self.myEasyrtcid) {
-                delete acceptancePending[caller];
-                if (queuedMessages[caller]) {
-                    delete queuedMessages[caller];
-                }
-                if (peerConns[caller]) {
-                    if (peerConns[caller].wasAcceptedCB) {
-                        peerConns[caller].wasAcceptedCB(true, caller);
-                    }
-                    delete peerConns[caller];
-                }
-                helper(true);
-                return;
-            }
-
-            offersPending[caller] = msgData;
-            if (!self.acceptCheck) {
-                helper(true);
-            }
-            else {
-                self.acceptCheck(caller, helper);
-            }
-        };
-
-        function processReject(caller) {
-            delete acceptancePending[caller];
-            if (queuedMessages[caller]) {
-                delete queuedMessages[caller];
-            }
-            if (peerConns[caller]) {
-                if (peerConns[caller].wasAcceptedCB) {
-                    peerConns[caller].wasAcceptedCB(false, caller);
-                }
-                delete peerConns[caller];
-            }
-        }
-
-        function processAnswer(caller, msgData) {
-
-            delete acceptancePending[caller];
-
-            //
-            // if we've discarded the peer connection, ignore the answer.
-            //
-            if (!peerConns[caller]) {
-                return;
-            }
-
-            var isInitialConnect = !peerConns[caller].connectionAccepted;
-            if( isInitialConnect ) {
-                peerConns[caller].connectionAccepted = true;
-                if (peerConns[caller].wasAcceptedCB) {
-                    peerConns[caller].wasAcceptedCB(true, caller);
-                }
-            }
-            var onSignalSuccess = function() {
-
-            };
-            var onSignalFailure = function(errorCode, errorText) {
-                if (peerConns[caller]) {
-                    delete peerConns[caller];
-                }
-                self.showError(errorCode, errorText);
-            };
-            // peerConns[caller].startedAV = true;
-            sendQueuedCandidates(caller, onSignalSuccess, onSignalFailure);
-            pc = peerConns[caller].pc;
-            var sdp;
-            try {
-               if( sdpRemoteFilter ) {
-                  sdp = sdpRemoteFilter(msgData.sdp);
-               }
-               else {
-                  sdp = msgData.sdp;
-               }
-            }
-            catch(userError) {
-                self.showError(self.errCodes.DEVELOPER_ERR,"sdpRemoteFilter failed");
-                console.log(userError);
-            }
-            var sd = new RTCSessionDescription({type:msgData.type, sdp:sdp});
-            if (!sd) {
-                throw "Could not create the RTCSessionDescription";
-            }
-
-            logDebug("about to call initiating setRemoteDescription");
-
-            try {
-                if (sdpRemoteFilter) {
-                    sd.sdp = sdpRemoteFilter(sd.sdp);
-                }
-                pc.setRemoteDescription(sd, function() {
-                    if (pc.connectDataConnection) {
-                        logDebug("calling connectDataConnection(5001,5002)");
-			if( isInitialConnection ) {
-                            pc.connectDataConnection(5001, 5002); // these are like ids for data channels
-                        }
-                        try {
-                           var streamName;
-                           var acks = peerConns[caller].streamsAddedAcks || {};
-                           for( streamName in acks ) {
-                               acks[streamName](caller, streamName);
-                           }
-                           peerConns[caller].streamsAddedAcks = {};
-                        } 
-                        catch(userError) {
-                           easyrtc.showError(self.errCodes.DEVELOPER_ERR, "streamAdded receipt function failed");
-                        }
-                    }
-                }, function(message){
-                     logDebug("processAnswer setRemoteDescription failed: ", message);
-                    // TODO sendSignaling reject/failure
-                 });
-            } catch (smdException) {
-                logDebug("processAnswer setRemoteDescription error: ", smdException);
-                // TODO sendSignaling reject/failure
-            }
-
-            flushCachedCandidates(caller);
-        }
-
-        function processCandidateQueue(caller, msgData) {
-
-            if (peerConns[caller] && peerConns[caller].pc) {
-                processCandidateBody(caller, msgData);
-            }
-            else {
-                if (!peerConns[caller]) {
-                    queuedMessages[caller] = {
-                        candidates: []
-                    };
-                }
-                queuedMessages[caller].candidates.push(msgData);
-            }
-        }
 
         switch (msgType) {
             case "sessionData":
@@ -5587,6 +5592,31 @@ var Easyrtc = function() {
         });
     }
 
+    //
+    // this is a support function for halfTrickIce support.
+    // it sends a message to the peer when ice collection has finished on this side.
+    // it is only invoked for peers that have sent us a supportHalfTrickIce message.
+    //
+    function checkIceGatheringState(otherPeer) {
+        console.log("entered checkIceGatheringState");
+        if( peerConns[otherPeer] && peerConns[otherPeer].pc && peerConns[otherPeer].pc.iceGatheringState ) {
+           if( peerConns[otherPeer].pc.iceGatheringState === "complete" ) {
+               self.sendPeerMessage(otherPeer, "iceGatheringDone", {});
+               console.log("sent iceGatherDone message to ", otherPeer);
+           } 
+           else {
+               setTimeout( function() {
+                  checkIceGatheringState(otherPeer); 
+               }, 500);
+           }
+        }
+        else { 
+           console.log("checkIceGatherState: leaving");
+           // peer left, ignore
+        }
+    }
+
+
     /**
      * Connects to the EasyRTC signaling server. You must connect before trying to
      * call other users.
@@ -5637,6 +5667,15 @@ var Easyrtc = function() {
                 self.showError(errorCode, errorText);
             };
         }
+
+        self.setPeerListener(function(easyrtcid, msgType, msgData, targeting){
+             console.log("received request to supportHalfIceTrickle");
+             if( peerConns[easyrtcid] ) {
+                peerConns[easyrtcid].supportHalfTrickleIce = true;
+                flushCachedCandidates(easyrtcid);
+                checkIceGatheringState(easyrtcid);
+             }
+        }, "supportHalfTrickleIce");
 
         connectToWSServer(successCallback, errorCallback);
     };
