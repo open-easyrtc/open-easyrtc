@@ -6507,7 +6507,7 @@ var Easyrtc = function() {
                     //
                     processCandicate(event.candidate.candidate);
 
-                    if (peerConns[otherUser].connectionAccepted && 
+                    if (peerConns[otherUser].connectionAccepted || 
                         peerConns[otherUser].supportHalfTrickleIce) {
 
                         sendSignalling(otherUser, "candidate", candidateData, null, function() {
