@@ -2173,6 +2173,8 @@ var Easyrtc = function() {
             var videoObj, triesLeft, tryToGetSize, ele;
             if (haveAudioVideo.video) {
                 videoObj = document.createElement('video');
+                videoObj.style.display = "none";
+                document.body.appendChild(videoObj);
                 videoObj.muted = true;
                 triesLeft = 30;
                 tryToGetSize = function() {
@@ -2192,9 +2194,7 @@ var Easyrtc = function() {
                             videoObj.removeNode(true);
                         }
                         else {
-                            ele = document.createElement('div');
-                            ele.appendChild(videoObj);
-                            ele.removeChild(videoObj);
+                            document.body.removeChild(videoObj);
                         }
 
                         updateConfigurationInfo();
