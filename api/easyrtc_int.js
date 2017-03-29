@@ -259,6 +259,52 @@ var Easyrtc = function() {
         return formatted;
     };
 
+
+
+    /** This method is used to trigger renegotiation, which is how you
+     * you update change the properties of an existing connection (such as the
+     * the bandwidth used. Before calling it, you modify your sdp filters
+     * to reflect the desired changes.
+     * @param otherUser the easyrtcid of the peer corresponding to the 
+     *  connection being updated. 
+     */
+    this.restartIce = function(otherUser) {
+        var peerConnObj =  peerConns[otherUser];
+        if(!peerConnObj) {
+            logDebug("Attempt to restartIce on nonexistant connection");
+            return;
+        }
+        var callFailureCB = peerConnObj.callFailureCB; 
+        var pc = peerConnObj.pc;
+
+        pc.addStream( this.getLocalStream());
+
+        var setLocalAndSendMessage0 = function(sessionDescription) {
+            if (peerConnObj.cancelled) {
+                return;
+            }
+            var sendOffer = function() {
+
+                sendSignalling(otherUser, "offer", sessionDescription, null, callFailureCB);
+            };
+            if (sdpLocalFilter) {
+                sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
+            }
+            pc.setLocalDescription(sessionDescription, sendOffer,
+                    function(errorText) {
+                        callFailureCB(self.errCodes.CALL_ERR, errorText);
+                    });
+        };
+
+        optionsUsed = {iceRestart:true};
+        pc.createOffer(setLocalAndSendMessage0, 
+           function(errorObj) {
+             callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(errorObj));
+           },
+           optionsUsed);
+
+    }
+
     /**
      * This function checks if a socket is actually connected.
      * @private
