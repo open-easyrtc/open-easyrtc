@@ -405,6 +405,15 @@ SDPUtils.writeRtpDescription = function(kind, caps) {
     sdp += SDPUtils.writeFmtp(codec);
     sdp += SDPUtils.writeRtcpFb(codec);
   });
+  var maxptime = 0;
+  caps.codecs.forEach(function(codec) {
+    if (codec.maxptime > maxptime) {
+      maxptime = codec.maxptime;
+    }
+  });
+  if (maxptime > 0) {
+    sdp += 'a=maxptime:' + maxptime + '\r\n';
+  }
   sdp += 'a=rtcp-mux\r\n';
 
   caps.headerExtensions.forEach(function(extension) {
@@ -451,7 +460,6 @@ SDPUtils.parseRtpEncodingParameters = function(mediaSection) {
         ssrc: primarySsrc,
         codecPayloadType: parseInt(codec.parameters.apt, 10),
         rtx: {
-          payloadType: codec.payloadType,
           ssrc: secondarySsrc
         }
       };
@@ -487,6 +495,61 @@ SDPUtils.parseRtpEncodingParameters = function(mediaSection) {
   return encodingParameters;
 };
 
+// parses http://draft.ortc.org/#rtcrtcpparameters*
+SDPUtils.parseRtcpParameters = function(mediaSection) {
+  var rtcpParameters = {};
+
+  var cname;
+  // Gets the first SSRC. Note that with RTX there might be multiple
+  // SSRCs.
+  var remoteSsrc = SDPUtils.matchPrefix(mediaSection, 'a=ssrc:')
+      .map(function(line) {
+        return SDPUtils.parseSsrcMedia(line);
+      })
+      .filter(function(obj) {
+        return obj.attribute === 'cname';
+      })[0];
+  if (remoteSsrc) {
+    rtcpParameters.cname = remoteSsrc.value;
+    rtcpParameters.ssrc = remoteSsrc.ssrc;
+  }
+
+  // Edge uses the compound attribute instead of reducedSize
+  // compound is !reducedSize
+  var rsize = SDPUtils.matchPrefix(mediaSection, 'a=rtcp-rsize');
+  rtcpParameters.reducedSize = rsize.length > 0;
+  rtcpParameters.compound = rsize.length === 0;
+
+  // parses the rtcp-mux attrіbute.
+  // Note that Edge does not support unmuxed RTCP.
+  var mux = SDPUtils.matchPrefix(mediaSection, 'a=rtcp-mux');
+  rtcpParameters.mux = mux.length > 0;
+
+  return rtcpParameters;
+};
+
+// parses either a=msid: or a=ssrc:... msid lines an returns
+// the id of the MediaStream and MediaStreamTrack.
+SDPUtils.parseMsid = function(mediaSection) {
+  var parts;
+  var spec = SDPUtils.matchPrefix(mediaSection, 'a=msid:');
+  if (spec.length === 1) {
+    parts = spec[0].substr(7).split(' ');
+    return {stream: parts[0], track: parts[1]};
+  }
+  var planB = SDPUtils.matchPrefix(mediaSection, 'a=ssrc:')
+  .map(function(line) {
+    return SDPUtils.parseSsrcMedia(line);
+  })
+  .filter(function(parts) {
+    return parts.attribute === 'msid';
+  });
+  if (planB.length > 0) {
+    parts = planB[0].value.split(' ');
+    return {stream: parts[0], track: parts[1]};
+  }
+};
+
 SDPUtils.writeSessionBoilerplate = function() {
   // FIXME: sess-id should be an NTP timestamp.
   return 'v=0\r\n' +
@@ -519,17 +582,31 @@ SDPUtils.writeMediaSection = function(transceiver, caps, type, stream) {
     sdp += 'a=inactive\r\n';
   }
 
-  // FIXME: for RTX there might be multiple SSRCs. Not implemented in Edge yet.
   if (transceiver.rtpSender) {
+    // spec.
     var msid = 'msid:' + stream.id + ' ' +
         transceiver.rtpSender.track.id + '\r\n';
     sdp += 'a=' + msid;
+
+    // for Chrome.
     sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
         ' ' + msid;
+    if (transceiver.sendEncodingParameters[0].rtx) {
+      sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].rtx.ssrc +
+          ' ' + msid;
+      sdp += 'a=ssrc-group:FID ' +
+          transceiver.sendEncodingParameters[0].ssrc + ' ' +
+          transceiver.sendEncodingParameters[0].rtx.ssrc +
+          '\r\n';
+    }
   }
   // FIXME: this should be written by writeRtpDescription.
   sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
       ' cname:' + SDPUtils.localCName + '\r\n';
+  if (transceiver.rtpSender && transceiver.sendEncodingParameters[0].rtx) {
+    sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].rtx.ssrc +
+        ' cname:' + SDPUtils.localCName + '\r\n';
+  }
   return sdp;
 };
 
@@ -552,6 +629,16 @@ SDPUtils.getDirection = function(mediaSection, sessionpart) {
     return SDPUtils.getDirection(sessionpart);
   }
   return 'sendrecv';
+};
+
+SDPUtils.getKind = function(mediaSection) {
+  var lines = SDPUtils.splitLines(mediaSection);
+  var mline = lines[0].split(' ');
+  return mline[0].substr(2);
+};
+
+SDPUtils.isRejected = function(mediaSection) {
+  return mediaSection.split(' ', 2)[1] === '0';
 };
 
 // Expose public methods.
@@ -609,6 +696,7 @@ module.exports = SDPUtils;
       chromeShim.shimSourceObject();
       chromeShim.shimPeerConnection();
       chromeShim.shimOnTrack();
+      chromeShim.shimGetSendersWithDtmf();
       break;
     case 'firefox':
       if (!firefoxShim || !firefoxShim.shimPeerConnection) {
@@ -707,6 +795,53 @@ var chromeShim = {
           }.bind(this));
         }
       });
+    }
+  },
+
+  shimGetSendersWithDtmf: function() {
+    if (typeof window === 'object' && window.RTCPeerConnection &&
+        !('getSenders' in RTCPeerConnection.prototype) &&
+        'createDTMFSender' in RTCPeerConnection.prototype) {
+      RTCPeerConnection.prototype.getSenders = function() {
+        return this._senders;
+      };
+      var origAddStream = RTCPeerConnection.prototype.addStream;
+      var origRemoveStream = RTCPeerConnection.prototype.removeStream;
+
+      RTCPeerConnection.prototype.addStream = function(stream) {
+        var pc = this;
+        pc._senders = pc._senders || [];
+        origAddStream.apply(pc, [stream]);
+        stream.getTracks().forEach(function(track) {
+          pc._senders.push({
+            track: track,
+            get dtmf() {
+              if (this._dtmf === undefined) {
+                if (track.kind === 'audio') {
+                  this._dtmf = pc.createDTMFSender(track);
+                } else {
+                  this._dtmf = null;
+                }
+              }
+              return this._dtmf;
+            }
+          });
+        });
+      };
+
+      RTCPeerConnection.prototype.removeStream = function(stream) {
+        var pc = this;
+        pc._senders = pc._senders || [];
+        origRemoveStream.apply(pc, [stream]);
+        stream.getTracks().forEach(function(track) {
+          var sender = pc._senders.find(function(s) {
+            return s.track === track;
+          });
+          if (sender) {
+            pc._senders.splice(pc._senders.indexOf(sender), 1); // remove sender
+          }
+        });
+      };
     }
   },
 
@@ -918,6 +1053,7 @@ var chromeShim = {
 module.exports = {
   shimMediaStream: chromeShim.shimMediaStream,
   shimOnTrack: chromeShim.shimOnTrack,
+  shimGetSendersWithDtmf: chromeShim.shimGetSendersWithDtmf,
   shimSourceObject: chromeShim.shimSourceObject,
   shimPeerConnection: chromeShim.shimPeerConnection,
   shimGetUserMedia: require('./getusermedia')
@@ -934,6 +1070,7 @@ module.exports = {
  /* eslint-env node */
 
 var logging = require('../utils.js').log;
+var browserDetails = require('../utils.js').browserDetails;
 
 // Expose public methods.
 module.exports = function() {
@@ -997,11 +1134,13 @@ module.exports = function() {
       // Shim facingMode for mobile, where it defaults to "user".
       var face = constraints.video.facingMode;
       face = face && ((typeof face === 'object') ? face : {ideal: face});
+      var getSupportedFacingModeLies = browserDetails.version < 59;
 
       if ((face && (face.exact === 'user' || face.exact === 'environment' ||
                     face.ideal === 'user' || face.ideal === 'environment')) &&
           !(navigator.mediaDevices.getSupportedConstraints &&
-            navigator.mediaDevices.getSupportedConstraints().facingMode)) {
+            navigator.mediaDevices.getSupportedConstraints().facingMode &&
+            !getSupportedFacingModeLies)) {
         delete constraints.video.facingMode;
         if (face.exact === 'environment' || face.ideal === 'environment') {
           // Look for "back" in label, or use last cam (typically back cam).
@@ -1075,6 +1214,12 @@ module.exports = function() {
             }));
           });
         });
+      },
+      getSupportedConstraints: function() {
+        return {
+          deviceId: true, echoCancellation: true, facingMode: true,
+          frameRate: true, height: true, width: true
+        };
       }
     };
   }
@@ -1137,6 +1282,64 @@ module.exports = function() {
 var SDPUtils = require('sdp');
 var browserDetails = require('../utils').browserDetails;
 
+// sort tracks such that they follow an a-v-a-v...
+// pattern.
+function sortTracks(tracks) {
+  var audioTracks = tracks.filter(function(track) {
+    return track.kind === 'audio';
+  });
+  var videoTracks = tracks.filter(function(track) {
+    return track.kind === 'video';
+  });
+  tracks = [];
+  while (audioTracks.length || videoTracks.length) {
+    if (audioTracks.length) {
+      tracks.push(audioTracks.shift());
+    }
+    if (videoTracks.length) {
+      tracks.push(videoTracks.shift());
+    }
+  }
+  return tracks;
+}
+
+// Edge does not like
+// 1) stun:
+// 2) turn: that does not have all of turn:host:port?transport=udp
+// 3) turn: with ipv6 addresses
+// 4) turn: occurring muliple times
+function filterIceServers(iceServers) {
+  var hasTurn = false;
+  iceServers = JSON.parse(JSON.stringify(iceServers));
+  return iceServers.filter(function(server) {
+    if (server && (server.urls || server.url)) {
+      var urls = server.urls || server.url;
+      var isString = typeof urls === 'string';
+      if (isString) {
+        urls = [urls];
+      }
+      urls = urls.filter(function(url) {
+        var validTurn = url.indexOf('turn:') === 0 &&
+            url.indexOf('transport=udp') !== -1 &&
+            url.indexOf('turn:[') === -1 &&
+            !hasTurn;
+
+        if (validTurn) {
+          hasTurn = true;
+          return true;
+        }
+        return url.indexOf('stun:') === 0 &&
+            browserDetails.version >= 14393;
+      });
+
+      delete server.url;
+      server.urls = isString ? urls[0] : urls;
+      return !!urls.length;
+    }
+    return false;
+  });
+}
+
 var edgeShim = {
   shimPeerConnection: function() {
     if (window.RTCIceGatherer) {
@@ -1156,17 +1359,20 @@ var edgeShim = {
         };
       }
       // this adds an additional event listener to MediaStrackTrack that signals
-      // when a tracks enabled property was changed.
-      var origMSTEnabled = Object.getOwnPropertyDescriptor(
-          MediaStreamTrack.prototype, 'enabled');
-      Object.defineProperty(MediaStreamTrack.prototype, 'enabled', {
-        set: function(value) {
-          origMSTEnabled.set.call(this, value);
-          var ev = new Event('enabled');
-          ev.enabled = value;
-          this.dispatchEvent(ev);
-        }
-      });
+      // when a tracks enabled property was changed. Workaround for a bug in
+      // addStream, see below. No longer required in 15025+
+      if (browserDetails.version < 15025) {
+        var origMSTEnabled = Object.getOwnPropertyDescriptor(
+            MediaStreamTrack.prototype, 'enabled');
+        Object.defineProperty(MediaStreamTrack.prototype, 'enabled', {
+          set: function(value) {
+            origMSTEnabled.set.call(this, value);
+            var ev = new Event('enabled');
+            ev.enabled = value;
+            this.dispatchEvent(ev);
+          }
+        });
+      }
     }
 
     window.RTCPeerConnection = function(config) {
@@ -1184,6 +1390,7 @@ var edgeShim = {
       this.onremovestream = null;
       this.onsignalingstatechange = null;
       this.oniceconnectionstatechange = null;
+      this.onicegatheringstatechange = null;
       this.onnegotiationneeded = null;
       this.ondatachannel = null;
 
@@ -1218,9 +1425,6 @@ var edgeShim = {
           case 'relay':
             this.iceOptions.gatherPolicy = config.iceTransportPolicy;
             break;
-          case 'none':
-            // FIXME: remove once implementation and spec have added this.
-            throw new TypeError('iceTransportPolicy "none" not supported');
           default:
             // don't set iceTransportPolicy.
             break;
@@ -1229,28 +1433,7 @@ var edgeShim = {
       this.usingBundle = config && config.bundlePolicy === 'max-bundle';
 
       if (config && config.iceServers) {
-        // Edge does not like
-        // 1) stun:
-        // 2) turn: that does not have all of turn:host:port?transport=udp
-        // 3) turn: with ipv6 addresses
-        var iceServers = JSON.parse(JSON.stringify(config.iceServers));
-        this.iceOptions.iceServers = iceServers.filter(function(server) {
-          if (server && server.urls) {
-            var urls = server.urls;
-            if (typeof urls === 'string') {
-              urls = [urls];
-            }
-            urls = urls.filter(function(url) {
-              return (url.indexOf('turn:') === 0 &&
-                  url.indexOf('transport=udp') !== -1 &&
-                  url.indexOf('turn:[') === -1) ||
-                  (url.indexOf('stun:') === 0 &&
-                    browserDetails.version >= 14393);
-            })[0];
-            return !!urls;
-          }
-          return false;
-        });
+        this.iceOptions.iceServers = filterIceServers(config.iceServers);
       }
       this._config = config;
 
@@ -1262,6 +1445,14 @@ var edgeShim = {
       // must not emit candidates until after setLocalDescription we buffer
       // them in this array.
       this._localIceCandidatesBuffer = [];
+    };
+
+    window.RTCPeerConnection.prototype._emitGatheringStateChange = function() {
+      var event = new Event('icegatheringstatechange');
+      this.dispatchEvent(event);
+      if (this.onicegatheringstatechange !== null) {
+        this.onicegatheringstatechange(event);
+      }
     };
 
     window.RTCPeerConnection.prototype._emitBufferedCandidates = function() {
@@ -1291,8 +1482,9 @@ var edgeShim = {
             return transceiver.iceGatherer &&
                 transceiver.iceGatherer.state === 'completed';
           });
-          if (complete) {
+          if (complete && self.iceGatheringStateChange !== 'complete') {
             self.iceGatheringState = 'complete';
+            self._emitGatheringStateChange();
           }
         }
       });
@@ -1304,16 +1496,21 @@ var edgeShim = {
     };
 
     window.RTCPeerConnection.prototype.addStream = function(stream) {
-      // Clone is necessary for local demos mostly, attaching directly
-      // to two different senders does not work (build 10547).
-      var clonedStream = stream.clone();
-      stream.getTracks().forEach(function(track, idx) {
-        var clonedTrack = clonedStream.getTracks()[idx];
-        track.addEventListener('enabled', function(event) {
-          clonedTrack.enabled = event.enabled;
+      if (browserDetails.version >= 15025) {
+        this.localStreams.push(stream);
+      } else {
+        // Clone is necessary for local demos mostly, attaching directly
+        // to two different senders does not work (build 10547).
+        // Fixed in 15025 (or earlier)
+        var clonedStream = stream.clone();
+        stream.getTracks().forEach(function(track, idx) {
+          var clonedTrack = clonedStream.getTracks()[idx];
+          track.addEventListener('enabled', function(event) {
+            clonedTrack.enabled = event.enabled;
+          });
         });
-      });
-      this.localStreams.push(clonedStream);
+        this.localStreams.push(clonedStream);
+      }
       this._maybeFireNegotiationNeeded();
     };
 
@@ -1351,11 +1548,39 @@ var edgeShim = {
             headerExtensions: [],
             fecMechanisms: []
           };
+
+          var findCodecByPayloadType = function(pt, codecs) {
+            pt = parseInt(pt, 10);
+            for (var i = 0; i < codecs.length; i++) {
+              if (codecs[i].payloadType === pt ||
+                  codecs[i].preferredPayloadType === pt) {
+                return codecs[i];
+              }
+            }
+          };
+
+          var rtxCapabilityMatches = function(lRtx, rRtx, lCodecs, rCodecs) {
+            var lCodec = findCodecByPayloadType(lRtx.parameters.apt, lCodecs);
+            var rCodec = findCodecByPayloadType(rRtx.parameters.apt, rCodecs);
+            return lCodec && rCodec &&
+                lCodec.name.toLowerCase() === rCodec.name.toLowerCase();
+          };
+
           localCapabilities.codecs.forEach(function(lCodec) {
             for (var i = 0; i < remoteCapabilities.codecs.length; i++) {
               var rCodec = remoteCapabilities.codecs[i];
               if (lCodec.name.toLowerCase() === rCodec.name.toLowerCase() &&
                   lCodec.clockRate === rCodec.clockRate) {
+                if (lCodec.name.toLowerCase() === 'rtx' &&
+                    lCodec.parameters && rCodec.parameters.apt) {
+                  // for RTX we need to find the local rtx that has a apt
+                  // which points to the same local codec as the remote one.
+                  if (!rtxCapabilityMatches(lCodec, rCodec,
+                      localCapabilities.codecs, remoteCapabilities.codecs)) {
+                    continue;
+                  }
+                }
+                rCodec = JSON.parse(JSON.stringify(rCodec)); // deepcopy
                 // number of channels is the highest common number of channels
                 rCodec.numChannels = Math.min(lCodec.numChannels,
                     rCodec.numChannels);
@@ -1463,6 +1688,7 @@ var edgeShim = {
                     self.onicecandidate(new Event('icecandidate'));
                   }
                   self.iceGatheringState = 'complete';
+                  self._emitGatheringStateChange();
                 }
                 break;
               case 'complete':
@@ -1511,7 +1737,8 @@ var edgeShim = {
       if (recv && transceiver.rtpReceiver) {
         // remove RTX field in Edge 14942
         if (transceiver.kind === 'video'
-            && transceiver.recvEncodingParameters) {
+            && transceiver.recvEncodingParameters
+            && browserDetails.version < 15019) {
           transceiver.recvEncodingParameters.forEach(function(p) {
             delete p.rtx;
           });
@@ -1619,6 +1846,7 @@ var edgeShim = {
               cb();
               if (self.iceGatheringState === 'new') {
                 self.iceGatheringState = 'gathering';
+                self._emitGatheringStateChange();
               }
               self._emitBufferedCandidates();
             }, 0);
@@ -1628,6 +1856,7 @@ var edgeShim = {
             if (!hasCallback) {
               if (self.iceGatheringState === 'new') {
                 self.iceGatheringState = 'gathering';
+                self._emitGatheringStateChange();
               }
               // Usually candidates will be emitted earlier.
               window.setTimeout(self._emitBufferedCandidates.bind(self), 500);
@@ -1733,22 +1962,27 @@ var edgeShim = {
 
               // filter RTX until additional stuff needed for RTX is implemented
               // in adapter.js
-              localCapabilities.codecs = localCapabilities.codecs.filter(
-                  function(codec) {
-                    return codec.name !== 'rtx';
-                  });
+              if (browserDetails.version < 15019) {
+                localCapabilities.codecs = localCapabilities.codecs.filter(
+                    function(codec) {
+                      return codec.name !== 'rtx';
+                    });
+              }
 
               sendEncodingParameters = [{
                 ssrc: (2 * sdpMLineIndex + 2) * 1001
               }];
 
-              rtpReceiver = new RTCRtpReceiver(transports.dtlsTransport, kind);
+              if (direction === 'sendrecv' || direction === 'sendonly') {
+                rtpReceiver = new RTCRtpReceiver(transports.dtlsTransport,
+                    kind);
 
-              track = rtpReceiver.track;
-              receiverList.push([track, rtpReceiver]);
-              // FIXME: not correct when there are multiple streams but that is
-              // not currently supported in this shim.
-              stream.addTrack(track);
+                track = rtpReceiver.track;
+                receiverList.push([track, rtpReceiver]);
+                // FIXME: not correct when there are multiple streams but that
+                // is not currently supported in this shim.
+                stream.addTrack(track);
+              }
 
               // FIXME: look at direction.
               if (self.localStreams.length > 0 &&
@@ -1760,6 +1994,12 @@ var edgeShim = {
                   localTrack = self.localStreams[0].getVideoTracks()[0];
                 }
                 if (localTrack) {
+                  // add RTX
+                  if (browserDetails.version >= 15019 && kind === 'video') {
+                    sendEncodingParameters[0].rtx = {
+                      ssrc: (2 * sdpMLineIndex + 2) * 1001 + 1
+                    };
+                  }
                   rtpSender = new RTCRtpSender(localTrack,
                       transports.dtlsTransport);
                 }
@@ -2030,6 +2270,8 @@ var edgeShim = {
           numVideoTracks--;
         }
       }
+      // reorder tracks
+      tracks = sortTracks(tracks);
 
       var sdp = SDPUtils.writeSessionBoilerplate();
       var transceivers = [];
@@ -2049,10 +2291,12 @@ var edgeShim = {
         var localCapabilities = RTCRtpSender.getCapabilities(kind);
         // filter RTX until additional stuff needed for RTX is implemented
         // in adapter.js
-        localCapabilities.codecs = localCapabilities.codecs.filter(
-            function(codec) {
-              return codec.name !== 'rtx';
-            });
+        if (browserDetails.version < 15019) {
+          localCapabilities.codecs = localCapabilities.codecs.filter(
+              function(codec) {
+                return codec.name !== 'rtx';
+              });
+        }
         localCapabilities.codecs.forEach(function(codec) {
           // work around https://bugs.chromium.org/p/webrtc/issues/detail?id=6552
           // by adding level-asymmetry-allowed=1
@@ -2070,6 +2314,12 @@ var edgeShim = {
           ssrc: (2 * sdpMLineIndex + 1) * 1001
         }];
         if (track) {
+          // add RTX
+          if (browserDetails.version >= 15019 && kind === 'video') {
+            sendEncodingParameters[0].rtx = {
+              ssrc: (2 * sdpMLineIndex + 1) * 1001 + 1
+            };
+          }
           rtpSender = new RTCRtpSender(track, transports.dtlsTransport);
         }
 
@@ -2206,14 +2456,13 @@ var edgeShim = {
       var cb = arguments.length > 1 && typeof arguments[1] === 'function' &&
           arguments[1];
       var fixStatsType = function(stat) {
-        stat.type = {
+        return {
           inboundrtp: 'inbound-rtp',
           outboundrtp: 'outbound-rtp',
           candidatepair: 'candidate-pair',
           localcandidate: 'local-candidate',
           remotecandidate: 'remote-candidate'
         }[stat.type] || stat.type;
-        return stat;
       };
       return new Promise(function(resolve) {
         // shim getStats with maplike support
@@ -2648,7 +2897,17 @@ var safariShim = {
   // shimPeerConnection: function() { },
 
   shimGetUserMedia: function() {
-    navigator.getUserMedia = navigator.webkitGetUserMedia;
+    if (!navigator.getUserMedia) {
+      if (navigator.webkitGetUserMedia) {
+        navigator.getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
+      } else if (navigator.mediaDevices &&
+          navigator.mediaDevices.getUserMedia) {
+        navigator.getUserMedia = function(constraints, cb, errcb) {
+          navigator.mediaDevices.getUserMedia(constraints)
+          .then(cb, errcb);
+        }.bind(navigator);
+      }
+    }
   }
 };
 
@@ -2731,52 +2990,36 @@ var utils = {
     if (navigator.mozGetUserMedia) {
       result.browser = 'firefox';
       result.version = this.extractVersion(navigator.userAgent,
-          /Firefox\/([0-9]+)\./, 1);
-
-    // all webkit-based browsers
+          /Firefox\/(\d+)\./, 1);
     } else if (navigator.webkitGetUserMedia) {
       // Chrome, Chromium, Webview, Opera, all use the chrome shim for now
       if (window.webkitRTCPeerConnection) {
         result.browser = 'chrome';
         result.version = this.extractVersion(navigator.userAgent,
-          /Chrom(e|ium)\/([0-9]+)\./, 2);
-
-      // Safari or unknown webkit-based
-      // for the time being Safari has support for MediaStreams but not webRTC
-      } else {
-        // Safari UA substrings of interest for reference:
-        // - webkit version:           AppleWebKit/602.1.25 (also used in Op,Cr)
-        // - safari UI version:        Version/9.0.3 (unique to Safari)
-        // - safari UI webkit version: Safari/601.4.4 (also used in Op,Cr)
-        //
-        // if the webkit version and safari UI webkit versions are equals,
-        // ... this is a stable version.
-        //
-        // only the internal webkit version is important today to know if
-        // media streams are supported
-        //
+          /Chrom(e|ium)\/(\d+)\./, 2);
+      } else { // Safari (in an unpublished version) or unknown webkit-based.
         if (navigator.userAgent.match(/Version\/(\d+).(\d+)/)) {
           result.browser = 'safari';
           result.version = this.extractVersion(navigator.userAgent,
-            /AppleWebKit\/([0-9]+)\./, 1);
-
-        // unknown webkit-based browser
-        } else {
+            /AppleWebKit\/(\d+)\./, 1);
+        } else { // unknown webkit-based browser.
           result.browser = 'Unsupported webkit-based browser ' +
               'with GUM support but no WebRTC support.';
           return result;
         }
       }
-
-    // Edge.
     } else if (navigator.mediaDevices &&
-        navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
+        navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) { // Edge.
       result.browser = 'edge';
       result.version = this.extractVersion(navigator.userAgent,
           /Edge\/(\d+).(\d+)$/, 2);
-
-    // Default fallthrough: not supported.
-    } else {
+    } else if (navigator.mediaDevices &&
+        navigator.userAgent.match(/AppleWebKit\/(\d+)\./)) {
+        // Safari, with webkitGetUserMedia removed.
+      result.browser = 'safari';
+      result.version = this.extractVersion(navigator.userAgent,
+          /AppleWebKit\/(\d+)\./, 1);
+    } else { // Default fallthrough: not supported.
       result.browser = 'Not a supported browser.';
       return result;
     }
@@ -2823,6 +3066,15 @@ var utils = {
         return dsc.set.apply(this, [url]);
       }
     });
+
+    var nativeSetAttribute = HTMLMediaElement.prototype.setAttribute;
+    HTMLMediaElement.prototype.setAttribute = function() {
+      if (arguments.length === 2 &&
+          ('' + arguments[0]).toLowerCase() === 'src') {
+        this.srcObject = streams.get(arguments[1]) || null;
+      }
+      return nativeSetAttribute.apply(this, arguments);
+    };
   }
 };
 
@@ -2832,7 +3084,8 @@ module.exports = {
   disableLog: utils.disableLog,
   browserDetails: utils.detectBrowser(),
   extractVersion: utils.extractVersion,
-  shimCreateObjectURL: utils.shimCreateObjectURL
+  shimCreateObjectURL: utils.shimCreateObjectURL,
+  detectBrowser: utils.detectBrowser.bind(utils)
 };
 
 },{}]},{},[2])(2)
@@ -3107,16 +3360,20 @@ var Easyrtc = function() {
      * @param otherUser the easyrtcid of the peer corresponding to the 
      *  connection being updated. 
      */
-    this.restartIce = function(otherUser) {
+    this.renegotiate = function(otherUser) {
         var peerConnObj =  peerConns[otherUser];
         if(!peerConnObj) {
-            logDebug("Attempt to restartIce on nonexistant connection");
+            logDebug("Attempt to renegotiate ice on nonexistant connection");
             return;
         }
         var callFailureCB = peerConnObj.callFailureCB; 
         var pc = peerConnObj.pc;
 
-        pc.addStream( this.getLocalStream());
+        var streams = pc.getLocalStreams();
+        var i;
+        for( i = 0; i < streams.length; i++ ) {
+           pc.addStream( streams[i]);
+        }
 
         var setLocalAndSendMessage0 = function(sessionDescription) {
             if (peerConnObj.cancelled) {
@@ -3652,18 +3909,10 @@ var Easyrtc = function() {
             constraints.audio = false;
         }
         else {
-            if (adapter && adapter.browserDetails && adapter.browserDetails.browser === "firefox") {
-                constraints.audio = {};
-                if (self._desiredAudioProperties.audioSrcId) {
-                    constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
-                }
-            }
-            else { // chrome and opera
-                constraints.audio = {mandatory: {}, optional: []};
-                if (self._desiredAudioProperties.audioSrcId) {
-                    constraints.audio.optional = constraints.audio.optional || [];
-                    constraints.audio.optional.push({deviceId: self._desiredAudioProperties.audioSrcId});
-                }
+            constraints.audio = {};
+            if (self._desiredAudioProperties.audioSrcId) {
+            //    constraints.audio.deviceId = {exact: self._desiredAudioProperties.audioSrcId};
+             constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
             }
         }
         return constraints;

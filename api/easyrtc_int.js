@@ -268,16 +268,20 @@ var Easyrtc = function() {
      * @param otherUser the easyrtcid of the peer corresponding to the 
      *  connection being updated. 
      */
-    this.restartIce = function(otherUser) {
+    this.renegotiate = function(otherUser) {
         var peerConnObj =  peerConns[otherUser];
         if(!peerConnObj) {
-            logDebug("Attempt to restartIce on nonexistant connection");
+            logDebug("Attempt to renegotiate ice on nonexistant connection");
             return;
         }
         var callFailureCB = peerConnObj.callFailureCB; 
         var pc = peerConnObj.pc;
 
-        pc.addStream( this.getLocalStream());
+        var streams = pc.getLocalStreams();
+        var i;
+        for( i = 0; i < streams.length; i++ ) {
+           pc.addStream( streams[i]);
+        }
 
         var setLocalAndSendMessage0 = function(sessionDescription) {
             if (peerConnObj.cancelled) {
@@ -813,18 +817,10 @@ var Easyrtc = function() {
             constraints.audio = false;
         }
         else {
-            if (adapter && adapter.browserDetails && adapter.browserDetails.browser === "firefox") {
-                constraints.audio = {};
-                if (self._desiredAudioProperties.audioSrcId) {
-                    constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
-                }
-            }
-            else { // chrome and opera
-                constraints.audio = {mandatory: {}, optional: []};
-                if (self._desiredAudioProperties.audioSrcId) {
-                    constraints.audio.optional = constraints.audio.optional || [];
-                    constraints.audio.optional.push({deviceId: self._desiredAudioProperties.audioSrcId});
-                }
+            constraints.audio = {};
+            if (self._desiredAudioProperties.audioSrcId) {
+            //    constraints.audio.deviceId = {exact: self._desiredAudioProperties.audioSrcId};
+             constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
             }
         }
         return constraints;
