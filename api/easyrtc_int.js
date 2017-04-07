@@ -1379,7 +1379,7 @@ var Easyrtc = function() {
     }
 
     /** @private */
-    var roomApiFieldTimer = null;
+    var roomApiFieldTimer= {};
 
     /**
      * @private
@@ -1390,10 +1390,10 @@ var Easyrtc = function() {
         // Rather than issue the send request immediately, we set a timer so we can accumulate other
         // calls
         //
-        if (roomApiFieldTimer) {
-            clearTimeout(roomApiFieldTimer);
+        if (roomApiFieldTimer[roomName]) {
+            clearTimeout(roomApiFieldTimer[roomName]);
         }
-        roomApiFieldTimer = setTimeout(function() {
+        roomApiFieldTimer[roomName] = setTimeout(function() {
             sendRoomApiFields(roomName, self._roomApiFields[roomName]);
             roomApiFieldTimer = null;
         }, 10);
