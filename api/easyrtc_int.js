@@ -1395,7 +1395,7 @@ var Easyrtc = function() {
         }
         roomApiFieldTimer[roomName] = setTimeout(function() {
             sendRoomApiFields(roomName, self._roomApiFields[roomName]);
-            roomApiFieldTimer = null;
+            roomApiFieldTimer[roomName] = null;
         }, 10);
     }
 
