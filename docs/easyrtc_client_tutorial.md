@@ -256,7 +256,7 @@ because there won't be any automatically added hangup buttons. The HTML ends up 
          <body onload="my_init()">
             <div id="otherClients"> </div>
             <video style="float:left" id="self" width="300" height="200"></video>
-            <video style="float:left" id="caller" width="300" height="200">/video>
+            <video style="float:left" id="caller" width="300" height="200"></video>
         </body>
     </html>
 
