@@ -7297,6 +7297,7 @@ var Easyrtc = function() {
             pc.createAnswer(setLocalAndSendMessage1,
                 function(message) {
                     self.showError(self.errCodes.INTERNAL_ERR, "create-answer: " + message);
+                    hangupBody(caller);
                 },
                 receivedMediaConstraints);
         };
@@ -7754,6 +7755,7 @@ var Easyrtc = function() {
                pc.createAnswer(setLocalAndSendMessage1,
                     function(message) {
                         self.showError(self.errCodes.INTERNAL_ERR, "create-answer: " + message);
+                        hangupBody(easyrtcid);
                     },
                     receivedMediaConstraints);
             };
