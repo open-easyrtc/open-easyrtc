@@ -876,7 +876,7 @@ var Easyrtc = function() {
      * @returns {Boolean} True getUserMedia is supported.
      */
     this.supportsGetUserMedia = function() {
-        return typeof navigator.getUserMedia !== 'undefined';
+        return typeof navigator.mediaDevices.getUserMedia !== 'undefined';
     };
 
     /**
@@ -2303,11 +2303,7 @@ var Easyrtc = function() {
             var currentTime = getCurrentTime();
             if (currentTime < firstCallTime + 1000) {
                 logDebug("Trying getUserMedia a second time");
-                try {
-                    navigator.getUserMedia(mode, onUserMediaSuccess, onUserMediaError);
-                } catch (e) {
-                    onUserMediaError(err);
-                }
+                navigator.mediaDevices.getUserMedia(mode).then(onUserMediaSuccess).catch(onUserMediaError);
             }
             else {
                 onUserMediaError(err);
@@ -2319,12 +2315,8 @@ var Easyrtc = function() {
         // issue. So I'm going to try adding a 1 second delay to allow things to settle down first.
         // In addition, I'm going to try again after 3 seconds.
         //
-        try {
-            firstCallTime = getCurrentTime();
-            navigator.getUserMedia(mode, onUserMediaSuccess, tryAgain);
-        } catch (err) {
-            tryAgain(err);
-        }
+        firstCallTime = getCurrentTime();
+        navigator.mediaDevices.getUserMedia(mode).then(onUserMediaSuccess).catch(tryAgain);
     };
 
     /**
