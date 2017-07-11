@@ -1,4 +1,4 @@
-/// <reference path="../DefinitelyTyped/webrtc/RTCPeerConnection.d.ts" />
+declare type RTCPeerConnectionConfig = any;
 
 declare class Easyrtc_ReceivedMediaConstraints {
     offerToReceiveAudio:boolean;
