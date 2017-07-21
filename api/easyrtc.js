@@ -5912,12 +5912,12 @@ var Easyrtc = function() {
         if (stream && stream !== "") {
             element.autoplay = true;
 
-            if (typeof element.src !== 'undefined') {
-                element.src = self.createObjectURL(stream);
-            } else if (typeof element.srcObject !== 'undefined') {
+            if (typeof element.srcObject !== 'undefined') {
                 element.srcObject = stream;
             } else if (typeof element.mozSrcObject !== 'undefined') {
                 element.mozSrcObject = self.createObjectURL(stream);
+            } else if (typeof element.src !== 'undefined') {
+                element.src = self.createObjectURL(stream);
             }
         }
         else {
