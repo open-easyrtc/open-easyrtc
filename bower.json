@@ -30,11 +30,8 @@
     "server_example"
   ],
   "devDependencies": {
-    "webrtc-adapter": "gh-pages",
+    "webrtc-adapter": "4.1.1",
     "jasmine": "~2.2.1",
     "requirejs": "~2.1.16"
-  },
-  "resolutions": {
-    "webrtc-adapter": "^3.3.4"
   }
 }
