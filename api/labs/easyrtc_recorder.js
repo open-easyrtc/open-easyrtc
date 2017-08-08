@@ -93,6 +93,8 @@
    };
 
    var mimeType;
+   var audioBitRate;
+   var videoBitRate;
 
    /**
      * Set the desired codec for the video encoding. 
@@ -114,6 +116,20 @@
        }
    };
 
+   /** Sets the target bit rate of the audio encoder. 
+     * @param bitrate bits per second
+     */
+   easyrtc.setRecordingAudioBitRate = function(bitRate) {
+      audioBitRate = bitRate;
+   }
+
+   /** Sets the target bit rate of the video encoder. 
+     * @param bitrate bits per second
+     */
+   easyrtc.setRecordingVideoBitRate = function(bitRate) {
+      videoBitRate = bitRate;
+   }
+
    if( easyrtc.supportsRecording()) {
        easyrtc.setRecordingVideoCodec("vp8");
    }
@@ -132,7 +148,17 @@
            return null;
         }
 
-        var mediaRecorder = new MediaRecorder(mediaStream, {mimeType: mimeType});
+        var recorderOptions = { mimeType:mimeType};
+
+        if( audioBitRate ) {
+               recorderOptions.audioBitsPerSecond = audioBitRate;
+        }
+
+        if( videoBitRate ) {
+               recorderOptions.videoBitsPerSecond = videoBitRate;
+        }
+
+        var mediaRecorder = new MediaRecorder(mediaStream, recorderOptions);
         if( !mediaRecorder ) {
            console.log("no media recorder");
            return;
