@@ -1,14 +1,32 @@
 EasyRTC: Change Log
 ===================
 
-v1.1.1-beta
+v1.1.1
 -------
 New Features:
+  - Documentation - Added explanation on why native clients aren't provided.
+  - JS Client - Added restart ice.
+  - JS Client - Added support for Half-trickle ice.
+  - Server - Added methods to obtain connected easyrtcids with a given username.
+  - JS Client - Pass stillAliveInterval from server. detect lack of still alive response on client.
+  - JS Client - Better support for Cordova on iOS.
 
 Changes:
+  - JS Client - URL.createObjectURL was deprecated.
+  - JS Client - Changes to typescript files.
+  - JS Client - Updated use of navigator.GetUserMedia.
+  - JS Client - Got rid of multistream_no_iframe demo since we don't have a plugin for it.
+  - JS Client - Applied Chpasha's fix to support Temasys plugin.
+  - JS Client - Updated webrtc-adapter and modified demo_multistream.
+  - JS Client - fix Uncaught TypeError: Reduce of empty array with no initial value.
+  - Server - New disconnect() function from sever code's connection object to allow for more graceful connections.
 
 Fixes:
-
+  - JS Client - Fix possible bad PeerConnection state on create-answer failure.
+  - JS Client - RoomApiFieldTimer was being cleared instead of an element of it.
+  - JS Client - Got rid of warning message about element not connected to root.
+  - JS Client - fixed SessionDescription bug and IceCandidate bug.
+  - Server - Fix issue where server's connectionObj.getUsername() didn't return a null if the connection object had no username.
 
 v1.1.0
 -------
