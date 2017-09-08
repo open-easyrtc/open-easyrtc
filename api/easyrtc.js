@@ -4222,6 +4222,27 @@ var Easyrtc = function() {
     };
 
 
+    //
+    // this private method handles adding a stream to a peer connection.
+    // chrome only supports adding streams, safari only supports adding
+    // tracks. 
+    //
+    function addStreamToPeerConnection(stream, peerConnection) {
+       if( peerConnection.addStream ) {
+           peerConnection.addStream(stream);
+       }
+       else {
+          var tracks = stream.getAudioTracks();
+          var i;
+          for( i = 0; i < tracks.length; i++ ) {
+             peerConnection.addTrack( tracks[i]);
+          }
+          tracks = stream.getVideoTracks();
+          for( i = 0; i < tracks.length; i++ ) {
+             peerConnection.addTrack( tracks[i]);
+          }
+       }
+    }
 
     /** This method is used to trigger renegotiation, which is how you
      * you update change the properties of an existing connection (such as the
@@ -4242,7 +4263,7 @@ var Easyrtc = function() {
         var streams = pc.getLocalStreams();
         var i;
         for( i = 0; i < streams.length; i++ ) {
-           pc.addStream( streams[i]);
+           addStreamToPeerConnection(streams[i], pc);
         }
 
         var setLocalAndSendMessage0 = function(sessionDescription) {
@@ -4263,11 +4284,10 @@ var Easyrtc = function() {
         };
 
         optionsUsed = {iceRestart:true};
-        pc.createOffer(setLocalAndSendMessage0, 
-           function(errorObj) {
-             callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(errorObj));
-           },
-           optionsUsed);
+        pc.createOffer(optionsUsed).then(setLocalAndSendMessage0)
+             .catch( function(reason) {
+             callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(reason));
+           });
 
     }
 
@@ -5963,8 +5983,6 @@ var Easyrtc = function() {
                 element.src = self.createObjectURL(stream);
             } else if (typeof element.mozSrcObject !== 'undefined') {
                 element.mozSrcObject = self.createObjectURL(stream);
-            } else if (typeof element.src !== 'undefined') {
-                element.src = self.createObjectURL(stream);
             }
         }
         else {
@@ -6830,7 +6848,6 @@ var Easyrtc = function() {
         self.emitEvent("roomOccupant", {});
         self.roomData = {};
         self.roomJoin = {};
-        self._roomApiFields = {};
         self.loggingOut = false;
         self.myEasyrtcid = null;
         self.disconnecting = false;
@@ -7709,7 +7726,7 @@ var Easyrtc = function() {
             for (i = 0; i < streamNames.length; i++) {
                 stream = getLocalMediaStreamByName(streamNames[i]);
                 if (stream) {
-                    pc.addStream(stream);
+                    addStreamToPeerConnection(stream, pc);
                 }
                 else {
                     logDebug("Developer error, attempt to access unknown local media stream " + streamNames[i]);
@@ -7718,7 +7735,7 @@ var Easyrtc = function() {
         }
         else if (autoInitUserMedia && (self.videoEnabled || self.audioEnabled)) {
             stream = self.getLocalStream();
-            pc.addStream(stream);
+            addStreamToPeerConnection(stream, pc);
         }
 
         //
@@ -7994,12 +8011,11 @@ var Easyrtc = function() {
             if (newPeerConn.cancelled) {
                 return;
             }
-            pc.createAnswer(setLocalAndSendMessage1,
-                function(message) {
-                    self.showError(self.errCodes.INTERNAL_ERR, "create-answer: " + message);
-                    hangupBody(caller);
-                },
-                receivedMediaConstraints);
+            pc.createAnswer(receivedMediaConstraints)
+                 .then(setLocalAndSendMessage1)
+                 .catch( function(reason) {
+                    self.showError(self.errCodes.INTERNAL_ERR, "create-answer: " + reason);
+                });
         };
 
         logDebug("about to call setRemoteDescription in doAnswer");
@@ -8102,10 +8118,15 @@ var Easyrtc = function() {
             if( !peerConns[otherUser]) {
                 return;
             }
-            pc.createOffer(setLocalAndSendMessage0, function(errorObj) {
-                peerConnObj.callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(errorObj));
-            },
-                    receivedMediaConstraints);
+
+            pc.createOffer(receivedMediaConstraints)
+                 .then(setLocalAndSendMessage0)
+                 .catch(
+                   function(errorObj) {
+                     peerConnObj.callFailureCB(self.errCodes.CALL_ERR, 
+                        JSON.stringify(errorObj));
+                   }
+                  );
         }, 100);
     }
 
@@ -8219,8 +8240,7 @@ var Easyrtc = function() {
         if (stream.active === true || stream.ended === false)  {
             isActive = true;
         } else {
-            var tracks = stream.getTracks();
-            isActive = tracks.length > 0 && tracks.reduce(function (track) {
+            isActive = stream.getTracks().reduce(function (track) {
                 return track.enabled;
             });
         }
@@ -8414,7 +8434,7 @@ var Easyrtc = function() {
         else {
             var pc = peerConns[easyrtcId].pc;
             peerConns[easyrtcId].enableNegotiateListener = true;
-            pc.addStream(stream);
+            addStreamToPeerConnection(stream, pc);
             if (receiptHandler) {
                 peerConns[easyrtcId].streamsAddedAcks[streamName] = receiptHandler;
             }
