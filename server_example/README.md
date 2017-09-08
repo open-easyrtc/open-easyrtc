@@ -8,6 +8,8 @@ Files and Folders:
 
  - package.json - Provides project information allowing npm to find and install required modules.
  - server.js - Server code.
+ - server_ssl.js - Server code for doing ssl using included keys, for testing purposes.
+ - localhost.(key/crt) - self-signed keys for local host.
  - /static/ - Root folder for web server. Put html files here!
 
  
