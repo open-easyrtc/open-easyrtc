@@ -14,10 +14,10 @@
 
     <body onload="appInit()">
         <div id="fullpage"  class="boxCommon" style="background-image:url(images/irongrip.png)">
-            <video id="box0" class="transit boxCommon thumbCommon easyrtcMirror" muted="muted" volume="0" ></video>
-            <video id="box1" class="transit boxCommon thumbCommon" style="visibility:hidden"></video>
-            <video id="box2" class="transit boxCommon thumbCommon" style="visibility:hidden"></video>
-            <video id="box3" class="transit boxCommon thumbCommon" style="visibility:hidden"></video>
+            <video id="box0" class="transit boxCommon thumbCommon easyrtcMirror" muted="muted" volume="0" autoplay="autoplay" playsinline="playsinline"></video>
+            <video id="box1" class="transit boxCommon thumbCommon" style="visibility:hidden" autoplay="autoplay" playsinline="playsinline"></video>
+            <video id="box2" class="transit boxCommon thumbCommon" style="visibility:hidden" autoplay="autoplay" playsinline="playsinline"></video>
+            <video id="box3" class="transit boxCommon thumbCommon" style="visibility:hidden" autoplay="autoplay" playsinline="playsinline"></video>
             <div id="textentryBox" onsubmit="sendText()" style="display:none" >
                 <input type="text" id="textentryField"  class="transit boxcommon" /><br>
                 <button id="textentrySubmit" style="float:right;margin-right:1em" onclick="sendText()">Send</button>
