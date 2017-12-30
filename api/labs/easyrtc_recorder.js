@@ -49,11 +49,16 @@
 
 "use strict";
 
-    /**
-     * Provides methods for building MediaStream recorders.
-     * @class Easyrtc_Recorder
-     */
-
+  /**
+   * Provides methods for building MediaStream recorders.
+   * @class Easyrtc_Recorder
+   */
+   
+   function trace(message, obj) {
+        if (easyrtc.debugPrinter) {
+            easyrtc.debugPrinter(message, obj);
+        }
+    }
 
    /**
      * Determines if recording is supported by the browser. 
@@ -144,7 +149,7 @@
     function startRecording( mediaStream) {
 
         if( !easyrtc.supportsRecording ) {
-           console.log("recording not supported by your browser");
+           trace("recording not supported by your browser");
            return null;
         }
 
@@ -160,25 +165,25 @@
 
         var mediaRecorder = new MediaRecorder(mediaStream, recorderOptions);
         if( !mediaRecorder ) {
-           console.log("no media recorder");
+           trace("no media recorder");
            return;
         }
         mediaRecorder.start();
 
         mediaRecorder.onerror = function(e) {
-           console.log("Media recording error:", e);
+           trace("Media recording error:", e);
         };
 
         mediaRecorder.onwarning = function(e) {
-           console.log("Media recording error:", e);
+           trace("Media recording error:", e);
         };
     
         mediaRecorder.onstart = function(e) {
-           console.log("Media recording started");
+           trace("Media recording started");
         };
 
         mediaRecorder.onstop = function(e) {
-           console.log("Media recording stopped");
+           trace("Media recording stopped");
         };
 
         return mediaRecorder;

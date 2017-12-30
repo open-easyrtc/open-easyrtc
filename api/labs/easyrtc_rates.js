@@ -68,8 +68,11 @@
         var videoSendCodec = options.videoSendCodec || '';
         var videoRecvCodec = options.videoRecvCodec || '';
         var stereo = options.stereo;
-        function trace(arg) {
-            console.log("trace:" + arg);
+        
+        function trace(message, obj) {
+            if (easyrtc.debugPrinter) {
+                easyrtc.debugPrinter(message, obj);
+            }
         }
         // these functions were cribbed from the google apprtc.appspot.com demo.
 
@@ -273,7 +276,7 @@
 
         if( isLocal ) {
             return function(insdp) {
-                console.log("modifying local sdp");
+                trace("modifying local sdp");
                 var sdp;
                 sdp = maybePreferAudioReceiveCodec(insdp);
                 sdp = maybePreferVideoReceiveCodec(insdp);
@@ -287,7 +290,7 @@
         }
         else {
             return function(insdp) {
-                console.log("modifying remote sdp");
+                trace("modifying remote sdp");
                 var sdp;
                 sdp = maybePreferAudioSendCodec(insdp);
                 sdp = maybePreferVideoSendCodec(insdp);
