@@ -67,9 +67,9 @@ The second video tag should be in a &lt;div> block with a CSS _position_ value o
 
     <body>
        ...
-       <video  style="float:left" id="self" width="300" height="200" muted="muted"></video>
+       <video style="float:left" id="self" width="300" height="200" muted="muted" autoplay="autoplay" playsinline="playsinline"></video>
        <div style="position:relative;float:left;width:300px">
-           <video id="caller" width="300" height="200"></video>
+           <video id="caller" width="300" height="200" autoplay="autoplay" playsinline="playsinline"></video>
        </div>
        ...
     </body>
@@ -186,9 +186,9 @@ Here is the complete HTML and JavaScript for this solution.
             </head>
              <body onload="my_init()">
                 <div id="otherClients"> </div>
-                <video  style="float:left" id="self" width="300" height="200"></video>
+                <video style="float:left" id="self" width="300" height="200" autoplay="autoplay" playsinline="playsinline"></video>
                 <div style="position:relative;float:left;width:300px">
-                    <video id="caller" width="300" height="200"></video>
+                    <video id="caller" width="300" height="200" autoplay="autoplay" playsinline="playsinline"></video>
                 </div>
             </body>
         </html>
@@ -260,8 +260,8 @@ because there won't be any automatically added hangup buttons. The HTML ends up 
         </head>
          <body onload="my_init()">
             <div id="otherClients"> </div>
-            <video style="float:left" id="self" width="300" height="200"></video>
-            <video style="float:left" id="caller" width="300" height="200"></video>
+            <video style="float:left" id="self" width="300" height="200" autoplay="autoplay" playsinline="playsinline"></video>
+            <video style="float:left" id="caller" width="300" height="200" autoplay="autoplay" playsinline="playsinline"></video>
         </body>
     </html>
 
