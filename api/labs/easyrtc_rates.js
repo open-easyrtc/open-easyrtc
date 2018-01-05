@@ -118,6 +118,7 @@
                 adapter && adapter.browserDetails &&
                      (adapter.browserDetails.browser === "firefox")
             ) {
+                bitrate =  (bitrate >>> 0) * 1000;
                 bwLine = 'b=TIAS:' + bitrate;
             } else {
                 bwLine = 'b=AS:' + bitrate;
