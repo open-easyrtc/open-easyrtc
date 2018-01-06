@@ -724,7 +724,6 @@ var Easyrtc = function() {
      */
     this.setVideoSource = function(videoSrcId) {
         self._desiredVideoProperties.videoSrcId = videoSrcId;
-        delete self._desiredVideoProperties.screenCapture;
     };
 
     /** @private */
@@ -772,23 +771,7 @@ var Easyrtc = function() {
             constraints = self._presetMediaConstraints;
             delete self._presetMediaConstraints;
             return constraints;
-        } else if (self._desiredVideoProperties.screenCapture) {
-            return {
-                video: {
-                    mandatory: {
-                        chromeMediaSource: 'screen',
-                        maxWidth: screen.width,
-                        maxHeight: screen.height,
-                        minWidth: screen.width,
-                        minHeight: screen.height,
-                        minFrameRate: 1,
-                        maxFrameRate: 5},
-                    optional: []
-                },
-                audio: false
-            };
-        }
-        else if (!self.videoEnabled) {
+        }  else if (!self.videoEnabled) {
             constraints.video = false;
         }
         else {
