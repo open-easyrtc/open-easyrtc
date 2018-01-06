@@ -36,18 +36,18 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         //RequireJS (AMD) build system
-        define(['easyrtc'], factory);
+        define(['easyrtc', 'webrtc-adapter'], factory);
     } else if (typeof module === 'object' && module.exports) {
         //CommonJS build system
-        module.exports = factory(require('easyrtc'));
+        module.exports = factory(require('easyrtc'), require('webrtc-adapter'));
     } else {
         //Vanilla JS, ensure dependencies are loaded correctly
         if (typeof window.easyrtc !== 'object' || !window.easyrtc) {
             throw new Error("easyrtc_rates requires easyrtc");
         }
-        root.easyrtc = factory(window.easyrtc);
+        root.easyrtc = factory(window.easyrtc, window.adapter);
   }
-}(this, function (easyrtc, undefined) {
+}(this, function (easyrtc, adapter, undefined) {
 
 "use strict";
     /**
@@ -112,7 +112,18 @@
             if (bLineIndex) {
                 sdpLines.splice(bLineIndex, 1);
             }
-            var bwLine = 'b=AS:' + bitrate;
+
+            var bwLine;
+            if (
+                adapter && adapter.browserDetails &&
+                     (adapter.browserDetails.browser === "firefox")
+            ) {
+                bitrate =  (bitrate >>> 0) * 1000;
+                bwLine = 'b=TIAS:' + bitrate;
+            } else {
+                bwLine = 'b=AS:' + bitrate;
+            }
+
             sdpLines.splice(cLineIndex + 1, 0, bwLine);
             sdp = sdpLines.join('\r\n');
             return sdp;
