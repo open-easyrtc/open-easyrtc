@@ -267,17 +267,25 @@ var Easyrtc = function() {
     //
     function addStreamToPeerConnection(stream, peerConnection) {
        if( peerConnection.addStream ) {
-           peerConnection.addStream(stream);
+           var existingStreams = peerConnection.getLocalStreams();
+           if (existingStreams.indexOf(stream) === -1) {
+              peerConnection.addStream(stream);
+           }
        }
        else {
+          var existingTracks = peerConnection.getSenders();
           var tracks = stream.getAudioTracks();
           var i;
           for( i = 0; i < tracks.length; i++ ) {
+            if (existingTracks.indexOf(tracks[i]) === -1) {
              peerConnection.addTrack( tracks[i]);
+            }
           }
           tracks = stream.getVideoTracks();
           for( i = 0; i < tracks.length; i++ ) {
+            if (existingTracks.indexOf(tracks[i]) === -1) {
              peerConnection.addTrack( tracks[i]);
+            }
           }
        }
     }
@@ -297,12 +305,6 @@ var Easyrtc = function() {
         }
         var callFailureCB = peerConnObj.callFailureCB; 
         var pc = peerConnObj.pc;
-
-        var streams = pc.getLocalStreams();
-        var i;
-        for( i = 0; i < streams.length; i++ ) {
-           addStreamToPeerConnection(streams[i], pc);
-        }
 
         var setLocalAndSendMessage0 = function(sessionDescription) {
             if (peerConnObj.cancelled) {
