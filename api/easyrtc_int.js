@@ -5617,6 +5617,7 @@ var Easyrtc = function() {
                 self.showError(self.errCodes.CONNECT_ERR, self.getConstantString("badsocket"));
             }
             self.webSocketConnected = true;
+            missedAliveResponses = 0;
 
             logDebug("saw socket-server onconnect event");
 
