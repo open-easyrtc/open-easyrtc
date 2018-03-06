@@ -4779,17 +4779,25 @@ var Easyrtc = function() {
     //
     function addStreamToPeerConnection(stream, peerConnection) {
        if( peerConnection.addStream ) {
-           peerConnection.addStream(stream);
+           var existingStreams = peerConnection.getLocalStreams();
+           if (existingStreams.indexOf(stream) === -1) {
+              peerConnection.addStream(stream);
+           }
        }
        else {
+          var existingTracks = peerConnection.getSenders();
           var tracks = stream.getAudioTracks();
           var i;
           for( i = 0; i < tracks.length; i++ ) {
+            if (existingTracks.indexOf(tracks[i]) === -1) {
              peerConnection.addTrack( tracks[i]);
+            }
           }
           tracks = stream.getVideoTracks();
           for( i = 0; i < tracks.length; i++ ) {
+            if (existingTracks.indexOf(tracks[i]) === -1) {
              peerConnection.addTrack( tracks[i]);
+            }
           }
        }
     }
@@ -4809,12 +4817,6 @@ var Easyrtc = function() {
         }
         var callFailureCB = peerConnObj.callFailureCB; 
         var pc = peerConnObj.pc;
-
-        var streams = pc.getLocalStreams();
-        var i;
-        for( i = 0; i < streams.length; i++ ) {
-           addStreamToPeerConnection(streams[i], pc);
-        }
 
         var setLocalAndSendMessage0 = function(sessionDescription) {
             if (peerConnObj.cancelled) {
@@ -5234,7 +5236,6 @@ var Easyrtc = function() {
      */
     this.setVideoSource = function(videoSrcId) {
         self._desiredVideoProperties.videoSrcId = videoSrcId;
-        delete self._desiredVideoProperties.screenCapture;
     };
 
     /** @private */
@@ -5282,8 +5283,7 @@ var Easyrtc = function() {
             constraints = self._presetMediaConstraints;
             delete self._presetMediaConstraints;
             return constraints;
-        }
-        else if (!self.videoEnabled) {
+        }  else if (!self.videoEnabled) {
             constraints.video = false;
         }
         else {
@@ -10129,6 +10129,7 @@ var Easyrtc = function() {
                 self.showError(self.errCodes.CONNECT_ERR, self.getConstantString("badsocket"));
             }
             self.webSocketConnected = true;
+            missedAliveResponses = 0;
 
             logDebug("saw socket-server onconnect event");
 
