@@ -110,8 +110,11 @@ Running the server from the console may be the best approach for development. It
 2. Navigate to your EasyRTC application folder
     - copied from [server_example folder](../server_example/)
     - or using [Git Install Steps]() directly `cd server_example`
+    
+3. Install EasyRTC Sample Server dependencies from NPM
+    - npm install
 
-3. Run the server using the node command.
+4. Run the server using the node command.
     - `node server.js`
 
 
