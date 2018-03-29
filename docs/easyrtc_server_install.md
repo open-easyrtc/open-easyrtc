@@ -22,7 +22,7 @@ Ubuntu EasyRTC Install Steps:
 
 5. Change to the easyrtc folder and then install node modules locally
     - `cd /var/nodes/easyrtc`
-    - `sudo npm install`
+    - `npm install`
 
 
 Windows EasyRTC Install Steps:
@@ -314,7 +314,9 @@ Running the server from the console may be the best approach for development. It
 1. Open your console on the server.
     - In Windows you can use the provided Node.js console program located in the Start Menu.
 2. Navigate to your server_example folder
-3. Run the server using the node command.
+3. Install EasyRTC Sample Server dependencies from NPM
+    - `npm install`
+4. Run the server using the node command.
     - ex: `node server.js`
 
 Running EasyRTC as a Service in Ubuntu
