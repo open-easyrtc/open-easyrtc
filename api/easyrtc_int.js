@@ -726,6 +726,76 @@ var Easyrtc = function() {
         self._desiredVideoProperties.videoSrcId = videoSrcId;
     };
 
+    /** This function requests that screen capturing be used to provide the local media source
+     * rather than a webcam. If you have multiple screens, they are composited side by side.
+     * Note: this functionality is not supported by Firefox, has to be called before calling initMediaSource (or easyApp), we don't currently supply a way to
+     * turn it off (once it's on), only works if the website is hosted SSL (https), and the image quality is rather
+     * poor going across a network because it tries to transmit so much data. In short, screen sharing
+     * through WebRTC isn't worth using at this point, but it is provided here so people can try it out.
+     * @param {Boolean} enableScreenCapture
+     * @param {String} mediaSourceId (optional)
+     * @example
+     *    easyrtc.setScreenCapture(true);
+     */
+    this.setScreenCapture = function(enableScreenCapture, mediaSourceId) {
+
+        if (enableScreenCapture) {
+
+            // Set video
+            self._presetMediaConstraints = {
+                    video:{
+                        mozMediaSource: "screen",
+                        chromeMediaSource: 'screen',
+                        mediaSource: "screen",
+                        mediaSourceId: 'screen:0',
+                        maxWidth: screen.width,
+                        maxHeight: screen.height,
+                        minWidth: screen.width,
+                        minHeight: screen.height,
+                        minFrameRate: 1,
+                        maxFrameRate: 15
+                    },                    
+                    // In Chrome, the chrome.desktopCapture extension API can be used to capture the screen,
+                    // which includes system audio (but only on Windows and Chrome OS and without plans for OS X or Linux). 
+                    // - http://stackoverflow.com/questions/34235077/capture-system-sound-from-browser?answertab=votes#tab-top
+                    audio: false
+                    /*
+                    {
+                        optional: {
+                            chromeMediaSource: 'system',
+                            chromeMediaSourceId: that.chromeMediaSourceId
+                        }
+                    }
+                    */
+                };
+
+            if (mediaSourceId) {
+                if (
+                    adapter && adapter.browserDetails &&
+                        (adapter.browserDetails.browser === "chrome")
+                ) {
+
+                    var mandatory = self._presetMediaConstraints.video;
+                    mandatory.chromeMediaSource = 'desktop';
+                    mandatory.chromeMediaSourceId = mediaSourceId;
+                    self._presetMediaConstraints.video = {
+                        mandatory: mandatory,
+                        // http://www.acis.ufl.edu/~ptony82/jingle-html/classwebrtc_1_1MediaConstraintsInterface.html
+                        optional: [{
+                            googTemporalLayeredScreencast: true
+                        }]
+                    };
+                } else {
+                    self._presetMediaConstraints.video.mediaSourceId = mediaSourceId;
+                }
+            }
+
+        // Clear 
+        } else {
+            delete self._presetMediaConstraints;
+        }
+    };
+
     /** @private */
     this._desiredAudioProperties = {}; // default camera
 
