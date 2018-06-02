@@ -17,7 +17,7 @@ ADD package*.json $APPDIR/
 RUN npm install
 
 # Install dependencies in production mode (no dev dependencies).
-ARG EASYRTC_BRANCH=master
+ARG EASYRTC_BRANCH=feature/docker-easyrtc-server
 RUN npm install priologic/easyrtc#$EASYRTC_BRANCH
 RUN npm install --production
 
