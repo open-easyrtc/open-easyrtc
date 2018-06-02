@@ -72,7 +72,7 @@ var Easyrtc = function() {
            clearTimeout(stillAliveTimer);
         }
       
-        if( missedAliveResponses == 1 ) {
+        if( missedAliveResponses === 1 ) {
             self.showError(self.errCodes.SYSTEM_ERR, "Timed out trying to talk to the server.");
             self.printpeerconns();
             self.hangupAll();
@@ -323,13 +323,14 @@ var Easyrtc = function() {
                     });
         };
 
-        optionsUsed = {iceRestart:true};
-        pc.createOffer(optionsUsed).then(setLocalAndSendMessage0)
+        pc.createOffer({
+            iceRestart:true
+        }).then(setLocalAndSendMessage0)
              .catch( function(reason) {
              callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(reason));
            });
 
-    }
+    };
 
     /**
      * This function checks if a socket is actually connected.
@@ -4501,8 +4502,7 @@ var Easyrtc = function() {
             pc.removeStream(stream);
         }
 
-    }
-
+    };
 
     /** @private */
     this.dumpPeerConnectionInfo = function() {
@@ -4866,8 +4866,6 @@ var Easyrtc = function() {
 
     var processCandidateBody = function(caller, msgData) {
 
-        var candidate = null;
-
         //
         // if we've discarded the peer connection, ignore the candidate.
         //
@@ -4882,12 +4880,13 @@ var Easyrtc = function() {
            }
         }
 
-        candidate = new RTCIceCandidate({
+        var candidate = new RTCIceCandidate({
             sdpMLineIndex: msgData.label,
             sdpMid: msgData.id,
             candidate: msgData.candidate
         });
-        pc = peerConns[caller].pc;
+        
+        var pc = peerConns[caller].pc;
 
         function iceAddSuccess() {
             logDebug("iceAddSuccess: " + JSON.stringify(msgData));
@@ -5024,7 +5023,7 @@ var Easyrtc = function() {
         };
         // peerConns[caller].startedAV = true;
         sendQueuedCandidates(caller, onSignalSuccess, onSignalFailure);
-        pc = peerConns[caller].pc;
+        var pc = peerConns[caller].pc;
         var sdp;
         try {
            if( sdpRemoteFilter ) {
@@ -5052,19 +5051,21 @@ var Easyrtc = function() {
             pc.setRemoteDescription(sd, function() {
                 if (pc.connectDataConnection) {
                     logDebug("calling connectDataConnection(5001,5002)");
-                    if( isInitialConnection ) {
+                    if( isInitialConnect ) {
                         pc.connectDataConnection(5001, 5002); // these are like ids for data channels
                     }
                     try {
                        var streamName;
                        var acks = peerConns[caller].streamsAddedAcks || {};
                        for( streamName in acks ) {
-                           acks[streamName](caller, streamName);
+                            if (acks.hasOwnProperty(streamName)) {
+                               acks[streamName](caller, streamName);
+                            }
                        }
                        peerConns[caller].streamsAddedAcks = {};
                     } 
                     catch(userError) {
-                       easyrtc.showError(self.errCodes.DEVELOPER_ERR, "streamAdded receipt function failed");
+                       self.showError(self.errCodes.DEVELOPER_ERR, "streamAdded receipt function failed");
                     }
                 }
             }, function(message){
