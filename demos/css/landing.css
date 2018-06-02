@@ -45,7 +45,7 @@ body {
     border-width: 2px;
     border-style: outset;
     color: white;
-    padding: 0px 3px 0px 3px;
+    padding: 0 3px 0 3px;
     background-color: rgba(0,0,0,.4);
 }
 .menu_item:hover {
@@ -75,7 +75,7 @@ body {
     min-height:60px;
 }
 #footer p {
-    margin: 0px;
+    margin: 0;
     color:white;
     text-align:center;
 }

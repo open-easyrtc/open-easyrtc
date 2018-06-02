@@ -33,8 +33,5 @@
     "webrtc-adapter": "^5.0.6",
     "jasmine": "~2.2.1",
     "requirejs": "~2.1.16"
-  },
-  "resolutions": {
-    "webrtc-adapter": "^5.0.6"
   }
 }
