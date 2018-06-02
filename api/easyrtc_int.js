@@ -60,6 +60,7 @@
 var Easyrtc = function() {
 
     var self = this;
+    var peerConns = {};
     var stillAliveTimer = null;
     var stillAlivePeriod = 0;
     var missedAliveResponses = 0;
@@ -1025,7 +1026,7 @@ var Easyrtc = function() {
     //        function wasAcceptedCB(boolean,string) - see the easyrtc.call documentation.
     //     }
     //
-    var peerConns = {};
+    
     this.printpeerconns = function() {
         console.log("peerconns = ", peerConns);
     };
@@ -4131,6 +4132,7 @@ var Easyrtc = function() {
         }
 
         var pc = peerConnObj.pc;
+        var callFailureCB = peerConnObj.callFailureCB; 
         var setLocalAndSendMessage0 = function(sessionDescription) {
             if (peerConnObj.cancelled) {
                 return;
