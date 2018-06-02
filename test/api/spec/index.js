@@ -11,7 +11,7 @@ define([
 
     // Load specs
     'spec/api/adapter',
-    //'spec/api/easyrtc_int',
+    'spec/api/easyrtc_int',
 
 ], function () {
     'use strict';
