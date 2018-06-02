@@ -2,22 +2,21 @@
   "name": "easyrtc_server_example",
   "version": "0.1.6",
   "author": "Priologic Software Inc. <info@priologic.com> (http://priologic.com/)",
-  "description" : "Simple EasyRTC server example which includes EasyRTC, Express, and Socket.io",
-
+  "description": "Simple EasyRTC server example which includes EasyRTC, Express, and Socket.io",
   "private": true,
-
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "docker:build": "docker build -t priologic/easyrtc-server -f Dockerfile .",
+    "docker:start": "docker run -it -d -p 8080:8080 priologic/easyrtc-server",
+    "docker-compose:build": "docker-compose -f docker-compose.yml build",
+    "docker-compose:start": "docker-compose -f docker-compose.yml up"
   },
-
-  "dependencies" : {
+  "dependencies": {
     "express": "^4.10.7",
     "serve-static": "^1.8.0",
     "socket.io": "^1.4.5"
   },
-
   "license": "BSD2",
-
   "engines": {
     "node": ">=0.8"
   }
