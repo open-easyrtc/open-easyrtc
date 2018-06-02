@@ -30,6 +30,11 @@
     "colors": "*",
     "underscore": "1.5.x"
   },
+  "scripts": {
+    "lint": "grunt lint",
+    "build": "grunt build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "analyze": false,
   "license": "BSD-2-Clause",
   "engines": {
