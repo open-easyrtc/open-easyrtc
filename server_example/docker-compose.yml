@@ -7,7 +7,7 @@ services:
     build:
       context: .
       args:
-        EASYRTC_BRANCH: beta
+        EASYRTC_BRANCH: "feature/docker-easyrtc-server"
     networks:
       - frontend
     ports:
