@@ -33,8 +33,7 @@
   "scripts": {
     "lint": "grunt lint",
     "build": "grunt build",
-    "test": "grunt test",
-    "postinstall": "[ \"$NODE_ENV\" != production ] && bower install"
+    "test": "grunt test"
   },
   "analyze": false,
   "license": "BSD-2-Clause",
