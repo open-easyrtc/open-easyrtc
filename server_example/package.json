@@ -6,10 +6,12 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
-    "docker:build": "docker build -t priologic/easyrtc-server -f Dockerfile .",
-    "docker:start": "docker run -it -d -p 8080:8080 priologic/easyrtc-server",
+    "docker:build": "docker build -t easyrtc-server -f Dockerfile .",
+    "docker:start": "docker run -it -d -p 8080:8080 easyrtc-server",
+    "docker:start": "docker easyrtc-server",
     "docker-compose:build": "docker-compose -f docker-compose.yml build",
-    "docker-compose:start": "docker-compose -f docker-compose.yml up"
+    "docker-compose:start": "docker-compose -f docker-compose.yml up",
+    "docker-compose:stop": "docker-compose -f docker-compose.yml down"
   },
   "dependencies": {
     "express": "^4.10.7",
