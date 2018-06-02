@@ -35,7 +35,7 @@
 
                 <p>The application provides a simple audio-video chat using the easyrtc.easyApp method.</p>
 
-                <p>Connection is handled using an onload statement in the body. Requests are automatically accepted.<p>
+                <p>Connection is handled using an onload statement in the body. Requests are automatically accepted.</p>
 
                 <p>To hang-up on a call, hover your mouse over the upper right of the video, and click on the 'X' which appears at the top right of other person's video object.</p>
 
@@ -57,9 +57,15 @@
                         <!-- each caller video needs to be in it's own div so it's close button can be positioned correctly -->
                     </div>
                     <div id="recordButtons">
-                        <input type="radio" onclick="easyrtc.setRecordingVideoCodec('vp8');" checked="checked" id="useVP8" name="codecUsed"> VP8 </input>
-                        <input type="radio" onclick="easyrtc.setRecordingVideoCodec('vp9');" id="useVP9" name="codecUsed"> VP9 </input>
-                        <input type="radio" onclick="easyrtc.setRecordingVideoCodec('h264');" id="useH264" name="codecUsed"> H264 </input>
+                        <label for="useVP8">
+                            <input type="radio" onclick="easyrtc.setRecordingVideoCodec('vp8');" checked="checked" id="useVP8" name="codecUsed"> VP8 
+                        </label>
+                        <label for="codecUsed">
+                            <input type="radio" onclick="easyrtc.setRecordingVideoCodec('vp9');" id="useVP9" name="codecUsed"> VP9
+                        </label>
+                        <label for="useH264">
+                            <input type="radio" onclick="easyrtc.setRecordingVideoCodec('h264');" id="useH264" name="codecUsed"> H264
+                        </label>
                         <br>
                         <button id="startRecording" disabled="disabled" onclick="startRecording();" >Start recording</button> 
                         <button id="stopRecording" disabled="disabled" onclick="endRecording();" >End/finish recording</button> 
