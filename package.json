@@ -33,7 +33,8 @@
   "scripts": {
     "lint": "grunt lint",
     "build": "grunt build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "grunt test",
+    "postinstall": "[ \"$NODE_ENV\" != production ] && bower install"
   },
   "analyze": false,
   "license": "BSD-2-Clause",
@@ -62,9 +63,7 @@
     "karma-firefox-launcher": "^1.0.0",
     "karma-ie-launcher": "^1.0.0",
     "karma-jasmine": "^1.0.2",
-    "karma-phantomjs-launcher": "^1.0.0",
     "karma-requirejs": "^1.0.0",
-    "phantomjs-prebuilt": "^2.1.7",
     "requirejs": "^2.2.0",
     "strip-json-comments": "^2.0.1",
     "time-grunt": "^1.3.0"
