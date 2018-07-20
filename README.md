@@ -3,6 +3,9 @@
 EasyRTC
 =======
 
+Note: for last fixes use beta branch (@hthetiot 07-19-2018)
+npm install easyrtc@priologic#beta
+
 **A bundle of Open Source WebRTC joy!**
 
 Priologic's EasyRTC, a bundle of Open Source WebRTC joy, include an EasyRTC server andclient API, HTML5 and JavaScript demos under a BSD 2 license.
