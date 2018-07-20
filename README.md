@@ -4,7 +4,7 @@ EasyRTC
 =======
 
 Note: for last fixes use beta branch (@hthetiot 07-19-2018)
-npm install easyrtc@priologic#beta
+> npm install easyrtc@priologic/easyrtc#beta
 
 **A bundle of Open Source WebRTC joy!**
 
