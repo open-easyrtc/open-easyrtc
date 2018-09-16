@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>EasyRTC Documentation</title>
+  <script src="scripts/prettify/prettify.js"> </script>
+  <script src="scripts/prettify/lang-css.js"> </script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+  <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+  <link href="../assets/easyrtc-docs-jsdoc-styles-1.css" media="all" rel="stylesheet" />
+</head>
+<body>
+<header class="template">
+	<div class="wrapper-content">
+    <a href="../index.html"><img src="../assets/easyrtc-logo.png" alt="EasyRTC Documentation"></a>
+		<h1 title="EasyRTC Documentation">Documentation</h1>
+	</div>
+</header>
+<div class="wrapper-docs">
+<nav>
+	<h2><a href="../index.html">Docs Home</a></h2>
+	<h3>EasyRTC Guides</h3>
+	<ul>
+		<li><a href="../easyrtc_faq.html">FAQ</a></li>
+		<li><a href="../easyrtc_gettingStarted.html">Getting Started</a></li>
+		<li><a href="../easyrtc_server_install.html">EasyRTC Server: Installation</a></li>
+		<li><a href="../easyrtc_client_tutorial.html">EasyRTC Framework Tutorial</a></li>
+		<li><a href="../easyrtc_rooms.html">Rooms</a></li>
+		<li><a href="../easyrtc_server_configuration.html">EasyRTC Server: Configuration</a></li>
+		<li><a href="../easyrtc_server_events.html">EasyRTC Server: Events</a></li>
+		<li><a href="../easyrtc_server_ice.html">EasyRTC Server: ICE Configuration</a></li>
+		<li><a href="../easyrtc_with_other_servers.html">Using Alongside Other Servers</a></li>
+		<li><a href="../easyrtc_server_ssl.html">EasyRTC Server: Using SSL</a></li>
+		<li><a href="../easyrtc_webrtc_problems.html">WebRTC Problems and Possible Fixes</a></li>
+		<li><a href="../easyrtc_upcoming_features.html">Upcoming Features</a></li>
+		<li><a href="../easyrtc_changelog.html">Change Log</a></li>
+	</ul>
+	<h3>EasyRTC Client Classes</h3>
+	<ul>
+		<li><a href="../client-api/Easyrtc.html">Easyrtc</a></li>
+		<li><a href="../client-api/Easyrtc_App.html">Easyrtc_App</a></li>
+		<li><a href="../client-api/Easyrtc_ft.html">Easyrtc_ft</a></li>
+		<li><a href="../client-api/Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_Rates.html">Easyrtc_Rates</a></li>
+		<li><a href="../client-api/Easyrtc_Recorder.html">Easyrtc_Recorder</a></li>
+	</ul>
+	<h3>EasyRTC Server Modules</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li>
+		<li><a href="../server-api/module-easyrtc_default_options.html">easyrtc_default_options</a></li>
+		<li><a href="../server-api/module-easyrtc_private_obj.html">easyrtc_private_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj.html">easyrtc_public_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_util.html">easyrtc_util</a></li>
+		<li><a href="../server-api/module-general_util.html">general_util</a></li>
+	</ul>
+	<h3>EasyRTC Server Classes</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.html">pub</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.events.html">events</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.util.html">util</a></li>
+		<li><a href="../server-api/module-easyrtc_util-eu.html">eu</a></li>
+		<li><a href="../server-api/module-general_util-g.html">g</a></li>
+		<li><a href="../server-api/pub.appObj.html">appObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.html">connectionObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li>
+		<li><a href="../server-api/pub.appObj.roomObj.html">roomObj</a></li>
+		<li><a href="../server-api/pub.appObj.sessionObj.html">sessionObj</a></li>
+	</ul>
+</nav>
+<div class="easyrtc-docs-content">
+<div id="main">
+<h1 class="page-title">Source: general_util.js</h1>
+<section>
+<article>
+<pre class="prettyprint source linenums easyrtc"><code><a name="line1"></a><div class="linenumber">1</div><div style="width:0em;display:inline-block"></div>/*&nbsp;global&nbsp;module,&nbsp;require,&nbsp;process,&nbsp;console&nbsp;*/
+<a name="line2"></a><div class="linenumber">2</div><div style="width:0em;display:inline-block"></div>
+<a name="line3"></a><div class="linenumber">3</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line4"></a><div class="linenumber">4</div><div style="width:0em;display:inline-block"></div>*&nbsp;@file&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;General&nbsp;utility&nbsp;functions&nbsp;not&nbsp;specific&nbsp;to&nbsp;EasyRTC
+<a name="line5"></a><div class="linenumber">5</div><div style="width:0em;display:inline-block"></div>*&nbsp;@module&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;general_util
+<a name="line6"></a><div class="linenumber">6</div><div style="width:0em;display:inline-block"></div>*&nbsp;@author&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Priologic&nbsp;Software,&nbsp;info@easyrtc.com
+<a name="line7"></a><div class="linenumber">7</div><div style="width:0em;display:inline-block"></div>*&nbsp;@copyright&nbsp;&nbsp;&nbsp;Copyright&nbsp;2016&nbsp;Priologic&nbsp;Software.&nbsp;All&nbsp;rights&nbsp;reserved.
+<a name="line8"></a><div class="linenumber">8</div><div style="width:0em;display:inline-block"></div>*&nbsp;@license&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BSD&nbsp;v2,&nbsp;see&nbsp;LICENSE&nbsp;file&nbsp;in&nbsp;module&nbsp;root&nbsp;folder.
+<a name="line9"></a><div class="linenumber">9</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line10"></a><div class="linenumber">10</div><div style="width:0em;display:inline-block"></div>
+<a name="line11"></a><div class="linenumber">11</div><div style="width:0em;display:inline-block"></div>var&nbsp;util&nbsp;=&nbsp;require("util");
+<a name="line12"></a><div class="linenumber">12</div><div style="width:0em;display:inline-block"></div>
+<a name="line13"></a><div class="linenumber">13</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line14"></a><div class="linenumber">14</div><div style="width:0em;display:inline-block"></div>*&nbsp;&nbsp;Object&nbsp;to&nbsp;hold&nbsp;EasyRTC&nbsp;General&nbsp;Utility&nbsp;methods&nbsp;and&nbsp;classes.
+<a name="line15"></a><div class="linenumber">15</div><div style="width:0em;display:inline-block"></div>*
+<a name="line16"></a><div class="linenumber">16</div><div style="width:0em;display:inline-block"></div>*&nbsp;@class
+<a name="line17"></a><div class="linenumber">17</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line18"></a><div class="linenumber">18</div><div style="width:0em;display:inline-block"></div>var&nbsp;g&nbsp;=&nbsp;module.exports;
+<a name="line19"></a><div class="linenumber">19</div><div style="width:0em;display:inline-block"></div>
+<a name="line20"></a><div class="linenumber">20</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line21"></a><div class="linenumber">21</div><div style="width:0em;display:inline-block"></div>*&nbsp;Performs&nbsp;a&nbsp;deep&nbsp;copy&nbsp;of&nbsp;an&nbsp;object,&nbsp;returning&nbsp;the&nbsp;duplicate.
+<a name="line22"></a><div class="linenumber">22</div><div style="width:0em;display:inline-block"></div>*&nbsp;Do&nbsp;not&nbsp;use&nbsp;on&nbsp;objects&nbsp;with&nbsp;circular&nbsp;references.
+<a name="line23"></a><div class="linenumber">23</div><div style="width:0em;display:inline-block"></div>*
+<a name="line24"></a><div class="linenumber">24</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{Object}&nbsp;input&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;variable&nbsp;(or&nbsp;object)&nbsp;to&nbsp;be&nbsp;copied.
+<a name="line25"></a><div class="linenumber">25</div><div style="width:0em;display:inline-block"></div>*&nbsp;@returns&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{Object}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New&nbsp;copy&nbsp;of&nbsp;variable.
+<a name="line26"></a><div class="linenumber">26</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line27"></a><div class="linenumber">27</div><div style="width:0em;display:inline-block"></div>g.deepCopy&nbsp;=&nbsp;function(input)&nbsp;{
+<a name="line28"></a><div class="linenumber">28</div><div style="width:0em;display:inline-block"></div>
+<a name="line29"></a><div class="linenumber">29</div><div style="width:2em;display:inline-block"></div>if&nbsp;(
+<a name="line30"></a><div class="linenumber">30</div><div style="width:4em;display:inline-block"></div>input&nbsp;===&nbsp;null&nbsp;||&nbsp;input&nbsp;===&nbsp;undefined&nbsp;||
+<a name="line31"></a><div class="linenumber">31</div><div style="width:6em;display:inline-block"></div>typeof&nbsp;input&nbsp;!==&nbsp;"object"&nbsp;||&nbsp;
+<a name="line32"></a><div class="linenumber">32</div><div style="width:8em;display:inline-block"></div>(input.constructor&nbsp;!==&nbsp;Object&nbsp;&amp;&amp;&nbsp;input.constructor&nbsp;!==&nbsp;Array)
+<a name="line33"></a><div class="linenumber">33</div><div style="width:2em;display:inline-block"></div>)&nbsp;{
+<a name="line34"></a><div class="linenumber">34</div><div style="width:4em;display:inline-block"></div>return&nbsp;input;
+<a name="line35"></a><div class="linenumber">35</div><div style="width:2em;display:inline-block"></div>}
+<a name="line36"></a><div class="linenumber">36</div><div style="width:0em;display:inline-block"></div>
+<a name="line37"></a><div class="linenumber">37</div><div style="width:2em;display:inline-block"></div>if&nbsp;(
+<a name="line38"></a><div class="linenumber">38</div><div style="width:4em;display:inline-block"></div>input.constructor&nbsp;===&nbsp;Boolean&nbsp;||&nbsp;
+<a name="line39"></a><div class="linenumber">39</div><div style="width:6em;display:inline-block"></div>input.constructor&nbsp;===&nbsp;Date&nbsp;||&nbsp;
+<a name="line40"></a><div class="linenumber">40</div><div style="width:8em;display:inline-block"></div>input.constructor&nbsp;===&nbsp;Function&nbsp;||&nbsp;
+<a name="line41"></a><div class="linenumber">41</div><div style="width:10em;display:inline-block"></div>input.constructor&nbsp;===&nbsp;Number&nbsp;||&nbsp;
+<a name="line42"></a><div class="linenumber">42</div><div style="width:12em;display:inline-block"></div>input.constructor&nbsp;===&nbsp;RegExp&nbsp;||&nbsp;
+<a name="line43"></a><div class="linenumber">43</div><div style="width:14em;display:inline-block"></div>input.constructor&nbsp;===&nbsp;String
+<a name="line44"></a><div class="linenumber">44</div><div style="width:2em;display:inline-block"></div>)&nbsp;{
+<a name="line45"></a><div class="linenumber">45</div><div style="width:4em;display:inline-block"></div>return&nbsp;new&nbsp;input.constructor(input);
+<a name="line46"></a><div class="linenumber">46</div><div style="width:2em;display:inline-block"></div>}
+<a name="line47"></a><div class="linenumber">47</div><div style="width:0em;display:inline-block"></div>
+<a name="line48"></a><div class="linenumber">48</div><div style="width:2em;display:inline-block"></div>var&nbsp;copy;
+<a name="line49"></a><div class="linenumber">49</div><div style="width:2em;display:inline-block"></div>if&nbsp;(input&nbsp;instanceof&nbsp;Array)&nbsp;{
+<a name="line50"></a><div class="linenumber">50</div><div style="width:4em;display:inline-block"></div>copy&nbsp;=&nbsp;[];
+<a name="line51"></a><div class="linenumber">51</div><div style="width:4em;display:inline-block"></div>for&nbsp;(var&nbsp;i&nbsp;=&nbsp;0,&nbsp;len&nbsp;=&nbsp;input.length;&nbsp;i&nbsp;&lt;&nbsp;len;&nbsp;i++)&nbsp;{
+<a name="line52"></a><div class="linenumber">52</div><div style="width:6em;display:inline-block"></div>copy[i]&nbsp;=&nbsp;g.deepCopy(input[i]);
+<a name="line53"></a><div class="linenumber">53</div><div style="width:4em;display:inline-block"></div>}
+<a name="line54"></a><div class="linenumber">54</div><div style="width:4em;display:inline-block"></div>return&nbsp;copy;
+<a name="line55"></a><div class="linenumber">55</div><div style="width:2em;display:inline-block"></div>}
+<a name="line56"></a><div class="linenumber">56</div><div style="width:0em;display:inline-block"></div>
+<a name="line57"></a><div class="linenumber">57</div><div style="width:2em;display:inline-block"></div>if&nbsp;(input&nbsp;instanceof&nbsp;Object)&nbsp;{
+<a name="line58"></a><div class="linenumber">58</div><div style="width:4em;display:inline-block"></div>copy&nbsp;=&nbsp;{};
+<a name="line59"></a><div class="linenumber">59</div><div style="width:4em;display:inline-block"></div>for&nbsp;(var&nbsp;key&nbsp;in&nbsp;input)&nbsp;{
+<a name="line60"></a><div class="linenumber">60</div><div style="width:6em;display:inline-block"></div>if&nbsp;(input.hasOwnProperty(key))&nbsp;{
+<a name="line61"></a><div class="linenumber">61</div><div style="width:8em;display:inline-block"></div>copy[key]&nbsp;=&nbsp;g.deepCopy(input[key]);
+<a name="line62"></a><div class="linenumber">62</div><div style="width:6em;display:inline-block"></div>}
+<a name="line63"></a><div class="linenumber">63</div><div style="width:4em;display:inline-block"></div>}
+<a name="line64"></a><div class="linenumber">64</div><div style="width:4em;display:inline-block"></div>return&nbsp;copy;
+<a name="line65"></a><div class="linenumber">65</div><div style="width:2em;display:inline-block"></div>}
+<a name="line66"></a><div class="linenumber">66</div><div style="width:2em;display:inline-block"></div>return&nbsp;null;
+<a name="line67"></a><div class="linenumber">67</div><div style="width:0em;display:inline-block"></div>};
+<a name="line68"></a><div class="linenumber">68</div><div style="width:0em;display:inline-block"></div>
+<a name="line69"></a><div class="linenumber">69</div><div style="width:0em;display:inline-block"></div>
+<a name="line70"></a><div class="linenumber">70</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line71"></a><div class="linenumber">71</div><div style="width:0em;display:inline-block"></div>*&nbsp;Returns&nbsp;a&nbsp;field&nbsp;from&nbsp;the&nbsp;package.json&nbsp;file&nbsp;in&nbsp;the&nbsp;module&nbsp;root.
+<a name="line72"></a><div class="linenumber">72</div><div style="width:0em;display:inline-block"></div>*&nbsp;Giving&nbsp;null&nbsp;field&nbsp;name&nbsp;will&nbsp;return&nbsp;the&nbsp;full&nbsp;contents&nbsp;of&nbsp;the&nbsp;file.
+<a name="line73"></a><div class="linenumber">73</div><div style="width:0em;display:inline-block"></div>*&nbsp;If&nbsp;a&nbsp;field&nbsp;name&nbsp;is&nbsp;provided,&nbsp;it&nbsp;will&nbsp;return&nbsp;null&nbsp;if&nbsp;the&nbsp;field&nbsp;not&nbsp;found.
+<a name="line74"></a><div class="linenumber">74</div><div style="width:0em;display:inline-block"></div>*
+<a name="line75"></a><div class="linenumber">75</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{Object}&nbsp;fieldName&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name&nbsp;of&nbsp;field&nbsp;you&nbsp;wish&nbsp;to&nbsp;return.
+<a name="line76"></a><div class="linenumber">76</div><div style="width:0em;display:inline-block"></div>*&nbsp;@returns&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{Object}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value&nbsp;of&nbsp;the&nbsp;given&nbsp;field,&nbsp;or&nbsp;the&nbsp;full&nbsp;contents&nbsp;of&nbsp;the&nbsp;file&nbsp;if&nbsp;a&nbsp;null&nbsp;field&nbsp;is&nbsp;given.
+<a name="line77"></a><div class="linenumber">77</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line78"></a><div class="linenumber">78</div><div style="width:0em;display:inline-block"></div>g.getPackageData&nbsp;=&nbsp;function(fieldName)&nbsp;{
+<a name="line79"></a><div class="linenumber">79</div><div style="width:2em;display:inline-block"></div>var&nbsp;packageFile&nbsp;=&nbsp;require("../package");
+<a name="line80"></a><div class="linenumber">80</div><div style="width:2em;display:inline-block"></div>if&nbsp;(!fieldName)&nbsp;{
+<a name="line81"></a><div class="linenumber">81</div><div style="width:4em;display:inline-block"></div>return&nbsp;g.deepCopy(packageFile);
+<a name="line82"></a><div class="linenumber">82</div><div style="width:2em;display:inline-block"></div>}
+<a name="line83"></a><div class="linenumber">83</div><div style="width:2em;display:inline-block"></div>else&nbsp;if&nbsp;(packageFile[fieldName])&nbsp;{
+<a name="line84"></a><div class="linenumber">84</div><div style="width:4em;display:inline-block"></div>return&nbsp;g.deepCopy(packageFile[fieldName]);
+<a name="line85"></a><div class="linenumber">85</div><div style="width:2em;display:inline-block"></div>}
+<a name="line86"></a><div class="linenumber">86</div><div style="width:2em;display:inline-block"></div>else&nbsp;{
+<a name="line87"></a><div class="linenumber">87</div><div style="width:4em;display:inline-block"></div>return&nbsp;null;
+<a name="line88"></a><div class="linenumber">88</div><div style="width:2em;display:inline-block"></div>}
+<a name="line89"></a><div class="linenumber">89</div><div style="width:0em;display:inline-block"></div>};
+<a name="line90"></a><div class="linenumber">90</div><div style="width:0em;display:inline-block"></div>
+<a name="line91"></a><div class="linenumber">91</div><div style="width:0em;display:inline-block"></div>
+<a name="line92"></a><div class="linenumber">92</div><div style="width:0em;display:inline-block"></div>/*&nbsp;An&nbsp;abstract&nbsp;error&nbsp;object&nbsp;which&nbsp;should&nbsp;be&nbsp;easy&nbsp;to&nbsp;extend&nbsp;for&nbsp;custom&nbsp;Error&nbsp;classes.
+<a name="line93"></a><div class="linenumber">93</div><div style="width:0em;display:inline-block"></div>*
+<a name="line94"></a><div class="linenumber">94</div><div style="width:0em;display:inline-block"></div>*&nbsp;@copyright&nbsp;Based&nbsp;on&nbsp;code&nbsp;in&nbsp;article&nbsp;by&nbsp;Dustin&nbsp;Seno.
+<a name="line95"></a><div class="linenumber">95</div><div style="width:0em;display:inline-block"></div>*
+<a name="line96"></a><div class="linenumber">96</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;&nbsp;{String}&nbsp;&nbsp;&nbsp;&nbsp;Custom&nbsp;error&nbsp;message.
+<a name="line97"></a><div class="linenumber">97</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;&nbsp;{Object}&nbsp;&nbsp;&nbsp;&nbsp;Constructor&nbsp;property.
+<a name="line98"></a><div class="linenumber">98</div><div style="width:0em;display:inline-block"></div>*
+<a name="line99"></a><div class="linenumber">99</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line100"></a><div class="linenumber">100</div><div style="width:0em;display:inline-block"></div>g.AbstractError&nbsp;=&nbsp;function(msg,&nbsp;constr){
+<a name="line101"></a><div class="linenumber">101</div><div style="width:2em;display:inline-block"></div>Error.captureStackTrace(this,&nbsp;constr&nbsp;||&nbsp;this);
+<a name="line102"></a><div class="linenumber">102</div><div style="width:2em;display:inline-block"></div>this.message&nbsp;=&nbsp;msg&nbsp;||&nbsp;"Error";
+<a name="line103"></a><div class="linenumber">103</div><div style="width:0em;display:inline-block"></div>};
+<a name="line104"></a><div class="linenumber">104</div><div style="width:0em;display:inline-block"></div>util.inherits(g.AbstractError,&nbsp;Error);
+<a name="line105"></a><div class="linenumber">105</div><div style="width:0em;display:inline-block"></div>g.AbstractError.prototype.name&nbsp;=&nbsp;"Abstract&nbsp;Error";
+<a name="line106"></a><div class="linenumber">106</div><div style="width:0em;display:inline-block"></div>
+<a name="line107"></a><div class="linenumber">107</div><div style="width:0em;display:inline-block"></div>
+<a name="line108"></a><div class="linenumber">108</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line109"></a><div class="linenumber">109</div><div style="width:0em;display:inline-block"></div>*&nbsp;Reads&nbsp;package.json&nbsp;and&nbsp;ensures&nbsp;all&nbsp;required&nbsp;modules&nbsp;are&nbsp;installed.&nbsp;Will&nbsp;exit&nbsp;if&nbsp;one&nbsp;or&nbsp;more&nbsp;is&nbsp;not&nbsp;found.
+<a name="line110"></a><div class="linenumber">110</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line111"></a><div class="linenumber">111</div><div style="width:0em;display:inline-block"></div>g.checkModules&nbsp;=&nbsp;function&nbsp;()&nbsp;{
+<a name="line112"></a><div class="linenumber">112</div><div style="width:0em;display:inline-block"></div>
+<a name="line113"></a><div class="linenumber">113</div><div style="width:2em;display:inline-block"></div>var&nbsp;easyrtcPackage;
+<a name="line114"></a><div class="linenumber">114</div><div style="width:0em;display:inline-block"></div>
+<a name="line115"></a><div class="linenumber">115</div><div style="width:2em;display:inline-block"></div>try&nbsp;{
+<a name="line116"></a><div class="linenumber">116</div><div style="width:4em;display:inline-block"></div>easyrtcPackage&nbsp;=&nbsp;require("../package");
+<a name="line117"></a><div class="linenumber">117</div><div style="width:2em;display:inline-block"></div>}
+<a name="line118"></a><div class="linenumber">118</div><div style="width:2em;display:inline-block"></div>catch(&nbsp;e&nbsp;)&nbsp;{
+<a name="line119"></a><div class="linenumber">119</div><div style="width:4em;display:inline-block"></div>console.log("ERROR:&nbsp;Could&nbsp;not&nbsp;load&nbsp;package.json&nbsp;from&nbsp;project&nbsp;root.&nbsp;This&nbsp;file&nbsp;is&nbsp;required&nbsp;for&nbsp;reading&nbsp;project&nbsp;properties.");
+<a name="line120"></a><div class="linenumber">120</div><div style="width:4em;display:inline-block"></div>process.exit(1);
+<a name="line121"></a><div class="linenumber">121</div><div style="width:2em;display:inline-block"></div>}
+<a name="line122"></a><div class="linenumber">122</div><div style="width:0em;display:inline-block"></div>
+<a name="line123"></a><div class="linenumber">123</div><div style="width:2em;display:inline-block"></div>var&nbsp;moduleExists&nbsp;=&nbsp;function&nbsp;(modName)&nbsp;{
+<a name="line124"></a><div class="linenumber">124</div><div style="width:4em;display:inline-block"></div>try&nbsp;{&nbsp;return&nbsp;require.resolve(modName);&nbsp;}
+<a name="line125"></a><div class="linenumber">125</div><div style="width:4em;display:inline-block"></div>catch(&nbsp;e&nbsp;)&nbsp;{&nbsp;return&nbsp;false;&nbsp;}
+<a name="line126"></a><div class="linenumber">126</div><div style="width:2em;display:inline-block"></div>};
+<a name="line127"></a><div class="linenumber">127</div><div style="width:0em;display:inline-block"></div>
+<a name="line128"></a><div class="linenumber">128</div><div style="width:2em;display:inline-block"></div>var&nbsp;isModuleMissing&nbsp;=&nbsp;false;
+<a name="line129"></a><div class="linenumber">129</div><div style="width:2em;display:inline-block"></div>for&nbsp;(var&nbsp;key&nbsp;in&nbsp;easyrtcPackage.dependencies)&nbsp;{
+<a name="line130"></a><div class="linenumber">130</div><div style="width:4em;display:inline-block"></div>if&nbsp;(!moduleExists(key))&nbsp;{
+<a name="line131"></a><div class="linenumber">131</div><div style="width:6em;display:inline-block"></div>isModuleMissing&nbsp;=&nbsp;true;
+<a name="line132"></a><div class="linenumber">132</div><div style="width:6em;display:inline-block"></div>console.log("ERROR:&nbsp;Missing&nbsp;module&nbsp;'"&nbsp;+&nbsp;key&nbsp;+&nbsp;"'");
+<a name="line133"></a><div class="linenumber">133</div><div style="width:4em;display:inline-block"></div>}
+<a name="line134"></a><div class="linenumber">134</div><div style="width:2em;display:inline-block"></div>}
+<a name="line135"></a><div class="linenumber">135</div><div style="width:0em;display:inline-block"></div>
+<a name="line136"></a><div class="linenumber">136</div><div style="width:2em;display:inline-block"></div>if&nbsp;(isModuleMissing)&nbsp;{
+<a name="line137"></a><div class="linenumber">137</div><div style="width:4em;display:inline-block"></div>console.log("ERROR:&nbsp;Required&nbsp;modules&nbsp;are&nbsp;not&nbsp;installed.&nbsp;Run&nbsp;'npm&nbsp;install'&nbsp;from&nbsp;command&nbsp;line.");
+<a name="line138"></a><div class="linenumber">138</div><div style="width:4em;display:inline-block"></div>process.exit(1);
+<a name="line139"></a><div class="linenumber">139</div><div style="width:2em;display:inline-block"></div>}
+<a name="line140"></a><div class="linenumber">140</div><div style="width:0em;display:inline-block"></div>
+<a name="line141"></a><div class="linenumber">141</div><div style="width:2em;display:inline-block"></div>delete&nbsp;require.cache[easyrtcPackage];
+<a name="line142"></a><div class="linenumber">142</div><div style="width:0em;display:inline-block"></div>};
+<a name="line143"></a><div class="linenumber">143</div><div style="width:0em;display:inline-block"></div>
+<a name="line144"></a><div class="linenumber">144</div><div style="width:0em;display:inline-block"></div>
+<a name="line145"></a><div class="linenumber">145</div><div style="width:0em;display:inline-block"></div>/*
+<a name="line146"></a><div class="linenumber">146</div><div style="width:0em;display:inline-block"></div>*&nbsp;Return&nbsp;a&nbsp;random&nbsp;string&nbsp;of&nbsp;characters
+<a name="line147"></a><div class="linenumber">147</div><div style="width:0em;display:inline-block"></div>*
+<a name="line148"></a><div class="linenumber">148</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;{Integer}&nbsp;stringLength&nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;random&nbsp;characters&nbsp;the&nbsp;returned&nbsp;string&nbsp;should&nbsp;contain.&nbsp;Defaults&nbsp;to&nbsp;16.
+<a name="line149"></a><div class="linenumber">149</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;{String}&nbsp;&nbsp;chars&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Available&nbsp;characters&nbsp;to&nbsp;use&nbsp;in&nbsp;a&nbsp;string.&nbsp;Defaults&nbsp;to&nbsp;[A-Za-z0-9]
+<a name="line150"></a><div class="linenumber">150</div><div style="width:0em;display:inline-block"></div>*&nbsp;@returns&nbsp;{String}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Generated&nbsp;random&nbsp;string
+<a name="line151"></a><div class="linenumber">151</div><div style="width:0em;display:inline-block"></div>*
+<a name="line152"></a><div class="linenumber">152</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line153"></a><div class="linenumber">153</div><div style="width:0em;display:inline-block"></div>g.randomString&nbsp;=&nbsp;function(stringLength,&nbsp;chars){
+<a name="line154"></a><div class="linenumber">154</div><div style="width:2em;display:inline-block"></div>var&nbsp;newString&nbsp;=&nbsp;"";
+<a name="line155"></a><div class="linenumber">155</div><div style="width:0em;display:inline-block"></div>
+<a name="line156"></a><div class="linenumber">156</div><div style="width:2em;display:inline-block"></div>if&nbsp;(!chars)&nbsp;{
+<a name="line157"></a><div class="linenumber">157</div><div style="width:4em;display:inline-block"></div>chars&nbsp;=&nbsp;"ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz0123456789";
+<a name="line158"></a><div class="linenumber">158</div><div style="width:2em;display:inline-block"></div>}
+<a name="line159"></a><div class="linenumber">159</div><div style="width:0em;display:inline-block"></div>
+<a name="line160"></a><div class="linenumber">160</div><div style="width:2em;display:inline-block"></div>if&nbsp;(!stringLength)&nbsp;{
+<a name="line161"></a><div class="linenumber">161</div><div style="width:4em;display:inline-block"></div>stringLength&nbsp;=&nbsp;16;
+<a name="line162"></a><div class="linenumber">162</div><div style="width:2em;display:inline-block"></div>}
+<a name="line163"></a><div class="linenumber">163</div><div style="width:0em;display:inline-block"></div>
+<a name="line164"></a><div class="linenumber">164</div><div style="width:2em;display:inline-block"></div>for&nbsp;(var&nbsp;i=0;&nbsp;i&nbsp;&lt;&nbsp;stringLength;&nbsp;i=i+1)&nbsp;{
+<a name="line165"></a><div class="linenumber">165</div><div style="width:4em;display:inline-block"></div>var&nbsp;randomNumber&nbsp;=&nbsp;Math.floor(Math.random()&nbsp;*&nbsp;chars.length);
+<a name="line166"></a><div class="linenumber">166</div><div style="width:4em;display:inline-block"></div>newString&nbsp;+=&nbsp;chars.substring(randomNumber,&nbsp;randomNumber&nbsp;+&nbsp;1);
+<a name="line167"></a><div class="linenumber">167</div><div style="width:2em;display:inline-block"></div>}
+<a name="line168"></a><div class="linenumber">168</div><div style="width:0em;display:inline-block"></div>
+<a name="line169"></a><div class="linenumber">169</div><div style="width:2em;display:inline-block"></div>return&nbsp;newString;
+<a name="line170"></a><div class="linenumber">170</div><div style="width:0em;display:inline-block"></div>};
+</code></pre>
+</article>
+</section>
+</div>
+		
+	</div>
+</div>
+<footer class="template">
+	<div class="wrapper-content">
+		<p>Copyright &copy;2016 EasyRTC</p>
+	</div>
+</footer>
+<!-- <script>prettyPrint();</script> -->
+<!-- <script src="scripts/linenumber.js"></script> -->
+</body>
+</html>

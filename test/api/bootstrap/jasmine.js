@@ -14,11 +14,11 @@ require.config({
 
     paths: {
         // Externals
-        'jasmine': 'jasmine/lib/jasmine-core/jasmine',
-        'jasmine-html': 'jasmine/lib/jasmine-core/jasmine-html',
-        'boot': 'jasmine/lib/jasmine-core/boot',
-        'socket.io': 'socket.io-client/socket.io',
-        'webrtc-adapter': 'webrtc-adapter/adapter',
+        'jasmine': 'bower_components/jasmine/lib/jasmine-core/jasmine',
+        'jasmine-html': 'bower_components/jasmine/lib/jasmine-core/jasmine-html',
+        'boot': 'bower_components/jasmine/lib/jasmine-core/boot',
+        'socket.io': 'bower_components/socket.io-client/dist/socket.io',
+        'webrtc-adapter': 'bower_components/webrtc-adapter/release/adapter',
 
         // Internals
         "easyrtc_lang": "easyrtc_lang",

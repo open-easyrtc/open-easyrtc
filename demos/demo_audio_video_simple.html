@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
         <title>EasyRTC Demo: Simple Video+Audio</title>
-        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
+        <link rel="stylesheet" type="text/css" href="../easyrtc/easyrtc.css" />
 
         <!--hide-->
         <link rel="stylesheet" type="text/css" href="css/landing.css" />
@@ -17,7 +17,7 @@
         <!--show-->
         <!-- Assumes global locations for socket.io.js and easyrtc.js -->
         <script src="/socket.io/socket.io.js"></script>
-        <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
+        <script type="text/javascript" src="../easyrtc/easyrtc.js"></script>
         <script type="text/javascript" src="js/demo_audio_video_simple.js"></script>
 
     </head>
@@ -34,7 +34,7 @@
 
                 <p>The application provides a simple audio-video chat using the easyrtc.easyApp method.</p>
 
-                <p>Connection is handled using an onload statement in the body. Requests are automatically accepted.<p>
+                <p>Connection is handled using an onload statement in the body. Requests are automatically accepted.</p>
 
                 <p>To hang-up on a call, hover your mouse over the upper right of the video, and click on the 'X' which appears at the top right of other person's video object.</p>
 
@@ -49,9 +49,9 @@
                         <div id="otherClients"></div>
                     </div>
                     <div id="videos">
-                        <video autoplay="autoplay" class="easyrtcMirror" id="selfVideo" muted="muted" volume="0" ></video>
+                        <video autoplay="autoplay" playsinline="playsinline" class="easyrtcMirror" id="selfVideo" muted="muted" volume="0" ></video>
                         <div style="position:relative;float:left;">
-                        <video autoplay="autoplay" id="callerVideo"></video>
+                        <video autoplay="autoplay" playsinline="playsinline" id="callerVideo"></video>
                         </div>
                         <!-- each caller video needs to be in it's own div so it's close button can be positioned correctly -->
                     </div>
@@ -88,7 +88,7 @@
             </div>
             <div id="footer">
                 <a href="http://www.skedans.com/?from=landing"><img id="logo_priologic" src="images/skedans_logo.png" height="40" width="150" alt="Created By Skedans Systems, Inc." /></a>
-                <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="/easyrtc/img/powered_by_easyrtc.png" height="60" width="200" alt="Powered By EasyRTC" /></a>
+                <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="../easyrtc/img/powered_by_easyrtc.png" height="60" width="200" alt="Powered By EasyRTC" /></a>
                 <p><em>&copy; 2016 - Skedans Systems, Inc., All Rights Reserved.</em></p>
                 <p id="license">EasyRTC source code released under a BSD2 License. <a href="https://github.com/priologic/easyrtc/blob/master/LICENSE">See LICENSE file in project folder</a> for details.</p>
             </div>

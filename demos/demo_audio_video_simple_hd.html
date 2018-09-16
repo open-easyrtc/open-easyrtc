@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
         <title>EasyRTC Demo:EasyRTC Demo: Video+Audio HD 720</title>
-        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
+        <link rel="stylesheet" type="text/css" href="../easyrtc/easyrtc.css" />
 
         <!--hide-->
         <link rel="stylesheet" type="text/css" href="css/landing.css" />
@@ -17,7 +17,7 @@
 
         <!--show-->            <!-- Assumes global locations for socket.io.js and easyrtc.js -->
         <script src="/socket.io/socket.io.js"></script>
-        <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
+        <script type="text/javascript" src="../easyrtc/easyrtc.js"></script>
         <script type="text/javascript" src="js/demo_audio_video_simple_hd.js"></script>
 
     </head>
@@ -46,8 +46,8 @@
                     <div id="videos">
 
                         <div style="position:relative;float:left;" width="1282" height="722">
-                            <video autoplay="autoplay" id="callerVideo"></video>
-                            <video  class="easyrtcMirror" autoplay="autoplay" id="selfVideo" muted="true" volume="0" ></video>
+                            <video autoplay="autoplay" playsinline="playsinline" id="callerVideo"></video>
+                            <video autoplay="autoplay" playsinline="playsinline" class="easyrtcMirror" id="selfVideo" muted="true" volume="0" ></video>
                         </div>
                         <!-- each caller video needs to be in it's own div so it's close button can be positioned correctly -->
                     </div>
@@ -85,7 +85,7 @@
             </div>
             <div id="footer">
                 <a href="http://www.skedans.com/?from=landing"><img id="logo_priologic" src="images/skedans_logo.png" height="40" width="150" alt="Created By Skedans Systems, Inc." /></a>
-                <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="/easyrtc/img/powered_by_easyrtc.png" height="60" width="200" alt="Powered By EasyRTC" /></a>
+                <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="../easyrtc/img/powered_by_easyrtc.png" height="60" width="200" alt="Powered By EasyRTC" /></a>
                 <p><em>&copy; 2016 - Skedans Systems, Inc., All Rights Reserved.</em></p>
                 <p id="license">EasyRTC source code released under a BSD2 License. <a href="https://github.com/priologic/easyrtc/blob/master/LICENSE">See LICENSE file in project folder</a> for details.</p>
             </div>

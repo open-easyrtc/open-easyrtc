@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EasyRTC Documentation</title>
+	<link href="assets/easyrtc-docs-styles-1.css" media="all" rel="stylesheet" />
+</head>
+<body>
+<header class="template">
+	<div class="wrapper-content">
+    <a href="./index.html"><img src="assets/easyrtc-logo.png" alt="EasyRTC Documentation"></a>
+		<h1 title="EasyRTC Documentation">Documentation</h1>
+	</div>
+</header>
+<div class="wrapper-docs">
+<nav>
+	<h2><a href="./index.html">Docs Home</a></h2>
+	<h3>EasyRTC Guides</h3>
+	<ul>
+		<li><a href="easyrtc_faq.html">FAQ</a></li>
+		<li><a href="easyrtc_gettingStarted.html">Getting Started</a></li>
+		<li><a href="easyrtc_server_install.html">EasyRTC Server: Installation</a></li>
+		<li><a href="easyrtc_client_tutorial.html">EasyRTC Framework Tutorial</a></li>
+		<li><a href="easyrtc_rooms.html">Rooms</a></li>
+		<li><a href="easyrtc_server_configuration.html">EasyRTC Server: Configuration</a></li>
+		<li><a href="easyrtc_server_events.html">EasyRTC Server: Events</a></li>
+		<li><a href="easyrtc_server_ice.html">EasyRTC Server: ICE Configuration</a></li>
+		<li><a href="easyrtc_with_other_servers.html">Using Alongside Other Servers</a></li>
+		<li><a href="easyrtc_server_ssl.html">EasyRTC Server: Using SSL</a></li>
+		<li><a href="easyrtc_webrtc_problems.html">WebRTC Problems and Possible Fixes</a></li>
+		<li><a href="easyrtc_upcoming_features.html">Upcoming Features</a></li>
+		<li><a href="easyrtc_changelog.html">Change Log</a></li>
+	</ul>
+
+	<h3>EasyRTC Client Classes</h3>
+	<ul>
+		<li><a href="client-api/Easyrtc.html">Easyrtc</a></li>
+		<li><a href="client-api/Easyrtc_App.html">Easyrtc_App</a></li>
+		<li><a href="client-api/Easyrtc_ft.html">Easyrtc_ft</a></li>
+		<li><a href="client-api/Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li>
+		<li><a href="client-api/Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li>
+		<li><a href="client-api/Easyrtc_Rates.html">Easyrtc_Rates</a></li>
+		<li><a href="client-api/Easyrtc_Recorder.html">Easyrtc_Recorder</a></li>
+	</ul>
+	<h3>EasyRTC Server Modules</h3>
+	<ul>
+		<li><a href="server-api/module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li>
+		<li><a href="server-api/module-easyrtc_default_options.html">easyrtc_default_options</a></li>
+		<li><a href="server-api/module-easyrtc_private_obj.html">easyrtc_private_obj</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj.html">easyrtc_public_obj</a></li>
+		<li><a href="server-api/module-easyrtc_util.html">easyrtc_util</a></li>
+		<li><a href="server-api/module-general_util.html">general_util</a></li>
+	</ul>
+	<h3>EasyRTC Server Classes</h3>
+	<ul>
+		<li><a href="server-api/module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj-pub.html">pub</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj-pub.events.html">events</a></li>
+		<li><a href="server-api/module-easyrtc_public_obj-pub.util.html">util</a></li>
+		<li><a href="server-api/module-easyrtc_util-eu.html">eu</a></li>
+		<li><a href="server-api/module-general_util-g.html">g</a></li>
+		<li><a href="server-api/pub.appObj.html">appObj</a></li>
+		<li><a href="server-api/pub.appObj.connectionObj.html">connectionObj</a></li>
+		<li><a href="server-api/pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li>
+		<li><a href="server-api/pub.appObj.roomObj.html">roomObj</a></li>
+		<li><a href="server-api/pub.appObj.sessionObj.html">sessionObj</a></li>
+	</ul>
+</nav>
+<div class="easyrtc-docs-content">
+
+<div class="getting-started-wrapper">
+
+  <h1>Getting Started with WebRTC using EasyRTC Open Source</h1>
+  <p><strong>Prerequesites:</strong> You should be comfortable with both HTML and JavaScript.</p>
+  <h2>Table of Contents</h2>
+  <ul class="nospace">
+    <li><a href="#what-is-webrtc">What is WebRTC</a></li>
+    <li><a href="#what-is-easyrtc-opensource">What Is EasyRTC OpenSource</a></li>
+    <li><a href="#installing-an-easyrtc-server">Installing an EasyRTC Server on your workstation</a></li>
+    <li><a href="#useful-terminology">Useful Terminology</a></li>
+    <li><a href="#your-first-app">Your First App</a></li>
+    <li><a href="#hosting-on-a-server">Hosting on a server - &quot;Let My Clients Go&quot;</a></li>
+    <li><a href="#scaling-up">Scaling Up</a></li>
+  </ul>
+
+  <a name="what-is-webrtc"></a>
+  <h2>What is WebRTC</h2>
+  <p>WebRTC is a technology that allows two peers to communicate peer-to-peer, that is to say, to exchange data that doesn&apos;t go through a server. It includes the ability to capture, transmit, receive, and play audio/video data, well as text and raw byte arrays. It&apos;s audio/video transmission is optimized to reduce latency (the delay between when audio/video is captured on end and played on the other end), which means its better for applications like video conferencing than watching movies.</p>
+  <p>WebRTC is currently supported by several brands of browsers (Chrome, Firefox, Opera, maybe Edge, but not Safari yet). It is also possible to write native WebRTC clients, but that is a more advanced topic than covered in this document.</p>
+  <p>The crucial thing to realize is that peer-to-peer doesn&apos;t mean that no servers are involved, it just means that the regular data doesn&apos;t go through them. At the bare minimum, a server is still needed for two clients to exchange some basic information (where am I on the network, what codecs do I support) so that they can establish that peer-to-peer connection. The information used to establish the peer to peer connection is called signaling, and the server is called a signaling server.</p>
+  <p>WebRTC makes no specification of what you use for a signalling server or what protocol it uses. Websockets is the most common, but people have also used long polling and even email (twitter is possible but more painful due to the character length limitation).</p>
+  <p>When your product is in development, running your own server locally is very convenient; you can restart it whenever you want so that its at a known state, it&apos;s easier to check the logs, you can customize it&apos;s behavior, and it doesn&apos;t cost you anything. However, when your product moves into production you&apos;ll eventually be more concerned with robustness and scalablity, which are full time jobs in their own right.</p>
+
+  <a name="what-is-easyrtc-opensource"></a>
+  <h2>What Is EasyRTC OpenSource</h2>
+  <p>EasyRTC OpenSource is:</p>
+  <ul>
+    <li>A browser client library written in JavaScript. This client handles the signaling and to a large extent insulates applications from ongoing changes in the WebRTC api.</li>
+    <li>A signalling server based on Node.js. Node.js runs on platforms as small as a single core Raspberry Pi (first edition) to servers in the cloud.</li>
+  </ul>
+  <p>Together, these two components will let you write a simple video conferencing application, or a file sharing application, etc in just a few lines of simple code.</p>
+  <h3>EasyRTC Open Source Application Architecture Diagram</h3>
+
+  <div class="diagram-wrapper">
+    <div class="diagram">
+      <p>Web Browser<br>&nbsp;</p>
+      <div class="diagram-center"><div class="diagram-level-1 diagram-head"><p>Your EasyRTC Application Code</p></div></div>
+      <div class="diagram-bidirectional">
+        <div class="diagram-bidirectional-arrows">&#8597;</div>
+      </div>
+      <div class="diagram-level-1 diagram-space">
+        <p>EasyRTC Client Libraries</p>
+        <div class="diagram-third"><p>EasyRTC</p></div>
+        <div class="diagram-third"><p>EasyApp</p></div>
+        <div class="diagram-third"><p>EasyRTC_Rates</p></div>
+        <div class="diagram-third"><p>EasyRTC_Recorder</p></div>
+      </div>
+      <div class="diagram-bidirectional">
+        <div class="diagram-bidirectional-arrows">&#8597;</div>
+        <div class="diagram-bidirectional-arrows">&#8597;</div>
+      </div>
+      <div class="diagram-center">
+        <div class="diagram-level-1 diagram-half"><p>Socket.io</p></div>
+        <div class="diagram-level-1 diagram-half"><p>WebRTC</p></div>
+      </div>
+    </div>
+    <div class="diagram-bidirectional diagram-overlap">
+      <div class="diagram-bidirectional-arrows">&#8597;</div>
+      <div class="diagram-bidirectional-arrows">&#8597;</div>
+    </div>
+    <div class="diagram-center">
+      <div class="diagram-level-1 diagram-external"><p>EasyRTC Server</p></div>
+      <div class="diagram-bidirectional-arrows-lr">&#8596;</div>
+      <div class="diagram-level-1 diagram-external"><p>Another EasyRTC Client</p></div>
+    </div>
+  </div>
+
+
+
+  <a name="installing-an-easyrtc-server"></a>
+  <h2>Installing an EasyRTC Server on your workstation</h2>
+  <p>Installing an EasyRTC server on your workstation (be it a desktop or laptop) is the quick and easy way to get started. It will let you run your EasyRTC clients on the same workstation without having to fuss with SSL certificates. It will be less useful for testing your application with clients running other devices; WebRTC clients running on Chrome, can&apos;t access cameras or microphones unless they are hosted from SSL servers or on the same machine (it&apos;s a browser security constraint).</p>
+  <p>The easy way to do this is:</p>
+  <ul>
+    <li>Install (if you don&apos;t already have) a reasonably uptodate version of node.js on your machine. You can find node.js at <a href="https://nodejs.org/">https://nodejs.org/</a></li>
+    <li>Install a git client (if you don&apos;t already have one) on your machine. You can find git at <a href="https://git-scm.com/downloads">https://git-scm.com/downloads</a></li>
+    <li>
+      There are several ways we could pull down the easyrtc code base. The way we&apos;ll use has the advantage of you don&apos;t have to worry if somebody remebered to update an npm repository and it&apos;s trivial to switch to the beta (development) branch of easyrtc if you need to get recent bugfixes. Download easyrtc from the github repository with the command:
+      <br><code>git clone git@github.com:priologic/easyrtc.git</code>
+    </li>
+    <li>
+      Enter your new easyrtc directory (created by the git clone command):
+      <br><code>cd easyrtc</code>
+      <br><br>You should see a file called package.json .
+    </li>
+    <li>
+      Get the first set of dependencies by issuing the instruction:
+      <br><code>npm install</code>
+    </li>
+    <li>
+      Enter the server_example directory.
+      <br><code>cd server_example</code>
+    </li>
+    <li>Get the second set of dependencies by issuing the instruction:
+      <br><code>npm install</code>
+    </li>
+  </ul>
+  <p>
+    Assuming you haven&apos;t gotten any nasty errors, you should be able to start the seserver by issuing the following command (while in the server_example directory):
+    <br><code>node server.js</code>
+  </p>
+  <p>By default, the server serves demo applications on port 8080, so if you run a compatible browser on the same machine, and point it at localhost:8080, it should take you to the demos page. Pick a demo to run (the simple audio video demo is a good choice). Open a new tab and point it at the same URL to have a second instance of the demo so you can try the two way communications.</p>
+  <p>Warning: if you run two instances of the same webrtc application in the same physical room without using earphones, each will pick up the audio output of the other, resulting in a shrill feedback squeal. If there is anybody else in the same room, consider muting your speakers first.</p>
+  <p>Note: the simple audio video demo displays the output of the local camera (it&apos;s a good reminder so you don&apos;t do anything uncouth while in a conference) and the output of a potentially remote camera. When you are running everything on the same machine you&apos;ll notice that one display is mirrored compared to the other. If you are wondering why this is done, try the following:</p>
+  <ul>
+    <li>Raise your left hand while in front of the camera and consider which video pane looks correct.</li>
+    <li>Hold some printed text in front of the camera and consider which video pane looks correct.</li>
+  </ul>
+
+  <a name="useful-terminology"></a>
+  <h2>Useful Terminology</h2>
+  <p><strong><em>Video track:</em></strong> An object representing the output of a single camera or equivalent device</p>
+  <p><strong><em>Audio track:</em></strong> An object representing the output of a single microphone or equivalent device</p>
+  <p><strong><em>Media Stream:</em></strong> An object that serves as a package to hold one or more video tracks and/or one or more audio tracks.</p>
+  <p><strong><em>Data channel:</em></strong> An object used to send strings or binary data from one peer to another peer.</p>
+  <p><strong><em>Peer connection:</em></strong> An object that serves as portal between two peers, allowing media streams and data channels to be shared across a network.</p>
+  <p><strong><em>Easyrtcid:</em></strong> An id for a peer that is unique across an EasyRTC server.</p>
+  <p><strong><em>Call:</em></strong> As a verb, the act of establishing a peer connection with another peer so that media streams or data can be sent. As a noun, the state of having a working peer connection to another peer.</p>
+
+  <a name="your-first-app"></a>
+  <h2>Your First App</h2>
+  <p>Our simple browser app is going to follow the model of the simple audio video demo, which has two parts: an HTML file that defines some HTMLVideoObjects to display media streams and some buttons to initiate calls, and a JavaScript file for the program logic.</p>
+
+  <h3>The HTML</h3>
+  <p>The HTML will look like this:</p>
+
+  <pre>
+  &lt;!DOCTYPE html&gt;
+  &lt;html&gt;
+      &lt;head&gt;
+          &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+          &lt;title&gt;MyFirst app&lt;/title&gt;
+          &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;/easyrtc/easyrtc.css&quot; /&gt;
+          &lt;script src=&quot;/socket.io/socket.io.js&quot;&gt;&lt;/script&gt;
+          &lt;script type=&quot;text/javascript&quot; src=&quot;/easyrtc/easyrtc.js&quot;&gt;&lt;/script&gt;
+          &lt;script type=&quot;text/javascript&quot; src=&quot;MyFirstApp.js&quot;&gt;&lt;/script&gt;
+          &lt;style&gt;
+              video {
+                       width:320px;
+                       height:240px;
+                    }
+              .divHolder {
+                    position:relative;
+                    float:left; 
+                    background-color: blue;
+                    margin: 1px;
+                    }
+          &lt;/style&gt;
+      &lt;/head&gt;
+      &lt;body&gt;
+          &lt;button onclick = &quot;connect();&quot;&gt; Connect to server&lt;/button&gt;
+          &lt;div id=&quot;otherClients&quot;&gt;Peers:&lt;/div&gt;
+          &lt;div&gt;
+              &lt;div class=&quot;divHolder&quot;&gt;
+                &lt;video autoplay=&quot;autoplay&quot; class=&quot;easyrtcMirror&quot; id=&quot;selfVideo&quot; muted=&quot;muted&quot; volume=&quot;0&quot; &gt;&lt;/video&gt;
+              &lt;/div&gt;
+
+              &lt;div class=&quot;divHolder&quot;&gt;
+                &lt;video autoplay=&quot;autoplay&quot; id=&quot;callerVideo1&quot;&gt;&lt;/video&gt;
+              &lt;/div&gt;
+
+              &lt;div class=&quot;divHolder&quot;&gt;
+                &lt;video autoplay=&quot;autoplay&quot; id=&quot;callerVideo2&quot;&gt;&lt;/video&gt;
+              &lt;/div&gt;
+
+              &lt;div class=&quot;divHolder&quot;&gt;
+                &lt;video autoplay=&quot;autoplay&quot; id=&quot;callerVideo3&quot;&gt;&lt;/video&gt;
+              &lt;/div&gt;
+          &lt;/div&gt;
+      &lt;/body&gt;
+  &lt;/html&gt;
+  </pre>
+
+  <p>The first thing you&apos;ll notice is the reference to /easyrtc/easyrtc.css and /easyrtc/easyrtc.js. The easyrtc.css and easyrtc.js files are actually in the api folder, but the server is set up to map /easyrtc to the api folder.</p>
+  <p>The easyrtc.js file contains the basic Easyrtc methods and the Easyrtc_App methods. The easyrtc.css file contains a css definition for making a video mirrored and for positioning a &quot;close call&quot; icon above on the videos. The socket.io.js file provides websocket communication with the server. The MyFirstAp.js file is where our application specific JavaScript code will reside.</p>
+  <p>The connect method will be used to start the connection to the server.</p>
+  <p>The otherClients div will be used to hold buttons to call the other peers.</p>
+  <p>The divs that surrond each of the video objects are part of a mechanism that positions the &quot;close call&quot; icon on the contained video object.</p>
+
+  <h3>The JavaScript</h3>
+  <p>The JavaScript we will need is below.</p>
+  <pre>
+  function connect() {
+      easyrtc.setRoomOccupantListener(convertListToButtons);
+      easyrtc.easyApp(&quot;easyrtc.audioVideoSimple&quot;, &quot;selfVideo&quot;, 
+          [&quot;callerVideo1&quot;, &quot;callerVideo2&quot;, &quot;callerVideo3&quot;],
+                      loginSuccess, loginFailure);
+  }
+
+  function convertListToButtons (roomName, data, isPrimary) {
+      var otherClientDiv = document.getElementById('otherClients');
+      otherClientDiv.innerHTML = &quot;&quot;;
+      for(var easyrtcid in data) {
+          var button = document.createElement('button');
+
+          button.onclick = function(easyrtcid) {
+              return function() {
+                  performCall(easyrtcid);
+              };
+          }(easyrtcid);
+
+          var label = document.createTextNode(easyrtcid);
+          button.appendChild(label);
+          otherClientDiv.appendChild(button);
+      }
+  }
+
+  function performCall(otherEasyrtcid) {
+      var successCB = function() {};
+      var failureCB = function() {};
+      easyrtc.call(otherEasyrtcid, successCB, failureCB);
+  }
+
+  function loginSuccess(easyrtcid) {
+      easyrtc.showError(&quot;none&quot;, &quot;Successfully connected&quot;);
+  }
+
+  function loginFailure(errorCode, message) {
+      easyrtc.showError(errorCode, message);
+  }
+  </pre>
+
+  <p>The connect method does two things:</p>
+  <ul>
+    <li>Sets up a callback that will be called whenever the list of peers connected to the server changes.</li>
+    <li>Initiate a connection to the easyrtc server while supplying a list of video objects that can be attached to media streams.</li>
+  </ul>
+
+  <p>The convertListToButtons function builds a button for each peer known by the server. Each button has a callback that generates a call to a particular peer.</p>
+  <p>The performCall method takes a peer&apos;s easyrtcid and requests a call to it. When the call is established and a remote media stream is received from the peer, a callback (implicitly set up by the easyApp method) will attach that media stream to the first available video object. The easyApp method we used to initialize the connection sets up callbacks; one of the callbacks attaches a media stream received from the peer to a free video object, another callback clears a video object when the associated media stream ends.</p>
+  <p>This application just scratches on the surface of the EasyRTC API.</p>
+
+  <a name="hosting-on-a-server"></a>
+  <h2>Hosting on a server - &quot;Let My Clients Go&quot;</h2>
+  <p>There are three parts to hosting your application on a server.</p>
+  <ul class="nospace">
+    <li>Changing the server&apos;s port, since you probably don&apos;t want to use 8080.</li>
+    <li>Using SSL.</li>
+    <li>Providing STUN and TURN servers.</li>
+  </ul>
+
+  <h3>Changing the port</h3>
+  <p>To change the port that the applications serves on, open your server_example/server.js file in an editor. Look for a line that reads:</p>
+  <code>var webServer = http.createServer(app).listen(8080);</code>
+  <p>This line is determining what port your server is reached at. Change the 8080 to some other port number that isn&apos;t already being used. Be aware that on linux based systems, the lower numbered ports (< 1024) can normally only be used by a service that is run with root level permissions, so sticking with a higher numbered port is a good idea.</p>
+
+  <h3>Using SSL</h3>
+  <p>As mentioned earlier, apps running on Chrome browsers can&apos;t access local cameras and microphones unless the application is hosted from localhost or an SSL server (https). When you are doing development, it is simplest to get node.js to handle the SSL. You can find detailed instructions on the <a href="easyrtc_server_ssl.html">EasyRTC: Using SSL</a> page.</p>
+  <p>For production however, you should look at using NGINX, HAProxy, or a similar tool. These tools will map a low numbered port (like 443, the default https port) to a high-numbered port while handling the SSL encryption so your server code just sees regular non-SSL traffic coming in from a high numbered port. Our experience is that they offer much greater performance and reduced latency compared to handling the SSL inside the easyrtc server itself.</p>
+
+  <h3>Providing STUN and TURN servers.</h3>
+  <h4>The Why and The What</h4>
+  <p>WebRTC is advertised as being peer-to-peer, so the first question a new comer to the technology has is, &quot;if it&apos;s peer-to-peer, why do I still need servers?&quot;</p>
+  <p>In an ideal world (from the perspective of implementing peer-to-peer applications), all our devices would have unique addresses that could be reached from anywhere on the internet. Of course, the real world is far from ideal thanks to routers and firewalls that provide NAT and symmetric NAT behavior.</p>
+  <p>NAT is an abbreviation for Network Address Translation. What it basically means is that devices behind a router (that provides NAT) all appear to have the same IP address. When a device inside the network sends a packet to a device behind the router, its IP address is replaced by the routers external address, and its port is replaced by a unique port on the router (allocated for just that dialog).  When the device in front of the router sends a packet back, the router looks up the port number to figure out original device&apos;s address and relays the packet onto it. What this means is that a device in front of the router can&apos;t initiate a dialog with a device behind the router, which implies, two devices that are behind different routers can&apos;t initiate dialogs with each other at all (since neither can initiate the dialog). This is where a STUN server becomes useful.</p>
+  <p>STUN servers take advantage of something called port busting. When a device behind a NAT enforcing router contacts a device in front of the router, a hole is opened for the allocated port on the router, and the router doesn&apos;t check who (in front of the router) is sending packets through that hole. The way it works is: each devices contacts a STUN server, which opens up a hole in their respective routers and tells them the location of hole (IP address and port) as seen by the outside world. Using a signaling service, each device tells the other device the address of the hole it&apos;s opened. After that communication can proceed in a true peer-to-peer manner without further reliance on the STUN server.</p>
+  <p>While consumer owned devices tend to be behind routers with NAT behavior, but corporations lock down their networks much more, enforcing a policy called symmetrical NAT. Symmetrical NAT means that a router only allows an outside device send packets back through a router hole if it was the original device that was contacted to create the hole. If two devices are behind different routers that both have symmetrical NAT behavior, STUN servers are useless and you need a proxy service (that both devices can reach) to relay packets between the two of them. This is call a TURN service. Because it has to relay every packet between the two devices. In theory, only %5 of all calls will need the use of a TURN server, but that is generalization for WebRTC in general and the actual percentage is going to reflect what target audiences a particular WebRTC application serves.</p>
+
+  <h4>When And Where You Need Them</h4>
+  <p>In theory, you can make use of public STUN servers for free. STUN servers only need to send a few packets to help initiate any particular call, so they are very cheap to run. However, public STUN servers aren&apos;t always there when you need them, they come and go. Having your own means you have a stable set of servers whose addresses don&apos;t change.</p>
+  <p>TURN servers, being bandwidth intensive, are not available for free, except as a &quot;freemium&quot; service with limitations that prevent you from using it for production. If your target clients are inside businesses, government, or education institutions, you are going to need more turn servers than if your target clients are consumers connecting from their homes.</p>
+  <p>If your peer-to-peer traffic is staying inside a particular organization, a few STUN servers at various levels of the network may be all you need. In the more general case, you want TURN servers located someplace that minimizes the packet travel times between the peers and the TURN server. For example, if you are running service on people in Australia, you&apos;d want to use a TURN service hosted in Australia instead of the United States.</p>
+
+  <h4>Whose To Use</h4>
+  <p>There are two possible directions you can go with TURN services; run your own or rent somebody elses. In choosing, you&apos;ll need to consider pricing structure, scalability, ease of integration, locality to your clients, and how much of your own time you want to devote to setting up and running the service.</p>
+  <p>In the &quot;run your own&quot; camp, the popular solution is called CoTURN which can be found <a href="https://github.com/coturn/coturn">here</a>.</p>
+
+  <p>In the &quot;rent somebody elses&quot; camp, there is a lot to choose from. Below is a partial list of the bigger names.</p>
+  <ul class="nospace">
+    <li><a href="https://www.twilio.com/docs/api/stun-turn">Twilio</a></li>
+    <li><a href="http://www.eyeball.com/standards/stun-turn-ice/">Eyeball Networks</a></li>
+    <li><a href="http://viagenie.ca/">Viagenie</a> (notable because they offer a <a href="http://numb.viagenie.ca/">freemium account</a>)</li>
+    <li><a href="https://xirsys.com/">XirSYS</a></li>
+  </ul>
+  <p>Priologic Software is also planning to offer a STUN/TURN service that will have advantage of being trivial to integrate with your EasyRTC Server and very competitive pricing. See <a href="https://easyrtc.com/products/easyrtc-stun-turn/" title="EasyRTC STUN / TURN Service">EasyRTC STUN / TURN Service</a> for more details.</p>
+
+  <h4>Adding STUN and TURN services To Your EasyRTC Server</h4>
+  <p>This is covered in detail in this document: <a href="easyrtc_server_ice.html">EasyRTC Server: ICE Configuration</a>.</p>
+
+  <a name="scaling-up"></a>
+  <h2>Scaling Up</h2>
+  <p>The EasyRTC Open offering has scalability limitations in two different areas: the number of peers that can be in a video conference together, and the number of peers that can connect to the server.</p>
+
+  <h3>The Video Conference Limitation</h3>
+  <p>Any client using a purely peer-to-peer connection is limited in the number of media streams it can send and receive. That limit depends on the the processing power of the hardware the client is running on, and the upload speed of its connections to other peers. Typically, the later is encountered well before the former. We&apos;ve seen a 640x480 video successfully shared to 14 peers when all parties are on the same local network, but struggle with 3 peers when the peers were spread across the internet. The user observed effect is that the frame rate gets low, the picture gets grainy and pixelated, sound gets choppy, and connections can get dropped.</p>
+  <p>There are two solutions for this general problem: Media Servers and Selective Forwarding Units (SFU&apos;s). The idea of a media server is that everybody sends their local media to the media server, and in return the media server sends everybody a single composite media stream. An SFU also receives the peers local media streams, but instead of combining them, it relays the received media streams to the other parties.</p>
+  <p>EasyRTC doesn&apos;t currently support SFU&apos;s and Media Servers.</p>
+
+  <h3>The Peer To Server Limitation</h3>
+  <p>Currently, the EasyRTC server runs on a single Node.js instance. That means it is limited by the amount of memory and the number of ports the node.js instance has access to. It can also only send out and receive messages so fast. The number of clients it can support can range from hundreds to thousands, depending on how much demand your application puts on the server. This also means the EasyRTC server isn&apos;t as robust as you want for a production system. If the host running the server process goes down, the service fails.</p>
+  <h3>An Upcoming Solution</h3>
+  <p>The upcoming PlatformRTC PAAS has a wrapper that will let most EasyRTC clients run with minimal (if any) changes, while providing scalibilty and robustness through a distributed system. See <a href="https://easyrtc.com/products/easyrtc-enterprise/" title="EasyRTC Enterprise">EasyRTC Enterprise</a> link for more details.</p>
+  <p>There are also plans to add MediaServer and/or SFU support to the PlatformRTC service.</p>
+
+</div>
+	</div>
+</div>
+<footer class="template">
+	<div class="wrapper-content">
+		<p>Copyright &copy;2016 EasyRTC</p>
+	</div>
+</footer>
+</body>
+</html>

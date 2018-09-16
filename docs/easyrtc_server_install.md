@@ -171,7 +171,7 @@ Below is the initial server program which will run an EasyRTC server along with 
     var http    = require("http");              // http server core module
     var express = require("express");           // web framework external module
     var io      = require("socket.io");         // web socket external module
-    var easyrtc = require("easyrtc");           // EasyRTC external module
+    var easyrtc = require("..");           // EasyRTC external module
 
     // Setup and configure Express http server. Expect a subfolder called "static" to be the web root.
     var httpApp = express();
@@ -382,7 +382,7 @@ Below is the initial server program which will run an EasyRTC server along with 
     var http    = require("http");              // http server core module
     var express = require("express");           // web framework external module
     var io      = require("socket.io");         // web socket external module
-    var easyrtc = require("easyrtc");           // EasyRTC external module
+    var easyrtc = require("..");           // EasyRTC external module
 
     // Setup and configure Express http server. Expect a subfolder called "static" to be the web root.
     var httpApp = express();

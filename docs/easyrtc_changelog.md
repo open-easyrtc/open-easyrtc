@@ -1,9 +1,37 @@
 EasyRTC: Change Log
 ===================
 
+v1.1.1
+-------
+New Features:
+  - Documentation - Added explanation on why native clients aren't provided.
+  - JS Client - Added restart ice.
+  - JS Client - Added support for Half-trickle ice.
+  - Server - Added methods to obtain connected easyrtcids with a given username.
+  - JS Client - Pass stillAliveInterval from server. detect lack of still alive response on client.
+  - JS Client - Better support for Cordova on iOS.
+
+Changes:
+  - JS Client - URL.createObjectURL was deprecated.
+  - JS Client - Changes to typescript files.
+  - JS Client - Updated use of navigator.GetUserMedia.
+  - JS Client - Got rid of multistream_no_iframe demo since we don't have a plugin for it.
+  - JS Client - Applied Chpasha's fix to support Temasys plugin.
+  - JS Client - Updated webrtc-adapter and modified demo_multistream.
+  - JS Client - fix Uncaught TypeError: Reduce of empty array with no initial value.
+  - Server - New disconnect() function from sever code's connection object to allow for more graceful connections.
+
+Fixes:
+  - JS Client - Fix possible bad PeerConnection state on create-answer failure.
+  - JS Client - RoomApiFieldTimer was being cleared instead of an element of it.
+  - JS Client - Got rid of warning message about element not connected to root.
+  - JS Client - fixed SessionDescription bug and IceCandidate bug.
+  - Server - Fix issue where server's connectionObj.getUsername() didn't return a null if the connection object had no username.
+
 v1.1.0
 -------
 New Features:
+ 
  - JS Client - Added setPeerOpenListener and setSignalingStateChangeListener. 
  - JS Client - Added options to set preferred video codec in peer connection.
  - JS Client - Added media stream recording feature and demo.
@@ -11,6 +39,7 @@ New Features:
  - Documentation - Added info on git install steps. 
 
 Changes:
+ 
  - JS Client - Use minFrameRate/MaxFrameRate for Firefox and Edge instead of frameRate.min and frameRate.max.
  - JS Client - Updated to use WebRTC ontrack api and newer media constraints api.
  - JS Client -Updated the ice filter demo and exposed it on the demo page.
@@ -21,8 +50,9 @@ Changes:
  - Documentation - Updated link to EasyRTC forum.
  - Documentation - Updated README to include bower install step.
  - Documentation - Updated docs to reflect the ../ reference in server.js and the need to run https servers.
-  
+
 Fixes:
+ 
  - JS Client - Fixed file sharing demo.
  - JS Client - Put a guard on onPeerClosed.
  - JS Client - Improvements in cancelling file transfer requests.
@@ -41,6 +71,7 @@ v1.0.17
 New Features:
 
 Changes:
+ 
  - JS Client - Remove check to see if createRTCPeerConnection works.
  - JS Client - Got rid of setVideoSrc (use setVideoSource instead)
  - JS Client - Updated adapter.js.
@@ -63,14 +94,17 @@ v1.0.16
 -------
 
 New Features:
+ 
  - Add getSourceList and getAudioSourceList #80
  - IceConnectionStateChangeListener #122
 
 Changes:
+
  - Update to socket.io 1.3.7 #209
  - Remove deprecated easyrtc.setVideoBandwidth #120
 
 Fixes:
+
  - JS Client - WebRTC Version Detecting Fails When Simulating iPad In Chrome Dev Tools #90
  - JS Client - FileTransfer support on IE10 #137 #135
  - JS Client - Firefox and previous WebRTC impl does not call emitOnStreamClosed #173

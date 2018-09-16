@@ -1,7 +1,7 @@
 {
   "name": "easyrtc",
   "main": "api/easyrtc.js",
-  "version": "1.1.0",
+  "version": "1.1.1-beta",
   "homepage": "http://easyrtc.com/",
   "authors": [
     "Rod Apeldoorn <rod.apeldoorn@priologic.com>",
@@ -30,7 +30,7 @@
     "server_example"
   ],
   "devDependencies": {
-    "webrtc-adapter": "gh-pages",
+    "webrtc-adapter": "^5.0.6",
     "jasmine": "~2.2.1",
     "requirejs": "~2.1.16"
   }

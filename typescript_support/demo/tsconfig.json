@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "lib": ["dom", "es6", "scripthost"],
+    "outDir": "./",
+    "module": "amd",
+    "noImplicitReturns": true
+  },
+  "files": [
+    "exercise_easyrtc_d_ts.ts",
+    "exercise_easyrtc_ft_d_ts.ts"
+  ]
+}

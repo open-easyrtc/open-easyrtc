@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>EasyRTC Documentation</title>
+  <script src="scripts/prettify/prettify.js"> </script>
+  <script src="scripts/prettify/lang-css.js"> </script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+  <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+  <link href="../assets/easyrtc-docs-jsdoc-styles-1.css" media="all" rel="stylesheet" />
+</head>
+<body>
+<header class="template">
+	<div class="wrapper-content">
+    <a href="../index.html"><img src="../assets/easyrtc-logo.png" alt="EasyRTC Documentation"></a>
+		<h1 title="EasyRTC Documentation">Documentation</h1>
+	</div>
+</header>
+<div class="wrapper-docs">
+<nav>
+	<h2><a href="../index.html">Docs Home</a></h2>
+	<h3>EasyRTC Guides</h3>
+	<ul>
+		<li><a href="../easyrtc_faq.html">FAQ</a></li>
+		<li><a href="../easyrtc_gettingStarted.html">Getting Started</a></li>
+		<li><a href="../easyrtc_server_install.html">EasyRTC Server: Installation</a></li>
+		<li><a href="../easyrtc_client_tutorial.html">EasyRTC Framework Tutorial</a></li>
+		<li><a href="../easyrtc_rooms.html">Rooms</a></li>
+		<li><a href="../easyrtc_server_configuration.html">EasyRTC Server: Configuration</a></li>
+		<li><a href="../easyrtc_server_events.html">EasyRTC Server: Events</a></li>
+		<li><a href="../easyrtc_server_ice.html">EasyRTC Server: ICE Configuration</a></li>
+		<li><a href="../easyrtc_with_other_servers.html">Using Alongside Other Servers</a></li>
+		<li><a href="../easyrtc_server_ssl.html">EasyRTC Server: Using SSL</a></li>
+		<li><a href="../easyrtc_webrtc_problems.html">WebRTC Problems and Possible Fixes</a></li>
+		<li><a href="../easyrtc_upcoming_features.html">Upcoming Features</a></li>
+		<li><a href="../easyrtc_changelog.html">Change Log</a></li>
+	</ul>
+	<h3>EasyRTC Client Classes</h3>
+	<ul>
+		<li><a href="../client-api/Easyrtc.html">Easyrtc</a></li>
+		<li><a href="../client-api/Easyrtc_App.html">Easyrtc_App</a></li>
+		<li><a href="../client-api/Easyrtc_ft.html">Easyrtc_ft</a></li>
+		<li><a href="../client-api/Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_Rates.html">Easyrtc_Rates</a></li>
+		<li><a href="../client-api/Easyrtc_Recorder.html">Easyrtc_Recorder</a></li>
+	</ul>
+	<h3>EasyRTC Server Modules</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li>
+		<li><a href="../server-api/module-easyrtc_default_options.html">easyrtc_default_options</a></li>
+		<li><a href="../server-api/module-easyrtc_private_obj.html">easyrtc_private_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj.html">easyrtc_public_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_util.html">easyrtc_util</a></li>
+		<li><a href="../server-api/module-general_util.html">general_util</a></li>
+	</ul>
+	<h3>EasyRTC Server Classes</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.html">pub</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.events.html">events</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.util.html">util</a></li>
+		<li><a href="../server-api/module-easyrtc_util-eu.html">eu</a></li>
+		<li><a href="../server-api/module-general_util-g.html">g</a></li>
+		<li><a href="../server-api/pub.appObj.html">appObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.html">connectionObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li>
+		<li><a href="../server-api/pub.appObj.roomObj.html">roomObj</a></li>
+		<li><a href="../server-api/pub.appObj.sessionObj.html">sessionObj</a></li>
+	</ul>
+</nav>
+<div class="easyrtc-docs-content">
+<div id="main">
+<h1 class="page-title">Source: easyrtc_server.js</h1>
+<section>
+<article>
+<pre class="prettyprint source linenums easyrtc"><code><a name="line1"></a><div class="linenumber">1</div><div style="width:0em;display:inline-block"></div>/*&nbsp;global&nbsp;module,&nbsp;require&nbsp;*/
+<a name="line2"></a><div class="linenumber">2</div><div style="width:0em;display:inline-block"></div>
+<a name="line3"></a><div class="linenumber">3</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line4"></a><div class="linenumber">4</div><div style="width:0em;display:inline-block"></div>*&nbsp;@file&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Entry&nbsp;library&nbsp;for&nbsp;EasyRTC&nbsp;server.&nbsp;Houses&nbsp;the&nbsp;primary&nbsp;listen&nbsp;function.
+<a name="line5"></a><div class="linenumber">5</div><div style="width:0em;display:inline-block"></div>*&nbsp;@author&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Priologic&nbsp;Software,&nbsp;info@easyrtc.com
+<a name="line6"></a><div class="linenumber">6</div><div style="width:0em;display:inline-block"></div>*&nbsp;@copyright&nbsp;&nbsp;&nbsp;Copyright&nbsp;2016&nbsp;Priologic&nbsp;Software.&nbsp;All&nbsp;rights&nbsp;reserved.
+<a name="line7"></a><div class="linenumber">7</div><div style="width:0em;display:inline-block"></div>*&nbsp;@license&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BSD&nbsp;v2,&nbsp;see&nbsp;LICENSE&nbsp;file&nbsp;in&nbsp;module&nbsp;root&nbsp;folder.
+<a name="line8"></a><div class="linenumber">8</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line9"></a><div class="linenumber">9</div><div style="width:0em;display:inline-block"></div>
+<a name="line10"></a><div class="linenumber">10</div><div style="width:0em;display:inline-block"></div>var&nbsp;g&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;require("./general_util");&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;General&nbsp;utility&nbsp;functions&nbsp;local&nbsp;module
+<a name="line11"></a><div class="linenumber">11</div><div style="width:0em;display:inline-block"></div>g.checkModules();&nbsp;//&nbsp;Check&nbsp;to&nbsp;ensure&nbsp;all&nbsp;required&nbsp;modules&nbsp;are&nbsp;available
+<a name="line12"></a><div class="linenumber">12</div><div style="width:0em;display:inline-block"></div>
+<a name="line13"></a><div class="linenumber">13</div><div style="width:0em;display:inline-block"></div>var&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;require("underscore");&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;General&nbsp;utility&nbsp;functions&nbsp;external&nbsp;module
+<a name="line14"></a><div class="linenumber">14</div><div style="width:0em;display:inline-block"></div>var&nbsp;pub&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;require("./easyrtc_public_obj");&nbsp;&nbsp;//&nbsp;EasyRTC&nbsp;public&nbsp;object
+<a name="line15"></a><div class="linenumber">15</div><div style="width:0em;display:inline-block"></div>
+<a name="line16"></a><div class="linenumber">16</div><div style="width:0em;display:inline-block"></div>
+<a name="line17"></a><div class="linenumber">17</div><div style="width:0em;display:inline-block"></div>var&nbsp;server&nbsp;=&nbsp;module.exports;
+<a name="line18"></a><div class="linenumber">18</div><div style="width:0em;display:inline-block"></div>
+<a name="line19"></a><div class="linenumber">19</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line20"></a><div class="linenumber">20</div><div style="width:0em;display:inline-block"></div>*&nbsp;Listener&nbsp;for&nbsp;starting&nbsp;the&nbsp;EasyRTC&nbsp;server.&nbsp;The&nbsp;successCallback&nbsp;can&nbsp;be&nbsp;used&nbsp;to&nbsp;determine&nbsp;when&nbsp;EasyRTC&nbsp;is&nbsp;fully&nbsp;running.
+<a name="line21"></a><div class="linenumber">21</div><div style="width:0em;display:inline-block"></div>*
+<a name="line22"></a><div class="linenumber">22</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{Object}&nbsp;httpApp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;express&nbsp;http&nbsp;object.&nbsp;Allows&nbsp;EasyRTC&nbsp;to&nbsp;interact&nbsp;with&nbsp;the&nbsp;http&nbsp;server.
+<a name="line23"></a><div class="linenumber">23</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{Object}&nbsp;socketServer&nbsp;&nbsp;&nbsp;socket.io&nbsp;server&nbsp;object.&nbsp;Allows&nbsp;EasyRTC&nbsp;to&nbsp;interact&nbsp;with&nbsp;the&nbsp;socket&nbsp;server.
+<a name="line24"></a><div class="linenumber">24</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{Object}&nbsp;options&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EasyRTC&nbsp;options&nbsp;object.&nbsp;Sets&nbsp;configurable&nbsp;options.&nbsp;If&nbsp;null,&nbsp;than&nbsp;defaults&nbsp;will&nbsp;be&nbsp;used.
+<a name="line25"></a><div class="linenumber">25</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{function(Error,&nbsp;Object)}&nbsp;listenCallback&nbsp;Called&nbsp;when&nbsp;the&nbsp;start&nbsp;up&nbsp;routines&nbsp;are&nbsp;complete.&nbsp;In&nbsp;form&nbsp;of&nbsp;successCallback(err,&nbsp;pub).&nbsp;The&nbsp;parameter&nbsp;'err'&nbsp;will&nbsp;null&nbsp;unless&nbsp;an&nbsp;error&nbsp;occurs&nbsp;and&nbsp;'pub'&nbsp;is&nbsp;the&nbsp;EasyRTC&nbsp;public&nbsp;object&nbsp;for&nbsp;interacting&nbsp;with&nbsp;the&nbsp;server.
+<a name="line26"></a><div class="linenumber">26</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line27"></a><div class="linenumber">27</div><div style="width:0em;display:inline-block"></div>server.listen&nbsp;=&nbsp;function(httpApp,&nbsp;socketServer,&nbsp;options,&nbsp;listenCallback)&nbsp;{
+<a name="line28"></a><div class="linenumber">28</div><div style="width:2em;display:inline-block"></div>pub.util.logInfo("Starting&nbsp;EasyRTC&nbsp;Server&nbsp;(v"&nbsp;+&nbsp;pub.getVersion()&nbsp;+")&nbsp;on&nbsp;Node&nbsp;("&nbsp;+&nbsp;process.version&nbsp;+&nbsp;")");
+<a name="line29"></a><div class="linenumber">29</div><div style="width:0em;display:inline-block"></div>
+<a name="line30"></a><div class="linenumber">30</div><div style="width:2em;display:inline-block"></div>//&nbsp;Set&nbsp;server&nbsp;object&nbsp;references&nbsp;in&nbsp;public&nbsp;object
+<a name="line31"></a><div class="linenumber">31</div><div style="width:2em;display:inline-block"></div>pub.httpApp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;httpApp;
+<a name="line32"></a><div class="linenumber">32</div><div style="width:2em;display:inline-block"></div>pub.socketServer&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;socketServer;
+<a name="line33"></a><div class="linenumber">33</div><div style="width:0em;display:inline-block"></div>
+<a name="line34"></a><div class="linenumber">34</div><div style="width:2em;display:inline-block"></div>if&nbsp;(options){
+<a name="line35"></a><div class="linenumber">35</div><div style="width:4em;display:inline-block"></div>pub.util.logDebug("Overriding&nbsp;options",&nbsp;options);
+<a name="line36"></a><div class="linenumber">36</div><div style="width:0em;display:inline-block"></div>
+<a name="line37"></a><div class="linenumber">37</div><div style="width:4em;display:inline-block"></div>for&nbsp;(var&nbsp;optionName&nbsp;in&nbsp;options)&nbsp;{
+<a name="line38"></a><div class="linenumber">38</div><div style="width:6em;display:inline-block"></div>pub.setOption(optionName,&nbsp;options[optionName]);
+<a name="line39"></a><div class="linenumber">39</div><div style="width:4em;display:inline-block"></div>}
+<a name="line40"></a><div class="linenumber">40</div><div style="width:2em;display:inline-block"></div>}
+<a name="line41"></a><div class="linenumber">41</div><div style="width:0em;display:inline-block"></div>
+<a name="line42"></a><div class="linenumber">42</div><div style="width:2em;display:inline-block"></div>pub.util.logDebug("Emitting&nbsp;event&nbsp;'startup'");
+<a name="line43"></a><div class="linenumber">43</div><div style="width:2em;display:inline-block"></div>pub.events.emit("startup",&nbsp;function(err)&nbsp;{
+<a name="line44"></a><div class="linenumber">44</div><div style="width:4em;display:inline-block"></div>if&nbsp;(err)&nbsp;{
+<a name="line45"></a><div class="linenumber">45</div><div style="width:6em;display:inline-block"></div>pub.util.logError("Error&nbsp;occurred&nbsp;upon&nbsp;startup",&nbsp;err);
+<a name="line46"></a><div class="linenumber">46</div><div style="width:6em;display:inline-block"></div>if(_.isFunction(listenCallback))&nbsp;{
+<a name="line47"></a><div class="linenumber">47</div><div style="width:8em;display:inline-block"></div>listenCallback(err,&nbsp;null);
+<a name="line48"></a><div class="linenumber">48</div><div style="width:6em;display:inline-block"></div>}
+<a name="line49"></a><div class="linenumber">49</div><div style="width:4em;display:inline-block"></div>}
+<a name="line50"></a><div class="linenumber">50</div><div style="width:4em;display:inline-block"></div>else&nbsp;{
+<a name="line51"></a><div class="linenumber">51</div><div style="width:6em;display:inline-block"></div>pub.util.logInfo("EasyRTC&nbsp;Server&nbsp;Ready&nbsp;For&nbsp;Connections&nbsp;(v"+&nbsp;pub.getVersion()&nbsp;+&nbsp;")");
+<a name="line52"></a><div class="linenumber">52</div><div style="width:6em;display:inline-block"></div>if(_.isFunction(listenCallback))&nbsp;{
+<a name="line53"></a><div class="linenumber">53</div><div style="width:8em;display:inline-block"></div>listenCallback(err,&nbsp;pub);
+<a name="line54"></a><div class="linenumber">54</div><div style="width:6em;display:inline-block"></div>}
+<a name="line55"></a><div class="linenumber">55</div><div style="width:4em;display:inline-block"></div>}
+<a name="line56"></a><div class="linenumber">56</div><div style="width:2em;display:inline-block"></div>});
+<a name="line57"></a><div class="linenumber">57</div><div style="width:0em;display:inline-block"></div>};
+<a name="line58"></a><div class="linenumber">58</div><div style="width:0em;display:inline-block"></div>
+<a name="line59"></a><div class="linenumber">59</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line60"></a><div class="linenumber">60</div><div style="width:0em;display:inline-block"></div>*&nbsp;Returns&nbsp;an&nbsp;EasyRTC&nbsp;options&nbsp;object&nbsp;with&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;default&nbsp;options.
+<a name="line61"></a><div class="linenumber">61</div><div style="width:0em;display:inline-block"></div>*
+<a name="line62"></a><div class="linenumber">62</div><div style="width:0em;display:inline-block"></div>*&nbsp;@returns&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{Object}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EasyRTC&nbsp;options&nbsp;object
+<a name="line63"></a><div class="linenumber">63</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line64"></a><div class="linenumber">64</div><div style="width:0em;display:inline-block"></div>server.getDefaultOptions&nbsp;=&nbsp;function()&nbsp;{
+<a name="line65"></a><div class="linenumber">65</div><div style="width:2em;display:inline-block"></div>var&nbsp;defaultOptions&nbsp;=&nbsp;require("./easyrtc_default_options");
+<a name="line66"></a><div class="linenumber">66</div><div style="width:2em;display:inline-block"></div>return&nbsp;g.deepCopy(defaultOptions);
+<a name="line67"></a><div class="linenumber">67</div><div style="width:0em;display:inline-block"></div>};
+<a name="line68"></a><div class="linenumber">68</div><div style="width:0em;display:inline-block"></div>
+<a name="line69"></a><div class="linenumber">69</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line70"></a><div class="linenumber">70</div><div style="width:0em;display:inline-block"></div>*&nbsp;Sets&nbsp;listener&nbsp;for&nbsp;a&nbsp;given&nbsp;EasyRTC&nbsp;event.&nbsp;Only&nbsp;one&nbsp;listener&nbsp;is&nbsp;allowed&nbsp;per&nbsp;event.&nbsp;Any&nbsp;other&nbsp;listeners&nbsp;for&nbsp;an&nbsp;event&nbsp;are&nbsp;removed&nbsp;before&nbsp;adding&nbsp;the&nbsp;new&nbsp;one.
+<a name="line71"></a><div class="linenumber">71</div><div style="width:0em;display:inline-block"></div>*
+<a name="line72"></a><div class="linenumber">72</div><div style="width:0em;display:inline-block"></div>*&nbsp;@private
+<a name="line73"></a><div class="linenumber">73</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{String}&nbsp;event&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Listener&nbsp;name.
+<a name="line74"></a><div class="linenumber">74</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{Function}&nbsp;listener&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Function
+<a name="line75"></a><div class="linenumber">75</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line76"></a><div class="linenumber">76</div><div style="width:0em;display:inline-block"></div>server.on&nbsp;=&nbsp;function(event,&nbsp;listener)&nbsp;{
+<a name="line77"></a><div class="linenumber">77</div><div style="width:2em;display:inline-block"></div>if&nbsp;(event&nbsp;&amp;&amp;&nbsp;_.isFunction(listener))&nbsp;{
+<a name="line78"></a><div class="linenumber">78</div><div style="width:4em;display:inline-block"></div>pub.events.removeAllListeners(event);
+<a name="line79"></a><div class="linenumber">79</div><div style="width:4em;display:inline-block"></div>pub.events.on(event,&nbsp;listener);
+<a name="line80"></a><div class="linenumber">80</div><div style="width:2em;display:inline-block"></div>}
+<a name="line81"></a><div class="linenumber">81</div><div style="width:2em;display:inline-block"></div>else&nbsp;{
+<a name="line82"></a><div class="linenumber">82</div><div style="width:4em;display:inline-block"></div>pub.util.logError("Unable&nbsp;to&nbsp;add&nbsp;listener&nbsp;to&nbsp;event&nbsp;'"&nbsp;+&nbsp;event&nbsp;+&nbsp;"'");
+<a name="line83"></a><div class="linenumber">83</div><div style="width:2em;display:inline-block"></div>}
+<a name="line84"></a><div class="linenumber">84</div><div style="width:0em;display:inline-block"></div>};
+<a name="line85"></a><div class="linenumber">85</div><div style="width:0em;display:inline-block"></div>
+<a name="line86"></a><div class="linenumber">86</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line87"></a><div class="linenumber">87</div><div style="width:0em;display:inline-block"></div>*&nbsp;Removes&nbsp;all&nbsp;listeners&nbsp;for&nbsp;an&nbsp;event.&nbsp;If&nbsp;there&nbsp;is&nbsp;a&nbsp;default&nbsp;EasyRTC&nbsp;listener,&nbsp;it&nbsp;will&nbsp;be&nbsp;added.
+<a name="line88"></a><div class="linenumber">88</div><div style="width:0em;display:inline-block"></div>*
+<a name="line89"></a><div class="linenumber">89</div><div style="width:0em;display:inline-block"></div>*&nbsp;@private
+<a name="line90"></a><div class="linenumber">90</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{String}&nbsp;event&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Listener&nbsp;name.
+<a name="line91"></a><div class="linenumber">91</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line92"></a><div class="linenumber">92</div><div style="width:0em;display:inline-block"></div>server.removeAllListeners&nbsp;=&nbsp;function(event)&nbsp;{
+<a name="line93"></a><div class="linenumber">93</div><div style="width:2em;display:inline-block"></div>if&nbsp;(event)&nbsp;{
+<a name="line94"></a><div class="linenumber">94</div><div style="width:4em;display:inline-block"></div>pub.events.removeAllListeners(event);
+<a name="line95"></a><div class="linenumber">95</div><div style="width:4em;display:inline-block"></div>pub.events.setDefaultListener(event);
+<a name="line96"></a><div class="linenumber">96</div><div style="width:2em;display:inline-block"></div>}
+<a name="line97"></a><div class="linenumber">97</div><div style="width:0em;display:inline-block"></div>};
+<a name="line98"></a><div class="linenumber">98</div><div style="width:0em;display:inline-block"></div>
+<a name="line99"></a><div class="linenumber">99</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line100"></a><div class="linenumber">100</div><div style="width:0em;display:inline-block"></div>*&nbsp;Returns&nbsp;the&nbsp;listeners&nbsp;for&nbsp;an&nbsp;event.
+<a name="line101"></a><div class="linenumber">101</div><div style="width:0em;display:inline-block"></div>*
+<a name="line102"></a><div class="linenumber">102</div><div style="width:0em;display:inline-block"></div>*&nbsp;@private
+<a name="line103"></a><div class="linenumber">103</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{String}&nbsp;event&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Listener&nbsp;name.
+<a name="line104"></a><div class="linenumber">104</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line105"></a><div class="linenumber">105</div><div style="width:0em;display:inline-block"></div>server.listeners&nbsp;=&nbsp;pub.events.listeners;
+<a name="line106"></a><div class="linenumber">106</div><div style="width:0em;display:inline-block"></div>
+<a name="line107"></a><div class="linenumber">107</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line108"></a><div class="linenumber">108</div><div style="width:0em;display:inline-block"></div>*&nbsp;Expose&nbsp;all&nbsp;event&nbsp;functions
+<a name="line109"></a><div class="linenumber">109</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line110"></a><div class="linenumber">110</div><div style="width:0em;display:inline-block"></div>server.events&nbsp;=&nbsp;pub.events;
+<a name="line111"></a><div class="linenumber">111</div><div style="width:0em;display:inline-block"></div>
+<a name="line112"></a><div class="linenumber">112</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line113"></a><div class="linenumber">113</div><div style="width:0em;display:inline-block"></div>*&nbsp;Expose&nbsp;public&nbsp;utility&nbsp;functions
+<a name="line114"></a><div class="linenumber">114</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line115"></a><div class="linenumber">115</div><div style="width:0em;display:inline-block"></div>server.util&nbsp;=&nbsp;pub.util;
+<a name="line116"></a><div class="linenumber">116</div><div style="width:0em;display:inline-block"></div>
+<a name="line117"></a><div class="linenumber">117</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line118"></a><div class="linenumber">118</div><div style="width:0em;display:inline-block"></div>*&nbsp;Sets&nbsp;individual&nbsp;option.
+<a name="line119"></a><div class="linenumber">119</div><div style="width:0em;display:inline-block"></div>*
+<a name="line120"></a><div class="linenumber">120</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{Object}&nbsp;option&nbsp;Option&nbsp;name
+<a name="line121"></a><div class="linenumber">121</div><div style="width:0em;display:inline-block"></div>*&nbsp;@param&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{Object}&nbsp;value&nbsp;&nbsp;Option&nbsp;value
+<a name="line122"></a><div class="linenumber">122</div><div style="width:0em;display:inline-block"></div>*&nbsp;@returns&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{Boolean}&nbsp;true&nbsp;on&nbsp;success,&nbsp;false&nbsp;on&nbsp;failure
+<a name="line123"></a><div class="linenumber">123</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line124"></a><div class="linenumber">124</div><div style="width:0em;display:inline-block"></div>server.setOption&nbsp;=&nbsp;pub.setOption;
+</code></pre>
+</article>
+</section>
+</div>
+		
+	</div>
+</div>
+<footer class="template">
+	<div class="wrapper-content">
+		<p>Copyright &copy;2016 EasyRTC</p>
+	</div>
+</footer>
+<!-- <script>prettyPrint();</script> -->
+<!-- <script src="scripts/linenumber.js"></script> -->
+</body>
+</html>

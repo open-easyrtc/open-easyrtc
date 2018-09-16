@@ -47,6 +47,31 @@ We have used EasyRTC in production since May of 2013 (see [https://tawk.com](htt
 There is a lot of work still to go in providing additional features which production code will need. We invite all users to give us feedback as to what features you desire.
 
 
+How do I do a native client?
+----------------------------
+
+We do not provide native client libraries.
+We tried making a business out of it at one point but the costs are
+greater than the revenue.
+There were two reasons for this.
+
+The first reason is that Google keeps changing the WebRTC API. 
+Most of the improvements are for the good, 
+but backwards compability isn't in their vocabulary. 
+Every few months we'd want to get the latest bug fixes in (some of which were sorely needed due to large memory leaks) 
+and discover our code wouldn't work with it.
+
+The bigger reason was an inability to provide cost-effective support.
+In the browser, you've got a single thread and no memory management issues.
+With native clients, one careless memory access from any other part of your program and you've got weird intermittent bugs
+that are time-consuming to track down.
+
+So we suggest using Cordova, which basically lets you write web applications that run inside a native app (both android and iOS).
+Actually, they are hybrid apps, you can mix in android calls as well.
+
+If you want to write your own EasyRTC native library and can think of a way to make it a viable business, feel free to.
+
+
 Is WebRTC production ready?
 ---------------------------
 

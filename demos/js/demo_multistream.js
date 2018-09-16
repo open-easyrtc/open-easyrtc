@@ -26,7 +26,7 @@
 var selfEasyrtcid = "";
 var haveSelfVideo = false;
 var otherEasyrtcid = null;
-
+var localStreamCount = 0;
 
 function disable(domId) {
     console.log("about to try disabling "  +domId);
@@ -40,13 +40,56 @@ function enable(domId) {
 }
 
 
+function createMediaStream() {
+    easyrtc.setVideoSource(videoCurrentId);
+    easyrtc.setAudioSource(audioCurrentId);
+    var streamName = "stream" + "_" + localStreamCount;
+    localStreamCount++;
+    easyrtc.initMediaSource(
+            function(stream) {
+                createMediaStreamGui(stream, streamName);
+                if( otherEasyrtcid) {
+                    easyrtc.addStreamToCall(otherEasyrtcid, streamName, function(easyrtcid, streamName){
+                        easyrtc.showError("Informational", "other party " + easyrtcid + " acknowledges receiving " + streamName);
+                    });
+                }
+            },
+            function(errCode, errText) {
+                easyrtc.showError(errCode, errText);
+            }, streamName);
+}
+
+var checkBoxId = 0;
+var audioCurrentId = null, 
+    videoCurrentId = null;
+
 function createLabelledButton(buttonLabel) {
     var button = document.createElement("button");
     button.appendChild(document.createTextNode(buttonLabel));
-    document.getElementById("videoSrcBlk").appendChild(button);
     return button;
 }
 
+function createRadioButton(buttonLabel, type) {
+    var radiobutton = document.createElement("input");
+    radiobutton.id = "radio" + (checkBoxId++);
+    radiobutton.name = type;
+    radiobutton.type = "radio";
+    radiobutton.value = buttonLabel;
+    var label = document.createElement("label");
+    label.for = radiobutton.id;
+    label.appendChild(document.createTextNode(buttonLabel));
+    var parent = document.getElementById(type + "SrcBlk");
+    parent.appendChild(label);
+    parent.appendChild(radiobutton);
+    parent.appendChild(document.createElement("br"));
+    return radiobutton;
+}
+
+function removeStreamFromPeers(streamName) {
+  if( otherEasyrtcid ) {
+       easyrtc.removeStreamFromCall(otherEasyrtcid, streamName);
+  } 
+}
 
 function addMediaStreamToDiv(divId, stream, streamName, isLocal)
 {
@@ -72,35 +115,34 @@ function addMediaStreamToDiv(divId, stream, streamName, isLocal)
 
 
 
-function createLocalVideo(stream, streamName) {
+function createMediaStreamGui(stream, streamName) {
     var labelBlock = addMediaStreamToDiv("localVideos", stream, streamName, true);
     var closeButton = createLabelledButton("close");
     closeButton.onclick = function() {
         easyrtc.closeLocalStream(streamName);
         labelBlock.parentNode.parentNode.removeChild(labelBlock.parentNode);
     }
+    var removeButton = createLabelledButton("remove");
+    removeButton.onclick = function() {
+         removeStreamFromPeers(streamName);
+    }
     labelBlock.appendChild(closeButton);
+    labelBlock.appendChild(removeButton);
 
     console.log("created local video, stream.streamName = " + stream.streamName);
 }
 
-function addSrcButton(buttonLabel, videoId) {
-    var button = createLabelledButton(buttonLabel);
+function addSrcButton(buttonLabel, deviceId, type) {
+    var button = createRadioButton(buttonLabel, type);
     button.onclick = function() {
-        easyrtc.setVideoSource(videoId);
-        easyrtc.initMediaSource(
-                function(stream) {
-                    createLocalVideo(stream, buttonLabel);
-                    if( otherEasyrtcid) {
-                        easyrtc.addStreamToCall(otherEasyrtcid, buttonLabel, function(easyrtcid, streamName){
-                            easyrtc.showError("Informational", "other party " + easyrtcid + " acknowledges receiving " + streamName);
-                        });
-                    }
-                },
-                function(errCode, errText) {
-                    easyrtc.showError(errCode, errText);
-                }, buttonLabel);
-    };
+         if(type == "audio" ) {
+           audioCurrentId = deviceId;
+         }
+         else {
+           videoCurrentId = deviceId;
+         }
+    }
+    return button;
 }
 
 function connect() {
@@ -108,36 +150,29 @@ function connect() {
     easyrtc.setRoomOccupantListener(convertListToButtons);
     easyrtc.connect("easyrtc.multistream", loginSuccess, loginFailure);
     easyrtc.setAutoInitUserMedia(false);
+    easyrtc.getAudioSourceList(function(audioSrcList) {
+        for (var i = 0; i < audioSrcList.length; i++) {
+             var audioEle = audioSrcList[i];
+            var audioLabel = (audioSrcList[i].label &&audioSrcList[i].label.length > 0)?
+			(audioSrcList[i].label):("src_" + i);
+            var button = addSrcButton(audioLabel, audioSrcList[i].deviceId, "audio");
+            if( !audioCurrentId ) {
+                audioCurrentId =  audioSrcList[i].deviceId;
+                button.checked = true;
+            }
+        }
+    });
+
     easyrtc.getVideoSourceList(function(videoSrcList) {
         for (var i = 0; i < videoSrcList.length; i++) {
              var videoEle = videoSrcList[i];
             var videoLabel = (videoSrcList[i].label &&videoSrcList[i].label.length > 0)?
 			(videoSrcList[i].label):("src_" + i);
-            addSrcButton(videoLabel, videoSrcList[i].deviceId);
-        }
-        //
-        // add an extra button for screen sharing
-        //
-        var screenShareButton = createLabelledButton("Screen capture/share");
-        var numScreens = 0;
-        if (!chrome.desktopCapture) {
-            screenShareButton.disabled = true;
-        }
-        else {
-            screenShareButton.onclick = function() {
-                numScreens++;
-                var streamName = "screen" + numScreens;
-                easyrtc.initScreenCapture(
-                        function(stream) {
-                            createLocalVideo(stream, streamName);
-                            if( otherEasyrtcid) {
-                                easyrtc.addStreamToCall(otherEasyrtcid, "screen");
-                            }
-                        },
-                        function(errCode, errText) {
-                            easyrtc.showError(errCode, errText);
-                        }, streamName);
-            };
+            var button = addSrcButton(videoLabel, videoSrcList[i].deviceId, "video");
+            if( !videoCurrentId ) {
+                videoCurrentId =  videoSrcList[i].deviceId;
+                button.checked = true;
+            }
         }
     });
 }

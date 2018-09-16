@@ -74,7 +74,8 @@ module.exports = (function() {
                 all: [
                     'Gruntfile.js',
                     '<%= config.apiPath %>/**/*.js',
-                    '<%= config.libPath %>/**/*.js'
+                    '<%= config.libPath %>/**/*.js',
+                    '!<%= config.apiPath %>/**/easyrtc.js',
                 ],
                 api: [
                     '<%= config.apiPath %>/**/*.js',
@@ -133,7 +134,7 @@ module.exports = (function() {
                              // Don't attempt to include dependencies whose path begins with socket.io/
                             "socket.io": "empty:",
                             // Ditto for the following 3rd-party libraries
-                            'webrtc-adapter': '<%= config.bowerPath %>/webrtc-adapter/adapter',
+                            'webrtc-adapter': '<%= config.bowerPath %>/webrtc-adapter/release/adapter',
                             'easyrtc_lang': '<%= config.apiPath %>/easyrtc_lang',
                             'easyrtc': '<%= config.apiPath %>/easyrtc_int',
                             'easyrtc_app': '<%= config.apiPath %>/easyrtc_app'

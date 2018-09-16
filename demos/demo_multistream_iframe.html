@@ -3,10 +3,11 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> <!--skip-->
         <title>EasyRTC Demo: Multistream calls</title>
-        <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
+        <link rel="stylesheet" type="text/css" href="../easyrtc/easyrtc.css" />
 
         <!--hide-->
         <link rel="stylesheet" type="text/css" href="css/landing.css" />
+        <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk">
 
         <!-- Prettify Code -->
         <script type="text/javascript" src="js/prettify/prettify.js"></script>
@@ -17,8 +18,8 @@
         <!--show-->
         <!-- Assumes global locations for socket.io.js and easyrtc.js -->
         <script src="/socket.io/socket.io.js"></script>
-        <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
-        <script type="text/javascript" src="/easyrtc/labs/desktop_capture_iframe_version.js"></script>
+        <script type="text/javascript" src="../easyrtc/easyrtc.js"></script>
+        <script type="text/javascript" src="../easyrtc/labs/desktop_capture_iframe_version.js"></script>
         <script type="text/javascript" src="js/demo_multistream_iframe.js"></script>
 
         <!--hide-->
@@ -84,6 +85,12 @@
                     You should see buttons representing the video sources and a list of buttons representing other people using this demo.
                     Click one of those buttons to initiate a chat. Note: this demo looks much better when hosted on an https site.</p>
 
+                <p>
+                   Important note: in order to use screen share, chrome browsers
+                   need to install the following 
+                   <a href="https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk?utm_source=chrome-app-launcher-info-dialog"> plugin. </a>
+ 
+                </p>
                 <hr />
                 <h2>The Demo</h2>
                 <!--show-->
@@ -138,7 +145,7 @@
             </div>
             <div id="footer">
                 <a href="http://www.skedans.com/?from=landing"><img id="logo_priologic" src="images/skedans_logo.png" height="40" width="150" alt="Created By Skedans Systems, Inc." /></a>
-                <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="/easyrtc/img/powered_by_easyrtc.png" height="60" width="200" alt="Powered By EasyRTC" /></a>
+                <a href="http://www.easyrtc.com/?from=landing"><img id="logo_pb_easyrtc" src="../easyrtc/img/powered_by_easyrtc.png" height="60" width="200" alt="Powered By EasyRTC" /></a>
                 <p><em>&copy; 2016 - Skedans Systems, Inc., All Rights Reserved.</em></p>
                 <p id="license">EasyRTC source code released under a BSD2 License. <a href="https://github.com/priologic/easyrtc/blob/master/LICENSE">See LICENSE file in project folder</a> for details.</p>
             </div>

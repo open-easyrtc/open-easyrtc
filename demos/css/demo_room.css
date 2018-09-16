@@ -8,7 +8,7 @@
 
 .hidden {
     background-color: transparent;
-    border-color: 2px solid blue;
+    border: solid 2px blue;
 }
 
 .boxCommon {
@@ -30,8 +30,8 @@
 
 body {
     background-color:#ffd0d0;
-    margin-left:0px;
-    margin-top:0px;
+    margin-left:0;
+    margin-top:0;
 }
 
 #killButton {

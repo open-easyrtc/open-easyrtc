@@ -8,6 +8,8 @@ Files and Folders:
 
  - package.json - Provides project information allowing npm to find and install required modules.
  - server.js - Server code.
+ - server_ssl.js - Server code for doing ssl using included keys, for testing purposes.
+ - localhost.(key/crt) - self-signed keys for local host.
  - /static/ - Root folder for web server. Put html files here!
 
  
@@ -22,7 +24,7 @@ Installing Required Modules:
 Running the Server:
 -------------------
 
- - Type `node server` in console.
+ - Type `npm start` in console.
 
 
 Viewing the examples:
@@ -30,3 +32,17 @@ Viewing the examples:
 
  - In your WebRTC enabled browser, visit your server address including the port. By default port 8080 is used.
  - http://localhost:8080/
+
+Running the Server using docker:
+-------------------
+
+ - Type `npm run docker:build` then `npm run docker:start` in console.
+
+Note: Require Docker to be installed.
+
+Running the Server using docker-compose:
+-------------------
+
+ - Type `npm run docker-compose:start` in console.
+
+Note: Require docker-compose to be installed.

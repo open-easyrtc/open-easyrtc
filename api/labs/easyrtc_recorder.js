@@ -1,4 +1,4 @@
-/* global define, module, require, console */
+/* global define, module, require, console, MediaRecorder */
 /*!
   Script: easyrtc_recorder.js
 
@@ -31,8 +31,6 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
-"use strict";
-
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         //RequireJS (AMD) build system
@@ -49,192 +47,227 @@
   }
 }(this, function (easyrtc, undefined) {
 
-    /**
-     * Provides methods for building MediaStream recorders.
-     * @class Easyrtc_Recorder
-     */
+"use strict";
 
+  /**
+   * Provides methods for building MediaStream recorders.
+   * @class Easyrtc_Recorder
+   */
+  function trace(message, obj) {
+      if (easyrtc.debugPrinter) {
+          easyrtc.debugPrinter(message, obj);
+      }
+  }
 
-   /**
-     * Determines if recording is supported by the browser. 
-     * @function
-     * @memberOf Easyrtc_Recorder
-     * @returns true if recording is supported.
-     */
-   easyrtc.supportsRecording = function() {
-        return (typeof MediaRecorder !== "undefined" && navigator.getUserMedia );
-   };
+  /**
+   * Determines if recording is supported by the browser. 
+   * @function
+   * @memberOf Easyrtc_Recorder
+   * @returns true if recording is supported.
+   */
+  easyrtc.supportsRecording = function() {
+      return (typeof MediaRecorder !== "undefined" && navigator.getUserMedia );
+  };
 
-   /**
-    * Check if a particular codec can be used for recording.
-    * @function
-    * @memberOf Easyrtc_Recorder
-    * @param {String} codecName, either "vp8" or "vp9 or "h264"
-    * @returns true if the type can be used, or if the browser doesn't
-    *  support a method to find out.
-    */ 
-   easyrtc.isRecordingTypeSupported = function(videoCodecName) {
-       var mimeType = "video/webm;codecs=" + videoCodecName;
-       if( MediaRecorder.isTypeSupported ) {
-           // chrome definitely, maybe firefox
-           return MediaRecorder.isTypeSupported(mimeType);
-       }
-       else if( MediaRecorder.isMimeTypeSupported ) {
-           // maybe firefox
-           return MediaRecorder.isMimeTypeSupported(mimeType);
-       }
-       else {
-          if( typeof easyrtc.hasNoRecordTypeCheck === "undefined") {
-             easyrtc.hasNoRecordTypeCheck = true;
-             window.alert("This browser doesn't know what media types it supports. Assuming all types.");
-          }
-          return true;
-       }
-   };
-
-   var mimeType;
-
-   /**
-     * Set the desired codec for the video encoding. 
-     * @function
-     * @memberOf Easyrtc_Recorder
-     * @param {String} codecName, either "vp8" or "vp9 or "h264"
-     * @returns true if the type can be used.
-     */ 
-   easyrtc.setRecordingVideoCodec = function(videoCodecName) {
-       if( !easyrtc.supportsRecording ) {
-           return false;
-       }
-       if(easyrtc.isRecordingTypeSupported(videoCodecName)) {
-           mimeType = "video/webm;codecs=" + videoCodecName;
-           return true;
-       }
-       else {
-          return false;
-       }
-   };
-
-   if( easyrtc.supportsRecording()) {
-       easyrtc.setRecordingVideoCodec("vp8");
-   }
-
-   /**
-     * Create a recording object and attach a media stream to it.
-     * @function
-     * @memberOf Easyrtc_Recorder
-     * @param  {HTMLMediaStream} mediaStream 
-     * @returns a recorder object or null if recording not supported.
-     */
-    function startRecording( mediaStream) {
-
-        if( !easyrtc.supportsRecording ) {
-           console.log("recording not supported by your browser");
-           return null;
+  /**
+  * Check if a particular codec can be used for recording.
+  * @function
+  * @memberOf Easyrtc_Recorder
+  * @param {String} codecName, either "vp8" or "vp9 or "h264"
+  * @returns true if the type can be used, or if the browser doesn't
+  *  support a method to find out.
+  */ 
+  easyrtc.isRecordingTypeSupported = function(videoCodecName) {
+     var mimeType = "video/webm;codecs=" + videoCodecName;
+     if( MediaRecorder.isTypeSupported ) {
+         // chrome definitely, maybe firefox
+         return MediaRecorder.isTypeSupported(mimeType);
+     }
+     else if( MediaRecorder.isMimeTypeSupported ) {
+         // maybe firefox
+         return MediaRecorder.isMimeTypeSupported(mimeType);
+     }
+     else {
+        if( typeof easyrtc.hasNoRecordTypeCheck === "undefined") {
+           easyrtc.hasNoRecordTypeCheck = true;
+           window.alert("This browser doesn't know what media types it supports. Assuming all types.");
         }
+        return true;
+     }
+  };
 
-        var mediaRecorder = new MediaRecorder(mediaStream, {mimeType: mimeType});
-        if( !mediaRecorder ) {
-           console.log("no media recorder");
-           return;
-        }
-        mediaRecorder.start();
+  var mimeType;
+  var audioBitRate;
+  var videoBitRate;
 
-        mediaRecorder.onerror = function(e) {
-           console.log("Media recording error:", e);
-        }
+  /**
+   * Set the desired codec for the video encoding. 
+   * @function
+   * @memberOf Easyrtc_Recorder
+   * @param {String} codecName, either "vp8" or "vp9 or "h264"
+   * @returns true if the type can be used.
+   */ 
+  easyrtc.setRecordingVideoCodec = function(videoCodecName) {
+     if( !easyrtc.supportsRecording ) {
+         return false;
+     }
+     if(easyrtc.isRecordingTypeSupported(videoCodecName)) {
+         mimeType = "video/webm;codecs=" + videoCodecName;
+         return true;
+     }
+     else {
+        return false;
+     }
+  };
 
-        mediaRecorder.onwarning = function(e) {
-           console.log("Media recording error:", e);
-        }
-    
-        mediaRecorder.onstart = function(e) {
-           console.log("Media recording started");
-        }
+  /** Sets the target bit rate of the audio encoder. 
+   * @param bitrate bits per second
+   */
+  easyrtc.setRecordingAudioBitRate = function(bitRate) {
+    audioBitRate = bitRate;
+  };
 
-        mediaRecorder.onstop = function(e) {
-           console.log("Media recording stopped");
-        }
+  /** Sets the target bit rate of the video encoder. 
+   * @param bitrate bits per second
+   */
+  easyrtc.setRecordingVideoBitRate = function(bitRate) {
+    videoBitRate = bitRate;
+  };
 
-        return mediaRecorder;
-   };
+  if( easyrtc.supportsRecording()) {
+     easyrtc.setRecordingVideoCodec("vp8");
+  }
 
-   /** This method creates a media recorder and populates it's ondataavailable
-     * method so that your own callback gets called with the data.
-     * Use the media recorder's start(), stop(), pause() and resume() methods
-     * on the returned object.
-     * @function
-     * @memberOf Easyrtc_Recorder
-     * @param {HTMLMediaStream} mediaStream a local or remote media stream.
-     * @param {Function} dataCallback a function to receive the webm data from.
-     */
-   easyrtc.recordToCallback = function (mediaStream, dataCallback) {
-       var mediaRecorder = startRecording(mediaStream);
-       if( !mediaRecorder) {
-           return null;
-       }
-       mediaRecorder.ondataavailable = function(e) {
-           dataCallback(e.data);
-       }
-       return mediaRecorder;
-   };
+  /**
+   * Create a recording object and attach a media stream to it.
+   * @function
+   * @memberOf Easyrtc_Recorder
+   * @param  {HTMLMediaStream} mediaStream 
+   * @returns a recorder object or null if recording not supported.
+   */
+  function startRecording( mediaStream) {
 
-   /** This method creates a media recorder that builds a blob 
-    * Use the media recorder's start(), stop(), pause() and resume() methods
-    * on the returned object.
-    * @function
-    * @memberOf Easyrtc_Recorder
-    * @param  {HTMLMediaStream} mediaStream a local or remote media stream.
-    * @param {Function} blobCallback a callback function that gets called with a
-    *    blob once you invoke the stop method.
-    **/
-   easyrtc.recordToBlob = function(mediaStream, blobCallback) {
-       var chunks = [];
+      if( !easyrtc.supportsRecording ) {
+         trace("recording not supported by your browser");
+         return null;
+      }
 
-       function dataConsumer(chunk) {
-          chunks.push(chunk);
-       }
+      var recorderOptions = { mimeType:mimeType};
 
-       var mediaRecorder = easyrtc.recordToCallback(mediaStream,
-              dataConsumer);
+      if( audioBitRate ) {
+             recorderOptions.audioBitsPerSecond = audioBitRate;
+      }
 
-       if( !mediaRecorder) {
-           return null;
-       }
+      if( videoBitRate ) {
+             recorderOptions.videoBitsPerSecond = videoBitRate;
+      }
 
-       mediaRecorder.onstop = function() {
-            blobCallback( new Blob(chunks, {type:"video/webm"}));
-            chunks = [];
-       }
-       return mediaRecorder;
-   };
+      var mediaRecorder = new MediaRecorder(mediaStream, recorderOptions);
+      if( !mediaRecorder ) {
+         trace("no media recorder");
+         return;
+      }
+      mediaRecorder.start();
 
-   /** This method creates a media recorder that builds a file.
-    * Use the media recorder's start(), stop(), pause() and resume() methods
-    * on the returned object.
-    * @function
-    * @memberOf Easyrtc_Recorder
-    * @param {HTMLMediaStream} a local or remote media stream.
-    * @param {Object} downloadLink an anchor tag to attach the file to.
-    * @param {String} basename the name of the file. A .webm will be appended
-    *    to the file if its not already present. The file doesn't get written
-    *    until you call the mediaRecorder's stop method.
-    **/
-   easyrtc.recordToFile = function(mediaStream, downloadLink, basename) {
-       function blobCallback( blob ) {
-           var videoURL = window.URL.createObjectURL(blob);
-          
-           downloadLink.href = videoURL;
-           downloadLink.appendChild(document.createTextNode(basename));
-    
-           var name = basename + ((basename.indexOf(".webm")>0)?"": ".webm") ;
-           downloadLink.setAttribute( "download", name);
-           downloadLink.setAttribute( "name", name);
-       }
+      mediaRecorder.onerror = function(e) {
+         trace("Media recording error:", e);
+      };
 
-       downloadLink.innerHTML = "";
-       var mediaRecorder = easyrtc.recordToBlob(mediaStream, blobCallback);
-       return mediaRecorder;
-   };
+      mediaRecorder.onwarning = function(e) {
+         trace("Media recording error:", e);
+      };
+
+      mediaRecorder.onstart = function(e) {
+         trace("Media recording started");
+      };
+
+      mediaRecorder.onstop = function(e) {
+         trace("Media recording stopped");
+      };
+
+      return mediaRecorder;
+  }
+
+  /** This method creates a media recorder and populates it's ondataavailable
+   * method so that your own callback gets called with the data.
+   * Use the media recorder's start(), stop(), pause() and resume() methods
+   * on the returned object.
+   * @function
+   * @memberOf Easyrtc_Recorder
+   * @param {HTMLMediaStream} mediaStream a local or remote media stream.
+   * @param {Function} dataCallback a function to receive the webm data from.
+   */
+  easyrtc.recordToCallback = function (mediaStream, dataCallback) {
+     var mediaRecorder = startRecording(mediaStream);
+     if( !mediaRecorder) {
+         return null;
+     }
+
+     mediaRecorder.ondataavailable = function(e) {
+         dataCallback(e.data);
+     };
+
+     return mediaRecorder;
+  };
+
+  /** This method creates a media recorder that builds a blob 
+  * Use the media recorder's start(), stop(), pause() and resume() methods
+  * on the returned object.
+  * @function
+  * @memberOf Easyrtc_Recorder
+  * @param  {HTMLMediaStream} mediaStream a local or remote media stream.
+  * @param {Function} blobCallback a callback function that gets called with a
+  *    blob once you invoke the stop method.
+  **/
+  easyrtc.recordToBlob = function(mediaStream, blobCallback) {
+     var chunks = [];
+
+     function dataConsumer(chunk) {
+        chunks.push(chunk);
+     }
+
+     var mediaRecorder = easyrtc.recordToCallback(mediaStream,
+            dataConsumer);
+
+     if( !mediaRecorder) {
+         return null;
+     }
+
+     mediaRecorder.onstop = function() {
+          blobCallback( new Blob(chunks, {type:"video/webm"}));
+          chunks = [];
+     };
+     
+     return mediaRecorder;
+  };
+
+  /** This method creates a media recorder that builds a file.
+  * Use the media recorder's start(), stop(), pause() and resume() methods
+  * on the returned object.
+  * @function
+  * @memberOf Easyrtc_Recorder
+  * @param {HTMLMediaStream} a local or remote media stream.
+  * @param {Object} downloadLink an anchor tag to attach the file to.
+  * @param {String} basename the name of the file. A .webm will be appended
+  *    to the file if its not already present. The file doesn't get written
+  *    until you call the mediaRecorder's stop method.
+  **/
+  easyrtc.recordToFile = function(mediaStream, downloadLink, basename) {
+     function blobCallback( blob ) {
+         var videoURL = window.URL.createObjectURL(blob);
+        
+         downloadLink.href = videoURL;
+         downloadLink.appendChild(document.createTextNode(basename));
+
+         var name = basename + ((basename.indexOf(".webm")>0)?"": ".webm") ;
+         downloadLink.setAttribute( "download", name);
+         downloadLink.setAttribute( "name", name);
+     }
+
+     downloadLink.innerHTML = "";
+     var mediaRecorder = easyrtc.recordToBlob(mediaStream, blobCallback);
+     return mediaRecorder;
+  };
 
 return easyrtc;
 

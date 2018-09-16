@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>EasyRTC Documentation</title>
+  <script src="scripts/prettify/prettify.js"> </script>
+  <script src="scripts/prettify/lang-css.js"> </script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+  <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+  <link href="../assets/easyrtc-docs-jsdoc-styles-1.css" media="all" rel="stylesheet" />
+</head>
+<body>
+<header class="template">
+	<div class="wrapper-content">
+    <a href="../index.html"><img src="../assets/easyrtc-logo.png" alt="EasyRTC Documentation"></a>
+		<h1 title="EasyRTC Documentation">Documentation</h1>
+	</div>
+</header>
+<div class="wrapper-docs">
+<nav>
+	<h2><a href="../index.html">Docs Home</a></h2>
+	<h3>EasyRTC Guides</h3>
+	<ul>
+		<li><a href="../easyrtc_faq.html">FAQ</a></li>
+		<li><a href="../easyrtc_gettingStarted.html">Getting Started</a></li>
+		<li><a href="../easyrtc_server_install.html">EasyRTC Server: Installation</a></li>
+		<li><a href="../easyrtc_client_tutorial.html">EasyRTC Framework Tutorial</a></li>
+		<li><a href="../easyrtc_rooms.html">Rooms</a></li>
+		<li><a href="../easyrtc_server_configuration.html">EasyRTC Server: Configuration</a></li>
+		<li><a href="../easyrtc_server_events.html">EasyRTC Server: Events</a></li>
+		<li><a href="../easyrtc_server_ice.html">EasyRTC Server: ICE Configuration</a></li>
+		<li><a href="../easyrtc_with_other_servers.html">Using Alongside Other Servers</a></li>
+		<li><a href="../easyrtc_server_ssl.html">EasyRTC Server: Using SSL</a></li>
+		<li><a href="../easyrtc_webrtc_problems.html">WebRTC Problems and Possible Fixes</a></li>
+		<li><a href="../easyrtc_upcoming_features.html">Upcoming Features</a></li>
+		<li><a href="../easyrtc_changelog.html">Change Log</a></li>
+	</ul>
+	<h3>EasyRTC Client Classes</h3>
+	<ul>
+		<li><a href="../client-api/Easyrtc.html">Easyrtc</a></li>
+		<li><a href="../client-api/Easyrtc_App.html">Easyrtc_App</a></li>
+		<li><a href="../client-api/Easyrtc_ft.html">Easyrtc_ft</a></li>
+		<li><a href="../client-api/Easyrtc_IframeCapture.html">Easyrtc_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_No_IframeCapture.html">Easyrtc_No_IframeCapture</a></li>
+		<li><a href="../client-api/Easyrtc_Rates.html">Easyrtc_Rates</a></li>
+		<li><a href="../client-api/Easyrtc_Recorder.html">Easyrtc_Recorder</a></li>
+	</ul>
+	<h3>EasyRTC Server Modules</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners.html">easyrtc_default_event_listeners</a></li>
+		<li><a href="../server-api/module-easyrtc_default_options.html">easyrtc_default_options</a></li>
+		<li><a href="../server-api/module-easyrtc_private_obj.html">easyrtc_private_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj.html">easyrtc_public_obj</a></li>
+		<li><a href="../server-api/module-easyrtc_util.html">easyrtc_util</a></li>
+		<li><a href="../server-api/module-general_util.html">general_util</a></li>
+	</ul>
+	<h3>EasyRTC Server Classes</h3>
+	<ul>
+		<li><a href="../server-api/module-easyrtc_default_event_listeners-eventListener.html">eventListener</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.html">pub</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.events.html">events</a></li>
+		<li><a href="../server-api/module-easyrtc_public_obj-pub.util.html">util</a></li>
+		<li><a href="../server-api/module-easyrtc_util-eu.html">eu</a></li>
+		<li><a href="../server-api/module-general_util-g.html">g</a></li>
+		<li><a href="../server-api/pub.appObj.html">appObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.html">connectionObj</a></li>
+		<li><a href="../server-api/pub.appObj.connectionObj.connectionRoomObj.html">connectionRoomObj</a></li>
+		<li><a href="../server-api/pub.appObj.roomObj.html">roomObj</a></li>
+		<li><a href="../server-api/pub.appObj.sessionObj.html">sessionObj</a></li>
+	</ul>
+</nav>
+<div class="easyrtc-docs-content">
+<div id="main">
+<h1 class="page-title">Source: easyrtc_default_options.js</h1>
+<section>
+<article>
+<pre class="prettyprint source linenums easyrtc"><code><a name="line1"></a><div class="linenumber">1</div><div style="width:0em;display:inline-block"></div>/*&nbsp;global&nbsp;module,&nbsp;require&nbsp;*/
+<a name="line2"></a><div class="linenumber">2</div><div style="width:0em;display:inline-block"></div>
+<a name="line3"></a><div class="linenumber">3</div><div style="width:0em;display:inline-block"></div>/**
+<a name="line4"></a><div class="linenumber">4</div><div style="width:0em;display:inline-block"></div>*&nbsp;@file&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Default&nbsp;options&nbsp;used&nbsp;within&nbsp;EasyRTC.&nbsp;Overriding&nbsp;of&nbsp;default&nbsp;options&nbsp;should&nbsp;be&nbsp;done&nbsp;using&nbsp;the&nbsp;public&nbsp;listen()&nbsp;or&nbsp;setOption()&nbsp;functions.
+<a name="line5"></a><div class="linenumber">5</div><div style="width:0em;display:inline-block"></div>*&nbsp;@module&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;easyrtc_default_options
+<a name="line6"></a><div class="linenumber">6</div><div style="width:0em;display:inline-block"></div>*&nbsp;@author&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Priologic&nbsp;Software,&nbsp;info@easyrtc.com
+<a name="line7"></a><div class="linenumber">7</div><div style="width:0em;display:inline-block"></div>*&nbsp;@copyright&nbsp;&nbsp;&nbsp;Copyright&nbsp;2016&nbsp;Priologic&nbsp;Software.&nbsp;All&nbsp;rights&nbsp;reserved.
+<a name="line8"></a><div class="linenumber">8</div><div style="width:0em;display:inline-block"></div>*&nbsp;@license&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BSD&nbsp;v2,&nbsp;see&nbsp;LICENSE&nbsp;file&nbsp;in&nbsp;module&nbsp;root&nbsp;folder.
+<a name="line9"></a><div class="linenumber">9</div><div style="width:0em;display:inline-block"></div>*/
+<a name="line10"></a><div class="linenumber">10</div><div style="width:0em;display:inline-block"></div>
+<a name="line11"></a><div class="linenumber">11</div><div style="width:0em;display:inline-block"></div>var&nbsp;option&nbsp;=&nbsp;{};
+<a name="line12"></a><div class="linenumber">12</div><div style="width:0em;display:inline-block"></div>
+<a name="line13"></a><div class="linenumber">13</div><div style="width:0em;display:inline-block"></div>//&nbsp;Application&nbsp;Options
+<a name="line14"></a><div class="linenumber">14</div><div style="width:0em;display:inline-block"></div>option.appDefaultName&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;"default";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;The&nbsp;default&nbsp;application&nbsp;a&nbsp;connection&nbsp;belongs&nbsp;to&nbsp;if&nbsp;it&nbsp;is&nbsp;not&nbsp;initially&nbsp;specified.
+<a name="line15"></a><div class="linenumber">15</div><div style="width:0em;display:inline-block"></div>option.appAutoCreateEnable&nbsp;&nbsp;=&nbsp;true;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Enables&nbsp;the&nbsp;creation&nbsp;of&nbsp;rooms&nbsp;from&nbsp;the&nbsp;API.&nbsp;Occurs&nbsp;when&nbsp;client&nbsp;joins&nbsp;a&nbsp;nonexistent&nbsp;room.
+<a name="line16"></a><div class="linenumber">16</div><div style="width:0em;display:inline-block"></div>option.appDefaultFieldObj&nbsp;&nbsp;&nbsp;=&nbsp;null;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Default&nbsp;fields&nbsp;which&nbsp;are&nbsp;set&nbsp;when&nbsp;an&nbsp;application&nbsp;is&nbsp;created.&nbsp;In&nbsp;form&nbsp;of&nbsp;{"fieldName":{fieldValue:&lt;JsonObj&gt;,&nbsp;fieldOption:{isShared:&lt;boolean&gt;}}[,&nbsp;...]}
+<a name="line17"></a><div class="linenumber">17</div><div style="width:0em;display:inline-block"></div>option.appIceServers&nbsp;=&nbsp;[&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Array&nbsp;of&nbsp;STUN&nbsp;and&nbsp;TURN&nbsp;servers.&nbsp;By&nbsp;default&nbsp;there&nbsp;is&nbsp;only&nbsp;publicly&nbsp;available&nbsp;STUN&nbsp;servers.
+<a name="line18"></a><div class="linenumber">18</div><div style="width:2em;display:inline-block"></div>{urls:&nbsp;"stun:stun.l.google.com:19302"},
+<a name="line19"></a><div class="linenumber">19</div><div style="width:2em;display:inline-block"></div>{urls:&nbsp;"stun:stun.sipgate.net"},
+<a name="line20"></a><div class="linenumber">20</div><div style="width:2em;display:inline-block"></div>{urls:&nbsp;"stun:217.10.68.152"},
+<a name="line21"></a><div class="linenumber">21</div><div style="width:2em;display:inline-block"></div>{urls:&nbsp;"stun:stun.sipgate.net:10000"},
+<a name="line22"></a><div class="linenumber">22</div><div style="width:2em;display:inline-block"></div>{urls:&nbsp;"stun:217.10.68.152:10000"}
+<a name="line23"></a><div class="linenumber">23</div><div style="width:0em;display:inline-block"></div>];
+<a name="line24"></a><div class="linenumber">24</div><div style="width:0em;display:inline-block"></div>
+<a name="line25"></a><div class="linenumber">25</div><div style="width:0em;display:inline-block"></div>
+<a name="line26"></a><div class="linenumber">26</div><div style="width:0em;display:inline-block"></div>//&nbsp;Room&nbsp;Options
+<a name="line27"></a><div class="linenumber">27</div><div style="width:0em;display:inline-block"></div>option.roomDefaultEnable&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;true;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Enables&nbsp;connections&nbsp;joining&nbsp;a&nbsp;default&nbsp;room&nbsp;if&nbsp;it&nbsp;is&nbsp;not&nbsp;initially&nbsp;specified.&nbsp;If&nbsp;false,&nbsp;than&nbsp;a&nbsp;connection&nbsp;initially&nbsp;may&nbsp;be&nbsp;in&nbsp;no&nbsp;room.
+<a name="line28"></a><div class="linenumber">28</div><div style="width:0em;display:inline-block"></div>option.roomDefaultName&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;"default";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;The&nbsp;default&nbsp;room&nbsp;a&nbsp;connection&nbsp;joins&nbsp;if&nbsp;it&nbsp;is&nbsp;not&nbsp;initially&nbsp;specified.
+<a name="line29"></a><div class="linenumber">29</div><div style="width:0em;display:inline-block"></div>option.roomAutoCreateEnable&nbsp;=&nbsp;true;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Enables&nbsp;the&nbsp;creation&nbsp;of&nbsp;rooms&nbsp;from&nbsp;the&nbsp;API.&nbsp;Occurs&nbsp;when&nbsp;client&nbsp;joins&nbsp;a&nbsp;nonexistent&nbsp;room.
+<a name="line30"></a><div class="linenumber">30</div><div style="width:0em;display:inline-block"></div>option.roomDefaultFieldObj&nbsp;&nbsp;=&nbsp;null;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Default&nbsp;fields&nbsp;which&nbsp;are&nbsp;set&nbsp;when&nbsp;a&nbsp;room&nbsp;is&nbsp;created.&nbsp;In&nbsp;form&nbsp;of&nbsp;{"fieldName":{fieldValue:&lt;JsonObj&gt;,&nbsp;fieldOption:{isShared:&lt;boolean&gt;}}[,&nbsp;...]}
+<a name="line31"></a><div class="linenumber">31</div><div style="width:0em;display:inline-block"></div>
+<a name="line32"></a><div class="linenumber">32</div><div style="width:0em;display:inline-block"></div>
+<a name="line33"></a><div class="linenumber">33</div><div style="width:0em;display:inline-block"></div>//&nbsp;Connection&nbsp;Options
+<a name="line34"></a><div class="linenumber">34</div><div style="width:0em;display:inline-block"></div>option.connectionDefaultFieldObj&nbsp;&nbsp;=&nbsp;null;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Default&nbsp;fields&nbsp;which&nbsp;are&nbsp;set&nbsp;when&nbsp;a&nbsp;connection&nbsp;is&nbsp;created.&nbsp;In&nbsp;form&nbsp;of&nbsp;{"fieldName":{fieldValue:&lt;JsonObj&gt;,&nbsp;fieldOption:{isShared:&lt;boolean&gt;}}[,&nbsp;...]}
+<a name="line35"></a><div class="linenumber">35</div><div style="width:0em;display:inline-block"></div>
+<a name="line36"></a><div class="linenumber">36</div><div style="width:0em;display:inline-block"></div>
+<a name="line37"></a><div class="linenumber">37</div><div style="width:0em;display:inline-block"></div>//&nbsp;SessionOptions
+<a name="line38"></a><div class="linenumber">38</div><div style="width:0em;display:inline-block"></div>option.sessionEnable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;true;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Enable&nbsp;sessions.&nbsp;If&nbsp;sessions&nbsp;are&nbsp;disabled,&nbsp;each&nbsp;socket&nbsp;connection&nbsp;from&nbsp;the&nbsp;same&nbsp;user&nbsp;will&nbsp;be&nbsp;the&nbsp;same.&nbsp;Relies&nbsp;on&nbsp;Express&nbsp;session&nbsp;handling&nbsp;also&nbsp;being&nbsp;enabled.
+<a name="line39"></a><div class="linenumber">39</div><div style="width:0em;display:inline-block"></div>option.sessionCookieEnable&nbsp;&nbsp;=&nbsp;true;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;If&nbsp;enabled,&nbsp;the&nbsp;server&nbsp;will&nbsp;attempt&nbsp;to&nbsp;send&nbsp;a&nbsp;easyrtcsid&nbsp;cookie&nbsp;which&nbsp;matches&nbsp;the&nbsp;Express&nbsp;session&nbsp;id.
+<a name="line40"></a><div class="linenumber">40</div><div style="width:0em;display:inline-block"></div>
+<a name="line41"></a><div class="linenumber">41</div><div style="width:0em;display:inline-block"></div>
+<a name="line42"></a><div class="linenumber">42</div><div style="width:0em;display:inline-block"></div>//&nbsp;API&nbsp;Hosting&nbsp;Options
+<a name="line43"></a><div class="linenumber">43</div><div style="width:0em;display:inline-block"></div>option.apiEnable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;true;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Enables&nbsp;hosting&nbsp;of&nbsp;the&nbsp;EasyRTC&nbsp;API&nbsp;files.
+<a name="line44"></a><div class="linenumber">44</div><div style="width:0em;display:inline-block"></div>option.apiPublicFolder&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;"/easyrtc";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Api&nbsp;public&nbsp;folder&nbsp;without&nbsp;trailing&nbsp;slash.&nbsp;Note&nbsp;that&nbsp;the&nbsp;demos&nbsp;expect&nbsp;this&nbsp;to&nbsp;be&nbsp;'/easyrtc'
+<a name="line45"></a><div class="linenumber">45</div><div style="width:0em;display:inline-block"></div>option.apiLabsEnable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;true;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Enables&nbsp;hosting&nbsp;of&nbsp;the&nbsp;EasyRTC&nbsp;experimental&nbsp;API&nbsp;files&nbsp;located&nbsp;in&nbsp;the&nbsp;'labs'&nbsp;sub&nbsp;folder
+<a name="line46"></a><div class="linenumber">46</div><div style="width:0em;display:inline-block"></div>option.apiOldLocationEnable&nbsp;=&nbsp;false;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;[Depreciated]&nbsp;Listens&nbsp;for&nbsp;requests&nbsp;to&nbsp;core&nbsp;API&nbsp;files&nbsp;in&nbsp;old&nbsp;locations&nbsp;(in&nbsp;addition&nbsp;to&nbsp;the&nbsp;new&nbsp;standard&nbsp;locations)
+<a name="line47"></a><div class="linenumber">47</div><div style="width:0em;display:inline-block"></div>
+<a name="line48"></a><div class="linenumber">48</div><div style="width:0em;display:inline-block"></div>
+<a name="line49"></a><div class="linenumber">49</div><div style="width:0em;display:inline-block"></div>//&nbsp;Demo&nbsp;Options
+<a name="line50"></a><div class="linenumber">50</div><div style="width:0em;display:inline-block"></div>option.demosEnable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;true;
+<a name="line51"></a><div class="linenumber">51</div><div style="width:0em;display:inline-block"></div>option.demosPublicFolder&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;"/demos";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Demos&nbsp;public&nbsp;folder&nbsp;without&nbsp;trailing&nbsp;slash.&nbsp;This&nbsp;sets&nbsp;the&nbsp;public&nbsp;URL&nbsp;where&nbsp;where&nbsp;demos&nbsp;are&nbsp;hosted,&nbsp;such&nbsp;as&nbsp;http://yourdomain/demos/
+<a name="line52"></a><div class="linenumber">52</div><div style="width:0em;display:inline-block"></div>
+<a name="line53"></a><div class="linenumber">53</div><div style="width:0em;display:inline-block"></div>
+<a name="line54"></a><div class="linenumber">54</div><div style="width:0em;display:inline-block"></div>//&nbsp;Log&nbsp;options&nbsp;-&nbsp;Only&nbsp;apply&nbsp;if&nbsp;internal&nbsp;'log'&nbsp;event&nbsp;is&nbsp;used
+<a name="line55"></a><div class="linenumber">55</div><div style="width:0em;display:inline-block"></div>option.logLevel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;"info";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;The&nbsp;minimum&nbsp;log&nbsp;level&nbsp;to&nbsp;show.&nbsp;(debug|info|warning|error|none)
+<a name="line56"></a><div class="linenumber">56</div><div style="width:0em;display:inline-block"></div>option.logDateEnable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;false;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Display&nbsp;timestamp&nbsp;in&nbsp;each&nbsp;entry
+<a name="line57"></a><div class="linenumber">57</div><div style="width:0em;display:inline-block"></div>option.logErrorStackEnable&nbsp;&nbsp;=&nbsp;true;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;print&nbsp;the&nbsp;stack&nbsp;trace&nbsp;in&nbsp;logged&nbsp;errors&nbsp;when&nbsp;available
+<a name="line58"></a><div class="linenumber">58</div><div style="width:0em;display:inline-block"></div>option.logWarningStackEnable=&nbsp;true;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;print&nbsp;the&nbsp;stack&nbsp;trace&nbsp;in&nbsp;logged&nbsp;warnings&nbsp;when&nbsp;available
+<a name="line59"></a><div class="linenumber">59</div><div style="width:0em;display:inline-block"></div>option.logColorEnable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;true;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;include&nbsp;console&nbsp;colors.&nbsp;Disable&nbsp;if&nbsp;forwarding&nbsp;logs&nbsp;to&nbsp;files&nbsp;or&nbsp;databases
+<a name="line60"></a><div class="linenumber">60</div><div style="width:0em;display:inline-block"></div>option.logObjectDepth&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;7;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;When&nbsp;objects&nbsp;are&nbsp;included&nbsp;in&nbsp;the&nbsp;log,&nbsp;this&nbsp;is&nbsp;the&nbsp;max&nbsp;depth&nbsp;the&nbsp;log&nbsp;will&nbsp;display
+<a name="line61"></a><div class="linenumber">61</div><div style="width:0em;display:inline-block"></div>option.logMessagesEnable&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;false;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Log&nbsp;the&nbsp;full&nbsp;contents&nbsp;of&nbsp;incoming&nbsp;and&nbsp;outgoing&nbsp;messages.&nbsp;Also&nbsp;requires&nbsp;the&nbsp;logLevel&nbsp;to&nbsp;be&nbsp;set&nbsp;at&nbsp;"debug".&nbsp;Introduces&nbsp;security&nbsp;and&nbsp;performance&nbsp;concerns.
+<a name="line62"></a><div class="linenumber">62</div><div style="width:0em;display:inline-block"></div>
+<a name="line63"></a><div class="linenumber">63</div><div style="width:0em;display:inline-block"></div>//&nbsp;Miscellaneous&nbsp;Server&nbsp;Options
+<a name="line64"></a><div class="linenumber">64</div><div style="width:0em;display:inline-block"></div>option.updateCheckEnable&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;true;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Checks&nbsp;for&nbsp;updates
+<a name="line65"></a><div class="linenumber">65</div><div style="width:0em;display:inline-block"></div>
+<a name="line66"></a><div class="linenumber">66</div><div style="width:0em;display:inline-block"></div>
+<a name="line67"></a><div class="linenumber">67</div><div style="width:0em;display:inline-block"></div>//&nbsp;Regular&nbsp;expressions&nbsp;for&nbsp;validating&nbsp;names&nbsp;and&nbsp;other&nbsp;input
+<a name="line68"></a><div class="linenumber">68</div><div style="width:0em;display:inline-block"></div>option.apiVersionRegExp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;/^[a-z0-9_.+-]{1,32}$/i;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;API&nbsp;Version
+<a name="line69"></a><div class="linenumber">69</div><div style="width:0em;display:inline-block"></div>option.appNameRegExp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;/^[a-z0-9_.-]{1,32}$/i;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Application&nbsp;name
+<a name="line70"></a><div class="linenumber">70</div><div style="width:0em;display:inline-block"></div>option.easyrtcidRegExp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;/^[a-z0-9_.-]{1,32}$/i;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;EasyRTC&nbsp;socket&nbsp;id&nbsp;(easyrtcid)
+<a name="line71"></a><div class="linenumber">71</div><div style="width:0em;display:inline-block"></div>option.easyrtcsidRegExp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;/^[a-z0-9_.-]{1,64}$/i;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;EasyRTC&nbsp;session&nbsp;id&nbsp;(easyrtcsid)
+<a name="line72"></a><div class="linenumber">72</div><div style="width:0em;display:inline-block"></div>option.groupNameRegExp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;/^[a-z0-9_.-]{1,32}$/i;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Group&nbsp;name
+<a name="line73"></a><div class="linenumber">73</div><div style="width:0em;display:inline-block"></div>option.fieldNameRegExp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;/^[a-z0-9_.&nbsp;-]{1,32}$/i;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Field&nbsp;names&nbsp;(for&nbsp;defining&nbsp;app&nbsp;and&nbsp;room&nbsp;custom&nbsp;fields)
+<a name="line74"></a><div class="linenumber">74</div><div style="width:0em;display:inline-block"></div>option.optionNameRegExp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;/^[a-z0-9_.&nbsp;-]{1,32}$/i;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Option&nbsp;names&nbsp;(for&nbsp;defining&nbsp;server&nbsp;options)
+<a name="line75"></a><div class="linenumber">75</div><div style="width:0em;display:inline-block"></div>option.presenceShowRegExp&nbsp;&nbsp;&nbsp;=&nbsp;/^(away|chat|dnd|xa)$/;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Allowed&nbsp;presence&nbsp;"show"&nbsp;values&nbsp;(for&nbsp;setPresence&nbsp;command)
+<a name="line76"></a><div class="linenumber">76</div><div style="width:0em;display:inline-block"></div>option.presenceStatusRegExp&nbsp;=&nbsp;/^(.){0,255}$/;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Allowed&nbsp;presence&nbsp;"status"&nbsp;value
+<a name="line77"></a><div class="linenumber">77</div><div style="width:0em;display:inline-block"></div>option.roomNameRegExp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;/^[a-z0-9_.-]{1,32}$/i;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Room&nbsp;name
+<a name="line78"></a><div class="linenumber">78</div><div style="width:0em;display:inline-block"></div>option.usernameRegExp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;/^(.){1,64}$/i;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Username
+<a name="line79"></a><div class="linenumber">79</div><div style="width:0em;display:inline-block"></div>
+<a name="line80"></a><div class="linenumber">80</div><div style="width:0em;display:inline-block"></div>
+<a name="line81"></a><div class="linenumber">81</div><div style="width:0em;display:inline-block"></div>//&nbsp;Allows&nbsp;the&nbsp;option&nbsp;object&nbsp;to&nbsp;be&nbsp;seen&nbsp;by&nbsp;the&nbsp;caller.
+<a name="line82"></a><div class="linenumber">82</div><div style="width:0em;display:inline-block"></div>module.exports&nbsp;=&nbsp;option;
+</code></pre>
+</article>
+</section>
+</div>
+		
+	</div>
+</div>
+<footer class="template">
+	<div class="wrapper-content">
+		<p>Copyright &copy;2016 EasyRTC</p>
+	</div>
+</footer>
+<!-- <script>prettyPrint();</script> -->
+<!-- <script src="scripts/linenumber.js"></script> -->
+</body>
+</html>
