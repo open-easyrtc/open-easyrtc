@@ -132,6 +132,7 @@ function convertListToButtons(roomName, occupants, isPrimary) {
                     break;
                 case "started_file":
                     statusDiv.innerHTML = "started file: " + state.name;
+                    break;
                 case "working":
                     statusDiv.innerHTML = state.name + ":" + state.position + "/" + state.size + "(" + state.numFiles + " files)";
                     break;

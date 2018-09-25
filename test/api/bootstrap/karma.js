@@ -56,7 +56,7 @@ require.config({
             // Initialize the HTML Reporter and execute the environment (setup by `boot.js`)
             window.onload();
 
-            window.__karma__.start()
+            window.__karma__.start();
         });
     }
 
