@@ -3,7 +3,13 @@ var http    = require("http");              // http server core module
 var express = require("express");           // web framework external module
 var serveStatic = require('serve-static');  // serve static files
 var socketIo = require("socket.io");        // web socket external module
-var easyrtc = require("../");               // EasyRTC external module
+
+// This sample is using the easyrtc from parent folder.
+// To use this server_example folder only without parent folder:
+// 1. you need to replace this "require("../");" by "require("easyrtc");"
+// 2. install easyrtc (npm i easyrtc --save) in server_example/package.json
+
+var easyrtc = require("../"); // EasyRTC internal module
 
 // Set process name
 process.title = "node-easyrtc";
