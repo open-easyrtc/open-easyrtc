@@ -1259,8 +1259,8 @@ var Easyrtc = function() {
                     });
                 }
 
-                if( activeId ) {
-                    items["firefoxRemoteAddress"] = candidates[activeId];
+                if (activeId) {
+                    items.firefoxRemoteAddress = candidates[activeId];
                 }
                 if (!filter) {
                     callback(peerId, items);
