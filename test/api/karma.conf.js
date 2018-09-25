@@ -79,7 +79,27 @@ module.exports = function (config) {
         // - PhantomJS
         // - IE (only Windows)
         // CLI --browsers Chrome,Firefox,Safari
-        browsers: ['PhantomJS'],
+        browsers: ['Chrome_without_security'],
+
+        customLaunchers: {
+            firefoxLauncher: {
+                base: 'Firefox',
+                prefs: {
+                    'security.ssl.enable_ocsp_stapling': false
+                }
+            },
+            Chrome_without_security: {
+                base: 'Chrome',
+                flags: [
+                    '--ignore-certificate-errors=true',
+                    '--user-data-dir=./tmp',
+                    '--allow-insecure-localhost',
+                    '--allow-running-insecure-content',
+                    '--use-fake-device-for-media-stream',
+                    '--use-fake-ui-for-media-stream'
+                ]
+            },
+        },
 
         // If browser does not capture in given timeout [ms], kill it
         // CLI --capture-timeout 5000
@@ -97,7 +117,6 @@ module.exports = function (config) {
             'karma-jasmine',
             'karma-requirejs',
             'karma-coverage',
-            'karma-phantomjs-launcher',
             'karma-chrome-launcher',
             'karma-firefox-launcher',
             'karma-ie-launcher'

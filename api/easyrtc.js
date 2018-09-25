@@ -4714,6 +4714,7 @@ module.exports = {
 var Easyrtc = function() {
 
     var self = this;
+    var peerConns = {};
     var stillAliveTimer = null;
     var stillAlivePeriod = 0;
     var missedAliveResponses = 0;
@@ -4726,7 +4727,7 @@ var Easyrtc = function() {
            clearTimeout(stillAliveTimer);
         }
       
-        if( missedAliveResponses == 1 ) {
+        if( missedAliveResponses === 1 ) {
             self.showError(self.errCodes.SYSTEM_ERR, "Timed out trying to talk to the server.");
             self.printpeerconns();
             self.hangupAll();
@@ -4977,13 +4978,14 @@ var Easyrtc = function() {
                     });
         };
 
-        optionsUsed = {iceRestart:true};
-        pc.createOffer(optionsUsed).then(setLocalAndSendMessage0)
+        pc.createOffer({
+            iceRestart:true
+        }).then(setLocalAndSendMessage0)
              .catch( function(reason) {
              callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(reason));
            });
 
-    }
+    };
 
     /**
      * This function checks if a socket is actually connected.
@@ -5380,6 +5382,76 @@ var Easyrtc = function() {
         self._desiredVideoProperties.videoSrcId = videoSrcId;
     };
 
+    /** This function requests that screen capturing be used to provide the local media source
+     * rather than a webcam. If you have multiple screens, they are composited side by side.
+     * Note: this functionality is not supported by Firefox, has to be called before calling initMediaSource (or easyApp), we don't currently supply a way to
+     * turn it off (once it's on), only works if the website is hosted SSL (https), and the image quality is rather
+     * poor going across a network because it tries to transmit so much data. In short, screen sharing
+     * through WebRTC isn't worth using at this point, but it is provided here so people can try it out.
+     * @param {Boolean} enableScreenCapture
+     * @param {String} mediaSourceId (optional)
+     * @example
+     *    easyrtc.setScreenCapture(true);
+     */
+    this.setScreenCapture = function(enableScreenCapture, mediaSourceId) {
+
+        if (enableScreenCapture) {
+
+            // Set video
+            self._presetMediaConstraints = {
+                    video:{
+                        mozMediaSource: "screen",
+                        chromeMediaSource: 'screen',
+                        mediaSource: "screen",
+                        mediaSourceId: 'screen:0',
+                        maxWidth: screen.width,
+                        maxHeight: screen.height,
+                        minWidth: screen.width,
+                        minHeight: screen.height,
+                        minFrameRate: 1,
+                        maxFrameRate: 15
+                    },                    
+                    // In Chrome, the chrome.desktopCapture extension API can be used to capture the screen,
+                    // which includes system audio (but only on Windows and Chrome OS and without plans for OS X or Linux). 
+                    // - http://stackoverflow.com/questions/34235077/capture-system-sound-from-browser?answertab=votes#tab-top
+                    audio: false
+                    /*
+                    {
+                        optional: {
+                            chromeMediaSource: 'system',
+                            chromeMediaSourceId: that.chromeMediaSourceId
+                        }
+                    }
+                    */
+                };
+
+            if (mediaSourceId) {
+                if (
+                    adapter && adapter.browserDetails &&
+                        (adapter.browserDetails.browser === "chrome")
+                ) {
+
+                    var mandatory = self._presetMediaConstraints.video;
+                    mandatory.chromeMediaSource = 'desktop';
+                    mandatory.chromeMediaSourceId = mediaSourceId;
+                    self._presetMediaConstraints.video = {
+                        mandatory: mandatory,
+                        // http://www.acis.ufl.edu/~ptony82/jingle-html/classwebrtc_1_1MediaConstraintsInterface.html
+                        optional: [{
+                            googTemporalLayeredScreencast: true
+                        }]
+                    };
+                } else {
+                    self._presetMediaConstraints.video.mediaSourceId = mediaSourceId;
+                }
+            }
+
+        // Clear 
+        } else {
+            delete self._presetMediaConstraints;
+        }
+    };
+
     /** @private */
     this._desiredAudioProperties = {}; // default camera
 
@@ -5678,7 +5750,7 @@ var Easyrtc = function() {
     //        function wasAcceptedCB(boolean,string) - see the easyrtc.call documentation.
     //     }
     //
-    var peerConns = {};
+    
     this.printpeerconns = function() {
         console.log("peerconns = ", peerConns);
     };
@@ -8784,6 +8856,7 @@ var Easyrtc = function() {
         }
 
         var pc = peerConnObj.pc;
+        var callFailureCB = peerConnObj.callFailureCB; 
         var setLocalAndSendMessage0 = function(sessionDescription) {
             if (peerConnObj.cancelled) {
                 return;
@@ -9155,8 +9228,7 @@ var Easyrtc = function() {
             pc.removeStream(stream);
         }
 
-    }
-
+    };
 
     /** @private */
     this.dumpPeerConnectionInfo = function() {
@@ -9520,8 +9592,6 @@ var Easyrtc = function() {
 
     var processCandidateBody = function(caller, msgData) {
 
-        var candidate = null;
-
         //
         // if we've discarded the peer connection, ignore the candidate.
         //
@@ -9536,12 +9606,13 @@ var Easyrtc = function() {
            }
         }
 
-        candidate = new RTCIceCandidate({
+        var candidate = new RTCIceCandidate({
             sdpMLineIndex: msgData.label,
             sdpMid: msgData.id,
             candidate: msgData.candidate
         });
-        pc = peerConns[caller].pc;
+        
+        var pc = peerConns[caller].pc;
 
         function iceAddSuccess() {
             logDebug("iceAddSuccess: " + JSON.stringify(msgData));
@@ -9678,7 +9749,7 @@ var Easyrtc = function() {
         };
         // peerConns[caller].startedAV = true;
         sendQueuedCandidates(caller, onSignalSuccess, onSignalFailure);
-        pc = peerConns[caller].pc;
+        var pc = peerConns[caller].pc;
         var sdp;
         try {
            if( sdpRemoteFilter ) {
@@ -9706,19 +9777,21 @@ var Easyrtc = function() {
             pc.setRemoteDescription(sd, function() {
                 if (pc.connectDataConnection) {
                     logDebug("calling connectDataConnection(5001,5002)");
-                    if( isInitialConnection ) {
+                    if( isInitialConnect ) {
                         pc.connectDataConnection(5001, 5002); // these are like ids for data channels
                     }
                     try {
                        var streamName;
                        var acks = peerConns[caller].streamsAddedAcks || {};
                        for( streamName in acks ) {
-                           acks[streamName](caller, streamName);
+                            if (acks.hasOwnProperty(streamName)) {
+                               acks[streamName](caller, streamName);
+                            }
                        }
                        peerConns[caller].streamsAddedAcks = {};
                     } 
                     catch(userError) {
-                       easyrtc.showError(self.errCodes.DEVELOPER_ERR, "streamAdded receipt function failed");
+                       self.showError(self.errCodes.DEVELOPER_ERR, "streamAdded receipt function failed");
                     }
                 }
             }, function(message){
@@ -10271,6 +10344,7 @@ var Easyrtc = function() {
                 self.showError(self.errCodes.CONNECT_ERR, self.getConstantString("badsocket"));
             }
             self.webSocketConnected = true;
+            missedAliveResponses = 0;
 
             logDebug("saw socket-server onconnect event");
 

@@ -33,9 +33,9 @@
             background-color: transparent;
             background-image: url('../images/button_close.png');
             border:none;
-            margin:0px;
-            padding:0px;
-            top:0px;
+            margin:0;
+            padding:0;
+            top:0;
             width:56px;
             height:56px;
             z-index: 2;
