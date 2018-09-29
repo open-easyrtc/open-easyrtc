@@ -259,9 +259,8 @@ var mypluginId = "tawk-desktop-capture/bemabaogbdfpbkkganibcmhbgjogabfj";
 
 setTimeout(
      function() {
-         document.getElementById("pluginstatus").innerHTML = easyrtc.isDesktopCaptureInstalled()
-             ?"Desktop capture ready"
-             :"Desktop capture not installed";
+         document.getElementById("pluginstatus").innerHTML = easyrtc.isDesktopCaptureInstalled() ? 
+                                                                "Desktop capture ready" : "Desktop capture not installed";
      }, 3000);
 
 document.getElementById("installPluginButton").onclick = function() {

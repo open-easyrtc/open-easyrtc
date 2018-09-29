@@ -220,14 +220,14 @@ function addQuickJoinButtons(roomList) {
         quickJoinBlock.appendChild(div);
 
     }
-    if( !roomList["room1"]) {
-        roomList["room1"] = { numberClients:0};
+    if( !roomList.room1) {
+        roomList.room1 = { numberClients:0};
     }
-    if( !roomList["room2"]) {
-        roomList["room2"] = { numberClients:0};
+    if( !roomList.room2) {
+        roomList.room2 = { numberClients:0};
     }
-    if( !roomList["room3"]) {
-        roomList["room3"] = { numberClients:0};
+    if( !roomList.room3) {
+        roomList.room3 = { numberClients:0};
     }
     for (var roomName in roomList) {
         addQuickJoinButton(roomName, roomList[roomName].numberClients);
