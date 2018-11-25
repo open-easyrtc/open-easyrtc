@@ -58,13 +58,13 @@
                     </div>
                     <div id="recordButtons">
                         <label for="useVP8">
-                            <input type="radio" onclick="easyrtc.setRecordingVideoCodec('vp8');" checked="checked" id="useVP8" name="codecUsed"> VP8 
+                            <input type="radio" onclick="easyrtc.setRecordingVideoCodec('vp8');" checked="checked" id="useVP8" name="codecUsed" disabled="disabled" > VP8 
                         </label>
                         <label for="codecUsed">
-                            <input type="radio" onclick="easyrtc.setRecordingVideoCodec('vp9');" id="useVP9" name="codecUsed"> VP9
+                            <input type="radio" onclick="easyrtc.setRecordingVideoCodec('vp9');" id="useVP9" name="codecUsed" disabled="disabled" > VP9
                         </label>
                         <label for="useH264">
-                            <input type="radio" onclick="easyrtc.setRecordingVideoCodec('h264');" id="useH264" name="codecUsed"> H264
+                            <input type="radio" onclick="easyrtc.setRecordingVideoCodec('h264');" id="useH264" name="codecUsed" disabled="disabled"> H264
                         </label>
                         <br>
                         <button id="startRecording" disabled="disabled" onclick="startRecording();" >Start recording</button> 
