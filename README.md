@@ -3,12 +3,18 @@
 EasyRTC
 =======
 
-Note: for last fixes use beta branch (@hthetiot 07-19-2018)
-> npm install easyrtc@priologic/easyrtc#beta
-
 **A bundle of Open Source WebRTC joy!**
 
 Priologic's EasyRTC, a bundle of Open Source WebRTC joy, include an EasyRTC server andclient API, HTML5 and JavaScript demos under a BSD 2 license.
+
+Notice to Developers
+------
+
+* For last fixes use `beta` branch (@hthetiot 07-19-2018)
+> npm install easyrtc@priologic/easyrtc#beta
+
+* To try last EasyRTC Server simply try the lastest docker image (@hthetiot 11-25-2018)
+> docker run -it --name myeasyrtc --rm -p 8443:8443 hthetiot/easyrtc:latest run server_ssl
 
 Features
 --------
