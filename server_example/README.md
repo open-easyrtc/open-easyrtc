@@ -46,3 +46,25 @@ Running the Server using docker-compose:
  - Type `npm run docker-compose:start` in console.
 
 Note: Require docker-compose to be installed.
+
+
+Manualy build and run container
+-------------------
+
+Build:
+> docker build . -t easyrtc
+
+Run default:
+> docker run -it --name easyrtc -p 8080:8080 easyrtc
+
+Run HTTP server:
+> docker run -it --name easyrtc --rm -p 8080:8080 easyrtc run server
+
+Run HTTPS server:
+>  docker run -it --name easyrtc --rm -p 8443:8443 easyrtc run server_ssl
+
+Run HTTPS server with custom certs:
+>  docker run -it --name easyrtc --rm -p 8443:8443 -v $(pwd)/certs/:/usr/src/app/certs/:ro easyrtc run server_ssl
+
+
+

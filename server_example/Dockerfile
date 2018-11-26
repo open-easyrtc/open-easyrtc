@@ -4,6 +4,7 @@ MAINTAINER Harold Thetiot <hthetiot@gmail.com>
 
 # Upgrade npm
 RUN npm i npm@latest -g
+ENV NO_UPDATE_NOTIFIER 1
 
 # Create app directory
 ENV APPDIR /usr/src/app
@@ -23,9 +24,11 @@ RUN npm install --production
 
 ADD . $APPDIR
 
+VOLUME ['certs', 'static']
+
 # Replace 'easyrtc = require("..");' by 'easyrtc = require("easyrtc");''
 # To use easyrtc from node_modules instead of parent directory
-RUN sed -i "s|easyrtc = require(\"../\")|easyrtc = require(\"easyrtc\")|g" $APPDIR/server*.js
+RUN sed -i "s|easyrtc = require(\"../\")|easyrtc = require(\"easyrtc\")|g" $APPDIR/*.js
 
 # Define service user
 RUN chown -R nobody:nogroup $APPDIR && chmod -R a-w $APPDIR && ls -ld

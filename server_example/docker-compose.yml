@@ -7,7 +7,10 @@ services:
     build:
       context: .
       args:
-        EASYRTC_BRANCH: "feature/docker-easyrtc-server"
+        EASYRTC_BRANCH: "master"
+    command: server_ssl
+    volume:
+      - ./certs:/usr/src/app/certs:ro
     networks:
       - frontend
     ports:

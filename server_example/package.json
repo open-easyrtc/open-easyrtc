@@ -5,7 +5,9 @@
   "description": "Simple EasyRTC server example which includes EasyRTC, Express, and Socket.io",
   "private": true,
   "scripts": {
-    "start": "node server.js",
+    "start": "npm run server",
+    "server": "node server.js",
+    "server_ssl": "node server_ssl.js",
     "docker:build": "docker build -t easyrtc-server -f Dockerfile .",
     "docker:start": "docker run -it -d -p 8080:8080 easyrtc-server",
     "docker:start": "docker easyrtc-server",
