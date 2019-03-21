@@ -223,10 +223,13 @@
             }
             
             var vp8RtpmapIndex = findLine(sdpLines, 'a=rtpmap', 'VP8/90000');
-            var vp8Payload = getCodecPayloadType(sdpLines[vp8RtpmapIndex]);
-            var vp8Fmtp = 'a=fmtp:' + vp8Payload + ' x-google-min-bitrate=' + videoSendInitialBitrate.toString() + '; x-google-max-bitrate=' + maxBitrate.toString();
-            sdpLines.splice(vp8RtpmapIndex + 1, 0, vp8Fmtp);
-            
+            if (vp8RtpmapIndex) {
+                var vp8Payload = getCodecPayloadType(sdpLines[vp8RtpmapIndex]);
+                if (vp8Payload) {
+                    var vp8Fmtp = 'a=fmtp:' + vp8Payload + ' x-google-min-bitrate=' + videoSendInitialBitrate.toString() + '; x-google-max-bitrate=' + maxBitrate.toString();
+                    sdpLines.splice(vp8RtpmapIndex + 1, 0, vp8Fmtp);
+                }   
+            }
             return sdpLines.join('\r\n');
         }
 
