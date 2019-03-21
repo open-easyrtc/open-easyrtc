@@ -4117,8 +4117,6 @@ var Easyrtc = function() {
             throw "Could not create the RTCSessionDescription";
         }
 
-        logDebug("sdp ||  " + JSON.stringify(sd));
-
         var invokeCreateAnswer = function() {
             if (newPeerConn.cancelled) {
                 return;
@@ -4135,8 +4133,15 @@ var Easyrtc = function() {
         try {
 
             if (sdpRemoteFilter) {
-                sd.sdp = sdpRemoteFilter(sd.sdp);
+                //sd.sdp = sdpRemoteFilter(sd.sdp);
+                sd = new RTCSessionDescription({
+                    type: sd.type, 
+                    sdp: sdpRemoteFilter(sd.sdp)
+                });
             }
+
+            logDebug("sdp ||  " + JSON.stringify(sd));
+
             pc.setRemoteDescription(sd, invokeCreateAnswer, function(message) {
                 self.showError(self.errCodes.INTERNAL_ERR, "doAnswerBody setRemoteDescription failed: " + message);
                 // TODO sendSignaling reject/failure
@@ -5120,8 +5125,15 @@ var Easyrtc = function() {
 
         try {
             if (sdpRemoteFilter) {
-                sd.sdp = sdpRemoteFilter(sd.sdp);
+                //sd.sdp = sdpRemoteFilter(sd.sdp);
+                sd = new RTCSessionDescription({
+                    type: sd.type, 
+                    sdp: sdpRemoteFilter(sd.sdp)
+                });
             }
+
+            logDebug("sdp ||  " + JSON.stringify(sd));
+            
             pc.setRemoteDescription(sd, function() {
                 if (pc.connectDataConnection) {
                     logDebug("calling connectDataConnection(5001,5002)");
