@@ -32,6 +32,7 @@
   },
   "scripts": {
     "lint": "grunt lint",
+    "cleanup": "rm -fr node_modules/ && npm install && rm -fr bower_components/ && bower install",
     "build": "grunt build",
     "test": "grunt test"
   },
