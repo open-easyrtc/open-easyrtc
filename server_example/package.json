@@ -10,15 +10,14 @@
     "server_ssl": "node server_ssl.js",
     "docker:build": "docker build -t easyrtc-server -f Dockerfile .",
     "docker:start": "docker run -it -d -p 8080:8080 easyrtc-server",
-    "docker:start": "docker easyrtc-server",
     "docker-compose:build": "docker-compose -f docker-compose.yml build",
     "docker-compose:start": "docker-compose -f docker-compose.yml up",
     "docker-compose:stop": "docker-compose -f docker-compose.yml down"
   },
   "dependencies": {
-    "express": "^4.10.7",
-    "serve-static": "^1.8.0",
-    "socket.io": "^1.4.5"
+    "express": "^4.17.1",
+    "serve-static": "^1.14.1",
+    "socket.io": "^2.2.0"
   },
   "license": "BSD2",
   "engines": {
