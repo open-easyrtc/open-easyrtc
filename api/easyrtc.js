@@ -5989,14 +5989,13 @@ var Easyrtc = function() {
      */
     this.enableAudioReceive = function(value) {
         if (
-            adapter && adapter.browserDetails &&
-             (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
-        ) {
-            receivedMediaConstraints.offerToReceiveAudio = value;
-        }
-        else {
+             adapter && adapter.browserDetails &&
+                 (adapter.browserDetails.browser === "chrome" && adapter.browserDetails.version < 65)
+         ) {
             receivedMediaConstraints.mandatory = receivedMediaConstraints.mandatory || {};
             receivedMediaConstraints.mandatory.OfferToReceiveAudio = value;
+        } else {
+            receivedMediaConstraints.offerToReceiveAudio = value;
         }
     };
 
@@ -6007,14 +6006,13 @@ var Easyrtc = function() {
      */
     this.enableVideoReceive = function(value) {
         if (
-            adapter && adapter.browserDetails &&
-             (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
-        ) {
-           receivedMediaConstraints.offerToReceiveVideo = value;
-        }
-        else {
+             adapter && adapter.browserDetails &&
+                 (adapter.browserDetails.browser === "chrome" && adapter.browserDetails.version < 65)
+         ) {
             receivedMediaConstraints.mandatory = receivedMediaConstraints.mandatory || {};
             receivedMediaConstraints.mandatory.OfferToReceiveVideo = value;
+        } else {
+           receivedMediaConstraints.offerToReceiveVideo = value;
         }
     };
 
@@ -6678,6 +6676,8 @@ var Easyrtc = function() {
             callback(peerId, {"connected": false});
         }
         else if (peerConns[peerId].pc.getStats) {
+            // TODO Safari
+            // [Error] Unhandled Promise Rejection: TypeError: Argument 1 ('selector') to RTCPeerConnection.getStats must be an instance of MediaStreamTrack
             peerConns[peerId].pc.getStats(null, function(stats) {
                 var items = {};
                 var candidates = {};
