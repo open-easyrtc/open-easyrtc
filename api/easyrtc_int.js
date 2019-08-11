@@ -527,14 +527,13 @@ var Easyrtc = function() {
      */
     this.enableAudioReceive = function(value) {
         if (
-            adapter && adapter.browserDetails &&
-             (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
-        ) {
-            receivedMediaConstraints.offerToReceiveAudio = value;
-        }
-        else {
+             adapter && adapter.browserDetails &&
+                 (adapter.browserDetails.browser === "chrome" && adapter.browserDetails.version < 65)
+         ) {
             receivedMediaConstraints.mandatory = receivedMediaConstraints.mandatory || {};
             receivedMediaConstraints.mandatory.OfferToReceiveAudio = value;
+        } else {
+            receivedMediaConstraints.offerToReceiveAudio = value;
         }
     };
 
@@ -545,14 +544,13 @@ var Easyrtc = function() {
      */
     this.enableVideoReceive = function(value) {
         if (
-            adapter && adapter.browserDetails &&
-             (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
-        ) {
-           receivedMediaConstraints.offerToReceiveVideo = value;
-        }
-        else {
+             adapter && adapter.browserDetails &&
+                 (adapter.browserDetails.browser === "chrome" && adapter.browserDetails.version < 65)
+         ) {
             receivedMediaConstraints.mandatory = receivedMediaConstraints.mandatory || {};
             receivedMediaConstraints.mandatory.OfferToReceiveVideo = value;
+        } else {
+           receivedMediaConstraints.offerToReceiveVideo = value;
         }
     };
 
