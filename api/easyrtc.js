@@ -5612,31 +5612,37 @@ var Easyrtc = function() {
             logDebug("Attempt to renegotiate ice on nonexistant connection");
             return;
         }
-        var callFailureCB = peerConnObj.callFailureCB; 
+        var callFailureCB = peerConnObj.callFailureCB || self.showError; 
         var pc = peerConnObj.pc;
 
         var setLocalAndSendMessage0 = function(sessionDescription) {
             if (peerConnObj.cancelled) {
+                logDebug('renegotiate.setLocalAndSendMessage0.ignored', peerConnObj.cancelled, peerConnObj.sendingOffer);
                 return;
             }
             var sendOffer = function() {
-
+                peerConnObj.sendingOffer = false;
                 sendSignalling(otherUser, "offer", sessionDescription, null, callFailureCB);
             };
             if (sdpLocalFilter) {
                 sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
             }
-            pc.setLocalDescription(sessionDescription, sendOffer,
-                    function(errorText) {
-                        callFailureCB(self.errCodes.CALL_ERR, errorText);
-                    });
+            pc.setLocalDescription(sessionDescription, sendOffer, function(errorText) {
+                peerConnObj.sendingOffer = false;
+                callFailureCB(self.errCodes.CALL_ERR, errorText);
+            });
         };
 
-        pc.createOffer({
-            iceRestart:true
-        }).then(setLocalAndSendMessage0)
-             .catch( function(reason) {
-             callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(reason));
+        if (peerConnObj.sendingOffer) {
+            logDebug('initiateSendOffer.setLocalAndSendMessage0.ignored', peerConnObj.sendingOffer);
+            return;
+        }
+
+        peerConnObj.sendingOffer = true;
+        pc.createOffer({iceRestart: true }).then(setLocalAndSendMessage0)
+          .catch(function(reason) {
+                 peerConnObj.sendingOffer = false;
+                 callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(reason));
            });
 
     };
@@ -6274,7 +6280,7 @@ var Easyrtc = function() {
      * @returns {Boolean} True getUserMedia is supported.
      */
     this.supportsGetUserMedia = function() {
-        return typeof navigator.mediaDevices.getUserMedia !== 'undefined';
+        return navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia !== 'undefined';
     };
 
     /**
@@ -8992,6 +8998,10 @@ var Easyrtc = function() {
             }
 
             pc.onnegotiationneeded = function(event) {
+                var eventTarget = event.currentTarget || event.target || pc,
+                    signalingState = eventTarget.signalingState || 'unknown';
+
+                logDebug('onnegotiationneeded', signalingState);
                 if (
                     peerConns[otherUser] &&
                         (peerConns[otherUser].enableNegotiateListener)
@@ -9005,6 +9015,8 @@ var Easyrtc = function() {
                 var eventTarget = event.currentTarget || event.target || pc,
                     signalingState = eventTarget.signalingState || 'unknown';
 
+                logDebug('onsignalingstatechange', signalingState);
+
                 if (signalingStateChangeListener) {
                    signalingStateChangeListener(otherUser, eventTarget, signalingState);
                 }
@@ -9014,6 +9026,8 @@ var Easyrtc = function() {
 
                 var eventTarget = event.currentTarget || event.target || pc,
                     connState = eventTarget.iceConnectionState || 'unknown';
+
+                logDebug('onsignalingstatechange', connState);
 
                 if (iceConnectionStateChangeListener) {
                    iceConnectionStateChangeListener(otherUser, eventTarget, connState);
@@ -9401,6 +9415,7 @@ var Easyrtc = function() {
                     self.showError(errorCode, errorText);
                 }
 
+                newPeerConn.pendingAwnser = false;
                 sendSignalling(caller, "answer", sessionDescription, onSignalSuccess, onSignalFailure);
                 peerConns[caller].connectionAccepted = true;
                 sendQueuedCandidates(caller, onSignalSuccess, onSignalFailure);
@@ -9410,13 +9425,17 @@ var Easyrtc = function() {
                     pc.connectDataConnection(5002, 5001);
                 }
             };
+
             if (sdpLocalFilter) {
                 sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
             }
+
             pc.setLocalDescription(sessionDescription, sendAnswer, function(message) {
+                newPeerConn.pendingAwnser = false;
                 self.showError(self.errCodes.INTERNAL_ERR, "setLocalDescription: " + message);
             });
         };
+
         var sd = new RTCSessionDescription(msgData);
 
         if (!sd) {
@@ -9427,11 +9446,19 @@ var Easyrtc = function() {
 
         var invokeCreateAnswer = function() {
             if (newPeerConn.cancelled) {
+                logDebug('invokeCreateAnswer.canceled', pc.signalingState);
                 return;
             }
+            if (newPeerConn.pendingAwnser) {            
+                logDebug('invokeCreateAnswer.pending', pc.signalingState);
+            }
+
+            logDebug('invokeCreateAnswer', pc.signalingState);
+            newPeerConn.pendingAwnser = true;
             pc.createAnswer(receivedMediaConstraints)
-                 .then(setLocalAndSendMessage1)
-                 .catch( function(reason) {
+                .then(setLocalAndSendMessage1)
+                .catch(function(reason) {
+                    newPeerConn.pendingAwnser = false;
                     self.showError(self.errCodes.INTERNAL_ERR, "create-answer: " + reason);
                 });
         };
@@ -9441,8 +9468,15 @@ var Easyrtc = function() {
         try {
 
             if (sdpRemoteFilter) {
-                sd.sdp = sdpRemoteFilter(sd.sdp);
+                //sd.sdp = sdpRemoteFilter(sd.sdp);
+                sd = new RTCSessionDescription({
+                    type: sd.type, 
+                    sdp: sdpRemoteFilter(sd.sdp)
+                });
             }
+
+            logDebug("sdp ||  " + JSON.stringify(sd));
+
             pc.setRemoteDescription(sd, invokeCreateAnswer, function(message) {
                 self.showError(self.errCodes.INTERNAL_ERR, "doAnswerBody setRemoteDescription failed: " + message);
                 // TODO sendSignaling reject/failure
@@ -9510,43 +9544,38 @@ var Easyrtc = function() {
         }
 
         var pc = peerConnObj.pc;
-        var callFailureCB = peerConnObj.callFailureCB; 
+        var callFailureCB = peerConnObj.callFailureCB || self.showError; 
         var setLocalAndSendMessage0 = function(sessionDescription) {
             if (peerConnObj.cancelled) {
+                logDebug('initiateSendOffer.setLocalAndSendMessage0.ignored', peerConnObj.cancelled, peerConnObj.sendingOffer);
                 return;
             }
             var sendOffer = function() {
-
+                peerConnObj.sendingOffer = false;
                 sendSignalling(otherUser, "offer", sessionDescription, null, peerConnObj.callFailureCB);
             };
             if (sdpLocalFilter) {
                 sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
             }
-            pc.setLocalDescription(sessionDescription, sendOffer,
-                    function(errorText) {
-                        callFailureCB(self.errCodes.CALL_ERR, errorText);
-                    });
+
+            pc.setLocalDescription(sessionDescription, sendOffer, function(errorText) {
+                peerConnObj.sendingOffer = false;
+                callFailureCB(self.errCodes.CALL_ERR, errorText);
+            });
         };
 
-        setTimeout(function() {
-            //
-            // if the call was cancelled, we don't want to continue getting the offer.
-            // we can tell the call was cancelled because there won't be a peerConn object
-            // for it.
-            //
-            if( !peerConns[otherUser]) {
-                return;
-            }
+        if (peerConnObj.sendingOffer) {
+            logDebug('initiateSendOffer.setLocalAndSendMessage0.ignored', peerConnObj.sendingOffer);
+            return;
+        }
 
-            pc.createOffer(receivedMediaConstraints)
-                 .then(setLocalAndSendMessage0)
-                 .catch(
-                   function(errorObj) {
-                     peerConnObj.callFailureCB(self.errCodes.CALL_ERR, 
-                        JSON.stringify(errorObj));
-                   }
-                  );
-        }, 100);
+        peerConnObj.sendingOffer = true;
+        pc.createOffer(receivedMediaConstraints)
+            .then(setLocalAndSendMessage0)
+            .catch(function(errorObj) {
+                peerConnObj.sendingOffer = false;
+                callFailureCB(self.errCodes.CALL_ERR,  JSON.stringify(errorObj));
+            });
     }
 
     /**
@@ -10414,8 +10443,7 @@ var Easyrtc = function() {
            }
         }
         catch(userError) {
-            self.showError(self.errCodes.DEVELOPER_ERR,"sdpRemoteFilter failed");
-            console.log(userError);
+            self.showError(self.errCodes.DEVELOPER_ERR, "sdpRemoteFilter failed case: " + userError);
         }
         var sd = new RTCSessionDescription({type:msgData.type, sdp:sdp});
         if (!sd) {
@@ -10426,8 +10454,15 @@ var Easyrtc = function() {
 
         try {
             if (sdpRemoteFilter) {
-                sd.sdp = sdpRemoteFilter(sd.sdp);
+                //sd.sdp = sdpRemoteFilter(sd.sdp);
+                sd = new RTCSessionDescription({
+                    type: sd.type, 
+                    sdp: sdpRemoteFilter(sd.sdp)
+                });
             }
+
+            logDebug("sdp ||  " + JSON.stringify(sd));
+
             pc.setRemoteDescription(sd, function() {
                 if (pc.connectDataConnection) {
                     logDebug("calling connectDataConnection(5001,5002)");
@@ -10459,7 +10494,6 @@ var Easyrtc = function() {
 
         flushCachedCandidates(caller);
     }
-
 
     function processCandidateQueue(caller, msgData) {
         if (peerConns[caller] && peerConns[caller].pc) {
@@ -11038,11 +11072,11 @@ var Easyrtc = function() {
     // it is only invoked for peers that have sent us a supportHalfTrickIce message.
     //
     function checkIceGatheringState(otherPeer) {
-        console.log("entered checkIceGatheringState");
+        logDebug("entered checkIceGatheringState");
         if( peerConns[otherPeer] && peerConns[otherPeer].pc && peerConns[otherPeer].pc.iceGatheringState ) {
            if( peerConns[otherPeer].pc.iceGatheringState === "complete" ) {
                self.sendPeerMessage(otherPeer, "iceGatheringDone", {});
-               console.log("sent iceGatherDone message to ", otherPeer);
+               logDebug("sent iceGatherDone message to ", otherPeer);
            } 
            else {
                setTimeout( function() {
@@ -11051,7 +11085,7 @@ var Easyrtc = function() {
            }
         }
         else { 
-           console.log("checkIceGatherState: leaving");
+           logDebug("checkIceGatherState: leaving");
            // peer left, ignore
         }
     }
@@ -11109,7 +11143,7 @@ var Easyrtc = function() {
         }
 
         self.setPeerListener(function(easyrtcid, msgType, msgData, targeting){
-             console.log("received request to supportHalfIceTrickle");
+             logDebug("received request to supportHalfIceTrickle");
              if( peerConns[easyrtcid] ) {
                 peerConns[easyrtcid].supportHalfTrickleIce = true;
                 flushCachedCandidates(easyrtcid);
