@@ -1,6 +1,7 @@
-
 Open-EasyRTC
 =======
+
+[![npm version](https://img.shields.io/npm/v/open-easyrtc.svg?style=flat)](https://www.npmjs.com/package/open-easyrtc)
 
 Open-EasyRTC is a Fork of Priologic's EasyRTC, include an EasyRTC server and client API, HTML5 and JavaScript demos under a BSD 2 license.
 
