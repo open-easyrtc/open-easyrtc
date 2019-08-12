@@ -1,20 +1,8 @@
-![EasyRTC](./api/img/easyrtc.png "EasyRTC")
 
-EasyRTC
+Open-EasyRTC
 =======
 
-**A bundle of Open Source WebRTC joy!**
-
-Priologic's EasyRTC, a bundle of Open Source WebRTC joy, include an EasyRTC server andclient API, HTML5 and JavaScript demos under a BSD 2 license.
-
-Notice to Developers
-------
-
-* For last fixes use `beta` branch (@hthetiot 07-19-2018)
-> npm install easyrtc@priologic/easyrtc#beta
-
-* To try last EasyRTC Server simply try the lastest docker image (@hthetiot 11-25-2018)
-> docker run -it --name myeasyrtc --rm -p 8443:8443 hthetiot/easyrtc:latest run server_ssl
+Open-EasyRTC is a Fork of Priologic's EasyRTC, include an EasyRTC server and client API, HTML5 and JavaScript demos under a BSD 2 license.
 
 Features
 --------
@@ -22,11 +10,10 @@ Features
  * Use our EasyRTC API and sample application code to build and deploy your WebRTC app in hours not weeks.
  * EasyRTC is completely free and open source under a BSD 2 license. No usage costs or other hidden fees.
 
-
 Installation In A Nutshell
 --------------------------
  1. Install [Node.js](http://nodejs.org)
- 2. Download the EasyRTC distribution from github (https://github.com/priologic/easyrtc.git)
+ 2. Download the EasyRTC distribution from github (https://github.com/open-easyrtc/open-easyrtc.git)
  3. Run `npm install` in the easyrtc directory.
  4. Enter the easyrtc/server_example directory by executing `cd server_example`
  5. Run `npm install` in the server_example directory.
@@ -114,24 +101,6 @@ EasyRTC comes with a number of demo's which work immediately after installation.
  * Screen and tab sharing
  * File transfer
  * Client side video recording
-
-
-Links for help and information
-------------------------------
-
-* The EasyRTC website is at:
-  * [https://www.easyrtc.com/](https://www.easyrtc.com/)
-* Use our support forum is at:
-  * [https://groups.google.com/forum/?fromgroups#!forum/easyrtc](https://groups.google.com/forum/?fromgroups#!forum/easyrtc)
-* Live demo site:
-  * [https://demo.easyrtc.com/](https://demo.easyrtc.com/)
-* Bugs and requests can be filed on our github page or on the forum:
-  * [https://github.com/priologic/easyrtc/issues](https://github.com/priologic/easyrtc/issues)
-* Our YouTube channel has live demo's:
-  * [http://www.youtube.com/user/priologic](http://www.youtube.com/user/priologic)
-* Information on complimentary EasyRTC commercial products can be found here: 
-  * [Product and support pricing - https://easyrtc.com/pricing/](https://easyrtc.com/pricing/)
-
 
 License
 -------
