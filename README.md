@@ -5,6 +5,17 @@ Open-EasyRTC
 
 Open-EasyRTC is a Fork of Priologic's EasyRTC, include an EasyRTC server and client API, HTML5 and JavaScript demos under a BSD 2 license.
 
+Original Source and Fork intent
+--------------------
+
+This NodeJS `open-easyrtc` module version is a fork of `easyrtc` hosted on Github originally made by `Priologic Software Inc.` and available here: https://github.com/priologic/easyrtc
+
+This fork of `easyrtc` module named `open-easyrtc` starts at version `2.0.0` in case previous the repository decides to pick up work again on version `1.x.x`.
+
+The main reason of the fork is that `Priologic Software Inc.` as been trying to make the main contributor pay for pushing released on NPM and we don't agreed with that king of practices. 
+
+This Fork will retain it's original BSD 2-Clause "Simplified" License until a more suitable License is found.
+
 Features
 --------
  * Install EasyRTC's WebRTC Server on your own Linux, Windows, or Mac server in minutes not days.
