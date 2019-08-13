@@ -2,10 +2,10 @@
   "name": "open-easyrtc",
   "version": "2.0.0",
   "homepage": "https://github.com/open-easyrtc/open-easyrtc",
-  "author": "Harold Thetiot <hthetiot@sylaps.com>",
+  "author": "Harold Thetiot <hthetiot@gmail.com>",
   "description": "Open-EasyRTC enables quick development of WebRTC",
   "contributors": [
-    "Harold Thetiot <hthetiot@sylaps.com>",
+    "Harold Thetiot <hthetiot@gmail.com>",
     "Doug Pelton <doug@priologic.com>",
     "Rod Apeldoorn <rod.apeldoorn@priologic.com>",
     "Eric Davies <eric.davies@priologic.com>"

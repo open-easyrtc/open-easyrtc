@@ -12,9 +12,9 @@ This NodeJS `open-easyrtc` module version is a fork of `easyrtc` hosted on Githu
 
 This fork of `easyrtc` module named `open-easyrtc` starts at version `2.0.0` in case previous the repository decides to pick up work again on version `1.x.x`.
 
-The main reason of the fork is that `Priologic Software Inc.` as been trying to make the main contributor pay for pushing released on NPM and we don't agreed with that king of practices. 
+The main reason of the fork is that `Priologic Software Inc.` as been trying to make the main contributor @hthetiot pay $200,000 for pushing major issues and security fixes to be released on NPM registry and the maintainer that closed more than 200 issues and contributed more than 80 Pull-Request past 3 years, do not agreed with that kind crooked open-source of practices.
 
-This Fork will retain it's original BSD 2-Clause "Simplified" License until a more suitable License is found.
+This Fork will retain it's original BSD 2-Clause "Simplified" License until a License migration path solution is found.
 
 Features
 --------

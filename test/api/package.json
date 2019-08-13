@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "Open-EasyRTC API Specs",
   "main": "karma.conf.js",
+  "author": "Harold Thetiot <hthetiot@gmail.com>",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
   "license": "BSD-2-Clause",
-  "devDependencies": {
+  "dependencies": {
     "jasmine": "^3.4.0",
     "socket.io-client": "^2.2.0",
     "webrtc-adapter": "^7.2.9"
