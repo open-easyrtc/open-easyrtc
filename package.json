@@ -30,7 +30,7 @@
     "colors": "*",
     "socket.io-client": "^2.2.0",
     "underscore": "1.5.x",
-    "webrtc-adapter": "^7.2.9"
+    "webrtc-adapter": "^7.3.0"
   },
   "scripts": {
     "lint": "grunt lint",
