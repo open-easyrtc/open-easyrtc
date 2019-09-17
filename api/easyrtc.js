@@ -5879,7 +5879,7 @@ var Easyrtc = function() {
             if (sdpLocalFilter) {
                 sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
             }
-            pc.setLocalDescription(sessionDescription, sendOffer, function(errorText) {
+            pc.setLocalDescription(sessionDescription).then(sendOffer, function(errorText) {
                 peerConnObj.sendingOffer = false;
                 callFailureCB(self.errCodes.CALL_ERR, errorText);
             });
@@ -6782,7 +6782,7 @@ var Easyrtc = function() {
         else if (peerConns[peerId].pc.getStats) {
             // TODO Safari
             // [Error] Unhandled Promise Rejection: TypeError: Argument 1 ('selector') to RTCPeerConnection.getStats must be an instance of MediaStreamTrack
-            peerConns[peerId].pc.getStats(null, function(stats) {
+            peerConns[peerId].pc.getStats(null).then(function(stats) {
                 var items = {};
                 var candidates = {};
                 var activeId = null;
@@ -6857,7 +6857,7 @@ var Easyrtc = function() {
         }
         else if (peerConns[peerId].pc.getStats) {
 
-            peerConns[peerId].pc.getStats(function(stats) {
+            peerConns[peerId].pc.getStats().then(function(stats) {
 
                 var localStats = {};
                 var part, parts = stats.result();
@@ -9682,7 +9682,7 @@ var Easyrtc = function() {
                 sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
             }
 
-            pc.setLocalDescription(sessionDescription, sendAnswer, function(message) {
+            pc.setLocalDescription(sessionDescription).then(sendAnswer, function(message) {
                 newPeerConn.pendingAwnser = false;
                 self.showError(self.errCodes.INTERNAL_ERR, "setLocalDescription: " + message);
             });
@@ -9729,7 +9729,7 @@ var Easyrtc = function() {
 
             logDebug("sdp ||  " + JSON.stringify(sd));
 
-            pc.setRemoteDescription(sd, invokeCreateAnswer, function(message) {
+            pc.setRemoteDescription(sd).then(invokeCreateAnswer, function(message) {
                 self.showError(self.errCodes.INTERNAL_ERR, "doAnswerBody setRemoteDescription failed: " + message);
                 // TODO sendSignaling reject/failure
             });
@@ -9810,7 +9810,7 @@ var Easyrtc = function() {
                 sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
             }
 
-            pc.setLocalDescription(sessionDescription, sendOffer, function(errorText) {
+            pc.setLocalDescription(sessionDescription).then(sendOffer, function(errorText) {
                 peerConnObj.sendingOffer = false;
                 callFailureCB(self.errCodes.CALL_ERR, errorText);
             });
@@ -10715,7 +10715,7 @@ var Easyrtc = function() {
 
             logDebug("sdp ||  " + JSON.stringify(sd));
 
-            pc.setRemoteDescription(sd, function() {
+            pc.setRemoteDescription(sd).then(function() {
                 if (pc.connectDataConnection) {
                     logDebug("calling connectDataConnection(5001,5002)");
                     if( isInitialConnect ) {
