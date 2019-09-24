@@ -1561,12 +1561,43 @@ var Easyrtc = function() {
         self.onError({errorCode: messageCode, errorText: message});
     };
 
+    /** @private */
+    var customErrorListener;
+
+    /**
+     * Override the default open-easyrtc error handler. The default handler shows a popup error dialog.
+     * @param {Function} handler Error handler function with one param, an object with keys 'errorCode' and 'errorText'
+     * @example 
+     *  easyrtc.setErrorListener(({errorCode, errorText}) => {
+     *    alert(`${errorCode} error:\n${errorText}`);
+     * });
+     * @example // Removing previously set handler: 
+     * easyrtc.setErrorListener(undefined);
+     */
+    this.setErrorListener = function(handler) {
+        if (errorListener && typeof errorListener != "function") {
+            this.showError({
+                errorCode: this.errCodes.DEVELOPER_ERR,
+                errorText: "setErrorListener was provided invalid handler: " + handler 
+            });
+            return;
+        }
+        customErrorListener = errorListener;
+    };
+
     /**
      * @private
      * @param errorObject
      */
     this.onError = function(errorObject) {
         logDebug("saw error " + errorObject.errorText);
+
+        // Use custom error handler if set, rather than creating dialog
+        if (customErrorListener) {
+            logDebug("Using custom error handler");
+            customErrorListener(errorObject);
+            return;
+        }
 
         var errorDiv = document.getElementById('easyrtcErrorDialog');
         var errorBody;

@@ -31,6 +31,8 @@ declare  interface Easyrtc_PeerMessage extends Easyrtc_BasicMessage {
     msgData:any;
 }
 
+declare type Easyrtc_ErrorHandler = ({errorCode, errorText}:{errorCode:string, errorText:string}) => void;
+
 declare type Easyrtc_ReceivePeerCallback = (easyrtcId:string, msgType:string, msgData:any, targetting:Easyrtc_MessageTargeting) => void;
 
 declare type Easyrtc_ReceiveServerCallback = (msgType:string, msgData:any, targeting:Easyrtc_MessageTargeting) => void;
@@ -442,6 +444,18 @@ declare class Easyrtc {
      *     easyrtc.showError("BAD_NAME", "Invalid username");
      */
     showError(messageCode:string, message:string):void;
+
+    /**
+     * Override the default open-easyrtc error handler. The default handler shows a popup error dialog.
+     * @param {Easyrtc_ErrorHandler} handler Error handler function with one param, an object with keys 'errorCode' and 'errorText'
+     * @example 
+     *  easyrtc.setErrorListener(({errorCode, errorText}) => {
+     *    alert(`${errorCode} error:\n${errorText}`);
+     * });
+     * @example // Removing previously set handler: 
+     * easyrtc.setErrorListener(undefined);
+     */
+    setErrorListener(handler:Easyrtc_ErrorHandler):void;
 
     /**
      * A convenience function to ensure that a string doesn't have symbols that will be interpreted by HTML.
