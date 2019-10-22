@@ -1,6 +1,13 @@
 EasyRTC: Change Log
 ===================
 
+v2.0.3
+-------
+Changes:
+ -  Improve stillAlive option changes and documentation #11
+ -  Remove updateCheckEnable options #16
+ -  Default STUN options are invalid #15
+
 v2.0.2
 -------
 Changes:
