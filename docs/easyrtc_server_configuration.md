@@ -189,12 +189,6 @@ Log options only apply if internal 'log' event is used
    - Defaults to: 7
 
 
-### Miscellaneous Server Options
- - **updateCheckEnable**
-   - Checks for updates to EasyRTC
-   - Defaults to: true
-
-
 ### Regular expressions for validating names and other input
  - **apiVersionRegExp**
    - API Version
