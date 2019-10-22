@@ -7,7 +7,7 @@ var io      = require("socket.io"); // web socket external module
 // This sample is using the easyrtc from parent folder.
 // To use this server_example folder only without parent folder:
 // 1. you need to replace this "require("../");" by "require("open-easyrtc");"
-// 2. install easyrtc (npm i easyrtc --save) in server_example/package.json
+// 2. install easyrtc (npm i open-easyrtc --save) in server_example/package.json
 
 var easyrtc = require("../"); // EasyRTC internal module
 

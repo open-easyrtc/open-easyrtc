@@ -1,13 +1,4 @@
-# EasyRTC: Resolving Problems
-
-
-## Why this document
-
-When you are new to WebRTC, you tend to make the same mistakes that 
-everybody else made a year or two ago. 
-Those experienced with WebRTC/EasyRTC tend to get bored answering the same question over and over, and as the person with problem, you can fix things much faster if you don't have to wait for someone to respond.
-
-## Common Problems And Their Symptoms
+# Common EasyRTC Problems
 
 ### I can't get video from my camera and/or microphone
 
@@ -72,73 +63,3 @@ The demos at demo.EasyRTC.com are backed by a turn server and should still work 
 
    + Do you only fail to establish a peer connection when using 3G or 4G on a cell phone? Some cell providers block WebRTC. The TCP 443 dodge sometimes helps here.
  
-
-## Common Sense Guidelines For Posting Questions to the Forum
-
-The general theme here is 
-
-      There is no financial incentive to help you so 
-      if you want to have any reasonable expectation of someone helping, 
-      MAKE IT EASY FOR SOMEONE TO HELP YOU. 
-
-If someone is helping you for free, their time is more valuable 
-than yours because they know how to do something you don't, 
-you just aren't being charged for it. 
-
-### Be intelligible to the people you expect to answer your questions.
-    
-     "You have not experienced Shakepeare until you have read him in the original Klingon" (Star Trek, the Undiscovered Country).
-
-For those of you who aren't English speakers, we appreciate the 
-difficulties of translation, but be aware that Google Translate can produce 
-gibberish. 
-Try translating your question from your language to 
-English, and then back; if the twice translated code looks like gibberish to you, 
-the once translated code will probably look like gibberish to the people on 
-the forum.
-
-It will probably help to use complete sentences and avoid idioms/slang.
-
-### Supply sufficient information.
-
-  + Under what circumstances did you see the problem?
-
-  + What was the network configuration of the clients relative to each other
-    and relative to the signaling server?
-
-  + What were the symptoms of the problem?
-
-  + What interesting messages showed up in the console window?
-
-  + What did you try to diagnose the problem?
-
-  + What did you try to fix the problem?
-
-  + What changes to the server or client code did you make?
-
-  + How can other people duplicate the problem?
-
-### Supplying demonstrating code
-
-If a forum reader has to spend more than five minutes trying to duplicate
-your environment, or wade through hundreds of lines of logic is that is irrelevant to the bug, your problem is much less likely to be answered. 
-You should be paring it down to the minimum code body that demonstrates the problem. 
-You should be explaining what it is trying to accomplish and how.
-
-If your added or modified code is purely client side, 
-it's going to be much easier for people to help you 
-if you supply a URL they can simply point their browser at, 
-rather than having to run their own server.
-
-###  Realistic Expectations
-
-The EasyRTC client code tends to have simple well-understood interfaces 
-that happen in a single thread and lots of people have used it directly. 
-The server code tends to be harder to follow and relatively few people have 
-bothered to learn how it works. 
-If you are changing/extending the server code, 
-there are going to be fewer people who can help you; 
-you may need to familarize youself with the server code yourself to be your own solution.
-
-If you are looking for a WebRTC/EasyRTC expert and no-one steps up, 
-that's possibly because they are busy with their own projects. 

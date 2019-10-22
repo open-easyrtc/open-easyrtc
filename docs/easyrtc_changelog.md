@@ -15,6 +15,7 @@ v2.0.0
 -------
 Changes:
   - Merge beta branch
+  - Fork from _EasyRTC_ to _Open-EasyRTC_, along with three years of changes [see here](https://github.com/open-easyrtc/open-easyrtc/issues/6)
 
 v1.1.1
 -------

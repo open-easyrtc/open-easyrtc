@@ -173,7 +173,7 @@ Log options only apply if internal 'log' event is used
    - The minimum log level to show. (debug|info|warning|error|none)
    - Defaults to: "info"
  - **logDateEnable**
-   -  Display timestamp in each entry
+   - Display timestamp in each entry
    - Defaults to: false
  - **logErrorStackEnable**
    - print the stack trace in logged errors when available
@@ -187,6 +187,16 @@ Log options only apply if internal 'log' event is used
  - **logObjectDepth**
    - When objects are included in the log, this is the max depth the log will display
    - Defaults to: 7
+
+
+### Miscellaneous Server Options
+ - **stillAliveInterval**
+   - Maximum time between stillAlive messages, before connection is considered dead
+   - When set to 0, stillAlive timeout checking is disabled
+   - Defaults to: 20000
+ - **stillAliveGracePeriod**
+   - Additional grace period for stillAlive messages
+   - Defaults to: 10000
 
 
 ### Regular expressions for validating names and other input
