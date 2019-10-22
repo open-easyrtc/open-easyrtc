@@ -190,9 +190,6 @@ Log options only apply if internal 'log' event is used
 
 
 ### Miscellaneous Server Options
- - **updateCheckEnable**
-   - Checks for updates to EasyRTC
-   - Defaults to: true
  - **stillAliveInterval**
    - Maximum time between stillAlive messages, before connection is considered dead
    - When set to 0, stillAlive timeout checking is disabled
@@ -200,6 +197,7 @@ Log options only apply if internal 'log' event is used
  - **stillAliveGracePeriod**
    - Additional grace period for stillAlive messages
    - Defaults to: 10000
+
 
 ### Regular expressions for validating names and other input
  - **apiVersionRegExp**

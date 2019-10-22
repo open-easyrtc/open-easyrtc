@@ -4891,12 +4891,18 @@ var Easyrtc = function() {
 
         for (i = 0; i < iceConfig.iceServers.length; i++) {
             item = iceConfig.iceServers[i];
-            if( item.urls && item.urls.length ) {
-               for( j = 0; j < item.urls.length; j++ ) {
-                  processUrl(item.urls[j]);
+            if (item.urls && item.urls.length) {
+                // Handle legacy options urls has string
+                if (typeof item.urls === 'string') {
+                   processUrl(item.urls);
+
+                // Handle proper options urls as array
+                } else if (item.urls instanceof Array) {
+                   for( j = 0; j < item.urls.length; j++ ) {
+                      processUrl(item.urls[j]);
+                   }
                }
-            }
-            else if( item.url ) {
+            } else if (item.url) {
                processUrl(item.url);
             }
          }
