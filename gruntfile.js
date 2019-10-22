@@ -37,10 +37,6 @@ module.exports = (function() {
                 options: {
                     livereload: true,
                 },
-                bower: {
-                    files: ['bower.json'],
-                    tasks: ['bowerInstall']
-                },
                 css: {
                     files: [
                         '<%= config.apiPath %>/**/*.css',
