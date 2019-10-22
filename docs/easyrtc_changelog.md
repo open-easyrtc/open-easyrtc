@@ -1,6 +1,21 @@
 EasyRTC: Change Log
 ===================
 
+v2.0.2
+-------
+Changes:
+  - Migrate RTCPeerConnection.getStats|setLocalDescription|setRemoteDescription to Promise instead of callbacks.
+
+v2.0.1
+-------
+Changes:
+  - Update to webrtc-adapter@7.3.0
+
+v2.0.0
+-------
+Changes:
+  - Merge beta branch
+
 v1.1.1
 -------
 New Features:
