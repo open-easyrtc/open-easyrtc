@@ -26,9 +26,9 @@ ADD . $APPDIR
 
 VOLUME ['certs', 'static']
 
-# Replace 'easyrtc = require("..");' by 'easyrtc = require("easyrtc");''
+# Replace 'easyrtc = require("..");' by 'easyrtc = require("open-easyrtc");''
 # To use easyrtc from node_modules instead of parent directory
-RUN sed -i "s|easyrtc = require(\"../\")|easyrtc = require(\"easyrtc\")|g" $APPDIR/*.js
+RUN sed -i "s|easyrtc = require(\"../\")|easyrtc = require(\"open-easyrtc\")|g" $APPDIR/*.js
 
 # Define service user
 RUN chown -R nobody:nogroup $APPDIR && chmod -R a-w $APPDIR && ls -ld
