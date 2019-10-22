@@ -221,6 +221,10 @@ Sets user configurable options. User must be authenticated.
    - **userSettings** (optional) Map of fields related to the user's settings, WebRTC, browser, and OS capabilities/status. Any settings not mentioned will be left as-is. To remove a setting, give it a value of `null`.
    - **apiField** (optional) Map of fields for the special appDefinedFields value which gets transferred in the broadcast list. Any fields not mentioned will be left as-is. To remove a field, give it a value of `null`.
 
+### msgType - 'stillAlive'
+
+Keeps connection with signalling server alive. Must be sent regularly if the signalling server specifies a non-zero interval. The interval is received in the 'token' cmd.
+
 
 Outgoing (from server)
 ----------------------
@@ -324,7 +328,7 @@ Initiates an authenticated EasyRTC application. Note this may be sent multiple t
      - **fieldName**
      - **fieldValue**
    - May contain other application options which user is permitted to view.
-
+ - **stillAliveInterval** (required) Interval that keepAlive commands should be sent, in ms. May be 0, indicating that keepAlive commands aren't required.
 
 ### msgType - 'roomData'
 
