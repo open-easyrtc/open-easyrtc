@@ -6,6 +6,7 @@
   "description": "Open-EasyRTC enables quick development of WebRTC",
   "contributors": [
     "Harold Thetiot <hthetiot@gmail.com>",
+    "Chris De Pasquale <cdep@squale.me>",
     "Doug Pelton <doug@priologic.com>",
     "Rod Apeldoorn <rod.apeldoorn@priologic.com>",
     "Eric Davies <eric.davies@priologic.com>"

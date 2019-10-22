@@ -7135,13 +7135,6 @@ var Easyrtc = function() {
      * easyrtc.setErrorListener(undefined);
      */
     this.setErrorListener = function(handler) {
-        if (errorListener && typeof errorListener != "function") {
-            this.showError({
-                errorCode: this.errCodes.DEVELOPER_ERR,
-                errorText: "setErrorListener was provided invalid handler: " + handler 
-            });
-            return;
-        }
         customErrorListener = errorListener;
     };
 
