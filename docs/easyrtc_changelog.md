@@ -1,6 +1,11 @@
 EasyRTC: Change Log
 ===================
 
+v2.0.4
+------
+Changes:
+- Update enumerateDevices source.id only if missing to avoid readonly property error
+
 v2.0.3
 -------
 Changes:
