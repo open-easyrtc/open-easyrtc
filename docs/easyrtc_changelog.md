@@ -1,10 +1,15 @@
 EasyRTC: Change Log
 ===================
 
-v2.0.4
-------
+v.2.0.5
+-------
 Changes:
-- Update enumerateDevices source.id only if missing to avoid readonly property error
+- Fix clearMediaStream and call clearMediaStream on onUserMediaSuccess on video element used to detect size. 
+
+v2.0.4
+-------
+Changes:
+- Update enumerateDevices source.id only if missing to avoid readonly property error.
 
 v2.0.3
 -------
