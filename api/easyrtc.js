@@ -6066,7 +6066,7 @@ var Easyrtc = function() {
     this.cookieId = "easyrtcsid";
 
     /** @private */
-    var username = null;
+    this.username = null;
 
     /** Flag to indicate that user is currently logging out */
     this.loggingOut = false;
@@ -7140,7 +7140,7 @@ var Easyrtc = function() {
      * easyrtc.setErrorListener(undefined);
      */
     this.setErrorListener = function(handler) {
-        customErrorListener = errorListener;
+        customErrorListener = handler;
     };
 
     /**
@@ -7653,13 +7653,13 @@ var Easyrtc = function() {
             element.pause();
         }
 
-        if (typeof element.src !== 'undefined') {
-            //noinspection JSUndefinedPropertyAssignment
-            element.src = "";
-        } else if (typeof element.srcObject !== 'undefined') {
-            element.srcObject = "";
+        if (typeof element.srcObject !== 'undefined') {
+            element.srcObject = null;
         } else if (typeof element.mozSrcObject !== 'undefined') {
             element.mozSrcObject = null;
+        } else if (typeof element.src !== 'undefined') {
+            //noinspection JSUndefinedPropertyAssignment
+            element.src = "";
         }
     };
 
@@ -7684,10 +7684,10 @@ var Easyrtc = function() {
 
             if (typeof element.srcObject !== 'undefined') {
                 element.srcObject = stream;
-            } else if (typeof element.src !== 'undefined') {
-                element.src = self.createObjectURL(stream);
             } else if (typeof element.mozSrcObject !== 'undefined') {
                 element.mozSrcObject = self.createObjectURL(stream);
+            } else if (typeof element.src !== 'undefined') {
+                element.src = self.createObjectURL(stream);
             }
         }
         else {
@@ -7899,7 +7899,7 @@ var Easyrtc = function() {
 
             stream.streamName = streamName;
             registerLocalMediaStreamByName(stream, streamName);
-            var videoObj, triesLeft, tryToGetSize, ele;
+            var videoObj, triesLeft, tryToGetSize;
             if (haveAudioVideo.video) {
                 videoObj = document.createElement('video');
                 videoObj.style.display = "none";
@@ -7927,6 +7927,8 @@ var Easyrtc = function() {
                         }
 
                         updateConfigurationInfo();
+                        self.clearMediaStream(videoObj);
+
                         if (successCallback) {
                             successCallback(stream);
                         }
@@ -10796,14 +10798,12 @@ var Easyrtc = function() {
         }
     }
 
-
     /** @private */
     function onChannelCmd(msg, ackAcceptorFn) {
 
         var caller = msg.senderEasyrtcid;
         var msgType = msg.msgType;
         var msgData = msg.msgData;
-        var pc;
 
         logDebug('received message of type ' + msgType);
 
