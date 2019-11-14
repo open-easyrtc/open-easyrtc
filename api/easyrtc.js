@@ -6132,7 +6132,12 @@ var Easyrtc = function() {
                 for (var i = 0; i < values.length; i++) {
                     var source = values[i];
                     if (source.kind === sourceType) {
-                        source.id = source.deviceId; //backwards compatibility
+
+                        //backwards compatibility
+                        if (!source.id) {
+                            source.id = source.deviceId; 
+                        }
+                        
                         results.push(source);
                     }
                 }
