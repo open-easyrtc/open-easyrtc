@@ -5686,6 +5686,7 @@ var Easyrtc = function() {
         }
         else if (!self.webSocket) {
             try {
+               connectionOptions['force new connection'] = true;
                self.webSocket = io.connect(serverPath, connectionOptions);
 
                 if (!self.webSocket) {
@@ -5720,26 +5721,28 @@ var Easyrtc = function() {
             logDebug("the web socket closed");
         });
 
-        addSocketListener('error', function(event) {
-            function handleErrorEvent() {
-                if (self.myEasyrtcid) {
-                    //
-                    // socket.io version 1 got rid of the socket member, moving everything up one level.
-                    //
-                    if (isSocketConnected(self.webSocket)) {
-                        self.showError(self.errCodes.SIGNAL_ERR, self.getConstantString("miscSignalError"));
-                    }
-                    else {
-                        /* socket server went down. this will generate a 'disconnect' event as well, so skip this event */
-                        errorCallback(self.errCodes.CONNECT_ERR, self.getConstantString("noServer"));
-                    }
+        function handleErrorEvent() {
+            if (self.myEasyrtcid) {
+                //
+                // socket.io version 1 got rid of the socket member, moving everything up one level.
+                //
+                if (isSocketConnected(self.webSocket)) {
+                    self.showError(self.errCodes.SIGNAL_ERR, self.getConstantString("miscSignalError"));
                 }
                 else {
+                    /* socket server went down. this will generate a 'disconnect' event as well, so skip this event */
                     errorCallback(self.errCodes.CONNECT_ERR, self.getConstantString("noServer"));
                 }
             }
-            handleErrorEvent();
-        });
+            else {
+                errorCallback(self.errCodes.CONNECT_ERR, self.getConstantString("noServer"));
+            }
+        }
+        addSocketListener('error', handleErrorEvent);
+        if (connectionOptions.reconnection !== false)
+          addSocketListener('reconnect_failed', handleErrorEvent);
+        else
+          addSocketListener('connect_error', handleErrorEvent);
 
         function connectHandler(event) {
             if (!self.webSocket) {
