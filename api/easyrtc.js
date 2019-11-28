@@ -8543,6 +8543,7 @@ var Easyrtc = function() {
             }
             self.webSocketConnected = false;
         }
+        self.webSocket = 0;
         self.hangupAll();
         if (roomOccupantListener) {
             for (key in lastLoggedInList) {
@@ -8559,6 +8560,10 @@ var Easyrtc = function() {
         self.myEasyrtcid = null;
         self.disconnecting = false;
         oldConfig = {};
+
+        if (self.disconnectListener) {
+            self.disconnectListener();
+        }
     }
 
     /**
@@ -8579,25 +8584,7 @@ var Easyrtc = function() {
         // connection until it's had a chance to be sent. We allocate 100ms for collecting
         // the info, so 250ms should be sufficient for the disconnecting.
         //
-        setTimeout(function() {
-            if (self.webSocket) {
-                try {
-                    self.webSocket.disconnect();
-                } catch (e) {
-                    // we don't really care if this fails.
-                }
-
-                closedChannel = self.webSocket;
-                self.webSocket = 0;
-            }
-            self.loggingOut = false;
-            self.disconnecting = false;
-            if (roomOccupantListener) {
-                roomOccupantListener(null, {}, false);
-            }
-            self.emitEvent("roomOccupant", {});
-            oldConfig = {};
-        }, 250);
+        setTimeout(disconnectBody, 250);
     };
 
     /** @private */
@@ -11346,10 +11333,6 @@ var Easyrtc = function() {
             updateConfigurationInfo = function() {}; // dummy update function
             oldConfig = {};
             disconnectBody();
-
-            if (self.disconnectListener) {
-                self.disconnectListener();
-            }
         });
     }
 
