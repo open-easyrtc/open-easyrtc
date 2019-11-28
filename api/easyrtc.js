@@ -8537,12 +8537,12 @@ var Easyrtc = function() {
            stillAliveTimer = null;
         }
 
-        if (self.webSocketConnected) {
+        if (self.webSocket) {
             if (!preallocatedSocketIo) {
                 self.webSocket.close();
             }
-            self.webSocketConnected = false;
         }
+        self.webSocketConnected = false;
         self.webSocket = 0;
         self.hangupAll();
         if (roomOccupantListener) {
