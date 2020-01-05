@@ -290,7 +290,7 @@
                 trace("modifying local sdp");
                 var sdp;
                 sdp = maybePreferAudioReceiveCodec(insdp);
-                sdp = maybePreferVideoReceiveCodec(insdp);
+                sdp = maybePreferVideoReceiveCodec(sdp);
                 sdp = maybeSetAudioReceiveBitRate(sdp);
                 sdp = maybeSetVideoReceiveBitRate(sdp);
                 //if( sdp != insdp ) {
@@ -304,7 +304,7 @@
                 trace("modifying remote sdp");
                 var sdp;
                 sdp = maybePreferAudioSendCodec(insdp);
-                sdp = maybePreferVideoSendCodec(insdp);
+                sdp = maybePreferVideoSendCodec(sdp);
                 sdp = maybeSetAudioSendBitRate(sdp);
                 sdp = maybeSetVideoSendBitRate(sdp);
                 sdp = maybeSetVideoSendInitialBitRate(sdp);
