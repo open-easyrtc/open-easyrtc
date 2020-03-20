@@ -4165,6 +4165,8 @@ var Easyrtc = function() {
             throw "Could not create the RTCSessionDescription";
         }
 
+        logDebug("sdp ||  " + JSON.stringify(sd));
+
         var invokeCreateAnswer = function() {
             if (newPeerConn.cancelled) {
                 logDebug('invokeCreateAnswer.canceled', pc.signalingState);
