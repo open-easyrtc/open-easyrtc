@@ -1,14 +1,15 @@
 {
-  "name": "easyrtc",
-  "version": "1.1.1-beta",
-  "homepage": "http://www.easyrtc.com/",
-  "author": "Priologic Software Inc. <info@priologic.com> (http://priologic.com/)",
-  "description": "EasyRTC enables quick development of webRTC",
+  "name": "open-easyrtc",
+  "version": "2.0.5",
+  "homepage": "https://github.com/open-easyrtc/open-easyrtc",
+  "author": "Harold Thetiot <hthetiot@gmail.com>",
+  "description": "Open-EasyRTC enables quick development of WebRTC",
   "contributors": [
+    "Harold Thetiot <hthetiot@gmail.com>",
+    "Chris De Pasquale <cdep@squale.me>",
     "Doug Pelton <doug@priologic.com>",
     "Rod Apeldoorn <rod.apeldoorn@priologic.com>",
-    "Eric Davies <eric.davies@priologic.com>",
-    "Harold Thetiot <hthetiot@sylaps.com>"
+    "Eric Davies <eric.davies@priologic.com>"
   ],
   "keywords": [
     "webRTC",
@@ -19,19 +20,22 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/priologic/easyrtc.git"
+    "url": "https://github.com/open-easyrtc/open-easyrtc.git"
   },
   "bugs": {
-    "url": "https://github.com/priologic/easyrtc/issues"
+    "url": "https://github.com/open-easyrtc/open-easyrtc/issues"
   },
   "main": "index",
   "dependencies": {
     "async": "0.2.x",
     "colors": "*",
-    "underscore": "1.5.x"
+    "socket.io-client": "^2.2.0",
+    "underscore": "1.5.x",
+    "webrtc-adapter": "^7.3.0"
   },
   "scripts": {
     "lint": "grunt lint",
+    "cleanup": "rm -fr node_modules/ && npm install && rm -fr bower_components/ && bower install",
     "build": "grunt build",
     "test": "grunt test"
   },
@@ -42,7 +46,7 @@
   },
   "devDependencies": {
     "fs": "0.0.2",
-    "grunt": "^1.0.3",
+    "grunt": "^1.0.4",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-connect": "^1.0.2",
     "grunt-contrib-csslint": "^2.0.0",
@@ -51,14 +55,13 @@
     "grunt-contrib-uglify": "^1.0.1",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-file-info": "^1.0.10",
-    "grunt-htmlhint": "^0.9.13",
-    "grunt-jsdoc": "^2.0.0",
+    "grunt-jsdoc": "^2.4.0",
     "grunt-karma": "^3.0.0",
     "jasmine-core": "^2.4.1",
     "jsdoc-oblivion": "0.0.4",
-    "karma": "^3.0.0",
+    "karma": "^4.2.0",
     "karma-chrome-launcher": "^1.0.1",
-    "karma-coverage": "^1.0.0",
+    "karma-coverage": "^1.1.2",
     "karma-firefox-launcher": "^1.0.0",
     "karma-ie-launcher": "^1.0.0",
     "karma-jasmine": "^1.0.2",

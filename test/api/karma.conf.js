@@ -20,7 +20,7 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         files: [
             {
-                pattern: 'test/api/bower_components/**/*',
+                pattern: 'test/api/node_modules/**/*',
                 included: false
             },
             {

@@ -42,7 +42,7 @@ For the most part, if you can run Node.JS, you can run EasyRTC.
 Is EasyRTC production ready?
 ----------------------------
 
-We have used EasyRTC in production since May of 2013 (see [https://tawk.com](https://tawk.com "tawk.com")). The included demos include notes about what browsers the various features work in, or how experimental the feature is.
+We have used EasyRTC in production since May of 2013. The included demos include notes about what browsers the various features work in, or how experimental the feature is.
 
 There is a lot of work still to go in providing additional features which production code will need. We invite all users to give us feedback as to what features you desire.
 
@@ -109,8 +109,6 @@ How about Multi-way Conversations?
 ----------------------------------
 
 EasyRTC includes a demo showing up to four connections in a star configuration. Each peer establishes a connection to every other peer.
-
-Check out [tawk.com](http://tawk.com) for an in-production example.
 
 More advanced conference and multicast requirements would require a dedicated WebRTC capable conference server or [MCU](http://en.wikipedia.org/wiki/Multipoint_control_unit "MCU"). EasyRTC does not yet include direct support for these. We are working with various vendors to gain this support.
 

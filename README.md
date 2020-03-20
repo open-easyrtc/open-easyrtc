@@ -1,20 +1,21 @@
-![EasyRTC](./api/img/easyrtc.png "EasyRTC")
-
-EasyRTC
+Open-EasyRTC
 =======
 
-**A bundle of Open Source WebRTC joy!**
+[![npm version](https://img.shields.io/npm/v/open-easyrtc.svg?style=flat)](https://www.npmjs.com/package/open-easyrtc)
+[![Build Status](https://travis-ci.org/open-easyrtc/open-easyrtc.svg?branch=master)](https://travis-ci.org/open-easyrtc/open-easyrtc)
 
-Priologic's EasyRTC, a bundle of Open Source WebRTC joy, include an EasyRTC server andclient API, HTML5 and JavaScript demos under a BSD 2 license.
+Open-EasyRTC is a Fork of Priologic's EasyRTC, include an EasyRTC server and client API, HTML5 and JavaScript demos under a BSD 2 license.
 
-Notice to Developers
-------
+Original Source and Fork intent
+--------------------
 
-* For last fixes use `beta` branch (@hthetiot 07-19-2018)
-> npm install easyrtc@priologic/easyrtc#beta
+This NodeJS `open-easyrtc` module version is a fork of `easyrtc` hosted on Github originally made by `Priologic Software Inc.` and available here: https://github.com/priologic/easyrtc
 
-* To try last EasyRTC Server simply try the lastest docker image (@hthetiot 11-25-2018)
-> docker run -it --name myeasyrtc --rm -p 8443:8443 hthetiot/easyrtc:latest run server_ssl
+This fork of `easyrtc` module named `open-easyrtc` starts at version `2.0.0` in case previous the repository decides to pick up work again on version `1.x.x`.
+
+The main reason of the fork is that `Priologic Software Inc.` as been trying to make the main contributor @hthetiot pay for pushing major issues and security fixes to be released on NPM registry and the maintainer that closed more than 200 issues and contributed more than 80 Pull-Request past 3 years, do not agreed with that kind crooked open-source of practices.
+
+This Fork will retain it's original BSD 2-Clause "Simplified" License until a License migration path solution is found.
 
 Features
 --------
@@ -22,11 +23,10 @@ Features
  * Use our EasyRTC API and sample application code to build and deploy your WebRTC app in hours not weeks.
  * EasyRTC is completely free and open source under a BSD 2 license. No usage costs or other hidden fees.
 
-
 Installation In A Nutshell
 --------------------------
  1. Install [Node.js](http://nodejs.org)
- 2. Download the EasyRTC distribution from github (https://github.com/priologic/easyrtc.git)
+ 2. Download the EasyRTC distribution from github (https://github.com/open-easyrtc/open-easyrtc.git)
  3. Run `npm install` in the easyrtc directory.
  4. Enter the easyrtc/server_example directory by executing `cd server_example`
  5. Run `npm install` in the server_example directory.
@@ -43,6 +43,8 @@ Documentation
 -------------
 All documentation can be found within [the docs folder](./docs/).
 
+_**Note:** Links marked with an asterisk (__*__) use the third-party service [http://htmlpreview.github.io](http://htmlpreview.github.io) to render HTML._
+
 **EasyRTC Server**
 
  * [Install instructions for Ubuntu, Windows, and Mac](./docs/easyrtc_server_install.md)
@@ -51,16 +53,16 @@ All documentation can be found within [the docs folder](./docs/).
      * `/docs/easyrtc_server_configuration.md`
  * [Using Server Events](./docs/easyrtc_server_events.md)
      * `/docs/easyrtc_server_events.md`  
- * Server API
-     * `/docs/server_html_docs/index.html`  
+ * [Server API](http://htmlpreview.github.io/?https://github.com/open-easyrtc/open-easyrtc/blob/master/docs/docs_in_html/server-api/index.html)__*__
+     * `/docs/docs_in_html/server-api/index.html`  
 
 **EasyRTC Client API**
  * [Client API tutorial](./docs/easyrtc_client_tutorial.md)
      * `/docs/easyrtc_client_tutorial.md`
- * Client API
-     * `/docs/client_html_docs/easyrtc.html`
- * Client File Transfer API
-     * `/docs/client_html_docs/easyrtc_ft.html`
+ * [Client API (lite)](http://htmlpreview.github.io/?https://github.com/open-easyrtc/open-easyrtc/blob/master/docs/client_html_docs_lite/Easyrtc.html)__*__
+     * `/docs/client_html_docs_lite/Easyrtc.html`
+ * [Client File Transfer API (lite)](http://htmlpreview.github.io/?https://github.com/open-easyrtc/open-easyrtc/blob/master/docs/client_html_docs_lite/Easyrtc_ft.html)__*__
+     * `/docs/client_html_docs_lite/easyrtc_ft.html`
 
 **General Development**
  * [Frequently asked questions](./docs/easyrtc_faq.md)
@@ -79,6 +81,12 @@ All documentation can be found within [the docs folder](./docs/).
      * `/docs/easyrtc_upcoming_features.md`
  * [Common WebRTC problems](./docs/easyrtc_webrtc_problems.md)
      * `/docs/easyrtc_webrtc_problems.md`
+ * [Common EasyRTC problems (and solutions)](./docs/easyrtc_common_problems.md)
+     * `/docs/easyrtc_common_problems.md`
+ * [Debugging WebRTC](./docs/webrtc_debugging.md)
+     * `/docs/webrtc_debugging.md`
+ * [Server/Client Message Types](./docs/easyrtc_server_msgtypes.md)
+     * `/docs/easyrtc_changelog.md`
  * [Changelog](./docs/easyrtc_changelog.md)
      * `/docs/easyrtc_changelog.md`
 
@@ -114,24 +122,6 @@ EasyRTC comes with a number of demo's which work immediately after installation.
  * Screen and tab sharing
  * File transfer
  * Client side video recording
-
-
-Links for help and information
-------------------------------
-
-* The EasyRTC website is at:
-  * [https://www.easyrtc.com/](https://www.easyrtc.com/)
-* Use our support forum is at:
-  * [https://groups.google.com/forum/?fromgroups#!forum/easyrtc](https://groups.google.com/forum/?fromgroups#!forum/easyrtc)
-* Live demo site:
-  * [https://demo.easyrtc.com/](https://demo.easyrtc.com/)
-* Bugs and requests can be filed on our github page or on the forum:
-  * [https://github.com/priologic/easyrtc/issues](https://github.com/priologic/easyrtc/issues)
-* Our YouTube channel has live demo's:
-  * [http://www.youtube.com/user/priologic](http://www.youtube.com/user/priologic)
-* Information on complimentary EasyRTC commercial products can be found here: 
-  * [Product and support pricing - https://easyrtc.com/pricing/](https://easyrtc.com/pricing/)
-
 
 License
 -------

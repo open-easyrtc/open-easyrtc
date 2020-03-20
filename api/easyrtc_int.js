@@ -72,12 +72,12 @@ var Easyrtc = function() {
         if( stillAliveTimer ) {
            clearTimeout(stillAliveTimer);
         }
-      
+
         if( missedAliveResponses === 1 ) {
             self.showError(self.errCodes.SYSTEM_ERR, "Timed out trying to talk to the server.");
             self.printpeerconns();
             self.hangupAll();
-            self.disconnect(); 
+            self.disconnect();
             return;
         }
         stillAliveTimer = setTimeout(stillAliveEmitter, 20*1000);
@@ -264,7 +264,7 @@ var Easyrtc = function() {
     //
     // this private method handles adding a stream to a peer connection.
     // chrome only supports adding streams, safari only supports adding
-    // tracks. 
+    // tracks.
     //
     function addStreamToPeerConnection(stream, peerConnection) {
        if( peerConnection.addStream ) {
@@ -295,8 +295,8 @@ var Easyrtc = function() {
      * you update change the properties of an existing connection (such as the
      * the bandwidth used. Before calling it, you modify your sdp filters
      * to reflect the desired changes.
-     * @param otherUser the easyrtcid of the peer corresponding to the 
-     *  connection being updated. 
+     * @param otherUser the easyrtcid of the peer corresponding to the
+     *  connection being updated.
      */
     this.renegotiate = function(otherUser) {
         var peerConnObj =  peerConns[otherUser];
@@ -304,31 +304,37 @@ var Easyrtc = function() {
             logDebug("Attempt to renegotiate ice on nonexistant connection");
             return;
         }
-        var callFailureCB = peerConnObj.callFailureCB; 
+        var callFailureCB = peerConnObj.callFailureCB || self.showError;
         var pc = peerConnObj.pc;
 
         var setLocalAndSendMessage0 = function(sessionDescription) {
             if (peerConnObj.cancelled) {
+                logDebug('renegotiate.setLocalAndSendMessage0.ignored', peerConnObj.cancelled, peerConnObj.sendingOffer);
                 return;
             }
             var sendOffer = function() {
-
+                peerConnObj.sendingOffer = false;
                 sendSignalling(otherUser, "offer", sessionDescription, null, callFailureCB);
             };
             if (sdpLocalFilter) {
                 sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
             }
-            pc.setLocalDescription(sessionDescription, sendOffer,
-                    function(errorText) {
-                        callFailureCB(self.errCodes.CALL_ERR, errorText);
-                    });
+            pc.setLocalDescription(sessionDescription).then(sendOffer, function(errorText) {
+                peerConnObj.sendingOffer = false;
+                callFailureCB(self.errCodes.CALL_ERR, errorText);
+            });
         };
 
-        pc.createOffer({
-            iceRestart:true
-        }).then(setLocalAndSendMessage0)
-             .catch( function(reason) {
-             callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(reason));
+        if (peerConnObj.sendingOffer) {
+            logDebug('initiateSendOffer.setLocalAndSendMessage0.ignored', peerConnObj.sendingOffer);
+            return;
+        }
+
+        peerConnObj.sendingOffer = true;
+        pc.createOffer({iceRestart: true }).then(setLocalAndSendMessage0)
+          .catch(function(reason) {
+                 peerConnObj.sendingOffer = false;
+                 callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(reason));
            });
 
     };
@@ -500,7 +506,7 @@ var Easyrtc = function() {
     this.cookieId = "easyrtcsid";
 
     /** @private */
-    var username = null;
+    this.username = null;
 
     /** Flag to indicate that user is currently logging out */
     this.loggingOut = false;
@@ -527,14 +533,13 @@ var Easyrtc = function() {
      */
     this.enableAudioReceive = function(value) {
         if (
-            adapter && adapter.browserDetails &&
-             (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
-        ) {
-            receivedMediaConstraints.offerToReceiveAudio = value;
-        }
-        else {
+             adapter && adapter.browserDetails &&
+                 (adapter.browserDetails.browser === "chrome" && adapter.browserDetails.version < 65)
+         ) {
             receivedMediaConstraints.mandatory = receivedMediaConstraints.mandatory || {};
             receivedMediaConstraints.mandatory.OfferToReceiveAudio = value;
+        } else {
+            receivedMediaConstraints.offerToReceiveAudio = value;
         }
     };
 
@@ -545,14 +550,13 @@ var Easyrtc = function() {
      */
     this.enableVideoReceive = function(value) {
         if (
-            adapter && adapter.browserDetails &&
-             (adapter.browserDetails.browser === "firefox" || adapter.browserDetails.browser === "edge")
-        ) {
-           receivedMediaConstraints.offerToReceiveVideo = value;
-        }
-        else {
+             adapter && adapter.browserDetails &&
+                 (adapter.browserDetails.browser === "chrome" && adapter.browserDetails.version < 65)
+         ) {
             receivedMediaConstraints.mandatory = receivedMediaConstraints.mandatory || {};
             receivedMediaConstraints.mandatory.OfferToReceiveVideo = value;
+        } else {
+           receivedMediaConstraints.offerToReceiveVideo = value;
         }
     };
 
@@ -568,7 +572,12 @@ var Easyrtc = function() {
                 for (var i = 0; i < values.length; i++) {
                     var source = values[i];
                     if (source.kind === sourceType) {
-                        source.id = source.deviceId; //backwards compatibility
+
+                        //backwards compatibility
+                        if (!source.id) {
+                            source.id = source.deviceId;
+                        }
+
                         results.push(source);
                     }
                 }
@@ -582,7 +591,7 @@ var Easyrtc = function() {
     }
 
     /**
-     * Sets the audio output device of a Video object. 
+     * Sets the audio output device of a Video object.
      * That is to say, this controls what speakers get the sound.
      * In theory, this works on Chrome but probably doesn't work anywhere else yet.
      * This code was cribbed from https://webrtc.github.io/samples/src/content/devices/multi/.
@@ -756,9 +765,9 @@ var Easyrtc = function() {
                         minHeight: screen.height,
                         minFrameRate: 1,
                         maxFrameRate: 15
-                    },                    
+                    },
                     // In Chrome, the chrome.desktopCapture extension API can be used to capture the screen,
-                    // which includes system audio (but only on Windows and Chrome OS and without plans for OS X or Linux). 
+                    // which includes system audio (but only on Windows and Chrome OS and without plans for OS X or Linux).
                     // - http://stackoverflow.com/questions/34235077/capture-system-sound-from-browser?answertab=votes#tab-top
                     audio: false
                     /*
@@ -792,7 +801,7 @@ var Easyrtc = function() {
                 }
             }
 
-        // Clear 
+        // Clear
         } else {
             delete self._presetMediaConstraints;
         }
@@ -848,7 +857,7 @@ var Easyrtc = function() {
         }
         else {
 
-            // Tested Firefox 49 and MS Edge require minFrameRate and maxFrameRate 
+            // Tested Firefox 49 and MS Edge require minFrameRate and maxFrameRate
             // instead max,min,ideal that cause GetUserMedia failure.
             // Until confirmed both browser support idea,max and min we need this.
             if (
@@ -863,7 +872,7 @@ var Easyrtc = function() {
                     constraints.video.height = self._desiredVideoProperties.height;
                 }
                 if (self._desiredVideoProperties.frameRate) {
-                    constraints.video.frameRate = { 
+                    constraints.video.frameRate = {
                         minFrameRate: self._desiredVideoProperties.frameRate,
                         maxFrameRate: self._desiredVideoProperties.frameRate
                     };
@@ -873,13 +882,13 @@ var Easyrtc = function() {
                 }
 
             // chrome and opera
-            } else { 
+            } else {
                 constraints.video = {};
                 if (self._desiredVideoProperties.width) {
-                     constraints.video.width = { 
+                     constraints.video.width = {
                         max: self._desiredVideoProperties.width,
                         min : self._desiredVideoProperties.width,
-                        ideal : self._desiredVideoProperties.width 
+                        ideal : self._desiredVideoProperties.width
                      };
                 }
                 if (self._desiredVideoProperties.height) {
@@ -896,7 +905,8 @@ var Easyrtc = function() {
                     };
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
-                    constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
+                    constraints.video.deviceId = {exact: self._desiredVideoProperties.audioSrcId};
+                    //constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
                 }
                 // hack for opera
                 if (Object.keys(constraints.video).length === 0 ) {
@@ -911,8 +921,8 @@ var Easyrtc = function() {
         else {
             constraints.audio = {};
             if (self._desiredAudioProperties.audioSrcId) {
-            //    constraints.audio.deviceId = {exact: self._desiredAudioProperties.audioSrcId};
-             constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
+             constraints.audio.deviceId = {exact: self._desiredAudioProperties.audioSrcId};
+             //constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
             }
         }
         return constraints;
@@ -968,7 +978,7 @@ var Easyrtc = function() {
      * @returns {Boolean} True getUserMedia is supported.
      */
     this.supportsGetUserMedia = function() {
-        return typeof navigator.mediaDevices.getUserMedia !== 'undefined';
+        return navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia !== 'undefined';
     };
 
     /**
@@ -1096,7 +1106,7 @@ var Easyrtc = function() {
     //        function wasAcceptedCB(boolean,string) - see the easyrtc.call documentation.
     //     }
     //
-    
+
     this.printpeerconns = function() {
         console.log("peerconns = ", peerConns);
     };
@@ -1204,7 +1214,7 @@ var Easyrtc = function() {
 
     /**
       * This is a basic statistics filter that keesp just the generally
-      * useful information. 
+      * useful information.
       */
     this.standardStatsFilter = adapter && adapter.browserDetails &&
                 adapter.browserDetails.browser === "firefox" ? firefoxStatsFilter : chromeStatsFilter;
@@ -1218,7 +1228,7 @@ var Easyrtc = function() {
         else if (peerConns[peerId].pc.getStats) {
             // TODO Safari
             // [Error] Unhandled Promise Rejection: TypeError: Argument 1 ('selector') to RTCPeerConnection.getStats must be an instance of MediaStreamTrack
-            peerConns[peerId].pc.getStats(null, function(stats) {
+            peerConns[peerId].pc.getStats(null).then(function(stats) {
                 var items = {};
                 var candidates = {};
                 var activeId = null;
@@ -1293,7 +1303,7 @@ var Easyrtc = function() {
         }
         else if (peerConns[peerId].pc.getStats) {
 
-            peerConns[peerId].pc.getStats(function(stats) {
+            peerConns[peerId].pc.getStats().then(function(stats) {
 
                 var localStats = {};
                 var part, parts = stats.result();
@@ -1473,7 +1483,7 @@ var Easyrtc = function() {
     }
 
     /** @private */
-    var roomApiFieldTimer= {};
+    self._roomApiFieldTimer= {};
 
     /**
      * @private
@@ -1484,12 +1494,15 @@ var Easyrtc = function() {
         // Rather than issue the send request immediately, we set a timer so we can accumulate other
         // calls
         //
-        if (roomApiFieldTimer[roomName]) {
-            clearTimeout(roomApiFieldTimer[roomName]);
+        if (self._roomApiFieldTimer[roomName]) {
+            clearTimeout(self._roomApiFieldTimer[roomName]);
         }
-        roomApiFieldTimer[roomName] = setTimeout(function() {
-            sendRoomApiFields(roomName, self._roomApiFields[roomName]);
-            roomApiFieldTimer[roomName] = null;
+        self._roomApiFieldTimer[roomName] = setTimeout(function() {
+            var roomApiFields = self._roomApiFields[roomName];
+            if (roomApiFields) {
+                sendRoomApiFields(roomName, roomApiFields);
+            }
+            self._roomApiFieldTimer[roomName] = null;
         }, 10);
     }
 
@@ -1515,30 +1528,31 @@ var Easyrtc = function() {
             self._roomApiFields = {};
         }
         if (!fieldName && !fieldValue) {
+            clearTimeout(self._roomApiFieldTimer[roomName]);
             delete self._roomApiFields[roomName];
-            return;
-        }
+        } else {
 
-        if (!self._roomApiFields[roomName]) {
-            self._roomApiFields[roomName] = {};
-        }
-        if (fieldValue !== undefined && fieldValue !== null) {
-            if (typeof fieldValue === "object") {
-                try {
-                    JSON.stringify(fieldValue);
-                }
-                catch (jsonError) {
-                    self.showError(self.errCodes.DEVELOPER_ERR, "easyrtc.setRoomApiField passed bad object ");
-                    return;
-                }
+            if (!self._roomApiFields[roomName]) {
+                self._roomApiFields[roomName] = {};
             }
-            self._roomApiFields[roomName][fieldName] = {fieldName: fieldName, fieldValue: fieldValue};
-        }
-        else {
-            delete self._roomApiFields[roomName][fieldName];
-        }
-        if (self.webSocketConnected) {
-            enqueueSendRoomApi(roomName);
+
+            if (fieldValue !== undefined && fieldValue !== null) {
+                if (typeof fieldValue === "object") {
+                    try {
+                        JSON.stringify(fieldValue);
+                    } catch (jsonError) {
+                        self.showError(self.errCodes.DEVELOPER_ERR, "easyrtc.setRoomApiField passed bad object ");
+                        return;
+                    }
+                }
+                self._roomApiFields[roomName][fieldName] = {fieldName: fieldName, fieldValue: fieldValue};
+            } else {
+                delete self._roomApiFields[roomName][fieldName];
+            }
+
+            if (self.webSocketConnected) {
+                enqueueSendRoomApi(roomName);
+            }
         }
     };
 
@@ -1557,12 +1571,36 @@ var Easyrtc = function() {
         self.onError({errorCode: messageCode, errorText: message});
     };
 
+    /** @private */
+    var customErrorListener;
+
+    /**
+     * Override the default open-easyrtc error handler. The default handler shows a popup error dialog.
+     * @param {Function} handler Error handler function with one param, an object with keys 'errorCode' and 'errorText'
+     * @example
+     *  easyrtc.setErrorListener(({errorCode, errorText}) => {
+     *    alert(`${errorCode} error:\n${errorText}`);
+     * });
+     * @example // Removing previously set handler:
+     * easyrtc.setErrorListener(undefined);
+     */
+    this.setErrorListener = function(handler) {
+        customErrorListener = handler;
+    };
+
     /**
      * @private
      * @param errorObject
      */
     this.onError = function(errorObject) {
         logDebug("saw error " + errorObject.errorText);
+
+        // Use custom error handler if set, rather than creating dialog
+        if (customErrorListener) {
+            logDebug("Using custom error handler");
+            customErrorListener(errorObject);
+            return;
+        }
 
         var errorDiv = document.getElementById('easyrtcErrorDialog');
         var errorBody;
@@ -1858,16 +1896,16 @@ var Easyrtc = function() {
             if (self.roomData.hasOwnProperty(roomName)) {
 
                 mediaIds = self.getRoomApiField(roomName, easyrtcId, "mediaIds");
-                
+
                 if (!mediaIds) {
                     continue;
                 }
-                
+
                 for (streamName in mediaIds) {
                     if (
                         mediaIds.hasOwnProperty(streamName) && (
                             mediaIds[streamName] === webrtcStreamId || // Full match
-                                webrtcStreamId.indexOf(mediaIds[streamName]) === 0 || // Partial match 
+                                webrtcStreamId.indexOf(mediaIds[streamName]) === 0 || // Partial match
                                   mediaIds[streamName].indexOf(webrtcStreamId) === 0 // Partial match
                         )
                     ) {
@@ -2060,13 +2098,13 @@ var Easyrtc = function() {
             element.pause();
         }
 
-        if (typeof element.src !== 'undefined') {
-            //noinspection JSUndefinedPropertyAssignment
-            element.src = "";
-        } else if (typeof element.srcObject !== 'undefined') {
-            element.srcObject = "";
+        if (typeof element.srcObject !== 'undefined') {
+            element.srcObject = null;
         } else if (typeof element.mozSrcObject !== 'undefined') {
             element.mozSrcObject = null;
+        } else if (typeof element.src !== 'undefined') {
+            //noinspection JSUndefinedPropertyAssignment
+            element.src = "";
         }
     };
 
@@ -2091,10 +2129,10 @@ var Easyrtc = function() {
 
             if (typeof element.srcObject !== 'undefined') {
                 element.srcObject = stream;
-            } else if (typeof element.src !== 'undefined') {
-                element.src = self.createObjectURL(stream);
             } else if (typeof element.mozSrcObject !== 'undefined') {
                 element.mozSrcObject = self.createObjectURL(stream);
+            } else if (typeof element.src !== 'undefined') {
+                element.src = self.createObjectURL(stream);
             }
         }
         else {
@@ -2306,7 +2344,7 @@ var Easyrtc = function() {
 
             stream.streamName = streamName;
             registerLocalMediaStreamByName(stream, streamName);
-            var videoObj, triesLeft, tryToGetSize, ele;
+            var videoObj, triesLeft, tryToGetSize;
             if (haveAudioVideo.video) {
                 videoObj = document.createElement('video');
                 videoObj.style.display = "none";
@@ -2325,7 +2363,9 @@ var Easyrtc = function() {
                                     self._desiredVideoProperties.width, self._desiredVideoProperties.height,
                                     self.nativeVideoWidth, self.nativeVideoHeight));
                         }
-                        self.setVideoObjectSrc(videoObj, null);
+
+                        self.clearMediaStream(videoObj);
+
                         if (videoObj.removeNode) {
                             videoObj.removeNode(true);
                         }
@@ -2334,6 +2374,7 @@ var Easyrtc = function() {
                         }
 
                         updateConfigurationInfo();
+
                         if (successCallback) {
                             successCallback(stream);
                         }
@@ -2786,11 +2827,11 @@ var Easyrtc = function() {
 
     /** @private */
     function getRemoteStreamByName(peerConn, otherUser, streamName) {
-                    
+
         var keyToMatch = null;
         var remoteStreams = peerConn.pc.getRemoteStreams();
 
-        // No streamName lead to default 
+        // No streamName lead to default
         if (!streamName) {
             streamName = "default";
         }
@@ -2816,12 +2857,12 @@ var Easyrtc = function() {
             }
         }
 
-        // 
+        //
         if (!keyToMatch) {
             self.showError(self.errCodes.DEVELOPER_ERR, "remote peer does not have media stream called " + streamName);
         }
 
-        // 
+        //
         for (var i = 0; i < remoteStreams.length; i++) {
             var remoteId;
             if (remoteStreams[i].id) {
@@ -2930,40 +2971,52 @@ var Easyrtc = function() {
     // easyrtc.disconnect performs a clean disconnection of the client from the server.
     //
     function disconnectBody() {
-        var key;
+        var roomName;
         self.loggingOut = true;
         offersPending = {};
         acceptancePending = {};
         self.disconnecting = true;
         closedChannel = self.webSocket;
 
-        if( stillAliveTimer ) {
+        if (stillAliveTimer) {
            clearTimeout(stillAliveTimer);
            stillAliveTimer = null;
         }
 
-        if (self.webSocketConnected) {
+        if (self.webSocket) {
             if (!preallocatedSocketIo) {
                 self.webSocket.close();
             }
-            self.webSocketConnected = false;
         }
+        self.webSocketConnected = false;
+        self.webSocket = 0;
         self.hangupAll();
         if (roomOccupantListener) {
-            for (key in lastLoggedInList) {
-                if (lastLoggedInList.hasOwnProperty(key)) {
-                    roomOccupantListener(key, {}, false);
+            for (roomName in lastLoggedInList) {
+                if (lastLoggedInList.hasOwnProperty(roomName)) {
+
+                    // Notify roomOccupantListener
+                    roomOccupantListener(roomName, {}, false);
+
+                    // Clear roomApiFields and roomApiFieldTimer
+                    self.setRoomApiField(roomName);
                 }
             }
         }
+
         lastLoggedInList = {};
         self.emitEvent("roomOccupant", {});
+
         self.roomData = {};
         self.roomJoin = {};
         self.loggingOut = false;
         self.myEasyrtcid = null;
         self.disconnecting = false;
         oldConfig = {};
+
+        if (self.disconnectListener) {
+            self.disconnectListener();
+        }
     }
 
     /**
@@ -2984,25 +3037,7 @@ var Easyrtc = function() {
         // connection until it's had a chance to be sent. We allocate 100ms for collecting
         // the info, so 250ms should be sufficient for the disconnecting.
         //
-        setTimeout(function() {
-            if (self.webSocket) {
-                try {
-                    self.webSocket.disconnect();
-                } catch (e) {
-                    // we don't really care if this fails.
-                }
-
-                closedChannel = self.webSocket;
-                self.webSocket = 0;
-            }
-            self.loggingOut = false;
-            self.disconnecting = false;
-            if (roomOccupantListener) {
-                roomOccupantListener(null, {}, false);
-            }
-            self.emitEvent("roomOccupant", {});
-            oldConfig = {};
-        }, 250);
+        setTimeout(disconnectBody, 250);
     };
 
     /** @private */
@@ -3388,7 +3423,7 @@ var Easyrtc = function() {
     // and the name of the stream.
     //
     function emitOnStreamClosed(easyrtcid, stream) {
-        
+
         if (!peerConns[easyrtcid]) {
             return;
         }
@@ -3399,7 +3434,7 @@ var Easyrtc = function() {
         if (peerConns[easyrtcid].liveRemoteStreams[streamName]) {
             delete peerConns[easyrtcid].liveRemoteStreams[streamName];
             if (self.onStreamClosed) {
-                self.onStreamClosed(easyrtcid, stream, streamName);   
+                self.onStreamClosed(easyrtcid, stream, streamName);
             }
         }
         delete peerConns[easyrtcid].remoteStreamIdToName[streamId];
@@ -3686,6 +3721,10 @@ var Easyrtc = function() {
             }
 
             pc.onnegotiationneeded = function(event) {
+                var eventTarget = event.currentTarget || event.target || pc,
+                    signalingState = eventTarget.signalingState || 'unknown';
+
+                logDebug('onnegotiationneeded', signalingState);
                 if (
                     peerConns[otherUser] &&
                         (peerConns[otherUser].enableNegotiateListener)
@@ -3695,9 +3734,11 @@ var Easyrtc = function() {
             };
 
             pc.onsignalingstatechange = function () {
-                
+
                 var eventTarget = event.currentTarget || event.target || pc,
                     signalingState = eventTarget.signalingState || 'unknown';
+
+                logDebug('onsignalingstatechange', signalingState);
 
                 if (signalingStateChangeListener) {
                    signalingStateChangeListener(otherUser, eventTarget, signalingState);
@@ -3708,6 +3749,8 @@ var Easyrtc = function() {
 
                 var eventTarget = event.currentTarget || event.target || pc,
                     connState = eventTarget.iceConnectionState || 'unknown';
+
+                logDebug('onsignalingstatechange', connState);
 
                 if (iceConnectionStateChangeListener) {
                    iceConnectionStateChangeListener(otherUser, eventTarget, connState);
@@ -3796,7 +3839,7 @@ var Easyrtc = function() {
                     //
                     processCandidate(event.candidate.candidate);
 
-                    if (peerConns[otherUser].connectionAccepted || 
+                    if (peerConns[otherUser].connectionAccepted ||
                         peerConns[otherUser].supportHalfTrickleIce) {
 
                         sendSignalling(otherUser, "candidate", candidateData, null, function() {
@@ -4095,6 +4138,7 @@ var Easyrtc = function() {
                     self.showError(errorCode, errorText);
                 }
 
+                newPeerConn.pendingAwnser = false;
                 sendSignalling(caller, "answer", sessionDescription, onSignalSuccess, onSignalFailure);
                 peerConns[caller].connectionAccepted = true;
                 sendQueuedCandidates(caller, onSignalSuccess, onSignalFailure);
@@ -4104,13 +4148,17 @@ var Easyrtc = function() {
                     pc.connectDataConnection(5002, 5001);
                 }
             };
+
             if (sdpLocalFilter) {
                 sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
             }
-            pc.setLocalDescription(sessionDescription, sendAnswer, function(message) {
+
+            pc.setLocalDescription(sessionDescription).then(sendAnswer, function(message) {
+                newPeerConn.pendingAwnser = false;
                 self.showError(self.errCodes.INTERNAL_ERR, "setLocalDescription: " + message);
             });
         };
+
         var sd = new RTCSessionDescription(msgData);
 
         if (!sd) {
@@ -4119,11 +4167,19 @@ var Easyrtc = function() {
 
         var invokeCreateAnswer = function() {
             if (newPeerConn.cancelled) {
+                logDebug('invokeCreateAnswer.canceled', pc.signalingState);
                 return;
             }
+            if (newPeerConn.pendingAwnser) {
+                logDebug('invokeCreateAnswer.pending', pc.signalingState);
+            }
+
+            logDebug('invokeCreateAnswer', pc.signalingState);
+            newPeerConn.pendingAwnser = true;
             pc.createAnswer(receivedMediaConstraints)
-                 .then(setLocalAndSendMessage1)
-                 .catch( function(reason) {
+                .then(setLocalAndSendMessage1)
+                .catch(function(reason) {
+                    newPeerConn.pendingAwnser = false;
                     self.showError(self.errCodes.INTERNAL_ERR, "create-answer: " + reason);
                 });
         };
@@ -4135,14 +4191,14 @@ var Easyrtc = function() {
             if (sdpRemoteFilter) {
                 //sd.sdp = sdpRemoteFilter(sd.sdp);
                 sd = new RTCSessionDescription({
-                    type: sd.type, 
+                    type: sd.type,
                     sdp: sdpRemoteFilter(sd.sdp)
                 });
             }
 
             logDebug("sdp ||  " + JSON.stringify(sd));
 
-            pc.setRemoteDescription(sd, invokeCreateAnswer, function(message) {
+            pc.setRemoteDescription(sd).then(invokeCreateAnswer, function(message) {
                 self.showError(self.errCodes.INTERNAL_ERR, "doAnswerBody setRemoteDescription failed: " + message);
                 // TODO sendSignaling reject/failure
             });
@@ -4209,43 +4265,38 @@ var Easyrtc = function() {
         }
 
         var pc = peerConnObj.pc;
-        var callFailureCB = peerConnObj.callFailureCB; 
+        var callFailureCB = peerConnObj.callFailureCB || self.showError;
         var setLocalAndSendMessage0 = function(sessionDescription) {
             if (peerConnObj.cancelled) {
+                logDebug('initiateSendOffer.setLocalAndSendMessage0.ignored', peerConnObj.cancelled, peerConnObj.sendingOffer);
                 return;
             }
             var sendOffer = function() {
-
+                peerConnObj.sendingOffer = false;
                 sendSignalling(otherUser, "offer", sessionDescription, null, peerConnObj.callFailureCB);
             };
             if (sdpLocalFilter) {
                 sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
             }
-            pc.setLocalDescription(sessionDescription, sendOffer,
-                    function(errorText) {
-                        callFailureCB(self.errCodes.CALL_ERR, errorText);
-                    });
+
+            pc.setLocalDescription(sessionDescription).then(sendOffer, function(errorText) {
+                peerConnObj.sendingOffer = false;
+                callFailureCB(self.errCodes.CALL_ERR, errorText);
+            });
         };
 
-        setTimeout(function() {
-            //
-            // if the call was cancelled, we don't want to continue getting the offer.
-            // we can tell the call was cancelled because there won't be a peerConn object
-            // for it.
-            //
-            if( !peerConns[otherUser]) {
-                return;
-            }
+        if (peerConnObj.sendingOffer) {
+            logDebug('initiateSendOffer.setLocalAndSendMessage0.ignored', peerConnObj.sendingOffer);
+            return;
+        }
 
-            pc.createOffer(receivedMediaConstraints)
-                 .then(setLocalAndSendMessage0)
-                 .catch(
-                   function(errorObj) {
-                     peerConnObj.callFailureCB(self.errCodes.CALL_ERR, 
-                        JSON.stringify(errorObj));
-                   }
-                  );
-        }, 100);
+        peerConnObj.sendingOffer = true;
+        pc.createOffer(receivedMediaConstraints)
+            .then(setLocalAndSendMessage0)
+            .catch(function(errorObj) {
+                peerConnObj.sendingOffer = false;
+                callFailureCB(self.errCodes.CALL_ERR,  JSON.stringify(errorObj));
+            });
     }
 
     /**
@@ -4325,7 +4376,7 @@ var Easyrtc = function() {
             wasAcceptedCB(true, otherUser);
             doAnswer(otherUser, offersPending[otherUser], streamNames);
             self.callCancelled(otherUser, false);
-         
+
         // do we already have a pending call?
         } else if (typeof acceptancePending[otherUser] !== 'undefined') {
             message = "Call already pending acceptance";
@@ -4414,7 +4465,7 @@ var Easyrtc = function() {
 
     /** @private */
     function hangupBody(otherUser) {
-        
+
         logDebug("Hanging up on " + otherUser);
         clearQueuedMessages(otherUser);
 
@@ -4422,14 +4473,14 @@ var Easyrtc = function() {
 
             if (peerConns[otherUser].pc) {
                 closePeer(otherUser);
-            } 
+            }
 
             if (peerConns[otherUser]) {
                 delete peerConns[otherUser];
             }
 
             updateConfigurationInfo();
-            
+
             if (self.webSocket) {
                 sendSignalling(otherUser, "hangup", null, function() {
                     logDebug("hangup succeeds");
@@ -4441,7 +4492,7 @@ var Easyrtc = function() {
         }
     }
 
-    
+
 
     /**
      * Hang up on a particular user or all users.
@@ -4845,12 +4896,18 @@ var Easyrtc = function() {
 
         for (i = 0; i < iceConfig.iceServers.length; i++) {
             item = iceConfig.iceServers[i];
-            if( item.urls && item.urls.length ) {
-               for( j = 0; j < item.urls.length; j++ ) {
-                  processUrl(item.urls[j]);
+            if (item.urls && item.urls.length) {
+                // Handle legacy options urls has string
+                if (typeof item.urls === 'string') {
+                   processUrl(item.urls);
+
+                // Handle proper options urls as array
+                } else if (item.urls instanceof Array) {
+                   for( j = 0; j < item.urls.length; j++ ) {
+                      processUrl(item.urls[j]);
+                   }
                }
-            }
-            else if( item.url ) {
+            } else if (item.url) {
                processUrl(item.url);
             }
          }
@@ -4964,7 +5021,7 @@ var Easyrtc = function() {
             sdpMid: msgData.id,
             candidate: msgData.candidate
         });
-        
+
         var pc = peerConns[caller].pc;
 
         function iceAddSuccess() {
@@ -5113,8 +5170,7 @@ var Easyrtc = function() {
            }
         }
         catch(userError) {
-            self.showError(self.errCodes.DEVELOPER_ERR,"sdpRemoteFilter failed");
-            console.log(userError);
+            self.showError(self.errCodes.DEVELOPER_ERR, "sdpRemoteFilter failed case: " + userError);
         }
         var sd = new RTCSessionDescription({type:msgData.type, sdp:sdp});
         if (!sd) {
@@ -5127,14 +5183,14 @@ var Easyrtc = function() {
             if (sdpRemoteFilter) {
                 //sd.sdp = sdpRemoteFilter(sd.sdp);
                 sd = new RTCSessionDescription({
-                    type: sd.type, 
+                    type: sd.type,
                     sdp: sdpRemoteFilter(sd.sdp)
                 });
             }
 
             logDebug("sdp ||  " + JSON.stringify(sd));
-            
-            pc.setRemoteDescription(sd, function() {
+
+            pc.setRemoteDescription(sd).then(function() {
                 if (pc.connectDataConnection) {
                     logDebug("calling connectDataConnection(5001,5002)");
                     if( isInitialConnect ) {
@@ -5149,7 +5205,7 @@ var Easyrtc = function() {
                             }
                        }
                        peerConns[caller].streamsAddedAcks = {};
-                    } 
+                    }
                     catch(userError) {
                        self.showError(self.errCodes.DEVELOPER_ERR, "streamAdded receipt function failed");
                     }
@@ -5165,7 +5221,6 @@ var Easyrtc = function() {
 
         flushCachedCandidates(caller);
     }
-
 
     function processCandidateQueue(caller, msgData) {
         if (peerConns[caller] && peerConns[caller].pc) {
@@ -5188,7 +5243,6 @@ var Easyrtc = function() {
         var caller = msg.senderEasyrtcid;
         var msgType = msg.msgType;
         var msgData = msg.msgData;
-        var pc;
 
         logDebug('received message of type ' + msgType);
 
@@ -5458,6 +5512,10 @@ var Easyrtc = function() {
                 delete self.roomJoin[roomName];
             }
             else {
+
+                // Clear roomApiFields and roomApiFieldTimer
+                self.setRoomApiField(roomName);
+
                 roomItem = {};
                 roomItem[roomName] = {roomName: roomName};
                 sendSignalling(null, "roomLeave", {roomLeave: roomItem},
@@ -5468,11 +5526,11 @@ var Easyrtc = function() {
                         successCallback(roomName);
                     }
                 },
-                        function(errorCode, errorText) {
-                            if (failureCallback) {
-                                failureCallback(errorCode, errorText, roomName);
-                            }
-                        });
+                function(errorCode, errorText) {
+                    if (failureCallback) {
+                        failureCallback(errorCode, errorText, roomName);
+                    }
+                });
             }
         }
     };
@@ -5644,6 +5702,7 @@ var Easyrtc = function() {
         }
         else if (!self.webSocket) {
             try {
+               connectionOptions['force new connection'] = true;
                self.webSocket = io.connect(serverPath, connectionOptions);
 
                 if (!self.webSocket) {
@@ -5678,26 +5737,28 @@ var Easyrtc = function() {
             logDebug("the web socket closed");
         });
 
-        addSocketListener('error', function(event) {
-            function handleErrorEvent() {
-                if (self.myEasyrtcid) {
-                    //
-                    // socket.io version 1 got rid of the socket member, moving everything up one level.
-                    //
-                    if (isSocketConnected(self.webSocket)) {
-                        self.showError(self.errCodes.SIGNAL_ERR, self.getConstantString("miscSignalError"));
-                    }
-                    else {
-                        /* socket server went down. this will generate a 'disconnect' event as well, so skip this event */
-                        errorCallback(self.errCodes.CONNECT_ERR, self.getConstantString("noServer"));
-                    }
+        function handleErrorEvent() {
+            if (self.myEasyrtcid) {
+                //
+                // socket.io version 1 got rid of the socket member, moving everything up one level.
+                //
+                if (isSocketConnected(self.webSocket)) {
+                    self.showError(self.errCodes.SIGNAL_ERR, self.getConstantString("miscSignalError"));
                 }
                 else {
+                    /* socket server went down. this will generate a 'disconnect' event as well, so skip this event */
                     errorCallback(self.errCodes.CONNECT_ERR, self.getConstantString("noServer"));
                 }
             }
-            handleErrorEvent();
-        });
+            else {
+                errorCallback(self.errCodes.CONNECT_ERR, self.getConstantString("noServer"));
+            }
+        }
+        addSocketListener('error', handleErrorEvent);
+        if (connectionOptions.reconnection !== false)
+          addSocketListener('reconnect_failed', handleErrorEvent);
+        else
+          addSocketListener('connect_error', handleErrorEvent);
 
         function connectHandler(event) {
             if (!self.webSocket) {
@@ -5731,10 +5792,6 @@ var Easyrtc = function() {
             updateConfigurationInfo = function() {}; // dummy update function
             oldConfig = {};
             disconnectBody();
-
-            if (self.disconnectListener) {
-                self.disconnectListener();
-            }
         });
     }
 
@@ -5744,20 +5801,20 @@ var Easyrtc = function() {
     // it is only invoked for peers that have sent us a supportHalfTrickIce message.
     //
     function checkIceGatheringState(otherPeer) {
-        console.log("entered checkIceGatheringState");
+        logDebug("entered checkIceGatheringState");
         if( peerConns[otherPeer] && peerConns[otherPeer].pc && peerConns[otherPeer].pc.iceGatheringState ) {
            if( peerConns[otherPeer].pc.iceGatheringState === "complete" ) {
                self.sendPeerMessage(otherPeer, "iceGatheringDone", {});
-               console.log("sent iceGatherDone message to ", otherPeer);
-           } 
+               logDebug("sent iceGatherDone message to ", otherPeer);
+           }
            else {
                setTimeout( function() {
-                  checkIceGatheringState(otherPeer); 
+                  checkIceGatheringState(otherPeer);
                }, 500);
            }
         }
-        else { 
-           console.log("checkIceGatherState: leaving");
+        else {
+           logDebug("checkIceGatherState: leaving");
            // peer left, ignore
         }
     }
@@ -5815,7 +5872,7 @@ var Easyrtc = function() {
         }
 
         self.setPeerListener(function(easyrtcid, msgType, msgData, targeting){
-             console.log("received request to supportHalfIceTrickle");
+             logDebug("received request to supportHalfIceTrickle");
              if( peerConns[easyrtcid] ) {
                 peerConns[easyrtcid].supportHalfTrickleIce = true;
                 flushCachedCandidates(easyrtcid);
@@ -5829,4 +5886,4 @@ var Easyrtc = function() {
 
 return new Easyrtc();
 
-})); 
+}));

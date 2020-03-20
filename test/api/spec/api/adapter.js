@@ -19,12 +19,15 @@ define(['webrtc-adapter'], function(easyrtc) {
                 expect(typeof RTCPeerConnection).toBe('function');
             });
 
-            it('should works', function () {
+            xit('should works', function () {
                 // http://w3c-test.org/webrtc/datachannel-emptystring.html
                 var pc1 = new RTCPeerConnection(),
                     pc2 = new RTCPeerConnection();
 
-                navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function (stream) {
+                navigator.mediaDevices.getUserMedia({ 
+                  video: true, 
+                  audio: true 
+                }).then(function (stream) {
                   return pc1.addStream(stream);
                 }).catch(log);
 
@@ -68,7 +71,7 @@ define(['webrtc-adapter'], function(easyrtc) {
 
         describe('navigator.getUserMedia', function() {
             it('should be a function', function() {
-                expect(typeof navigator.getUserMedia).toBe('function');
+                expect(typeof navigator.mediaDevices.getUserMedia).toBe('function');
             });
         });
     });
