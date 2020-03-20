@@ -94,38 +94,57 @@
 
         function preferBitRate(sdp, bitrate, mediaType) {
             var sdpLines = sdp.split('\r\n');
-            var mLineIndex = findLine(sdpLines, 'm=', mediaType);
-            if (mLineIndex === null) {
-                trace('Failed to add bandwidth line to sdp, as no m-line found');
-                return sdp;
-            }
-            var nextMLineIndex = findLineInRange(sdpLines, mLineIndex + 1, -1, 'm=');
-            if (nextMLineIndex === null) {
-                nextMLineIndex = sdpLines.length;
-            }
-            var cLineIndex = findLineInRange(sdpLines, mLineIndex + 1, nextMLineIndex, 'c=');
-            if (cLineIndex === null) {
-                trace('Failed to add bandwidth line to sdp, as no c-line found');
-                return sdp;
-            }
-            var bLineIndex = findLineInRange(sdpLines, cLineIndex + 1, nextMLineIndex, 'b=AS');
-            if (bLineIndex) {
-                sdpLines.splice(bLineIndex, 1);
-            }
 
-            var bwLine;
-            if (
-                adapter && adapter.browserDetails &&
-                     (adapter.browserDetails.browser === "firefox")
-            ) {
-                bitrate =  (bitrate >>> 0) * 1000;
-                bwLine = 'b=TIAS:' + bitrate;
-            } else {
-                bwLine = 'b=AS:' + bitrate;
-            }
+            var mSteamIndex = 0,    
+                nbStreams = 0;
 
-            sdpLines.splice(cLineIndex + 1, 0, bwLine);
+            do {
+
+                var mLineIndex = findLineInRange(sdpLines, mSteamIndex, -1, 'm=', mediaType);
+                if (mLineIndex === null) {
+                    trace('Failed to add bandwidth line to sdp, as no m-line found');
+                    break;
+                }
+
+                var nextMLineIndex = findLineInRange(sdpLines, mLineIndex + 1, -1, 'm=');
+                if (nextMLineIndex === null) {
+                    nextMLineIndex = sdpLines.length;
+                }
+
+                var cLineIndex = findLineInRange(sdpLines, mLineIndex + 1, nextMLineIndex, 'c=');
+                if (cLineIndex === null) {
+                    trace('Failed to add bandwidth line to sdp, as no c-line found');
+                    break;
+                }
+
+                var bLineIndex = findLineInRange(sdpLines, cLineIndex + 1, nextMLineIndex, 'b=AS');
+                if (bLineIndex) {
+                    sdpLines.splice(bLineIndex, 1);
+                }
+
+                // Handle multiple bitrate per stream index
+                var bitrateValue = Array.isArray(bitrate) ? bitrate[nbStreams] : bitrate;
+                    
+                var bwLine;
+                if (
+                    adapter && adapter.browserDetails &&
+                         (adapter.browserDetails.browser === "firefox")
+                ) {
+                    bitrateValue =  (bitrateValue >>> 0) * 1000;
+                    bwLine = 'b=TIAS:' + bitrateValue;
+                } else {
+                    bwLine = 'b=AS:' + bitrateValue;
+                }
+
+                sdpLines.splice(cLineIndex + 1, 0, bwLine);      
+                
+                mSteamIndex = mLineIndex + 1;   
+                nbStreams++;  
+            
+            } while(mSteamIndex < sdpLines.length)
+
             sdp = sdpLines.join('\r\n');
+
             return sdp;
         }
 
@@ -186,6 +205,7 @@
             if (!videoSendInitialBitrate) {
                 return sdp;
             }
+
             var maxBitrate = videoSendInitialBitrate;
             if (videoSendBitrate) {
                 if (videoSendInitialBitrate > videoSendBitrate) {
@@ -194,16 +214,22 @@
                 }
                 maxBitrate = videoSendBitrate;
             }
+
             var sdpLines = sdp.split('\r\n');
             var mLineIndex = findLine(sdpLines, 'm=', 'video');
             if (mLineIndex === null) {
                 trace('Failed to find video m-line');
                 return sdp;
             }
+            
             var vp8RtpmapIndex = findLine(sdpLines, 'a=rtpmap', 'VP8/90000');
-            var vp8Payload = getCodecPayloadType(sdpLines[vp8RtpmapIndex]);
-            var vp8Fmtp = 'a=fmtp:' + vp8Payload + ' x-google-min-bitrate=' + videoSendInitialBitrate.toString() + '; x-google-max-bitrate=' + maxBitrate.toString();
-            sdpLines.splice(vp8RtpmapIndex + 1, 0, vp8Fmtp);
+            if (vp8RtpmapIndex) {
+                var vp8Payload = getCodecPayloadType(sdpLines[vp8RtpmapIndex]);
+                if (vp8Payload) {
+                    var vp8Fmtp = 'a=fmtp:' + vp8Payload + ' x-google-min-bitrate=' + videoSendInitialBitrate.toString() + '; x-google-max-bitrate=' + maxBitrate.toString();
+                    sdpLines.splice(vp8RtpmapIndex + 1, 0, vp8Fmtp);
+                }   
+            }
             return sdpLines.join('\r\n');
         }
 
@@ -213,13 +239,13 @@
             if (mLineIndex === null) {
                 return sdp;
             }
-            //
+
             // there are two m= lines in the sdp, one for audio, one for video.
             // the audio one comes first. when we search for codecs for audio, we
             // want stop before we enter the section for video, hence we'll hunt 
             // for that subsequent m= line before we look for codecs. Otherwise,
             // you could ask for a audio codec of VP9.
-            //
+            
             var mBottom = findLineInRange(sdpLines, mLineIndex+1, -1, "m=") || -1;
 
             var codecIndex = findLineInRange(sdpLines, mLineIndex, mBottom, 'a=rtpmap', codec);
