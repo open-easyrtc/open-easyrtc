@@ -7043,7 +7043,7 @@ var Easyrtc = function() {
     }
 
     /** @private */
-    var roomApiFieldTimer= {};
+    self._roomApiFieldTimer= {};
 
     /**
      * @private
@@ -7054,12 +7054,15 @@ var Easyrtc = function() {
         // Rather than issue the send request immediately, we set a timer so we can accumulate other
         // calls
         //
-        if (roomApiFieldTimer[roomName]) {
-            clearTimeout(roomApiFieldTimer[roomName]);
+        if (self._roomApiFieldTimer[roomName]) {
+            clearTimeout(self._roomApiFieldTimer[roomName]);
         }
-        roomApiFieldTimer[roomName] = setTimeout(function() {
-            sendRoomApiFields(roomName, self._roomApiFields[roomName]);
-            roomApiFieldTimer[roomName] = null;
+        self._roomApiFieldTimer[roomName] = setTimeout(function() {
+            var roomApiFields = self._roomApiFields[roomName];
+            if (roomApiFields) {
+                sendRoomApiFields(roomName, roomApiFields);
+            }
+            self._roomApiFieldTimer[roomName] = null;
         }, 10);
     }
 
@@ -7085,30 +7088,31 @@ var Easyrtc = function() {
             self._roomApiFields = {};
         }
         if (!fieldName && !fieldValue) {
+            clearTimeout(self._roomApiFieldTimer[roomName]);
             delete self._roomApiFields[roomName];
-            return;
-        }
+        } else {
 
-        if (!self._roomApiFields[roomName]) {
-            self._roomApiFields[roomName] = {};
-        }
-        if (fieldValue !== undefined && fieldValue !== null) {
-            if (typeof fieldValue === "object") {
-                try {
-                    JSON.stringify(fieldValue);
-                }
-                catch (jsonError) {
-                    self.showError(self.errCodes.DEVELOPER_ERR, "easyrtc.setRoomApiField passed bad object ");
-                    return;
-                }
+            if (!self._roomApiFields[roomName]) {
+                self._roomApiFields[roomName] = {};
             }
-            self._roomApiFields[roomName][fieldName] = {fieldName: fieldName, fieldValue: fieldValue};
-        }
-        else {
-            delete self._roomApiFields[roomName][fieldName];
-        }
-        if (self.webSocketConnected) {
-            enqueueSendRoomApi(roomName);
+
+            if (fieldValue !== undefined && fieldValue !== null) {
+                if (typeof fieldValue === "object") {
+                    try {
+                        JSON.stringify(fieldValue);
+                    } catch (jsonError) {
+                        self.showError(self.errCodes.DEVELOPER_ERR, "easyrtc.setRoomApiField passed bad object ");
+                        return;
+                    }
+                }
+                self._roomApiFields[roomName][fieldName] = {fieldName: fieldName, fieldValue: fieldValue};
+            } else {
+                delete self._roomApiFields[roomName][fieldName];
+            }
+
+            if (self.webSocketConnected) {
+                enqueueSendRoomApi(roomName);
+            }
         }
     };
 
@@ -7919,7 +7923,9 @@ var Easyrtc = function() {
                                     self._desiredVideoProperties.width, self._desiredVideoProperties.height,
                                     self.nativeVideoWidth, self.nativeVideoHeight));
                         }
-                        self.setVideoObjectSrc(videoObj, null);
+
+                        self.clearMediaStream(videoObj);
+
                         if (videoObj.removeNode) {
                             videoObj.removeNode(true);
                         }
@@ -7928,7 +7934,6 @@ var Easyrtc = function() {
                         }
 
                         updateConfigurationInfo();
-                        self.clearMediaStream(videoObj);
 
                         if (successCallback) {
                             successCallback(stream);
@@ -8526,14 +8531,14 @@ var Easyrtc = function() {
     // easyrtc.disconnect performs a clean disconnection of the client from the server.
     //
     function disconnectBody() {
-        var key;
+        var roomName;
         self.loggingOut = true;
         offersPending = {};
         acceptancePending = {};
         self.disconnecting = true;
         closedChannel = self.webSocket;
 
-        if( stillAliveTimer ) {
+        if (stillAliveTimer) {
            clearTimeout(stillAliveTimer);
            stillAliveTimer = null;
         }
@@ -8547,14 +8552,21 @@ var Easyrtc = function() {
         self.webSocket = 0;
         self.hangupAll();
         if (roomOccupantListener) {
-            for (key in lastLoggedInList) {
-                if (lastLoggedInList.hasOwnProperty(key)) {
-                    roomOccupantListener(key, {}, false);
+            for (roomName in lastLoggedInList) {
+                if (lastLoggedInList.hasOwnProperty(roomName)) {
+
+                    // Notify roomOccupantListener
+                    roomOccupantListener(roomName, {}, false);
+
+                    // Clear roomApiFields and roomApiFieldTimer
+                    self.setRoomApiField(roomName);
                 }
             }
         }
+
         lastLoggedInList = {};
         self.emitEvent("roomOccupant", {});
+
         self.roomData = {};
         self.roomJoin = {};
         self.loggingOut = false;
@@ -10786,6 +10798,7 @@ var Easyrtc = function() {
         }
     }
 
+
     /** @private */
     function onChannelCmd(msg, ackAcceptorFn) {
 
@@ -11061,6 +11074,10 @@ var Easyrtc = function() {
                 delete self.roomJoin[roomName];
             }
             else {
+
+                // Clear roomApiFields and roomApiFieldTimer
+                self.setRoomApiField(roomName);
+
                 roomItem = {};
                 roomItem[roomName] = {roomName: roomName};
                 sendSignalling(null, "roomLeave", {roomLeave: roomItem},
@@ -11071,11 +11088,11 @@ var Easyrtc = function() {
                         successCallback(roomName);
                     }
                 },
-                        function(errorCode, errorText) {
-                            if (failureCallback) {
-                                failureCallback(errorCode, errorText, roomName);
-                            }
-                        });
+                function(errorCode, errorText) {
+                    if (failureCallback) {
+                        failureCallback(errorCode, errorText, roomName);
+                    }
+                });
             }
         }
     };
@@ -11485,7 +11502,7 @@ return new Easyrtc();
     "use strict";
 
     /**
-     * This file adds additional methods to Easyrtc for simplifying the 
+     * This file adds additional methods to Easyrtc for simplifying the
      * management of video-mediastream assignment.
      * @class Easyrtc_App
      */
@@ -11516,7 +11533,7 @@ return new Easyrtc();
         var videoIdsP = videoIds || [],
             numPEOPLE = videoIds.length,
             videoIdToCallerMap = {},
-            onCall = null, 
+            onCall = null,
             onHangup = null;
 
         /**
@@ -11533,7 +11550,7 @@ return new Easyrtc();
                 easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "The monitor video id passed to easyApp was bad, saw " + monitorVideoId);
                 return false;
             }
-    
+
             for (i in videoIds) {
                 if (!videoIds.hasOwnProperty(i)) {
                     continue;
@@ -11590,7 +11607,7 @@ return new Easyrtc();
             document.getElementById(monitorVideoId).muted = "muted";
         }
 
-        easyrtc.addEventListener("roomOccupants", 
+        easyrtc.addEventListener("roomOccupants",
             function(eventName, eventData) {
                 var i;
                 for (i = 0; i < numPEOPLE; i++) {
@@ -11607,7 +11624,7 @@ return new Easyrtc();
             }
         );
 
-        /** Sets an event handler that gets called when an incoming MediaStream is assigned 
+        /** Sets an event handler that gets called when an incoming MediaStream is assigned
          * to a video object. The name is poorly chosen and reflects a simpler era when you could
          * only have one media stream per peer connection.
          * @function
@@ -11640,7 +11657,7 @@ return new Easyrtc();
             onHangup = cb;
         };
 
-        /** 
+        /**
           * Get the easyrtcid of the ith caller, starting at 0.
           * @function
           * @memberOf Easyrtc_App
@@ -11655,12 +11672,12 @@ return new Easyrtc();
             return getCallerOfVideo(vid);
         };
 
-        /** 
+        /**
           * This is the complement of getIthCaller. Given an easyrtcid,
           * it determines which slot the easyrtc is in.
           * @function
           * @memberOf Easyrtc_App
-          * @param {string} easyrtcid 
+          * @param {string} easyrtcid
           * @returns {number} or -1 if the easyrtcid is not a caller.
           */
         easyrtc.getSlotOfCaller = function(easyrtcid) {
@@ -11807,7 +11824,7 @@ return new Easyrtc();
      *              });
      */
     easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, onFailure) {
-        
+
         var gotMediaCallback = null,
             gotConnectionCallback = null;
 
@@ -11846,7 +11863,7 @@ return new Easyrtc();
         easyrtc.setGotConnection = function(gotConnectionCB) {
             gotConnectionCallback = gotConnectionCB;
         };
-        
+
         function nextInitializationStep(/* token */) {
             if (gotConnectionCallback) {
                 gotConnectionCallback(true, "");

@@ -1483,7 +1483,7 @@ var Easyrtc = function() {
     }
 
     /** @private */
-    var roomApiFieldTimer= {};
+    self._roomApiFieldTimer= {};
 
     /**
      * @private
@@ -1494,12 +1494,15 @@ var Easyrtc = function() {
         // Rather than issue the send request immediately, we set a timer so we can accumulate other
         // calls
         //
-        if (roomApiFieldTimer[roomName]) {
-            clearTimeout(roomApiFieldTimer[roomName]);
+        if (self._roomApiFieldTimer[roomName]) {
+            clearTimeout(self._roomApiFieldTimer[roomName]);
         }
-        roomApiFieldTimer[roomName] = setTimeout(function() {
-            sendRoomApiFields(roomName, self._roomApiFields[roomName]);
-            roomApiFieldTimer[roomName] = null;
+        self._roomApiFieldTimer[roomName] = setTimeout(function() {
+            var roomApiFields = self._roomApiFields[roomName];
+            if (roomApiFields) {
+                sendRoomApiFields(roomName, roomApiFields);
+            }
+            self._roomApiFieldTimer[roomName] = null;
         }, 10);
     }
 
@@ -1525,30 +1528,31 @@ var Easyrtc = function() {
             self._roomApiFields = {};
         }
         if (!fieldName && !fieldValue) {
+            clearTimeout(self._roomApiFieldTimer[roomName]);
             delete self._roomApiFields[roomName];
-            return;
-        }
+        } else {
 
-        if (!self._roomApiFields[roomName]) {
-            self._roomApiFields[roomName] = {};
-        }
-        if (fieldValue !== undefined && fieldValue !== null) {
-            if (typeof fieldValue === "object") {
-                try {
-                    JSON.stringify(fieldValue);
-                }
-                catch (jsonError) {
-                    self.showError(self.errCodes.DEVELOPER_ERR, "easyrtc.setRoomApiField passed bad object ");
-                    return;
-                }
+            if (!self._roomApiFields[roomName]) {
+                self._roomApiFields[roomName] = {};
             }
-            self._roomApiFields[roomName][fieldName] = {fieldName: fieldName, fieldValue: fieldValue};
-        }
-        else {
-            delete self._roomApiFields[roomName][fieldName];
-        }
-        if (self.webSocketConnected) {
-            enqueueSendRoomApi(roomName);
+
+            if (fieldValue !== undefined && fieldValue !== null) {
+                if (typeof fieldValue === "object") {
+                    try {
+                        JSON.stringify(fieldValue);
+                    } catch (jsonError) {
+                        self.showError(self.errCodes.DEVELOPER_ERR, "easyrtc.setRoomApiField passed bad object ");
+                        return;
+                    }
+                }
+                self._roomApiFields[roomName][fieldName] = {fieldName: fieldName, fieldValue: fieldValue};
+            } else {
+                delete self._roomApiFields[roomName][fieldName];
+            }
+
+            if (self.webSocketConnected) {
+                enqueueSendRoomApi(roomName);
+            }
         }
     };
 
@@ -2359,7 +2363,9 @@ var Easyrtc = function() {
                                     self._desiredVideoProperties.width, self._desiredVideoProperties.height,
                                     self.nativeVideoWidth, self.nativeVideoHeight));
                         }
-                        self.setVideoObjectSrc(videoObj, null);
+
+                        self.clearMediaStream(videoObj);
+
                         if (videoObj.removeNode) {
                             videoObj.removeNode(true);
                         }
@@ -2368,7 +2374,6 @@ var Easyrtc = function() {
                         }
 
                         updateConfigurationInfo();
-                        self.clearMediaStream(videoObj);
 
                         if (successCallback) {
                             successCallback(stream);
@@ -2966,14 +2971,14 @@ var Easyrtc = function() {
     // easyrtc.disconnect performs a clean disconnection of the client from the server.
     //
     function disconnectBody() {
-        var key;
+        var roomName;
         self.loggingOut = true;
         offersPending = {};
         acceptancePending = {};
         self.disconnecting = true;
         closedChannel = self.webSocket;
 
-        if( stillAliveTimer ) {
+        if (stillAliveTimer) {
            clearTimeout(stillAliveTimer);
            stillAliveTimer = null;
         }
@@ -2987,14 +2992,21 @@ var Easyrtc = function() {
         self.webSocket = 0;
         self.hangupAll();
         if (roomOccupantListener) {
-            for (key in lastLoggedInList) {
-                if (lastLoggedInList.hasOwnProperty(key)) {
-                    roomOccupantListener(key, {}, false);
+            for (roomName in lastLoggedInList) {
+                if (lastLoggedInList.hasOwnProperty(roomName)) {
+
+                    // Notify roomOccupantListener
+                    roomOccupantListener(roomName, {}, false);
+
+                    // Clear roomApiFields and roomApiFieldTimer
+                    self.setRoomApiField(roomName);
                 }
             }
         }
+
         lastLoggedInList = {};
         self.emitEvent("roomOccupant", {});
+
         self.roomData = {};
         self.roomJoin = {};
         self.loggingOut = false;
@@ -5226,6 +5238,7 @@ var Easyrtc = function() {
         }
     }
 
+
     /** @private */
     function onChannelCmd(msg, ackAcceptorFn) {
 
@@ -5501,6 +5514,10 @@ var Easyrtc = function() {
                 delete self.roomJoin[roomName];
             }
             else {
+
+                // Clear roomApiFields and roomApiFieldTimer
+                self.setRoomApiField(roomName);
+
                 roomItem = {};
                 roomItem[roomName] = {roomName: roomName};
                 sendSignalling(null, "roomLeave", {roomLeave: roomItem},
@@ -5511,11 +5528,11 @@ var Easyrtc = function() {
                         successCallback(roomName);
                     }
                 },
-                        function(errorCode, errorText) {
-                            if (failureCallback) {
-                                failureCallback(errorCode, errorText, roomName);
-                            }
-                        });
+                function(errorCode, errorText) {
+                    if (failureCallback) {
+                        failureCallback(errorCode, errorText, roomName);
+                    }
+                });
             }
         }
     };
