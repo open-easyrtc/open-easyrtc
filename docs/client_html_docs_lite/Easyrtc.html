@@ -1,16 +1,16 @@
 <html>
-    
+
 <head>
  <title>EasyRTC Client JsDocs</title>
- <link rel="stylesheet" type="text/css" href="jsdoc/styles/jsdoc-client.css" />
+ <link rel="stylesheet" type="text/css" href="./styles/jsdoc-default.css" />
 
 </head>
 
 <body>
 <div id="main">
-    
+
     <h1 class="page-title">Client API - Class easyrtc</h1>
-    
+
     
 
 
@@ -618,6 +618,54 @@ of your video objects before you use them for pixel specific operations.
     <div class="description">
         The rooms the user is in. This only applies to room oriented applications and is set at the same
 time a token is received.
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="standardStatsFilter"><span class="type-signature"></span>standardStatsFilter<span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        This is a basic statistics filter that keesp just the generally
+useful information.
     </div>
     
     
@@ -7082,6 +7130,11 @@ If it isn't, we assume it's logged out.
             
             <td class="type">
             
+                
+<span class="param-type">string</span>
+
+
+            
             </td>
             
             
@@ -7186,6 +7239,11 @@ in the ice config.
             
             
             <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
             
             </td>
             
@@ -8235,6 +8293,234 @@ must be done by the supplying party.
             
             
             <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="removeStreamFromCall"><span class="type-signature"></span>removeStreamFromCall<span class="signature">(easyrtcId, streamName)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Removes a mediastream from a peer connection.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>easyrtcId</code></td>
+            
+            
+            <td class="type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>streamName</code></td>
+            
+            
+            <td class="type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="renegotiate"><span class="type-signature"></span>renegotiate<span class="signature">(otherUser)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        This method is used to trigger renegotiation, which is how you
+you update change the properties of an existing connection (such as the
+the bandwidth used. Before calling it, you modify your sdp filters
+to reflect the desired changes.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>otherUser</code></td>
+            
+            
+            <td class="type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">the easyrtcid of the peer corresponding to the
+ connection being updated.</td>
         </tr>
 	
 	
@@ -9474,7 +9760,7 @@ names. Maximum length is
     
     
     <div class="description">
-        Sets the audio output device of a Video object. 
+        Sets the audio output device of a Video object.
 That is to say, this controls what speakers get the sound.
 In theory, this works on Chrome but probably doesn't work anywhere else yet.
 This code was cribbed from https://webrtc.github.io/samples/src/content/devices/multi/.
@@ -10511,6 +10797,124 @@ The callback will be called with an easyrtcid as it's sole argument.
         
             
 <dt>
+    <h3 class="name" id="setErrorListener"><span class="type-signature"></span>setErrorListener<span class="signature">(handler)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Override the default open-easyrtc error handler. The default handler shows a popup error dialog.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>handler</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Error handler function with one param, an object with keys 'errorCode' and 'errorText'</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+        <h5>Examples</h5>
+        
+    <pre class="prettyprint"><code>easyrtc.setErrorListener(({errorCode, errorText}) => {
+   alert(`${errorCode} error:\n${errorText}`);
+});</code></pre>
+
+    <pre class="prettyprint"><code>// Removing previously set handler:
+easyrtc.setErrorListener(undefined);</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
     <h3 class="name" id="setIceCandidateFilter"><span class="type-signature"></span>setIceCandidateFilter<span class="signature">(filter)</span><span class="type-signature"></span></h3>
     
     
@@ -10639,7 +11043,7 @@ candidate should be discarded).
 
 During ICE negotiation the peer connection fires the iceconnectionstatechange event.
 It is sometimes useful for the application to learn about these changes, especially if the ICE connection fails.
-The function should accept two parameters: the easyrtc id of the peer and the iceconnectionstatechange event target.
+The function should accept three parameters: the easyrtc id of the peer, the iceconnectionstatechange event target and the iceconnectionstate.
     </div>
     
 
@@ -11511,6 +11915,114 @@ The most specific case takes priority over the more general.
         
             
 <dt>
+    <h3 class="name" id="setPeerOpenListener"><span class="type-signature"></span>setPeerOpenListener<span class="signature">(handler:)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sets a function to warn about the peer connection open.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>handler:</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">a function that gets an easyrtcid as an argument.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h3 class="name" id="setRoomApiField"><span class="type-signature"></span>setRoomApiField<span class="signature">(roomName, fieldName, fieldValue)</span><span class="type-signature"></span></h3>
     
     
@@ -11677,7 +12189,7 @@ path.
         
             
 <dt>
-    <h3 class="name" id="setScreenCapture"><span class="type-signature"></span>setScreenCapture<span class="signature">()</span><span class="type-signature"></span></h3>
+    <h3 class="name" id="setScreenCapture"><span class="type-signature"></span>setScreenCapture<span class="signature">(enableScreenCapture, mediaSourceId)</span><span class="type-signature"></span></h3>
     
     
 </dt>
@@ -11698,6 +12210,77 @@ through WebRTC isn't worth using at this point, but it is provided here so peopl
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>enableScreenCapture</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>mediaSourceId</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">(optional)</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
     
     
     
@@ -11739,7 +12322,7 @@ through WebRTC isn't worth using at this point, but it is provided here so peopl
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>easyrtc.setScreenCapture();</code></pre>
+    <pre class="prettyprint"><code>easyrtc.setScreenCapture(true);</code></pre>
 
     
 </dd>
@@ -11989,6 +12572,117 @@ filter builder.
         ("The Server sent the following message " + JSON.stringify(msgData));
     });</code></pre>
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h3 class="name" id="setSignalingStateChangeListener"><span class="type-signature"></span>setSignalingStateChangeListener<span class="signature">(listener)</span><span class="type-signature"></span></h3>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sets a function that listens on SignalingStateChange events.
+
+During ICE negotiation the peer connection fires the signalingstatechange event.
+The function should accept three parameters: the easyrtc id of the peer, the signalingstatechange event target and the signalingstate.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>listener</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
     
 </dd>
 
@@ -13720,7 +14414,7 @@ close sockets that were supplied with easyrtc.useThisSocketConnection.
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Sep 16 2016 14:46:21 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Sat Apr 04 2020 17:19:40 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

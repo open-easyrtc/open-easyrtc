@@ -133,7 +133,7 @@ module.exports = (function() {
                     configure: '<%= config.docsPath %>/conf.json',
                     template: './node_modules/jsdoc-oblivion/template'
                 },
-                
+
                 client : {
                     src: [
                         '<%= config.apiPath %>/easyrtc_int.js',
@@ -154,10 +154,10 @@ module.exports = (function() {
                         '<%= config.docsPath %>/easyrtc_server_install.md'
                     ],
                     options: {
-                        destination: '<%= config.docsPath %>/server_html_docs_lite'
+                        destination: '<%= config.docsPath %>/server_html_docs'
                     }
                 },
-                
+
                 client_lite: {
                     src: [
                         '<%= config.apiPath %>/easyrtc_int.js',
@@ -168,16 +168,6 @@ module.exports = (function() {
                     options: {
                         template: 'dev/scripts/client_jsdoc_templates',
                         destination: '<%= config.docsPath %>/client_html_docs_lite'
-                    }
-                },
-
-                client_ft_lite: {
-                    src: [
-                        '<%= config.apiPath %>/easyrtc_ft.js'
-                    ],
-                    options: {
-                        template: 'dev/scripts/client_jsdoc_templates2',
-                        destination: '<%= config.docsPath %>/client_ft_html_docs_lite'
                     }
                 },
 
@@ -232,7 +222,7 @@ module.exports = (function() {
                         '<%= config.apiPath %>/easyrtc_lang.js',
                         '<%= config.apiPath %>/easyrtc_ft.js',
                         '<%= config.apiPath %>/easyrtc_app.js',
-                        '<%= config.apiPath %>/easyrtc.js', 
+                        '<%= config.apiPath %>/easyrtc.js',
                     ],
                     options: {
                         stdout:
@@ -250,13 +240,13 @@ module.exports = (function() {
         grunt.option('force', true);
 
         grunt.loadNpmTasks('grunt-contrib-connect');
-        
+
         grunt.loadNpmTasks('grunt-contrib-watch');
         grunt.loadNpmTasks('grunt-contrib-jshint');
         grunt.loadNpmTasks('grunt-contrib-csslint');
 
         grunt.loadNpmTasks('grunt-karma');
-        grunt.loadNpmTasks('grunt-jsdoc');  
+        grunt.loadNpmTasks('grunt-jsdoc');
         grunt.loadNpmTasks('grunt-file-info');
         grunt.loadNpmTasks('grunt-contrib-requirejs');
 
