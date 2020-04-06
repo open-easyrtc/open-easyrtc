@@ -10004,6 +10004,7 @@ var Easyrtc = function() {
               peerConns[otherUser].pc
         ) {
             try {
+                peerConns[otherUser].cancelled = true;
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
                 for (var i = 0; i < remoteStreams.length; i++) {
                     if (isStreamActive(remoteStreams[i])) {
@@ -10013,7 +10014,6 @@ var Easyrtc = function() {
                 }
 
                 peerConns[otherUser].pc.close();
-                peerConns[otherUser].cancelled = true;
                 logDebug("peer closed");
             } catch (err) {
                 logDebug("peer " + otherUser + " close failed:" + err);
