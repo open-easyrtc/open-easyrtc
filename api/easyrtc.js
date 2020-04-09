@@ -9183,7 +9183,7 @@ var Easyrtc = function() {
         self._candidates.push(parseCandidate(candidate));
     }
 
-    function processAddedStream(otherUser, theStream) {
+    function processAddedStream(otherUser, peerStream) {
 
         if (!peerConns[otherUser] ||  peerConns[otherUser].cancelled) {
             return;
@@ -9206,23 +9206,36 @@ var Easyrtc = function() {
             }
         }
 
-        var streamId = theStream.id || "default";
+        var streamId = peerStream.id || "default";
         var remoteName = getNameOfRemoteStream(otherUser, streamId) || "default";
 
         if (!peerConn.liveRemoteStreams[remoteName]) {
 
             peerConn.remoteStreamIdToName[streamId] = remoteName;
             peerConn.liveRemoteStreams[remoteName] = true;
-            theStream.streamName = remoteName;
+            peerStream.streamName = remoteName;
+
+            var tracks = peerStream.getTracks();
+            peerStream.addEventListener('removetrack', function (e) {
+                var trackIndex = tracks.indexOf(e.track);
+                if (trackIndex !== -1) {
+                    tracks.splice(trackIndex, 1);
+                }
+                if (tracks.length === 0) {
+                    emitOnStreamClosed(otherUser, peerStream);
+                }
+            });
 
             if (self.streamAcceptor) {
-                self.streamAcceptor(otherUser, theStream, remoteName);
+                self.streamAcceptor(otherUser, peerStream, remoteName);
                 //
                 // Inform the other user that the stream they provided has been received.
                 // This should be moved into signalling at some point
                 //
                 self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
             }
+        } else {
+            logDebug('remove stream ' + remoteName + ' already exist');
         }
     }
 
