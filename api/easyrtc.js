@@ -6465,7 +6465,7 @@ var Easyrtc = function() {
                     };
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
-                    constraints.video.deviceId = {exact: self._desiredVideoProperties.audioSrcId};
+                    constraints.video.deviceId = {exact: self._desiredVideoProperties.videoSrcId};
                     //constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
                 }
                 // hack for opera
