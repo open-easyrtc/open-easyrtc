@@ -905,8 +905,7 @@ var Easyrtc = function() {
                     };
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
-                    constraints.video.deviceId = {exact: self._desiredVideoProperties.videoSrcId};
-                    //constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
+                    constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
                 }
                 // hack for opera
                 if (Object.keys(constraints.video).length === 0 ) {
@@ -921,8 +920,7 @@ var Easyrtc = function() {
         else {
             constraints.audio = {};
             if (self._desiredAudioProperties.audioSrcId) {
-             constraints.audio.deviceId = {exact: self._desiredAudioProperties.audioSrcId};
-             //constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
+             constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
             }
         }
         return constraints;
