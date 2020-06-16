@@ -1,17 +1,14 @@
 language: node_js
-dist: trusty
-cache:
-  directories:
-    - node_modules
 node_js:
-#  - "9"
-  - "8"
-#  - "6"
-#  - "4"
+  - "12"
+dist: trusty
 sudo: required
-before_script:
-  - npm prune
+branches:
+  only:
+  - master
+before_install:
+  - npm install -g yarn
 script:
-  - npm run lint
-  - npm run test
-  - npm run build
+- npm run lint
+- npm run test
+- npm run build
