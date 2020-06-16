@@ -6,7 +6,7 @@ sudo: required
 branches:
   only:
   - master
-after_install:
+before_script:
   - cd test && npm i
 script:
 - npm run lint
