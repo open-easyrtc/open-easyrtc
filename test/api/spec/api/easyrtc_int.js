@@ -13,36 +13,42 @@ define(['easyrtc_int'], function (easyrtc) {
     'use strict';
 
     describe("easyrtc_int", function () {
-        
+
         describe('apiVersion', function () {
-            it('should be a string', function () {
+            it('should be a string', function (done) {
                 expect(typeof easyrtc.apiVersion).toBe('string');
+                done();
             });
         });
 
         describe('supportsGetUserMedia', function () {
-            it('should be a function', function () {
+            it('should be a function', function (done) {
                 expect(typeof easyrtc.supportsGetUserMedia).toBe('function');
+                done();
             });
 
-            it('should return boolean', function () {
+            it('should return boolean', function (done) {
                 expect(typeof easyrtc.supportsGetUserMedia()).toBe('boolean');
+                done();
             });
         });
 
         describe('supportsPeerConnections', function () {
-            it('should be a function', function () {
+            it('should be a function', function (done) {
                 expect(typeof easyrtc.supportsPeerConnections).toBe('function');
+                done();
             });
 
-            it('should return boolean', function () {
+            it('should return boolean', function (done) {
                 expect(typeof easyrtc.supportsPeerConnections()).toBe('boolean');
+                done();
             });
         });
 
         describe('initMediaSource', function () {
-            it('should be a function', function () {
+            it('should be a function', function (done) {
                 expect(typeof easyrtc.initMediaSource).toBe('function');
+                done();
             });
 
             it('should return undefined cand call Success or Error callback', function (done) {

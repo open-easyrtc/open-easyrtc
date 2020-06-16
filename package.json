@@ -64,7 +64,7 @@
     "karma-coverage": "^2.0.2",
     "karma-firefox-launcher": "^1.0.0",
     "karma-ie-launcher": "^1.0.0",
-    "karma-jasmine": "^1.0.2",
+    "karma-jasmine": "^1.1.2",
     "karma-requirejs": "^1.0.0",
     "requirejs": "^2.2.0",
     "strip-json-comments": "^2.0.1",

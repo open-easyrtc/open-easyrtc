@@ -11,22 +11,19 @@ define(['webrtc-adapter'], function(easyrtc) {
 
     describe("adapter", function() {
         describe('RTCPeerConnection', function() {
-            it('should be a function', function() {
+            it('should be a function', function(done) {
                 expect(typeof RTCPeerConnection).toBe('function');
+                done();
             });
 
-            it('should be a function', function() {
-                expect(typeof RTCPeerConnection).toBe('function');
-            });
-
-            xit('should works', function () {
+            it('should works', function (done) {
                 // http://w3c-test.org/webrtc/datachannel-emptystring.html
                 var pc1 = new RTCPeerConnection(),
                     pc2 = new RTCPeerConnection();
 
-                navigator.mediaDevices.getUserMedia({ 
-                  video: true, 
-                  audio: true 
+                navigator.mediaDevices.getUserMedia({
+                  video: true,
+                  audio: true
                 }).then(function (stream) {
                   return pc1.addStream(stream);
                 }).catch(log);
@@ -45,6 +42,9 @@ define(['webrtc-adapter'], function(easyrtc) {
                   return e.stream;
                 };
                 pc1.oniceconnectionstatechange = function (e) {
+                  if (pc1.iceConnectionState === 'connected') {
+                    done();
+                  }
                   return log(pc1.iceConnectionState);
                 };
                 pc1.onnegotiationneeded = function (e) {
@@ -62,7 +62,7 @@ define(['webrtc-adapter'], function(easyrtc) {
                 };
 
                 var log = function log(msg) {
-                  return console.log(msg);
+                  //return console.log(msg);
                 };
 
                 expect(typeof window).toBe('object');
@@ -70,8 +70,9 @@ define(['webrtc-adapter'], function(easyrtc) {
         });
 
         describe('navigator.getUserMedia', function() {
-            it('should be a function', function() {
+            it('should be a function', function(done) {
                 expect(typeof navigator.mediaDevices.getUserMedia).toBe('function');
+                done();
             });
         });
     });
