@@ -11,7 +11,7 @@ module.exports = function (config) {
     'use strict';
 
     config.set({
-     
+
         frameworks: ['jasmine', 'requirejs'],
 
         // base path, that will be used to resolve files and exclude
@@ -99,6 +99,24 @@ module.exports = function (config) {
                     '--use-fake-ui-for-media-stream'
                 ]
             },
+            'ChromeHeadless': {
+                base: 'Chrome',
+                flags: [
+                    '--headless',
+                    '--disable-gpu',
+                    '--no-sandbox',
+                    '--disable-dev-shm-usage',
+                    '--window-size=1280,1024',
+                    '--ignore-certificate-errors=true',
+                    '--allow-insecure-localhost',
+                    '--allow-running-insecure-content',
+                    '--use-fake-device-for-media-stream',
+                    '--use-fake-ui-for-media-stream',
+                    // Without a remote debugging port, Google Chrome exits immediately.
+                    '--remote-debugging-port=9222'
+                ],
+                debug: true
+            }
         },
 
         // If browser does not capture in given timeout [ms], kill it

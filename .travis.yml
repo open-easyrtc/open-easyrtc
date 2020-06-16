@@ -10,5 +10,5 @@ before_install:
   - npm install -g yarn
 script:
 - npm run lint
-- npm run test
+- npm run test-headless
 - npm run build

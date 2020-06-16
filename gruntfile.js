@@ -133,7 +133,7 @@ module.exports = (function() {
                     configure: '<%= config.docsPath %>/conf.json',
                     template: './node_modules/jsdoc-oblivion/template'
                 },
-                
+
                 client : {
                     src: [
                         '<%= config.apiPath %>/easyrtc_int.js',
@@ -157,7 +157,7 @@ module.exports = (function() {
                         destination: '<%= config.docsPath %>/server_html_docs_lite'
                     }
                 },
-                
+
                 client_lite: {
                     src: [
                         '<%= config.apiPath %>/easyrtc_int.js',
@@ -222,6 +222,10 @@ module.exports = (function() {
             karma: {
                 test_api: {
                     configFile: '<%= config.testPath %>/api/karma.conf.js'
+                },
+                headless: {
+                    configFile: '<%= config.testPath %>/api/karma.conf.js',
+                    browsers: ['ChromeHeadless'],
                 }
             },
 
@@ -232,7 +236,7 @@ module.exports = (function() {
                         '<%= config.apiPath %>/easyrtc_lang.js',
                         '<%= config.apiPath %>/easyrtc_ft.js',
                         '<%= config.apiPath %>/easyrtc_app.js',
-                        '<%= config.apiPath %>/easyrtc.js', 
+                        '<%= config.apiPath %>/easyrtc.js',
                     ],
                     options: {
                         stdout:
@@ -250,13 +254,13 @@ module.exports = (function() {
         grunt.option('force', true);
 
         grunt.loadNpmTasks('grunt-contrib-connect');
-        
+
         grunt.loadNpmTasks('grunt-contrib-watch');
         grunt.loadNpmTasks('grunt-contrib-jshint');
         grunt.loadNpmTasks('grunt-contrib-csslint');
 
         grunt.loadNpmTasks('grunt-karma');
-        grunt.loadNpmTasks('grunt-jsdoc');  
+        grunt.loadNpmTasks('grunt-jsdoc');
         grunt.loadNpmTasks('grunt-file-info');
         grunt.loadNpmTasks('grunt-contrib-requirejs');
 
@@ -280,6 +284,7 @@ module.exports = (function() {
 
         // Test task(s).
         grunt.registerTask('test', ['test:karma']);
+        grunt.registerTask('test-headless', ['karma:headless']);
         grunt.registerTask('test:karma', ['karma:test_api']);
         grunt.registerTask('test:jasmine', ['serve:test_api']);
     };
