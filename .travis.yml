@@ -7,7 +7,7 @@ branches:
   only:
   - master
 before_script:
-  - cd test && npm i
+  - cd test/api && npm i
 script:
 - npm run lint
 - npm run test-headless
