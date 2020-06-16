@@ -6,8 +6,8 @@ sudo: required
 branches:
   only:
   - master
-before_install:
-  - npm install -g yarn
+after_install:
+  - cd test && npm i
 script:
 - npm run lint
 - npm run test-headless
