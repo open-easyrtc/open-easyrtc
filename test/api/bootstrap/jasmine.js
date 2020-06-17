@@ -14,18 +14,18 @@ require.config({
 
     paths: {
         // Externals
-        'jasmine': 'node_modules/jasmine-core/lib/jasmine-core/jasmine',
-        'jasmine-html': 'node_modules/jasmine-core/lib/jasmine-core/jasmine-html',
-        'boot': 'node_modules/jasmine-core/lib/jasmine-core/boot',
-        'socket.io': 'node_modules/socket.io-client/dist/socket.io',
-        'webrtc-adapter': 'node_modules/webrtc-adapter/out/adapter',
+        'jasmine': '../../node_modules/jasmine-core/lib/jasmine-core/jasmine',
+        'jasmine-html': '../../node_modules/jasmine-core/lib/jasmine-core/jasmine-html',
+        'boot': '../../node_modules/jasmine-core/lib/jasmine-core/boot',
+        'socket.io': '../../node_modules/socket.io-client/dist/socket.io',
+        'webrtc-adapter': '../../node_modules/webrtc-adapter/out/adapter',
 
         // Internals
-        "easyrtc_lang": "easyrtc_lang",
-        "easyrtc_int": "easyrtc_int",
-        "easyrtc_ft": "easyrtc_ft",
-        "easy_app": "easyrtc_app",
-        "easyrtc": "easyrtc",
+        "easyrtc_lang": "../../api/easyrtc_lang",
+        "easyrtc_int": "../../api/easyrtc_int",
+        "easyrtc_ft": "../../api/easyrtc_ft",
+        "easy_app": "../../api/easyrtc_app",
+        "easyrtc": "../../api/easyrtc",
 
         // Internals
 

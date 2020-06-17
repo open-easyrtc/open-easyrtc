@@ -60,7 +60,7 @@
   }
 
   /**
-   * Determines if recording is supported by the browser. 
+   * Determines if recording is supported by the browser.
    * @function
    * @memberOf Easyrtc_Recorder
    * @returns true if recording is supported.
@@ -76,19 +76,19 @@
   * @param {String} codecName, either "vp8" or "vp9 or "h264"
   * @returns true if the type can be used, or if the browser doesn't
   *  support a method to find out.
-  */ 
+  */
   easyrtc.isRecordingTypeSupported = function(videoCodecName) {
-     var mimeType = "video/webm;codecs=" + videoCodecName;
-     if( MediaRecorder.isTypeSupported ) {
+     var mimeType = "video/webm;codec=" + videoCodecName;
+     if (MediaRecorder.isTypeSupported) {
          // chrome definitely, maybe firefox
          return MediaRecorder.isTypeSupported(mimeType);
      }
-     else if( MediaRecorder.isMimeTypeSupported ) {
+     else if (MediaRecorder.isMimeTypeSupported) {
          // maybe firefox
          return MediaRecorder.isMimeTypeSupported(mimeType);
      }
      else {
-        if( typeof easyrtc.hasNoRecordTypeCheck === "undefined") {
+        if (typeof easyrtc.hasNoRecordTypeCheck === "undefined") {
            easyrtc.hasNoRecordTypeCheck = true;
            window.alert("This browser doesn't know what media types it supports. Assuming all types.");
         }
@@ -101,18 +101,20 @@
   var videoBitRate;
 
   /**
-   * Set the desired codec for the video encoding. 
+   * Set the desired codec for the video encoding.
    * @function
    * @memberOf Easyrtc_Recorder
    * @param {String} codecName, either "vp8" or "vp9 or "h264"
    * @returns true if the type can be used.
-   */ 
+   */
   easyrtc.setRecordingVideoCodec = function(videoCodecName) {
-     if( !easyrtc.supportsRecording ) {
+     if (!easyrtc.supportsRecording ) {
          return false;
      }
+
      if(easyrtc.isRecordingTypeSupported(videoCodecName)) {
-         mimeType = "video/webm;codecs=" + videoCodecName;
+         // video/webm;codecs=h264 indicates an unsupported codec
+         mimeType = "video/webm;codec=" + videoCodecName;
          return true;
      }
      else {
@@ -120,50 +122,56 @@
      }
   };
 
-  /** Sets the target bit rate of the audio encoder. 
+  /** Sets the target bit rate of the audio encoder.
    * @param bitrate bits per second
    */
   easyrtc.setRecordingAudioBitRate = function(bitRate) {
     audioBitRate = bitRate;
   };
 
-  /** Sets the target bit rate of the video encoder. 
+  /** Sets the target bit rate of the video encoder.
    * @param bitrate bits per second
    */
   easyrtc.setRecordingVideoBitRate = function(bitRate) {
     videoBitRate = bitRate;
   };
 
-  if( easyrtc.supportsRecording()) {
+  if (easyrtc.supportsRecording()) {
+    if (easyrtc.isRecordingTypeSupported('h264')) {
+     easyrtc.setRecordingVideoCodec("h264");
+    } else {
      easyrtc.setRecordingVideoCodec("vp8");
+    }
   }
 
   /**
    * Create a recording object and attach a media stream to it.
    * @function
    * @memberOf Easyrtc_Recorder
-   * @param  {HTMLMediaStream} mediaStream 
+   * @param  {HTMLMediaStream} mediaStream
    * @returns a recorder object or null if recording not supported.
    */
-  function startRecording( mediaStream) {
+  function startRecording(mediaStream) {
 
-      if( !easyrtc.supportsRecording ) {
+      if (!easyrtc.supportsRecording ) {
          trace("recording not supported by your browser");
          return null;
       }
 
-      var recorderOptions = { mimeType:mimeType};
+      var recorderOptions = {
+          mimeType: mimeType
+      };
 
-      if( audioBitRate ) {
-             recorderOptions.audioBitsPerSecond = audioBitRate;
+      if (audioBitRate) {
+          recorderOptions.audioBitsPerSecond = audioBitRate;
       }
 
-      if( videoBitRate ) {
-             recorderOptions.videoBitsPerSecond = videoBitRate;
+      if (videoBitRate) {
+          recorderOptions.videoBitsPerSecond = videoBitRate;
       }
 
       var mediaRecorder = new MediaRecorder(mediaStream, recorderOptions);
-      if( !mediaRecorder ) {
+      if (!mediaRecorder) {
          trace("no media recorder");
          return;
       }
@@ -199,7 +207,7 @@
    */
   easyrtc.recordToCallback = function (mediaStream, dataCallback) {
      var mediaRecorder = startRecording(mediaStream);
-     if( !mediaRecorder) {
+     if (!mediaRecorder) {
          return null;
      }
 
@@ -210,7 +218,7 @@
      return mediaRecorder;
   };
 
-  /** This method creates a media recorder that builds a blob 
+  /** This method creates a media recorder that builds a blob
   * Use the media recorder's start(), stop(), pause() and resume() methods
   * on the returned object.
   * @function
@@ -229,7 +237,7 @@
      var mediaRecorder = easyrtc.recordToCallback(mediaStream,
             dataConsumer);
 
-     if( !mediaRecorder) {
+     if (!mediaRecorder) {
          return null;
      }
 
@@ -237,7 +245,7 @@
           blobCallback( new Blob(chunks, {type:"video/webm"}));
           chunks = [];
      };
-     
+
      return mediaRecorder;
   };
 
@@ -255,7 +263,7 @@
   easyrtc.recordToFile = function(mediaStream, downloadLink, basename) {
      function blobCallback( blob ) {
          var videoURL = window.URL.createObjectURL(blob);
-        
+
          downloadLink.href = videoURL;
          downloadLink.appendChild(document.createTextNode(basename));
 
@@ -272,4 +280,3 @@
 return easyrtc;
 
 }));
-
