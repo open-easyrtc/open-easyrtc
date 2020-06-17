@@ -212,6 +212,10 @@ module.exports = (function() {
             karma: {
                 test_api: {
                     configFile: '<%= config.testPath %>/api/karma.conf.js'
+                },
+                headless: {
+                    configFile: '<%= config.testPath %>/api/karma.conf.js',
+                    browsers: ['ChromeHeadless'],
                 }
             },
 
@@ -270,6 +274,7 @@ module.exports = (function() {
 
         // Test task(s).
         grunt.registerTask('test', ['test:karma']);
+        grunt.registerTask('test-headless', ['karma:headless']);
         grunt.registerTask('test:karma', ['karma:test_api']);
         grunt.registerTask('test:jasmine', ['serve:test_api']);
     };

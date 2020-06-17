@@ -905,8 +905,7 @@ var Easyrtc = function() {
                     };
                 }
                 if (self._desiredVideoProperties.videoSrcId) {
-                    constraints.video.deviceId = {exact: self._desiredVideoProperties.audioSrcId};
-                    //constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
+                    constraints.video.deviceId = self._desiredVideoProperties.videoSrcId;
                 }
                 // hack for opera
                 if (Object.keys(constraints.video).length === 0 ) {
@@ -921,8 +920,7 @@ var Easyrtc = function() {
         else {
             constraints.audio = {};
             if (self._desiredAudioProperties.audioSrcId) {
-             constraints.audio.deviceId = {exact: self._desiredAudioProperties.audioSrcId};
-             //constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
+             constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
             }
         }
         return constraints;
@@ -4444,6 +4442,7 @@ var Easyrtc = function() {
               peerConns[otherUser].pc
         ) {
             try {
+                peerConns[otherUser].cancelled = true;
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
                 for (var i = 0; i < remoteStreams.length; i++) {
                     if (isStreamActive(remoteStreams[i])) {
@@ -4453,7 +4452,6 @@ var Easyrtc = function() {
                 }
 
                 peerConns[otherUser].pc.close();
-                peerConns[otherUser].cancelled = true;
                 logDebug("peer closed");
             } catch (err) {
                 logDebug("peer " + otherUser + " close failed:" + err);

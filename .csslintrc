@@ -1,4 +1,4 @@
-{ 
+{
   "ids": false,
   "import": false,
   "important": false,
@@ -20,5 +20,6 @@
   "universal-selector": false,
   "unqualified-attributes": false,
   "gradients": false,
-  "empty-rules": false
+  "empty-rules": false,
+  "order-alphabetical": false
 }
