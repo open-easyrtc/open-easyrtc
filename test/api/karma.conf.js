@@ -20,7 +20,11 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         files: [
             {
-                pattern: 'test/api/node_modules/**/*',
+                pattern: 'node_modules/socket.io-client/dist/socket.io.js',
+                included: false
+            },
+            {
+                pattern: 'node_modules/webrtc-adapter/out/adapter.js',
                 included: false
             },
             {

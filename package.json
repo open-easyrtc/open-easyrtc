@@ -58,6 +58,7 @@
     "grunt-file-info": "^1.0.10",
     "grunt-jsdoc": "^2.4.0",
     "grunt-karma": "^3.0.0",
+    "jasmine": "^3.5.0",
     "jasmine-core": "^2.4.1",
     "jsdoc-oblivion": "0.0.4",
     "karma": "^5.1.0",
