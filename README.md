@@ -19,6 +19,11 @@ The main reason of the fork is that `Priologic Software Inc.` as been trying to 
 
 This Fork will retain it's original BSD 2-Clause "Simplified" License until a License migration path solution is found.
 
+Try a Live Demo Here:
+--------
+
+[![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg)](https://glitch.com/edit/#!/open-easyrtc-demo?path=server.js%3A7%3A0)
+
 Features
 --------
  * Install EasyRTC's WebRTC Server on your own Linux, Windows, or Mac server in minutes not days.
