@@ -298,7 +298,7 @@ var Easyrtc = function() {
      * @param otherUser the easyrtcid of the peer corresponding to the
      *  connection being updated.
      */
-    this.renegotiate = function(otherUser) {
+    this.renegotiate = function(otherUser, iceRestart) {
         var peerConnObj =  peerConns[otherUser];
         if(!peerConnObj) {
             logDebug("Attempt to renegotiate ice on nonexistant connection");
@@ -331,7 +331,7 @@ var Easyrtc = function() {
         }
 
         peerConnObj.sendingOffer = true;
-        pc.createOffer({iceRestart: true }).then(setLocalAndSendMessage0)
+        pc.createOffer({iceRestart: iceRestart }).then(setLocalAndSendMessage0)
           .catch(function(reason) {
                  peerConnObj.sendingOffer = false;
                  callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(reason));
@@ -1481,7 +1481,7 @@ var Easyrtc = function() {
     }
 
     /** @private */
-    self._roomApiFieldTimer= {};
+    self._roomApiFieldTimer = {};
 
     /**
      * @private
@@ -1570,7 +1570,7 @@ var Easyrtc = function() {
     };
 
     /** @private */
-    var customErrorListener;
+    this._customErrorListener = null;
 
     /**
      * Override the default open-easyrtc error handler. The default handler shows a popup error dialog.
@@ -1583,7 +1583,7 @@ var Easyrtc = function() {
      * easyrtc.setErrorListener(undefined);
      */
     this.setErrorListener = function(handler) {
-        customErrorListener = handler;
+        this._customErrorListener = handler;
     };
 
     /**
@@ -1594,9 +1594,9 @@ var Easyrtc = function() {
         logDebug("saw error " + errorObject.errorText);
 
         // Use custom error handler if set, rather than creating dialog
-        if (customErrorListener) {
+        if (this._customErrorListener) {
             logDebug("Using custom error handler");
-            customErrorListener(errorObject);
+            this._customErrorListener(errorObject);
             return;
         }
 
@@ -2362,7 +2362,7 @@ var Easyrtc = function() {
                                     self.nativeVideoWidth, self.nativeVideoHeight));
                         }
 
-                        self.clearMediaStream(videoObj);
+                        self.setVideoObjectSrc(videoObj, null);
 
                         if (videoObj.removeNode) {
                             videoObj.removeNode(true);
@@ -3828,7 +3828,11 @@ var Easyrtc = function() {
                     return;
                 }
                 var candidateData;
-                if (event.candidate && peerConns[otherUser]) {
+                if (
+                    event.candidate &&
+                        peerConns[otherUser] && peerConns[otherUser].pc &&
+                            peerConns[otherUser].pc.iceConnectionState !== 'connected'
+                ) {
                     candidateData = {
                         type: 'candidate',
                         label: event.candidate.sdpMLineIndex,
@@ -3863,20 +3867,20 @@ var Easyrtc = function() {
                 }
             };
 
-            pc.ontrack = function(event) {
+            pc.addEventListener('track', function(event) {
                 logDebug("saw ontrack method invoked, which is expected");
                 processAddedTrack(otherUser, event.streams);
-            };
+            });
 
-            pc.onaddstream = function(event) {
+            pc.addEventListener('addstream', function(event) {
                 logDebug("empty onaddstream method invoked, which is expected");
                 processAddedStream(otherUser, event.stream);
-            };
+            });
 
-            pc.onremovestream = function(event) {
+            pc.addEventListener('removestream', function(event) {
                 logDebug("saw remove on remote media stream");
                 onRemoveStreamHelper(otherUser, event.stream);
-            };
+            });
 
             // Register PeerConn
             peerConns[otherUser] = newPeerConn;
@@ -4005,6 +4009,11 @@ var Easyrtc = function() {
         function initOutGoingChannel(otherUser) {
             logDebug("saw initOutgoingChannel call");
 
+            if (!peerConns[otherUser]) {
+                logDebug("failed to setup outgoing channel listener");
+                return;
+            }
+
             var dataChannel = pc.createDataChannel(dataChannelName, self.getDatachannelConstraints());
             peerConns[otherUser].dataChannelS = dataChannel;
             peerConns[otherUser].dataChannelR = dataChannel;
@@ -4037,6 +4046,11 @@ var Easyrtc = function() {
             peerConns[otherUser].pc.ondatachannel = function(event) {
 
                 logDebug("saw incoming data channel");
+
+                if (!peerConns[otherUser]) {
+                    logDebug("failed to setup incoming channel listener");
+                    return;
+                }
 
                 var dataChannel = event.channel;
                 peerConns[otherUser].dataChannelR = dataChannel;
@@ -5043,8 +5057,9 @@ var Easyrtc = function() {
         }
 
         function iceAddFailure(domError) {
-               self.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice candidate (" + domError.name + "): " +
-                JSON.stringify(msgData));
+               self.showError(self.errCodes.ICECANDIDATE_ERR, 
+                   "bad ice candidate (" + domError.name + "): " + JSON.stringify(msgData)
+               );
         }
 
         pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
