@@ -9,7 +9,7 @@ services:
       args:
         EASYRTC_BRANCH: "master"
     command: server_ssl
-    volume:
+    volumes:
       - ./certs:/usr/src/app/certs:ro
     networks:
       - frontend
