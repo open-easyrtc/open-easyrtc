@@ -19,7 +19,7 @@ RUN npm install
 
 # Install dependencies in production mode (no dev dependencies).
 ARG EASYRTC_BRANCH=master
-RUN npm install priologic/easyrtc#$EASYRTC_BRANCH
+RUN npm install open-easyrtc/open-easyrtc#$EASYRTC_BRANCH
 RUN npm install --production
 
 ADD . $APPDIR
