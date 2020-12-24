@@ -671,7 +671,7 @@ function messageListener(easyrtcid, msgType, content) {
 }
 
 
-function appInit() {
+function appInit(roomName) {
 
     // Prep for the top-down layout manager
     setReshaper('fullpage', reshapeFull);
@@ -688,7 +688,7 @@ function appInit() {
     window.onresize = handleWindowResize;
     handleWindowResize(); //initial call of the top-down layout manager
 
-
+    easyrtc.joinRoom(roomName, null)
     easyrtc.setRoomOccupantListener(callEverybodyElse);
     easyrtc.easyApp("easyrtc.multiparty", "box0", ["box1", "box2", "box3"], loginSuccess);
     easyrtc.setPeerListener(messageListener);
