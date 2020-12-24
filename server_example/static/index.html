@@ -2,30 +2,7 @@
 <html>
 <head>
     <title>Trip to fun</title>
-    <style>
-        #map{
-          background: url(city.png);
-          background-size:  100%;
-          width:500px;
-          height:500px;
-          position: relative;
-        }
-        .building-link{
-          position: absolute;
-          display: block;
-          width:50px;
-          height:50px;
-        }
-
-        #b1{left:10px;top:50px;background: red;}
-        #b2{left:100px;top:150px;background: blue;}
-        #b3{left:150px;top:250px;background: green;}
-        #b4{left:210px;top:90px;background: olive;}
-        #b5{left:310px;top:150px;background: orange;}
-        #b6{left:10px;top:150px;background: tomato;}
-
-        #building{display: none;}
-    </style>
+    <link rel="stylesheet" href="/home.css">
 </head>
 <body>
 <h1>Trip to fun</h1>
@@ -40,17 +17,67 @@
 
 </div>
 <script>
-    document.getElementById('map').addEventListener('click',function (e){
-        if(e.target.tagName==='A'){
-          e.preventDefault()
-          console.log(e.target.id);
-          loadBuilding(e.target.id)
-        }
-    })
-
-    function loadBuilding(id){
-
+  let activeBuilding = 0
+  let activeTable = 0
+  document.getElementById('map').addEventListener('click', function (e) {
+    if (e.target.tagName === 'A') {
+      e.preventDefault()
+      console.log(e.target.id)
+      loadBuilding(e.target.id)
     }
+  })
+
+  const buildings = {
+    b1: {
+      image: 'b1',
+      tables: [
+        { x: 100, y: 100, num: 4 },
+        { x: 200, y: 100, num: 3 },
+        { x: 200, y: 200, num: 2 },
+        { x: 200, y: 200, num: 2 },
+      ]
+    },
+    b2: {
+      image: 'b2',
+      tables: [
+        { x: 100, y: 100, num: 4 },
+        { x: 200, y: 100, num: 3 },
+        { x: 200, y: 200, num: 2 },
+        { x: 200, y: 200, num: 2 },
+      ]
+    },
+    b3: {
+      image: 'b3',
+      tables: [
+        { x: 100, y: 100, num: 4 },
+        { x: 200, y: 100, num: 3 },
+        { x: 200, y: 200, num: 2 },
+        { x: 200, y: 200, num: 2 },
+      ]
+    },
+    b4: {
+      image: 'b4',
+      tables: [
+        { x: 100, y: 100, num: 4 },
+        { x: 200, y: 100, num: 3 },
+        { x: 200, y: 200, num: 2 },
+        { x: 200, y: 200, num: 2 },
+      ]
+    },
+    b5: {
+      image: 'b5',
+      tables: [
+        { x: 100, y: 100, num: 4 },
+        { x: 200, y: 100, num: 3 },
+        { x: 200, y: 200, num: 2 },
+        { x: 200, y: 200, num: 2 },
+      ]
+    }
+  }
+
+  function loadBuilding (id) {
+    activeBuilding = id
+  }
 </script>
 </body>
 </html>
