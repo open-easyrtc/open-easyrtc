@@ -12,7 +12,7 @@
         <script type="text/javascript" src="js/demo_multiparty.js"></script>
     </head>
 
-    <body onload="appInit(location.search.replace(/[?=]/, ''))">
+    <body onload="appInit(location.search.replace(/[?=]/g, ''))">
         <div id="fullpage"  class="boxCommon" style="background-image:url(images/irongrip.png)">
             <video id="box0" class="transit boxCommon thumbCommon easyrtcMirror" muted="muted" volume="0" autoplay="autoplay" playsinline="playsinline"></video>
             <video id="box1" class="transit boxCommon thumbCommon" style="visibility:hidden" autoplay="autoplay" playsinline="playsinline"></video>

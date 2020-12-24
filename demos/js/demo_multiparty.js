@@ -526,7 +526,6 @@ function muteActiveBox() {
 
 
 function callEverybodyElse(roomName, otherPeople) {
-
     easyrtc.setRoomOccupantListener(null); // so we're only called once.
 
     var list = [];
@@ -535,8 +534,7 @@ function callEverybodyElse(roomName, otherPeople) {
         list.push(easyrtcid);
     }
     //
-    // Connect in reverse order. Latter arriving people are more likely to have
-    // empty slots.
+    // Connect in reverse order. Latter arriving people are more likely to have empty slots.
     //
     function establishConnection(position) {
         function callSuccess() {
@@ -688,7 +686,7 @@ function appInit(roomName) {
     window.onresize = handleWindowResize;
     handleWindowResize(); //initial call of the top-down layout manager
 
-    easyrtc.joinRoom(roomName, null)
+    easyrtc.joinRoom(roomName, {},(e)=>{console.log(e)},()=>{})
     easyrtc.setRoomOccupantListener(callEverybodyElse);
     easyrtc.easyApp("easyrtc.multiparty", "box0", ["box1", "box2", "box3"], loginSuccess);
     easyrtc.setPeerListener(messageListener);
