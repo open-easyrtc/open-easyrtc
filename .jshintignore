@@ -1,9 +1,0 @@
-node_modules/*
-bower_components/*
-test/api/bower_components/*
-server_example/node_modules/*
-test/reports/*
-docs/*
-dev/*
-demos/js/prettify
-api/easyrtc.js

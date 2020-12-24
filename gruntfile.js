@@ -54,50 +54,6 @@ module.exports = (function() {
                 }
             },
 
-            jshint: {
-                options: {
-                    jshintrc: '.jshintrc',
-                    ignores: [
-                        '<%= config.apiPath %>/**/*.min.js'
-                    ]
-                },
-                all: [
-                    'Gruntfile.js',
-                    '<%= config.apiPath %>/**/*.js',
-                    '<%= config.libPath %>/**/*.js',
-                    '!<%= config.apiPath %>/**/easyrtc.js',
-                ],
-                api: [
-                    '<%= config.apiPath %>/**/*.js',
-                    '!<%= config.apiPath %>/**/easyrtc.js',
-                    '!<%= config.apiPath %>/labs/**/*.js'
-                ],
-                api_ft: [
-                    '<%= config.apiPath %>/**/easyrtc_ft.js'
-                ],
-                labs: [
-                    '<%= config.apiPath %>/labs/**/*.js'
-                ],
-                lib: [
-                    '<%= config.libPath %>/**/*.js'
-                ]
-            },
-
-            csslint: {
-                options: {
-                    csslintrc: '.csslintrc'
-                },
-                strict: {
-                    options: {
-                        import: 2
-                    },
-                    src: [
-                        '<%= config.apiPath %>/**/*.css',
-                        '<%= config.demosPath %>/**/*.css'
-                    ]
-                }
-            },
-
             requirejs: {
                 options: {
                     // How to optimize all the JS files in the build output directory.
@@ -122,72 +78,6 @@ module.exports = (function() {
                         },
 
                         deps: ['easyrtc_app']
-                    }
-                }
-            },
-
-            jsdoc : {
-                jsdoc: './node_modules/.bin/jsdoc',
-                options: {
-                    private: false,
-                    configure: '<%= config.docsPath %>/conf.json',
-                    template: './node_modules/jsdoc-oblivion/template'
-                },
-
-                client : {
-                    src: [
-                        '<%= config.apiPath %>/easyrtc_int.js',
-                        '<%= config.apiPath %>/easyrtc_ft.js',
-                        '<%= config.apiPath %>/easyrtc_app.js',
-                        '<%= config.apiPath %>/easyrtc_lang.js',
-                        '<%= config.docsPath %>/easyrtc_client_tutorial.md'
-                    ],
-                    options: {
-                        destination: '<%= config.docsPath %>/client_html_docs'
-                    }
-                },
-
-                server: {
-                    src: [
-                        '<%= config.libPath %>/easyrtc_public_obj.js',
-                        '<%= config.libPath %>/easyrtc_default_event_listeners',
-                        '<%= config.docsPath %>/easyrtc_server_install.md'
-                    ],
-                    options: {
-                        destination: '<%= config.docsPath %>/server_html_docs_lite'
-                    }
-                },
-
-                client_lite: {
-                    src: [
-                        '<%= config.apiPath %>/easyrtc_int.js',
-                        '<%= config.apiPath %>/easyrtc_ft.js',
-                        '<%= config.apiPath %>/easyrtc_app.js',
-                        '<%= config.apiPath %>/easyrtc_lang.js'
-                    ],
-                    options: {
-                        template: 'dev/scripts/client_jsdoc_templates',
-                        destination: '<%= config.docsPath %>/client_html_docs_lite'
-                    }
-                },
-
-                client_ft_lite: {
-                    src: [
-                        '<%= config.apiPath %>/easyrtc_ft.js'
-                    ],
-                    options: {
-                        template: 'dev/scripts/client_jsdoc_templates2',
-                        destination: '<%= config.docsPath %>/client_ft_html_docs_lite'
-                    }
-                },
-
-                server_lite: {
-                    src: [
-                        '<%= config.libPath %>/easyrtc_public_obj.js',
-                        '<%= config.libPath %>/easyrtc_default_event_listeners'
-                    ],
-                    options: {
-                        destination: '<%= config.docsPath %>/server_html_docs_lite'
                     }
                 }
             },
@@ -270,11 +160,6 @@ module.exports = (function() {
             target = target || 'dev';
             grunt.task.run(['connect:' + target]);
         });
-
-        // Code QA task(s)
-        grunt.registerTask('lint', ['csslint', 'jshint']);
-        grunt.registerTask('jslint', ['jshint']);
-        grunt.registerTask('csshint', ['csslint']);
 
         // Build task(s).
         grunt.registerTask('build', ['build_api']);
