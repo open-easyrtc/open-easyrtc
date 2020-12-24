@@ -14,69 +14,46 @@
     <a href="#" class="building-link" id="b5"></a>
 </div>
 <div id="building">
+    <div id="table">
 
+    </div>
 </div>
+<script src="/buildings.js"></script>
 <script>
   let activeBuilding = 0
   let activeTable = 0
   document.getElementById('map').addEventListener('click', function (e) {
     if (e.target.tagName === 'A') {
       e.preventDefault()
-      console.log(e.target.id)
       loadBuilding(e.target.id)
     }
   })
 
-  const buildings = {
-    b1: {
-      image: 'b1',
-      tables: [
-        { x: 100, y: 100, num: 4 },
-        { x: 200, y: 100, num: 3 },
-        { x: 200, y: 200, num: 2 },
-        { x: 200, y: 200, num: 2 },
-      ]
-    },
-    b2: {
-      image: 'b2',
-      tables: [
-        { x: 100, y: 100, num: 4 },
-        { x: 200, y: 100, num: 3 },
-        { x: 200, y: 200, num: 2 },
-        { x: 200, y: 200, num: 2 },
-      ]
-    },
-    b3: {
-      image: 'b3',
-      tables: [
-        { x: 100, y: 100, num: 4 },
-        { x: 200, y: 100, num: 3 },
-        { x: 200, y: 200, num: 2 },
-        { x: 200, y: 200, num: 2 },
-      ]
-    },
-    b4: {
-      image: 'b4',
-      tables: [
-        { x: 100, y: 100, num: 4 },
-        { x: 200, y: 100, num: 3 },
-        { x: 200, y: 200, num: 2 },
-        { x: 200, y: 200, num: 2 },
-      ]
-    },
-    b5: {
-      image: 'b5',
-      tables: [
-        { x: 100, y: 100, num: 4 },
-        { x: 200, y: 100, num: 3 },
-        { x: 200, y: 200, num: 2 },
-        { x: 200, y: 200, num: 2 },
-      ]
-    }
-  }
 
   function loadBuilding (id) {
     activeBuilding = id
+    document.getElementById("map").style.display='none'
+    document.getElementById("building").style.display='block'
+    let building = buildings[id]
+    const tables= document.getElementById("table")
+    tables.innerHTML='';
+    tables.style.backgroundImage=`url(/img/buildings/${building.image}.jpg)`;
+    building.tables.forEach((table,i)=>{
+      console.log(i,table);
+      const tableDiv = document.createElement('div')
+      tableDiv.classList.add('table')
+      tableDiv.classList.add('num'+table.num)
+      tableDiv.style.left=table.x+'px'
+      tableDiv.style.top=table.y+'px'
+      for(let i = 1; i<=table.num;i++){
+        let chair = document.createElement('div')
+        chair.classList.add('chair')
+        chair.classList.add('chair'+i)
+        tableDiv.appendChild(chair)
+      }
+
+      tables.appendChild(tableDiv)
+    });
   }
 </script>
 </body>
