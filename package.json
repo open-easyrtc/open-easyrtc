@@ -1,29 +1,12 @@
 {
   "name": "open-easyrtc",
   "version": "2.0.5",
-  "homepage": "https://github.com/open-easyrtc/open-easyrtc",
+  "homepage": "https://github.com/jelenatam/hackathon20-trip-to-fun",
   "author": "Harold Thetiot <hthetiot@gmail.com>",
   "description": "Open-EasyRTC enables quick development of WebRTC",
-  "contributors": [
-    "Harold Thetiot <hthetiot@gmail.com>",
-    "Chris De Pasquale <cdep@squale.me>",
-    "Doug Pelton <doug@priologic.com>",
-    "Rod Apeldoorn <rod.apeldoorn@priologic.com>",
-    "Eric Davies <eric.davies@priologic.com>"
-  ],
-  "keywords": [
-    "webRTC",
-    "easy",
-    "EasyRTC",
-    "RTC",
-    "server"
-  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/open-easyrtc/open-easyrtc.git"
-  },
-  "bugs": {
-    "url": "https://github.com/open-easyrtc/open-easyrtc/issues"
+    "url": "https://github.com/jelenatam/hackathon20-trip-to-fun"
   },
   "main": "index",
   "dependencies": {
