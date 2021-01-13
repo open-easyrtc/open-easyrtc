@@ -1,10 +1,15 @@
 EasyRTC: Change Log
 ===================
 
+v.2.0.6
+-------
+Fixes:
+  - JS Client - Various API Client fixes
+
 v.2.0.5
 -------
 Changes:
-- Fix clearMediaStream and call clearMediaStream on onUserMediaSuccess on video element used to detect size. 
+- Fix clearMediaStream and call clearMediaStream on onUserMediaSuccess on video element used to detect size.
 
 v2.0.4
 -------
@@ -64,15 +69,15 @@ Fixes:
 v1.1.0
 -------
 New Features:
- 
- - JS Client - Added setPeerOpenListener and setSignalingStateChangeListener. 
+
+ - JS Client - Added setPeerOpenListener and setSignalingStateChangeListener.
  - JS Client - Added options to set preferred video codec in peer connection.
  - JS Client - Added media stream recording feature and demo.
  - JS Client - Added support for selecting audio playback destination.
- - Documentation - Added info on git install steps. 
+ - Documentation - Added info on git install steps.
 
 Changes:
- 
+
  - JS Client - Use minFrameRate/MaxFrameRate for Firefox and Edge instead of frameRate.min and frameRate.max.
  - JS Client - Updated to use WebRTC ontrack api and newer media constraints api.
  - JS Client -Updated the ice filter demo and exposed it on the demo page.
@@ -85,7 +90,7 @@ Changes:
  - Documentation - Updated docs to reflect the ../ reference in server.js and the need to run https servers.
 
 Fixes:
- 
+
  - JS Client - Fixed file sharing demo.
  - JS Client - Put a guard on onPeerClosed.
  - JS Client - Improvements in cancelling file transfer requests.
@@ -104,7 +109,7 @@ v1.0.17
 New Features:
 
 Changes:
- 
+
  - JS Client - Remove check to see if createRTCPeerConnection works.
  - JS Client - Got rid of setVideoSrc (use setVideoSource instead)
  - JS Client - Updated adapter.js.
@@ -127,7 +132,7 @@ v1.0.16
 -------
 
 New Features:
- 
+
  - Add getSourceList and getAudioSourceList #80
  - IceConnectionStateChangeListener #122
 
@@ -192,7 +197,7 @@ Fixes:
 v1.0.14
 -------
 
-Fixes: 
+Fixes:
 
  - JS Client - Fix a bug in ProcessOccupantList that caused all rooms to appear to have the same occupant.
  - JS Client - Removed the dataset attribute usage in easyapp. It was causing problems in the multiroom demo.
@@ -251,15 +256,15 @@ New Features:
  - JS Client - New function setSdpFilters() for modifying SDP's just before a call. See issue #77.
  - JS Client - Labs directory with example SDP filters. See issue #77.
  - JS Client - New function getServerIce() gets the list of ice servers as supplied by the server.
- - JS Client - New function setIceUsedInCalls() sets the configuration used in the next call. 
+ - JS Client - New function setIceUsedInCalls() sets the configuration used in the next call.
  - JS Client - New function setUseFreshIceEachPeerConnection() causes the client to ask the server for a fresh ice config in the middle of each call or answer.
  - JS Client - Added support for multiple named mediastreams per connection , supported through the mediaIds apifield, getMediaStreamByName(), getLocalMediaIds(), closeLocalMediaStream(), buildLocalMediaStream(), getRemoteStream(), addStreamToCall(). See issue #34.
- - JS Client - Three new internal peer messages with types "__gotAddedMediaStream", "__closingMediaStream", and "__addedMediaStream" 
+ - JS Client - Three new internal peer messages with types "__gotAddedMediaStream", "__closingMediaStream", and "__addedMediaStream"
  - JS Client - New function getRoomOccupantsAsArray() and getRoomOccupantsAsMap().
  - JS Client - New function useThisSocketConnection() for people that want to allocate the websocket themselves. See issue #62.
  - Server - Socket.io v1.0 support. See issue #64.
  - Server - Support for hosting experimental API's in labs. New server option 'apiLabsEnable' defaults to true. See issue #76, #77.
- 
+
 Changes:
 
  - JS Client - enableCamera(), enableMicrophone(), getLocalStreamAsUrl(), initMediaSource(), call(), now take optional media stream names.
@@ -267,14 +272,14 @@ Changes:
  - JS Client - an onStreamClosed listener gets passed an easyrtcid plus the stream and the stream name.
  - JS Client - Added documentation for isTurnServer().
  - JS Client - getFreshIceConfig() now takes an optional callback.
- - Demos - Changed the titles of the demos and their labels to make them consistent. 
+ - Demos - Changed the titles of the demos and their labels to make them consistent.
  - Demos - Gave a different app name to each demo.
  - Demos - Added a few new demos (multistream and low bandwidth).
  - JS Client - reduce the number of places where videoIds and the monitorVideoId was validated. See issue #68.
 
 Fixes:
 
- - JS Client - Numerous documentation fixes.	
+ - JS Client - Numerous documentation fixes.
  - Demos - Fixed formatting in the hd definition demo. See issue #73.
  - JS Client - Fixed a null peer connection. See issue #72.
 
@@ -312,8 +317,8 @@ Fixes:
  - Server - Added additional error handling in several function to ensure objects are present
  - Server - Code clean-up. Spelling, documentation, formatting, and minor JavaScript fixes for issues found during code review
  - Server - Fixed message reply to setRoomApiField request which was invalid
- - Server - Fixed bad reference to default application name option. Added error handler so attempts to get a non-existent option are logged. 
- - Documentation - Updated ICE server help document to properly reference server option "appIceServers" 
+ - Server - Fixed bad reference to default application name option. Added error handler so attempts to get a non-existent option are logged.
+ - Documentation - Updated ICE server help document to properly reference server option "appIceServers"
  - Documentation - Several documentation updates to fix type-Os and improve clarity. Includes issue #39, #42
  - Documentation - Removed httpApp.configure() which caused a crash with Express v4. See issue #49, #57, #59.
  - Documentation - Improved documentation for 'demosPublicFolder' option. See issue #56
@@ -356,7 +361,7 @@ Changes:
 
 Fixes:
 
- - JS Client - Updated data channel support for Firefox so that it interops with Chrome again. 
+ - JS Client - Updated data channel support for Firefox so that it interops with Chrome again.
  - JS Client - Fixed the easyrtc.supportsDataChannel methods check for Android browsers. Data channels aren't currently supported for Android by EasyRTC.
  - JS Client - When data channels are opened, an initial message is sent each way to verify that data channels work.
  - Server - Fixed bug where a getIceConfig request didn't return the proper format. (issue #46)
@@ -381,7 +386,7 @@ Changes:
 Fixes:
 
  - JS Client - A couple type-o fixes in easyrtc.supportsDataChannels()
- - JS Client - Fixed type-o in easyrtc.connect() causing bad reference to listener for signal failure. See issue #32 
+ - JS Client - Fixed type-o in easyrtc.connect() causing bad reference to listener for signal failure. See issue #32
  - JS Client - Fixed reference to error code in easyrtc.connect()
  - JS Client - Made data channel checks more strict (to cover lack of support on mobile)
  - JS Client - Fixed missing parameter when handing candidates.
@@ -408,7 +413,7 @@ Changes:
 
 Fixes:
 
- - Server - Fixed issue when joining rooms when roomAutoCreateEnable option is disabled. When joining room fails, an error message is now returned rather than an empty roomData object. Related to issue #17 
+ - Server - Fixed issue when joining rooms when roomAutoCreateEnable option is disabled. When joining room fails, an error message is now returned rather than an empty roomData object. Related to issue #17
  - Demos - Fixes and improvements for rooms demo.
 
 
@@ -444,13 +449,13 @@ v1.0.5-beta
 
 Changes:
 
- - JS Client - Additional improvements to file sharing API such as better handling of aborted transfers. 
+ - JS Client - Additional improvements to file sharing API such as better handling of aborted transfers.
  - Server - Renamed server option to `appIceServers` to match other application level options.
 
 Fixes:
 
  - JS Client - Fixed a string split issue when sending easyrtcsid value
- - Server - Fixed bug which resulted in the iceServers message to be wrapped in another iceServers object. (Issue #20) 
+ - Server - Fixed bug which resulted in the iceServers message to be wrapped in another iceServers object. (Issue #20)
 
 
 v1.0.0-beta to v1.0.4-beta
@@ -492,7 +497,7 @@ New Features:
 Changes:
 
  - JS Client + Demos - Renaming initManaged() to easyApp(). Old name remains for the time being
- - Server - isAuthenticated() now a synchronous function and returns a boolean 
+ - Server - isAuthenticated() now a synchronous function and returns a boolean
 
 Fixes:
 
