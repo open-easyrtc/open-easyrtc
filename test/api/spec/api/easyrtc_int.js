@@ -53,7 +53,7 @@ define(['easyrtc_int'], function (easyrtc) {
 
             it('should return undefined cand call Success or Error callback', function (done) {
                 function success(mediastream) {
-                expect(typeof mediastream).not.toBe('undefined');
+                    expect(typeof mediastream).not.toBe('undefined');
                     easyrtc.closeLocalStream();
                     done();
                 }
