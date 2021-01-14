@@ -1,10 +1,15 @@
 EasyRTC: Change Log
 ===================
 
+v.2.0.7
+-------
+Fixes:
+  - Server - Restrict users not in same room from sending messages to users in room.
+
 v.2.0.6
 -------
 Fixes:
-  - JS Client - Various API Client fixes
+  - JS Client - Various API Client fixes.
 
 v.2.0.5
 -------
