@@ -3765,7 +3765,10 @@ var Easyrtc = function() {
         };
 
         // Apply iceServers
-        pcConfig.iceConfig = pc_ice_config_to_use ? pc_ice_config_to_use : pc_ice_config;
+        var iceConfig = (pc_ice_config_to_use ? pc_ice_config_to_use : pc_ice_config);
+        if (iceConfig.iceServers) {
+            pcConfig.iceServers = iceConfig.iceServers;
+        }
 
         logDebug("building peer connection to " + otherUser);
 
