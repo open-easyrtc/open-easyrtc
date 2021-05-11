@@ -1,6 +1,6 @@
 {
   "name": "open-easyrtc",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "homepage": "https://github.com/open-easyrtc/open-easyrtc",
   "author": "Harold Thetiot <hthetiot@gmail.com>",
   "description": "Open-EasyRTC enables quick development of WebRTC",
@@ -30,7 +30,7 @@
     "async": "0.2.x",
     "colors": "*",
     "socket.io-client": "^2.4.0",
-    "underscore": "1.5.x",
+    "underscore": "^1.13.1",
     "webrtc-adapter": "^7.3.0"
   },
   "scripts": {
@@ -61,7 +61,7 @@
     "jasmine": "^3.5.0",
     "jasmine-core": "^2.4.1",
     "jsdoc-oblivion": "0.0.4",
-    "karma": "^5.1.0",
+    "karma": "^6.3.2",
     "karma-chrome-launcher": "^1.0.1",
     "karma-coverage": "^2.0.2",
     "karma-firefox-launcher": "^1.0.0",
