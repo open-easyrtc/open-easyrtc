@@ -154,7 +154,7 @@ module.exports = (function() {
                         '<%= config.docsPath %>/easyrtc_server_install.md'
                     ],
                     options: {
-                        destination: '<%= config.docsPath %>/server_html_docs_lite'
+                        destination: '<%= config.docsPath %>/server_html_docs'
                     }
                 },
 
@@ -168,16 +168,6 @@ module.exports = (function() {
                     options: {
                         template: 'dev/scripts/client_jsdoc_templates',
                         destination: '<%= config.docsPath %>/client_html_docs_lite'
-                    }
-                },
-
-                client_ft_lite: {
-                    src: [
-                        '<%= config.apiPath %>/easyrtc_ft.js'
-                    ],
-                    options: {
-                        template: 'dev/scripts/client_jsdoc_templates2',
-                        destination: '<%= config.docsPath %>/client_ft_html_docs_lite'
                     }
                 },
 
