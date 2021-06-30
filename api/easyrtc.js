@@ -74,7 +74,7 @@ return {
 
 var _adapter_factory = require('./adapter_factory.js');
 
-var adapter = (0, _adapter_factory.adapterFactory)({ window: window });
+var adapter = (0, _adapter_factory.adapterFactory)({ window: typeof window === 'undefined' ? undefined : window });
 module.exports = adapter; // this is the difference from adapter_core.
 
 },{"./adapter_factory.js":2}],2:[function(require,module,exports){
@@ -149,25 +149,32 @@ function adapterFactory() {
         logging('Chrome shim is not included in this adapter release.');
         return adapter;
       }
+      if (browserDetails.version === null) {
+        logging('Chrome shim can not determine version, not shimming.');
+        return adapter;
+      }
       logging('adapter.js shimming chrome.');
       // Export to the adapter global object visible in the browser.
       adapter.browserShim = chromeShim;
 
-      chromeShim.shimGetUserMedia(window);
-      chromeShim.shimMediaStream(window);
-      chromeShim.shimPeerConnection(window);
-      chromeShim.shimOnTrack(window);
-      chromeShim.shimAddTrackRemoveTrack(window);
-      chromeShim.shimGetSendersWithDtmf(window);
-      chromeShim.shimGetStats(window);
-      chromeShim.shimSenderReceiverGetStats(window);
-      chromeShim.fixNegotiationNeeded(window);
+      // Must be called before shimPeerConnection.
+      commonShim.shimAddIceCandidateNullOrEmpty(window, browserDetails);
 
-      commonShim.shimRTCIceCandidate(window);
-      commonShim.shimConnectionState(window);
-      commonShim.shimMaxMessageSize(window);
-      commonShim.shimSendThrowTypeError(window);
-      commonShim.removeAllowExtmapMixed(window);
+      chromeShim.shimGetUserMedia(window, browserDetails);
+      chromeShim.shimMediaStream(window, browserDetails);
+      chromeShim.shimPeerConnection(window, browserDetails);
+      chromeShim.shimOnTrack(window, browserDetails);
+      chromeShim.shimAddTrackRemoveTrack(window, browserDetails);
+      chromeShim.shimGetSendersWithDtmf(window, browserDetails);
+      chromeShim.shimGetStats(window, browserDetails);
+      chromeShim.shimSenderReceiverGetStats(window, browserDetails);
+      chromeShim.fixNegotiationNeeded(window, browserDetails);
+
+      commonShim.shimRTCIceCandidate(window, browserDetails);
+      commonShim.shimConnectionState(window, browserDetails);
+      commonShim.shimMaxMessageSize(window, browserDetails);
+      commonShim.shimSendThrowTypeError(window, browserDetails);
+      commonShim.removeExtmapAllowMixed(window, browserDetails);
       break;
     case 'firefox':
       if (!firefoxShim || !firefoxShim.shimPeerConnection || !options.shimFirefox) {
@@ -178,21 +185,25 @@ function adapterFactory() {
       // Export to the adapter global object visible in the browser.
       adapter.browserShim = firefoxShim;
 
-      firefoxShim.shimGetUserMedia(window);
-      firefoxShim.shimPeerConnection(window);
-      firefoxShim.shimOnTrack(window);
-      firefoxShim.shimRemoveStream(window);
-      firefoxShim.shimSenderGetStats(window);
-      firefoxShim.shimReceiverGetStats(window);
-      firefoxShim.shimRTCDataChannel(window);
-      firefoxShim.shimAddTransceiver(window);
-      firefoxShim.shimCreateOffer(window);
-      firefoxShim.shimCreateAnswer(window);
+      // Must be called before shimPeerConnection.
+      commonShim.shimAddIceCandidateNullOrEmpty(window, browserDetails);
 
-      commonShim.shimRTCIceCandidate(window);
-      commonShim.shimConnectionState(window);
-      commonShim.shimMaxMessageSize(window);
-      commonShim.shimSendThrowTypeError(window);
+      firefoxShim.shimGetUserMedia(window, browserDetails);
+      firefoxShim.shimPeerConnection(window, browserDetails);
+      firefoxShim.shimOnTrack(window, browserDetails);
+      firefoxShim.shimRemoveStream(window, browserDetails);
+      firefoxShim.shimSenderGetStats(window, browserDetails);
+      firefoxShim.shimReceiverGetStats(window, browserDetails);
+      firefoxShim.shimRTCDataChannel(window, browserDetails);
+      firefoxShim.shimAddTransceiver(window, browserDetails);
+      firefoxShim.shimGetParameters(window, browserDetails);
+      firefoxShim.shimCreateOffer(window, browserDetails);
+      firefoxShim.shimCreateAnswer(window, browserDetails);
+
+      commonShim.shimRTCIceCandidate(window, browserDetails);
+      commonShim.shimConnectionState(window, browserDetails);
+      commonShim.shimMaxMessageSize(window, browserDetails);
+      commonShim.shimSendThrowTypeError(window, browserDetails);
       break;
     case 'edge':
       if (!edgeShim || !edgeShim.shimPeerConnection || !options.shimEdge) {
@@ -203,15 +214,15 @@ function adapterFactory() {
       // Export to the adapter global object visible in the browser.
       adapter.browserShim = edgeShim;
 
-      edgeShim.shimGetUserMedia(window);
-      edgeShim.shimGetDisplayMedia(window);
-      edgeShim.shimPeerConnection(window);
-      edgeShim.shimReplaceTrack(window);
+      edgeShim.shimGetUserMedia(window, browserDetails);
+      edgeShim.shimGetDisplayMedia(window, browserDetails);
+      edgeShim.shimPeerConnection(window, browserDetails);
+      edgeShim.shimReplaceTrack(window, browserDetails);
 
       // the edge shim implements the full RTCIceCandidate object.
 
-      commonShim.shimMaxMessageSize(window);
-      commonShim.shimSendThrowTypeError(window);
+      commonShim.shimMaxMessageSize(window, browserDetails);
+      commonShim.shimSendThrowTypeError(window, browserDetails);
       break;
     case 'safari':
       if (!safariShim || !options.shimSafari) {
@@ -222,18 +233,22 @@ function adapterFactory() {
       // Export to the adapter global object visible in the browser.
       adapter.browserShim = safariShim;
 
-      safariShim.shimRTCIceServerUrls(window);
-      safariShim.shimCreateOfferLegacy(window);
-      safariShim.shimCallbacksAPI(window);
-      safariShim.shimLocalStreamsAPI(window);
-      safariShim.shimRemoteStreamsAPI(window);
-      safariShim.shimTrackEventTransceiver(window);
-      safariShim.shimGetUserMedia(window);
+      // Must be called before shimCallbackAPI.
+      commonShim.shimAddIceCandidateNullOrEmpty(window, browserDetails);
 
-      commonShim.shimRTCIceCandidate(window);
-      commonShim.shimMaxMessageSize(window);
-      commonShim.shimSendThrowTypeError(window);
-      commonShim.removeAllowExtmapMixed(window);
+      safariShim.shimRTCIceServerUrls(window, browserDetails);
+      safariShim.shimCreateOfferLegacy(window, browserDetails);
+      safariShim.shimCallbacksAPI(window, browserDetails);
+      safariShim.shimLocalStreamsAPI(window, browserDetails);
+      safariShim.shimRemoteStreamsAPI(window, browserDetails);
+      safariShim.shimTrackEventTransceiver(window, browserDetails);
+      safariShim.shimGetUserMedia(window, browserDetails);
+      safariShim.shimAudioContext(window, browserDetails);
+
+      commonShim.shimRTCIceCandidate(window, browserDetails);
+      commonShim.shimMaxMessageSize(window, browserDetails);
+      commonShim.shimSendThrowTypeError(window, browserDetails);
+      commonShim.removeExtmapAllowMixed(window, browserDetails);
       break;
     default:
       logging('Unsupported browser!');
@@ -246,7 +261,6 @@ function adapterFactory() {
 // Browser shims.
 
 },{"./chrome/chrome_shim":3,"./common_shim":6,"./edge/edge_shim":7,"./firefox/firefox_shim":11,"./safari/safari_shim":14,"./utils":15}],3:[function(require,module,exports){
-
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -741,11 +755,10 @@ function shimAddTrackRemoveTrackWithNative(window) {
   };
 }
 
-function shimAddTrackRemoveTrack(window) {
+function shimAddTrackRemoveTrack(window, browserDetails) {
   if (!window.RTCPeerConnection) {
     return;
   }
-  var browserDetails = utils.detectBrowser(window);
   // shim addTrack and removeTrack.
   if (window.RTCPeerConnection.prototype.addTrack && browserDetails.version >= 65) {
     return shimAddTrackRemoveTrackWithNative(window);
@@ -961,9 +974,7 @@ function shimAddTrackRemoveTrack(window) {
   };
 }
 
-function shimPeerConnection(window) {
-  var browserDetails = utils.detectBrowser(window);
-
+function shimPeerConnection(window, browserDetails) {
   if (!window.RTCPeerConnection && window.webkitRTCPeerConnection) {
     // very basic support for old versions.
     window.RTCPeerConnection = window.webkitRTCPeerConnection;
@@ -983,30 +994,16 @@ function shimPeerConnection(window) {
       window.RTCPeerConnection.prototype[method] = methodObj[method];
     });
   }
-
-  // support for addIceCandidate(null or undefined)
-  var nativeAddIceCandidate = window.RTCPeerConnection.prototype.addIceCandidate;
-  window.RTCPeerConnection.prototype.addIceCandidate = function addIceCandidate() {
-    if (!arguments[0]) {
-      if (arguments[1]) {
-        arguments[1].apply(null);
-      }
-      return Promise.resolve();
-    }
-    // Firefox 68+ emits and processes {candidate: "", ...}, ignore
-    // in older versions. Native support planned for Chrome M77.
-    if (browserDetails.version < 78 && arguments[0] && arguments[0].candidate === '') {
-      return Promise.resolve();
-    }
-    return nativeAddIceCandidate.apply(this, arguments);
-  };
 }
 
-function fixNegotiationNeeded(window) {
+// Attempt to fix ONN in plan-b mode.
+function fixNegotiationNeeded(window, browserDetails) {
   utils.wrapPeerConnectionEvent(window, 'negotiationneeded', function (e) {
     var pc = e.target;
-    if (pc.signalingState !== 'stable') {
-      return;
+    if (browserDetails.version < 72 || pc.getConfiguration && pc.getConfiguration().sdpSemantics === 'plan-b') {
+      if (pc.signalingState !== 'stable') {
+        return;
+      }
     }
     return e;
   });
@@ -1090,14 +1087,12 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var logging = utils.log;
 
-function shimGetUserMedia(window) {
+function shimGetUserMedia(window, browserDetails) {
   var navigator = window && window.navigator;
 
   if (!navigator.mediaDevices) {
     return;
   }
-
-  var browserDetails = utils.detectBrowser(window);
 
   var constraintsToChrome_ = function constraintsToChrome_(c) {
     if ((typeof c === 'undefined' ? 'undefined' : _typeof(c)) !== 'object' || c.mandatory || c.optional) {
@@ -1291,7 +1286,8 @@ exports.shimRTCIceCandidate = shimRTCIceCandidate;
 exports.shimMaxMessageSize = shimMaxMessageSize;
 exports.shimSendThrowTypeError = shimSendThrowTypeError;
 exports.shimConnectionState = shimConnectionState;
-exports.removeAllowExtmapMixed = removeAllowExtmapMixed;
+exports.removeExtmapAllowMixed = removeExtmapAllowMixed;
+exports.shimAddIceCandidateNullOrEmpty = shimAddIceCandidateNullOrEmpty;
 
 var _sdp = require('sdp');
 
@@ -1354,11 +1350,10 @@ function shimRTCIceCandidate(window) {
   });
 }
 
-function shimMaxMessageSize(window) {
+function shimMaxMessageSize(window, browserDetails) {
   if (!window.RTCPeerConnection) {
     return;
   }
-  var browserDetails = utils.detectBrowser(window);
 
   if (!('sctp' in window.RTCPeerConnection.prototype)) {
     Object.defineProperty(window.RTCPeerConnection.prototype, 'sctp', {
@@ -1596,23 +1591,65 @@ function shimConnectionState(window) {
   });
 }
 
-function removeAllowExtmapMixed(window) {
-  /* remove a=extmap-allow-mixed for Chrome < M71 */
+function removeExtmapAllowMixed(window, browserDetails) {
+  /* remove a=extmap-allow-mixed for webrtc.org < M71 */
   if (!window.RTCPeerConnection) {
     return;
   }
-  var browserDetails = utils.detectBrowser(window);
   if (browserDetails.browser === 'chrome' && browserDetails.version >= 71) {
+    return;
+  }
+  if (browserDetails.browser === 'safari' && browserDetails.version >= 605) {
     return;
   }
   var nativeSRD = window.RTCPeerConnection.prototype.setRemoteDescription;
   window.RTCPeerConnection.prototype.setRemoteDescription = function setRemoteDescription(desc) {
     if (desc && desc.sdp && desc.sdp.indexOf('\na=extmap-allow-mixed') !== -1) {
-      desc.sdp = desc.sdp.split('\n').filter(function (line) {
+      var sdp = desc.sdp.split('\n').filter(function (line) {
         return line.trim() !== 'a=extmap-allow-mixed';
       }).join('\n');
+      // Safari enforces read-only-ness of RTCSessionDescription fields.
+      if (window.RTCSessionDescription && desc instanceof window.RTCSessionDescription) {
+        arguments[0] = new window.RTCSessionDescription({
+          type: desc.type,
+          sdp: sdp
+        });
+      } else {
+        desc.sdp = sdp;
+      }
     }
     return nativeSRD.apply(this, arguments);
+  };
+}
+
+function shimAddIceCandidateNullOrEmpty(window, browserDetails) {
+  // Support for addIceCandidate(null or undefined)
+  // as well as addIceCandidate({candidate: "", ...})
+  // https://bugs.chromium.org/p/chromium/issues/detail?id=978582
+  // Note: must be called before other polyfills which change the signature.
+  if (!(window.RTCPeerConnection && window.RTCPeerConnection.prototype)) {
+    return;
+  }
+  var nativeAddIceCandidate = window.RTCPeerConnection.prototype.addIceCandidate;
+  if (!nativeAddIceCandidate || nativeAddIceCandidate.length === 0) {
+    return;
+  }
+  window.RTCPeerConnection.prototype.addIceCandidate = function addIceCandidate() {
+    if (!arguments[0]) {
+      if (arguments[1]) {
+        arguments[1].apply(null);
+      }
+      return Promise.resolve();
+    }
+    // Firefox 68+ emits and processes {candidate: "", ...}, ignore
+    // in older versions.
+    // Native support for ignoring exists for Chrome M77+.
+    // Safari ignores as well, exact version unknown but works in the same
+    // version that also ignores addIceCandidate(null).
+    if ((browserDetails.browser === 'chrome' && browserDetails.version < 78 || browserDetails.browser === 'firefox' && browserDetails.version < 68 || browserDetails.browser === 'safari') && arguments[0] && arguments[0].candidate === '') {
+      return Promise.resolve();
+    }
+    return nativeAddIceCandidate.apply(this, arguments);
   };
 }
 
@@ -1666,9 +1703,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function shimPeerConnection(window) {
-  var browserDetails = utils.detectBrowser(window);
-
+function shimPeerConnection(window, browserDetails) {
   if (window.RTCIceGatherer) {
     if (!window.RTCIceCandidate) {
       window.RTCIceCandidate = function RTCIceCandidate(args) {
@@ -1905,6 +1940,7 @@ exports.shimReceiverGetStats = shimReceiverGetStats;
 exports.shimRemoveStream = shimRemoveStream;
 exports.shimRTCDataChannel = shimRTCDataChannel;
 exports.shimAddTransceiver = shimAddTransceiver;
+exports.shimGetParameters = shimGetParameters;
 exports.shimCreateOffer = shimCreateOffer;
 exports.shimCreateAnswer = shimCreateAnswer;
 
@@ -1926,9 +1962,7 @@ function shimOnTrack(window) {
   }
 }
 
-function shimPeerConnection(window) {
-  var browserDetails = utils.detectBrowser(window);
-
+function shimPeerConnection(window, browserDetails) {
   if ((typeof window === 'undefined' ? 'undefined' : _typeof(window)) !== 'object' || !(window.RTCPeerConnection || window.mozRTCPeerConnection)) {
     return; // probably media.peerconnection.enabled=false in about:config
   }
@@ -1947,26 +1981,6 @@ function shimPeerConnection(window) {
       });
       window.RTCPeerConnection.prototype[method] = methodObj[method];
     });
-  }
-
-  // support for addIceCandidate(null or undefined)
-  // as well as ignoring {sdpMid, candidate: ""}
-  if (browserDetails.version < 68) {
-    var nativeAddIceCandidate = window.RTCPeerConnection.prototype.addIceCandidate;
-    window.RTCPeerConnection.prototype.addIceCandidate = function addIceCandidate() {
-      if (!arguments[0]) {
-        if (arguments[1]) {
-          arguments[1].apply(null);
-        }
-        return Promise.resolve();
-      }
-      // Firefox 68+ emits and processes {candidate: "", ...}, ignore
-      // in older versions.
-      if (arguments[0] && arguments[0].candidate === '') {
-        return Promise.resolve();
-      }
-      return nativeAddIceCandidate.apply(this, arguments);
-    };
   }
 
   var modernStatsTypes = {
@@ -2140,12 +2154,35 @@ function shimAddTransceiver(window) {
         var sender = transceiver.sender;
 
         var params = sender.getParameters();
-        if (!('encodings' in params)) {
+        if (!('encodings' in params) ||
+        // Avoid being fooled by patched getParameters() below.
+        params.encodings.length === 1 && Object.keys(params.encodings[0]).length === 0) {
           params.encodings = initParameters.sendEncodings;
-          this.setParametersPromises.push(sender.setParameters(params).catch(function () {}));
+          sender.sendEncodings = initParameters.sendEncodings;
+          this.setParametersPromises.push(sender.setParameters(params).then(function () {
+            delete sender.sendEncodings;
+          }).catch(function () {
+            delete sender.sendEncodings;
+          }));
         }
       }
       return transceiver;
+    };
+  }
+}
+
+function shimGetParameters(window) {
+  if (!((typeof window === 'undefined' ? 'undefined' : _typeof(window)) === 'object' && window.RTCRtpSender)) {
+    return;
+  }
+  var origGetParameters = window.RTCRtpSender.prototype.getParameters;
+  if (origGetParameters) {
+    window.RTCRtpSender.prototype.getParameters = function getParameters() {
+      var params = origGetParameters.apply(this, arguments);
+      if (!('encodings' in params)) {
+        params.encodings = [].concat(this.sendEncodings || [{}]);
+      }
+      return params;
     };
   }
 }
@@ -2260,8 +2297,7 @@ var utils = _interopRequireWildcard(_utils);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function shimGetUserMedia(window) {
-  var browserDetails = utils.detectBrowser(window);
+function shimGetUserMedia(window, browserDetails) {
   var navigator = window && window.navigator;
   var MediaStreamTrack = window && window.MediaStreamTrack;
 
@@ -2337,6 +2373,7 @@ exports.shimConstraints = shimConstraints;
 exports.shimRTCIceServerUrls = shimRTCIceServerUrls;
 exports.shimTrackEventTransceiver = shimTrackEventTransceiver;
 exports.shimCreateOfferLegacy = shimCreateOfferLegacy;
+exports.shimAudioContext = shimAudioContext;
 
 var _utils = require('../utils');
 
@@ -2378,20 +2415,27 @@ function shimLocalStreamsAPI(window) {
     };
 
     window.RTCPeerConnection.prototype.addTrack = function addTrack(track) {
-      var stream = arguments[1];
-      if (stream) {
-        if (!this._localStreams) {
-          this._localStreams = [stream];
-        } else if (!this._localStreams.includes(stream)) {
-          this._localStreams.push(stream);
-        }
+      var _this2 = this;
+
+      for (var _len = arguments.length, streams = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        streams[_key - 1] = arguments[_key];
+      }
+
+      if (streams) {
+        streams.forEach(function (stream) {
+          if (!_this2._localStreams) {
+            _this2._localStreams = [stream];
+          } else if (!_this2._localStreams.includes(stream)) {
+            _this2._localStreams.push(stream);
+          }
+        });
       }
       return _addTrack.apply(this, arguments);
     };
   }
   if (!('removeStream' in window.RTCPeerConnection.prototype)) {
     window.RTCPeerConnection.prototype.removeStream = function removeStream(stream) {
-      var _this2 = this;
+      var _this3 = this;
 
       if (!this._localStreams) {
         this._localStreams = [];
@@ -2404,7 +2448,7 @@ function shimLocalStreamsAPI(window) {
       var tracks = stream.getTracks();
       this.getSenders().forEach(function (sender) {
         if (tracks.includes(sender.track)) {
-          _this2.removeTrack(sender);
+          _this3.removeTrack(sender);
         }
       });
     };
@@ -2426,7 +2470,7 @@ function shimRemoteStreamsAPI(window) {
         return this._onaddstream;
       },
       set: function set(f) {
-        var _this3 = this;
+        var _this4 = this;
 
         if (this._onaddstream) {
           this.removeEventListener('addstream', this._onaddstream);
@@ -2435,16 +2479,16 @@ function shimRemoteStreamsAPI(window) {
         this.addEventListener('addstream', this._onaddstream = f);
         this.addEventListener('track', this._onaddstreampoly = function (e) {
           e.streams.forEach(function (stream) {
-            if (!_this3._remoteStreams) {
-              _this3._remoteStreams = [];
+            if (!_this4._remoteStreams) {
+              _this4._remoteStreams = [];
             }
-            if (_this3._remoteStreams.includes(stream)) {
+            if (_this4._remoteStreams.includes(stream)) {
               return;
             }
-            _this3._remoteStreams.push(stream);
+            _this4._remoteStreams.push(stream);
             var event = new Event('addstream');
             event.stream = stream;
-            _this3.dispatchEvent(event);
+            _this4.dispatchEvent(event);
           });
         });
       }
@@ -2563,6 +2607,9 @@ function shimConstraints(constraints) {
 }
 
 function shimRTCIceServerUrls(window) {
+  if (!window.RTCPeerConnection) {
+    return;
+  }
   // migrate from non-spec RTCIceServer.url to RTCIceServer.urls
   var OrigPeerConnection = window.RTCPeerConnection;
   window.RTCPeerConnection = function RTCPeerConnection(pcConfig, pcConstraints) {
@@ -2586,7 +2633,7 @@ function shimRTCIceServerUrls(window) {
   };
   window.RTCPeerConnection.prototype = OrigPeerConnection.prototype;
   // wrap static methods. Currently just generateCertificate.
-  if ('generateCertificate' in window.RTCPeerConnection) {
+  if ('generateCertificate' in OrigPeerConnection) {
     Object.defineProperty(window.RTCPeerConnection, 'generateCertificate', {
       get: function get() {
         return OrigPeerConnection.generateCertificate;
@@ -2664,6 +2711,13 @@ function shimCreateOfferLegacy(window) {
   };
 }
 
+function shimAudioContext(window) {
+  if ((typeof window === 'undefined' ? 'undefined' : _typeof(window)) !== 'object' || window.AudioContext) {
+    return;
+  }
+  window.AudioContext = window.webkitAudioContext;
+}
+
 },{"../utils":15}],15:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
@@ -2726,21 +2780,37 @@ function wrapPeerConnectionEvent(window, eventNameToWrap, wrapper) {
     var wrappedCallback = function wrappedCallback(e) {
       var modifiedEvent = wrapper(e);
       if (modifiedEvent) {
-        cb(modifiedEvent);
+        if (cb.handleEvent) {
+          cb.handleEvent(modifiedEvent);
+        } else {
+          cb(modifiedEvent);
+        }
       }
     };
     this._eventMap = this._eventMap || {};
-    this._eventMap[cb] = wrappedCallback;
+    if (!this._eventMap[eventNameToWrap]) {
+      this._eventMap[eventNameToWrap] = new Map();
+    }
+    this._eventMap[eventNameToWrap].set(cb, wrappedCallback);
     return nativeAddEventListener.apply(this, [nativeEventName, wrappedCallback]);
   };
 
   var nativeRemoveEventListener = proto.removeEventListener;
   proto.removeEventListener = function (nativeEventName, cb) {
-    if (nativeEventName !== eventNameToWrap || !this._eventMap || !this._eventMap[cb]) {
+    if (nativeEventName !== eventNameToWrap || !this._eventMap || !this._eventMap[eventNameToWrap]) {
       return nativeRemoveEventListener.apply(this, arguments);
     }
-    var unwrappedCb = this._eventMap[cb];
-    delete this._eventMap[cb];
+    if (!this._eventMap[eventNameToWrap].has(cb)) {
+      return nativeRemoveEventListener.apply(this, arguments);
+    }
+    var unwrappedCb = this._eventMap[eventNameToWrap].get(cb);
+    this._eventMap[eventNameToWrap].delete(cb);
+    if (this._eventMap[eventNameToWrap].size === 0) {
+      delete this._eventMap[eventNameToWrap];
+    }
+    if (Object.keys(this._eventMap).length === 0) {
+      delete this._eventMap;
+    }
     return nativeRemoveEventListener.apply(this, [nativeEventName, unwrappedCb]);
   };
 
@@ -2811,10 +2881,7 @@ function deprecated(oldMethod, newMethod) {
  *     properties.
  */
 function detectBrowser(window) {
-  var navigator = window.navigator;
-
   // Returned result object.
-
   var result = { browser: null, version: null };
 
   // Fail early if it's not a browser
@@ -2822,6 +2889,9 @@ function detectBrowser(window) {
     result.browser = 'Not a browser.';
     return result;
   }
+
+  var navigator = window.navigator;
+
 
   if (navigator.mozGetUserMedia) {
     // Firefox.
@@ -5096,22 +5166,76 @@ SDPUtils.writeDtlsParameters = function(params, setupType) {
   });
   return sdp;
 };
+
+// Parses a=crypto lines into
+//   https://rawgit.com/aboba/edgertc/master/msortc-rs4.html#dictionary-rtcsrtpsdesparameters-members
+SDPUtils.parseCryptoLine = function(line) {
+  var parts = line.substr(9).split(' ');
+  return {
+    tag: parseInt(parts[0], 10),
+    cryptoSuite: parts[1],
+    keyParams: parts[2],
+    sessionParams: parts.slice(3),
+  };
+};
+
+SDPUtils.writeCryptoLine = function(parameters) {
+  return 'a=crypto:' + parameters.tag + ' ' +
+    parameters.cryptoSuite + ' ' +
+    (typeof parameters.keyParams === 'object'
+      ? SDPUtils.writeCryptoKeyParams(parameters.keyParams)
+      : parameters.keyParams) +
+    (parameters.sessionParams ? ' ' + parameters.sessionParams.join(' ') : '') +
+    '\r\n';
+};
+
+// Parses the crypto key parameters into
+//   https://rawgit.com/aboba/edgertc/master/msortc-rs4.html#rtcsrtpkeyparam*
+SDPUtils.parseCryptoKeyParams = function(keyParams) {
+  if (keyParams.indexOf('inline:') !== 0) {
+    return null;
+  }
+  var parts = keyParams.substr(7).split('|');
+  return {
+    keyMethod: 'inline',
+    keySalt: parts[0],
+    lifeTime: parts[1],
+    mkiValue: parts[2] ? parts[2].split(':')[0] : undefined,
+    mkiLength: parts[2] ? parts[2].split(':')[1] : undefined,
+  };
+};
+
+SDPUtils.writeCryptoKeyParams = function(keyParams) {
+  return keyParams.keyMethod + ':'
+    + keyParams.keySalt +
+    (keyParams.lifeTime ? '|' + keyParams.lifeTime : '') +
+    (keyParams.mkiValue && keyParams.mkiLength
+      ? '|' + keyParams.mkiValue + ':' + keyParams.mkiLength
+      : '');
+};
+
+// Extracts all SDES paramters.
+SDPUtils.getCryptoParameters = function(mediaSection, sessionpart) {
+  var lines = SDPUtils.matchPrefix(mediaSection + sessionpart,
+    'a=crypto:');
+  return lines.map(SDPUtils.parseCryptoLine);
+};
+
 // Parses ICE information from SDP media section or sessionpart.
 // FIXME: for consistency with other functions this should only
 //   get the ice-ufrag and ice-pwd lines as input.
 SDPUtils.getIceParameters = function(mediaSection, sessionpart) {
-  var lines = SDPUtils.splitLines(mediaSection);
-  // Search in session part, too.
-  lines = lines.concat(SDPUtils.splitLines(sessionpart));
-  var iceParameters = {
-    usernameFragment: lines.filter(function(line) {
-      return line.indexOf('a=ice-ufrag:') === 0;
-    })[0].substr(12),
-    password: lines.filter(function(line) {
-      return line.indexOf('a=ice-pwd:') === 0;
-    })[0].substr(10)
+  var ufrag = SDPUtils.matchPrefix(mediaSection + sessionpart,
+    'a=ice-ufrag:')[0];
+  var pwd = SDPUtils.matchPrefix(mediaSection + sessionpart,
+    'a=ice-pwd:')[0];
+  if (!(ufrag && pwd)) {
+    return null;
+  }
+  return {
+    usernameFragment: ufrag.substr(12),
+    password: pwd.substr(10),
   };
-  return iceParameters;
 };
 
 // Serializes ICE parameters to SDP.
@@ -5858,7 +5982,7 @@ var Easyrtc = function() {
      * @param otherUser the easyrtcid of the peer corresponding to the
      *  connection being updated.
      */
-    this.renegotiate = function(otherUser) {
+    this.renegotiate = function(otherUser, iceRestart) {
         var peerConnObj =  peerConns[otherUser];
         if(!peerConnObj) {
             logDebug("Attempt to renegotiate ice on nonexistant connection");
@@ -5890,8 +6014,14 @@ var Easyrtc = function() {
             return;
         }
 
+        if (typeof iceRestart === 'undefined') {
+            iceRestart = pc.iceConnectionState !== 'connected';
+        }
+
+        logDebug('iceRestart:' + iceRestart);
+
         peerConnObj.sendingOffer = true;
-        pc.createOffer({iceRestart: true }).then(setLocalAndSendMessage0)
+        pc.createOffer({iceRestart: iceRestart }).then(setLocalAndSendMessage0)
           .catch(function(reason) {
                  peerConnObj.sendingOffer = false;
                  callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(reason));
@@ -6476,13 +6606,13 @@ var Easyrtc = function() {
 
         if (!self.audioEnabled) {
             constraints.audio = false;
-        }
-        else {
+        } else {
             constraints.audio = {};
             if (self._desiredAudioProperties.audioSrcId) {
-             constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
+                constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
             }
         }
+
         return constraints;
     };
 
@@ -6594,7 +6724,7 @@ var Easyrtc = function() {
     };
 
     /** @private
-     * @param {Array} pc_config ice configuration array
+     * @param {Array} pc_ice_config ice configuration array
      * @param {Object} optionalStuff peer constraints.
      */
     this.createRTCPeerConnection = function(pc_config, optionalStuff) {
@@ -7031,17 +7161,25 @@ var Easyrtc = function() {
                 }
             }
         };
-        self.webSocket.json.emit("easyrtcCmd", dataToShip,
-                function(ackMsg) {
-                    if (ackMsg.msgType === "error") {
-                        self.showError(ackMsg.msgData.errorCode, ackMsg.msgData.errorText);
+
+        if (self.webSocket) {
+            self.webSocket.json.emit("easyrtcCmd", dataToShip,
+                    function(ackMsg) {
+                        if (ackMsg.msgType === "error") {
+                            self.showError(ackMsg.msgData.errorCode, ackMsg.msgData.errorText);
+                        }
                     }
-                }
-        );
+            );
+        }
+        else {
+            logDebug("websocket failed because no connection to server");
+
+            throw "Attempt to send message without a valid connection to the server.";
+        }
     }
 
     /** @private */
-    self._roomApiFieldTimer= {};
+    self._roomApiFieldTimer = {};
 
     /**
      * @private
@@ -7055,6 +7193,7 @@ var Easyrtc = function() {
         if (self._roomApiFieldTimer[roomName]) {
             clearTimeout(self._roomApiFieldTimer[roomName]);
         }
+
         self._roomApiFieldTimer[roomName] = setTimeout(function() {
             var roomApiFields = self._roomApiFields[roomName];
             if (roomApiFields) {
@@ -7130,7 +7269,7 @@ var Easyrtc = function() {
     };
 
     /** @private */
-    var customErrorListener;
+    this._customErrorListener = null;
 
     /**
      * Override the default open-easyrtc error handler. The default handler shows a popup error dialog.
@@ -7143,7 +7282,7 @@ var Easyrtc = function() {
      * easyrtc.setErrorListener(undefined);
      */
     this.setErrorListener = function(handler) {
-        customErrorListener = handler;
+        this._customErrorListener = handler;
     };
 
     /**
@@ -7154,9 +7293,9 @@ var Easyrtc = function() {
         logDebug("saw error " + errorObject.errorText);
 
         // Use custom error handler if set, rather than creating dialog
-        if (customErrorListener) {
+        if (this._customErrorListener) {
             logDebug("Using custom error handler");
-            customErrorListener(errorObject);
+            this._customErrorListener(errorObject);
             return;
         }
 
@@ -8333,11 +8472,20 @@ var Easyrtc = function() {
     /** @private */
     this.webSocket = null;
     /** @private */
-    var pc_config = {};
+    var pc_ice_config = {};
+    /** @private */
+    var pc_ice_config_to_use = null;
     /** @private */
     var pc_config_to_use = null;
     /** @private */
     var use_fresh_ice_each_peer = false;
+
+    /**
+     * Sets the peer connection configuration that will be used in subsequent calls.
+     */
+    this.setPeerConnectionConfig = function(value) {
+        pc_config_to_use = value;
+    };
 
     /**
      * Determines whether fresh ice server configuration should be requested from the server for each peer connection.
@@ -8353,7 +8501,7 @@ var Easyrtc = function() {
      * @return {Object} which has the form {iceServers:[ice_server_entry, ice_server_entry, ...]}
      */
     this.getServerIce = function() {
-        return pc_config;
+        return pc_ice_config;
     };
 
     /**
@@ -8379,7 +8527,7 @@ var Easyrtc = function() {
             self.showError(self.errCodes.DEVELOPER_ERR, "Bad ice configuration passed to easyrtc.setIceUsedInCalls");
         }
         else {
-            pc_config_to_use = ice;
+            pc_ice_config_to_use = ice;
         }
     };
 
@@ -8541,13 +8689,12 @@ var Easyrtc = function() {
            stillAliveTimer = null;
         }
 
-        if (self.webSocket) {
+        if (self.webSocketConnected) {
             if (!preallocatedSocketIo) {
                 self.webSocket.close();
             }
+            self.webSocketConnected = false;
         }
-        self.webSocketConnected = false;
-        self.webSocket = 0;
         self.hangupAll();
         if (roomOccupantListener) {
             for (roomName in lastLoggedInList) {
@@ -8571,10 +8718,6 @@ var Easyrtc = function() {
         self.myEasyrtcid = null;
         self.disconnecting = false;
         oldConfig = {};
-
-        if (self.disconnectListener) {
-            self.disconnectListener();
-        }
     }
 
     /**
@@ -8595,7 +8738,25 @@ var Easyrtc = function() {
         // connection until it's had a chance to be sent. We allocate 100ms for collecting
         // the info, so 250ms should be sufficient for the disconnecting.
         //
-        setTimeout(disconnectBody, 250);
+        setTimeout(function() {
+            if (self.webSocket) {
+                try {
+                    self.webSocket.disconnect();
+                } catch (e) {
+                    // we don't really care if this fails.
+                }
+
+                closedChannel = self.webSocket;
+                self.webSocket = 0;
+            }
+            self.loggingOut = false;
+            self.disconnecting = false;
+            if (roomOccupantListener) {
+                roomOccupantListener(null, {}, false);
+            }
+            self.emitEvent("roomOccupant", {});
+            oldConfig = {};
+        }, 250);
     };
 
     /** @private */
@@ -8609,6 +8770,8 @@ var Easyrtc = function() {
     //
     function sendSignalling(destUser, msgType, msgData, successCallback, errorCallback) {
         if (!self.webSocket) {
+            logDebug("websocket failed because no connection to server");
+
             throw "Attempt to send message without a valid connection to the server.";
         }
         else {
@@ -9233,7 +9396,7 @@ var Easyrtc = function() {
                 self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
             }
         } else {
-            logDebug('remove stream ' + remoteName + ' already exist');
+            logDebug('processAddedStream: stream ' + remoteName + ' already exist');
         }
     }
 
@@ -9265,7 +9428,31 @@ var Easyrtc = function() {
         var pc;
         var message;
         var newPeerConn;
-        var iceConfig = pc_config_to_use ? pc_config_to_use : pc_config;
+
+        // Apply peer config
+        var pcConfig = pc_config_to_use || {
+            //"offerToReceiveVideo": true,
+            //"offerToReceiveAudio": true,
+            // @ts-ignore
+            //"sdpSemantics": 'unified-plan',
+            //"sdpSemantics": 'plan-b',
+            //"peerIdentity": null,
+            //"bundlePolicy": 'max-compat', // balanced, max-compat, max-bundle
+            //"rtcpMuxPolicy": 'negotiate', // deprecated
+            //"iceTransportPolicy": 'relay',
+            //"iceTransportPolicy": "all",
+            //"iceCandidatePoolSize": 0,
+            // @ts-ignore
+            "voiceActivityDetection": true,
+            // @ts-ignore
+            "offerExtmapAllowMixed": false,
+        };
+
+        // Apply iceServers
+        var iceConfig = (pc_ice_config_to_use ? pc_ice_config_to_use : pc_ice_config);
+        if (iceConfig.iceServers) {
+            pcConfig.iceServers = iceConfig.iceServers;
+        }
 
         logDebug("building peer connection to " + otherUser);
 
@@ -9275,10 +9462,10 @@ var Easyrtc = function() {
 
         try {
 
-            pc = self.createRTCPeerConnection(iceConfig, buildPeerConstraints());
+            pc = self.createRTCPeerConnection(pcConfig, buildPeerConstraints());
 
             if (!pc) {
-                message = "Unable to create PeerConnection object, check your ice configuration(" + JSON.stringify(iceConfig) + ")";
+                message = "Unable to create PeerConnection object, check your ice configuration(" + JSON.stringify(pcConfig) + ")";
                 logDebug(message);
                 throw Error(message);
             }
@@ -9388,7 +9575,12 @@ var Easyrtc = function() {
                     return;
                 }
                 var candidateData;
-                if (event.candidate && peerConns[otherUser]) {
+                if (
+                    event.candidate &&
+                        peerConns[otherUser] && peerConns[otherUser].pc &&
+                            peerConns[otherUser].pc.iceConnectionState !== 'connected'
+                ) {
+
                     candidateData = {
                         type: 'candidate',
                         label: event.candidate.sdpMLineIndex,
@@ -9396,9 +9588,9 @@ var Easyrtc = function() {
                         candidate: event.candidate.candidate
                     };
 
-                    if (iceCandidateFilter ) {
+                    if (iceCandidateFilter) {
                        candidateData = iceCandidateFilter(candidateData, false);
-                       if( !candidateData ) {
+                       if (!candidateData) {
                           return;
                        }
                     }
@@ -9423,20 +9615,20 @@ var Easyrtc = function() {
                 }
             };
 
-            pc.ontrack = function(event) {
+            pc.addEventListener('track', function(event) {
                 logDebug("saw ontrack method invoked, which is expected");
                 processAddedTrack(otherUser, event.streams);
-            };
+            });
 
-            pc.onaddstream = function(event) {
+            pc.addEventListener('addstream', function(event) {
                 logDebug("empty onaddstream method invoked, which is expected");
                 processAddedStream(otherUser, event.stream);
-            };
+            });
 
-            pc.onremovestream = function(event) {
+            pc.addEventListener('removestream', function(event) {
                 logDebug("saw remove on remote media stream");
                 onRemoveStreamHelper(otherUser, event.stream);
-            };
+            });
 
             // Register PeerConn
             peerConns[otherUser] = newPeerConn;
@@ -9565,6 +9757,11 @@ var Easyrtc = function() {
         function initOutGoingChannel(otherUser) {
             logDebug("saw initOutgoingChannel call");
 
+            if (!peerConns[otherUser]) {
+                logDebug("failed to setup outgoing channel listener");
+                return;
+            }
+
             var dataChannel = pc.createDataChannel(dataChannelName, self.getDatachannelConstraints());
             peerConns[otherUser].dataChannelS = dataChannel;
             peerConns[otherUser].dataChannelR = dataChannel;
@@ -9594,9 +9791,19 @@ var Easyrtc = function() {
         function initIncomingChannel(otherUser) {
             logDebug("initializing incoming channel handler for " + otherUser);
 
+            if (!peerConns[otherUser]) {
+                logDebug("failed to setup incoming channel listener");
+                return;
+            }
+
             peerConns[otherUser].pc.ondatachannel = function(event) {
 
                 logDebug("saw incoming data channel");
+
+                if (!peerConns[otherUser]) {
+                    logDebug("failed to setup incoming channel listener");
+                    return;
+                }
 
                 var dataChannel = event.channel;
                 peerConns[otherUser].dataChannelR = dataChannel;
@@ -10015,7 +10222,6 @@ var Easyrtc = function() {
               peerConns[otherUser].pc
         ) {
             try {
-                peerConns[otherUser].cancelled = true;
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
                 for (var i = 0; i < remoteStreams.length; i++) {
                     if (isStreamActive(remoteStreams[i])) {
@@ -10025,6 +10231,7 @@ var Easyrtc = function() {
                 }
 
                 peerConns[otherUser].pc.close();
+                peerConns[otherUser].cancelled = true;
                 logDebug("peer closed");
             } catch (err) {
                 logDebug("peer " + otherUser + " close failed:" + err);
@@ -10445,7 +10652,7 @@ var Easyrtc = function() {
 
         var i, j, item;
 
-        pc_config = {
+        pc_ice_config = {
             iceServers: []
         };
 
@@ -10462,7 +10669,7 @@ var Easyrtc = function() {
                 "iceConfig received from server didn't have an array called iceServers, ignoring it"
             );
         } else {
-            pc_config = {
+            pc_ice_config = {
                 iceServers: iceConfig.iceServers
             };
         }
@@ -10573,7 +10780,7 @@ var Easyrtc = function() {
         self.emitEvent("roomOccupant", lastLoggedInList);
     }
 
-    var processCandidateBody = function(caller, msgData) {
+    var processCandidateBody = function (caller, msgData) {
 
         //
         // if we've discarded the peer connection, ignore the candidate.
@@ -10582,11 +10789,21 @@ var Easyrtc = function() {
             return;
         }
 
-        if( iceCandidateFilter ) {
+        if (peerConns[caller] && peerConns[caller].pc &&
+                peerConns[caller].pc.iceConnectionState === 'connected') {
+            return;
+        }
+
+        if (iceCandidateFilter) {
            msgData = iceCandidateFilter(msgData, true);
-           if( !msgData ) {
+           if (!msgData) {
               return;
            }
+        }
+
+        if (!msgData.candidate) {
+           self.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice empty candidate: " + JSON.stringify(msgData));
+           return;
         }
 
         var candidate = new RTCIceCandidate({
@@ -10603,8 +10820,9 @@ var Easyrtc = function() {
         }
 
         function iceAddFailure(domError) {
-               self.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice candidate (" + domError.name + "): " +
-                JSON.stringify(msgData));
+               self.showError(self.errCodes.ICECANDIDATE_ERR,
+                   "bad ice candidate (" + domError.name + "): " + JSON.stringify(msgData)
+               );
         }
 
         pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
@@ -10809,7 +11027,6 @@ var Easyrtc = function() {
         }
     }
 
-
     /** @private */
     function onChannelCmd(msg, ackAcceptorFn) {
 
@@ -10988,18 +11205,25 @@ var Easyrtc = function() {
             callback = function() {
             };
         }
-        self.webSocket.json.emit("easyrtcCmd", dataToShip,
-                function(ackMsg) {
-                    if (ackMsg.msgType === "iceConfig") {
-                        processIceConfig(ackMsg.msgData.iceConfig);
-                        callback(true);
+        if (self.webSocket) {
+            self.webSocket.json.emit("easyrtcCmd", dataToShip,
+                    function(ackMsg) {
+                        if (ackMsg.msgType === "iceConfig") {
+                            processIceConfig(ackMsg.msgData.iceConfig);
+                            callback(true);
+                        }
+                        else {
+                            self.showError(ackMsg.msgData.errorCode, ackMsg.msgData.errorText);
+                            callback(false);
+                        }
                     }
-                    else {
-                        self.showError(ackMsg.msgData.errorCode, ackMsg.msgData.errorText);
-                        callback(false);
-                    }
-                }
-        );
+            );
+        }
+        else {
+            logDebug("websocket failed because no connection to server");
+
+            throw "Attempt to send message without a valid connection to the server.";
+        }
     };
 
     /**
@@ -11238,33 +11462,41 @@ var Easyrtc = function() {
             msgData.credential = credential;
         }
 
-        self.webSocket.json.emit(
-            "easyrtcAuth",
-            {
-                msgType: "authenticate",
-                msgData: msgData
-            },
-            function(msg) {
-                var room;
-                if (msg.msgType === "error") {
-                    errorCallback(msg.msgData.errorCode, msg.msgData.errorText);
-                    self.roomJoin = {};
-                }
-                else {
-                    processToken(msg);
-                    if (self._roomApiFields) {
-                        for (room in self._roomApiFields) {
-                            if (self._roomApiFields.hasOwnProperty(room)) {
-                                enqueueSendRoomApi(room);
+        if (self.webSocket) {
+            self.webSocket.json.emit(
+                "easyrtcAuth",
+                {
+                    msgType: "authenticate",
+                    msgData: msgData
+                },
+                function(msg) {
+                    var room;
+                    if (msg.msgType === "error") {
+                        errorCallback(msg.msgData.errorCode, msg.msgData.errorText);
+                        self.roomJoin = {};
+                    }
+                    else {
+                        processToken(msg);
+                        if (self._roomApiFields) {
+                            for (room in self._roomApiFields) {
+                                if (self._roomApiFields.hasOwnProperty(room)) {
+                                    enqueueSendRoomApi(room);
+                                }
                             }
                         }
-                    }
-                    if (successCallback) {
-                        successCallback(self.myEasyrtcid);
+                        if (successCallback) {
+                            successCallback(self.myEasyrtcid);
+                        }
                     }
                 }
-            }
-        );
+            );
+        }
+        else {
+            logDebug("websocket failed because no connection to server");
+
+            throw "Attempt to send message without a valid connection to the server.";
+        }
+
     }
 
     /** @private */
@@ -11275,7 +11507,6 @@ var Easyrtc = function() {
         }
         else if (!self.webSocket) {
             try {
-               connectionOptions['force new connection'] = true;
                self.webSocket = io.connect(serverPath, connectionOptions);
 
                 if (!self.webSocket) {
@@ -11310,28 +11541,26 @@ var Easyrtc = function() {
             logDebug("the web socket closed");
         });
 
-        function handleErrorEvent() {
-            if (self.myEasyrtcid) {
-                //
-                // socket.io version 1 got rid of the socket member, moving everything up one level.
-                //
-                if (isSocketConnected(self.webSocket)) {
-                    self.showError(self.errCodes.SIGNAL_ERR, self.getConstantString("miscSignalError"));
+        addSocketListener('error', function(event) {
+            function handleErrorEvent() {
+                if (self.myEasyrtcid) {
+                    //
+                    // socket.io version 1 got rid of the socket member, moving everything up one level.
+                    //
+                    if (isSocketConnected(self.webSocket)) {
+                        self.showError(self.errCodes.SIGNAL_ERR, self.getConstantString("miscSignalError"));
+                    }
+                    else {
+                        /* socket server went down. this will generate a 'disconnect' event as well, so skip this event */
+                        errorCallback(self.errCodes.CONNECT_ERR, self.getConstantString("noServer"));
+                    }
                 }
                 else {
-                    /* socket server went down. this will generate a 'disconnect' event as well, so skip this event */
                     errorCallback(self.errCodes.CONNECT_ERR, self.getConstantString("noServer"));
                 }
             }
-            else {
-                errorCallback(self.errCodes.CONNECT_ERR, self.getConstantString("noServer"));
-            }
-        }
-        addSocketListener('error', handleErrorEvent);
-        if (connectionOptions.reconnection !== false)
-          addSocketListener('reconnect_failed', handleErrorEvent);
-        else
-          addSocketListener('connect_error', handleErrorEvent);
+            handleErrorEvent();
+        });
 
         function connectHandler(event) {
             if (!self.webSocket) {
@@ -11365,6 +11594,10 @@ var Easyrtc = function() {
             updateConfigurationInfo = function() {}; // dummy update function
             oldConfig = {};
             disconnectBody();
+
+            if (self.disconnectListener) {
+                self.disconnectListener();
+            }
         });
     }
 
@@ -11425,7 +11658,7 @@ var Easyrtc = function() {
             self.showError(self.errCodes.DEVELOPER_ERR, "Attempt to connect when already connected to socket server");
             return;
         }
-        pc_config = {};
+        pc_ice_config = {};
         closedChannel = null;
         oldConfig = {}; // used internally by updateConfiguration
         queuedMessages = {};

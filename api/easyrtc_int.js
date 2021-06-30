@@ -298,7 +298,7 @@ var Easyrtc = function() {
      * @param otherUser the easyrtcid of the peer corresponding to the
      *  connection being updated.
      */
-    this.renegotiate = function(otherUser) {
+    this.renegotiate = function(otherUser, iceRestart) {
         var peerConnObj =  peerConns[otherUser];
         if(!peerConnObj) {
             logDebug("Attempt to renegotiate ice on nonexistant connection");
@@ -330,8 +330,14 @@ var Easyrtc = function() {
             return;
         }
 
+        if (typeof iceRestart === 'undefined') {
+            iceRestart = pc.iceConnectionState !== 'connected';
+        }
+
+        logDebug('iceRestart:' + iceRestart);
+
         peerConnObj.sendingOffer = true;
-        pc.createOffer({iceRestart: true }).then(setLocalAndSendMessage0)
+        pc.createOffer({iceRestart: iceRestart }).then(setLocalAndSendMessage0)
           .catch(function(reason) {
                  peerConnObj.sendingOffer = false;
                  callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(reason));
@@ -916,13 +922,13 @@ var Easyrtc = function() {
 
         if (!self.audioEnabled) {
             constraints.audio = false;
-        }
-        else {
+        } else {
             constraints.audio = {};
             if (self._desiredAudioProperties.audioSrcId) {
-             constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
+                constraints.audio.deviceId = self._desiredAudioProperties.audioSrcId;
             }
         }
+
         return constraints;
     };
 
@@ -1034,7 +1040,7 @@ var Easyrtc = function() {
     };
 
     /** @private
-     * @param {Array} pc_config ice configuration array
+     * @param {Array} pc_ice_config ice configuration array
      * @param {Object} optionalStuff peer constraints.
      */
     this.createRTCPeerConnection = function(pc_config, optionalStuff) {
@@ -1471,17 +1477,25 @@ var Easyrtc = function() {
                 }
             }
         };
-        self.webSocket.json.emit("easyrtcCmd", dataToShip,
-                function(ackMsg) {
-                    if (ackMsg.msgType === "error") {
-                        self.showError(ackMsg.msgData.errorCode, ackMsg.msgData.errorText);
+
+        if (self.webSocket) {
+            self.webSocket.json.emit("easyrtcCmd", dataToShip,
+                    function(ackMsg) {
+                        if (ackMsg.msgType === "error") {
+                            self.showError(ackMsg.msgData.errorCode, ackMsg.msgData.errorText);
+                        }
                     }
-                }
-        );
+            );
+        }
+        else {
+            logDebug("websocket failed because no connection to server");
+
+            throw "Attempt to send message without a valid connection to the server.";
+        }
     }
 
     /** @private */
-    self._roomApiFieldTimer= {};
+    self._roomApiFieldTimer = {};
 
     /**
      * @private
@@ -1495,6 +1509,7 @@ var Easyrtc = function() {
         if (self._roomApiFieldTimer[roomName]) {
             clearTimeout(self._roomApiFieldTimer[roomName]);
         }
+
         self._roomApiFieldTimer[roomName] = setTimeout(function() {
             var roomApiFields = self._roomApiFields[roomName];
             if (roomApiFields) {
@@ -1570,7 +1585,7 @@ var Easyrtc = function() {
     };
 
     /** @private */
-    var customErrorListener;
+    this._customErrorListener = null;
 
     /**
      * Override the default open-easyrtc error handler. The default handler shows a popup error dialog.
@@ -1583,7 +1598,7 @@ var Easyrtc = function() {
      * easyrtc.setErrorListener(undefined);
      */
     this.setErrorListener = function(handler) {
-        customErrorListener = handler;
+        this._customErrorListener = handler;
     };
 
     /**
@@ -1594,9 +1609,9 @@ var Easyrtc = function() {
         logDebug("saw error " + errorObject.errorText);
 
         // Use custom error handler if set, rather than creating dialog
-        if (customErrorListener) {
+        if (this._customErrorListener) {
             logDebug("Using custom error handler");
-            customErrorListener(errorObject);
+            this._customErrorListener(errorObject);
             return;
         }
 
@@ -2773,11 +2788,20 @@ var Easyrtc = function() {
     /** @private */
     this.webSocket = null;
     /** @private */
-    var pc_config = {};
+    var pc_ice_config = {};
+    /** @private */
+    var pc_ice_config_to_use = null;
     /** @private */
     var pc_config_to_use = null;
     /** @private */
     var use_fresh_ice_each_peer = false;
+
+    /**
+     * Sets the peer connection configuration that will be used in subsequent calls.
+     */
+    this.setPeerConnectionConfig = function(value) {
+        pc_config_to_use = value;
+    };
 
     /**
      * Determines whether fresh ice server configuration should be requested from the server for each peer connection.
@@ -2793,7 +2817,7 @@ var Easyrtc = function() {
      * @return {Object} which has the form {iceServers:[ice_server_entry, ice_server_entry, ...]}
      */
     this.getServerIce = function() {
-        return pc_config;
+        return pc_ice_config;
     };
 
     /**
@@ -2819,7 +2843,7 @@ var Easyrtc = function() {
             self.showError(self.errCodes.DEVELOPER_ERR, "Bad ice configuration passed to easyrtc.setIceUsedInCalls");
         }
         else {
-            pc_config_to_use = ice;
+            pc_ice_config_to_use = ice;
         }
     };
 
@@ -2981,13 +3005,12 @@ var Easyrtc = function() {
            stillAliveTimer = null;
         }
 
-        if (self.webSocket) {
+        if (self.webSocketConnected) {
             if (!preallocatedSocketIo) {
                 self.webSocket.close();
             }
+            self.webSocketConnected = false;
         }
-        self.webSocketConnected = false;
-        self.webSocket = 0;
         self.hangupAll();
         if (roomOccupantListener) {
             for (roomName in lastLoggedInList) {
@@ -3011,10 +3034,6 @@ var Easyrtc = function() {
         self.myEasyrtcid = null;
         self.disconnecting = false;
         oldConfig = {};
-
-        if (self.disconnectListener) {
-            self.disconnectListener();
-        }
     }
 
     /**
@@ -3035,7 +3054,25 @@ var Easyrtc = function() {
         // connection until it's had a chance to be sent. We allocate 100ms for collecting
         // the info, so 250ms should be sufficient for the disconnecting.
         //
-        setTimeout(disconnectBody, 250);
+        setTimeout(function() {
+            if (self.webSocket) {
+                try {
+                    self.webSocket.disconnect();
+                } catch (e) {
+                    // we don't really care if this fails.
+                }
+
+                closedChannel = self.webSocket;
+                self.webSocket = 0;
+            }
+            self.loggingOut = false;
+            self.disconnecting = false;
+            if (roomOccupantListener) {
+                roomOccupantListener(null, {}, false);
+            }
+            self.emitEvent("roomOccupant", {});
+            oldConfig = {};
+        }, 250);
     };
 
     /** @private */
@@ -3049,6 +3086,8 @@ var Easyrtc = function() {
     //
     function sendSignalling(destUser, msgType, msgData, successCallback, errorCallback) {
         if (!self.webSocket) {
+            logDebug("websocket failed because no connection to server");
+
             throw "Attempt to send message without a valid connection to the server.";
         }
         else {
@@ -3673,7 +3712,7 @@ var Easyrtc = function() {
                 self.sendDataWS(otherUser, "easyrtc_streamReceived", {streamName:remoteName},function(){});
             }
         } else {
-            logDebug('Remote stream ' + remoteName + ' already exist');
+            logDebug('processAddedStream: stream ' + remoteName + ' already exist');
         }
     }
 
@@ -3705,7 +3744,31 @@ var Easyrtc = function() {
         var pc;
         var message;
         var newPeerConn;
-        var iceConfig = pc_config_to_use ? pc_config_to_use : pc_config;
+
+        // Apply peer config
+        var pcConfig = pc_config_to_use || {
+            //"offerToReceiveVideo": true,
+            //"offerToReceiveAudio": true,
+            // @ts-ignore
+            //"sdpSemantics": 'unified-plan',
+            //"sdpSemantics": 'plan-b',
+            //"peerIdentity": null,
+            //"bundlePolicy": 'max-compat', // balanced, max-compat, max-bundle
+            //"rtcpMuxPolicy": 'negotiate', // deprecated
+            //"iceTransportPolicy": 'relay',
+            //"iceTransportPolicy": "all",
+            //"iceCandidatePoolSize": 0,
+            // @ts-ignore
+            "voiceActivityDetection": true,
+            // @ts-ignore
+            "offerExtmapAllowMixed": false,
+        };
+
+        // Apply iceServers
+        var iceConfig = (pc_ice_config_to_use ? pc_ice_config_to_use : pc_ice_config);
+        if (iceConfig.iceServers) {
+            pcConfig.iceServers = iceConfig.iceServers;
+        }
 
         logDebug("building peer connection to " + otherUser);
 
@@ -3715,10 +3778,10 @@ var Easyrtc = function() {
 
         try {
 
-            pc = self.createRTCPeerConnection(iceConfig, buildPeerConstraints());
+            pc = self.createRTCPeerConnection(pcConfig, buildPeerConstraints());
 
             if (!pc) {
-                message = "Unable to create PeerConnection object, check your ice configuration(" + JSON.stringify(iceConfig) + ")";
+                message = "Unable to create PeerConnection object, check your ice configuration(" + JSON.stringify(pcConfig) + ")";
                 logDebug(message);
                 throw Error(message);
             }
@@ -3828,7 +3891,12 @@ var Easyrtc = function() {
                     return;
                 }
                 var candidateData;
-                if (event.candidate && peerConns[otherUser]) {
+                if (
+                    event.candidate &&
+                        peerConns[otherUser] && peerConns[otherUser].pc &&
+                            peerConns[otherUser].pc.iceConnectionState !== 'connected'
+                ) {
+
                     candidateData = {
                         type: 'candidate',
                         label: event.candidate.sdpMLineIndex,
@@ -3836,9 +3904,9 @@ var Easyrtc = function() {
                         candidate: event.candidate.candidate
                     };
 
-                    if (iceCandidateFilter ) {
+                    if (iceCandidateFilter) {
                        candidateData = iceCandidateFilter(candidateData, false);
-                       if( !candidateData ) {
+                       if (!candidateData) {
                           return;
                        }
                     }
@@ -3863,20 +3931,20 @@ var Easyrtc = function() {
                 }
             };
 
-            pc.ontrack = function(event) {
+            pc.addEventListener('track', function(event) {
                 logDebug("saw ontrack method invoked, which is expected");
                 processAddedTrack(otherUser, event.streams);
-            };
+            });
 
-            pc.onaddstream = function(event) {
+            pc.addEventListener('addstream', function(event) {
                 logDebug("empty onaddstream method invoked, which is expected");
                 processAddedStream(otherUser, event.stream);
-            };
+            });
 
-            pc.onremovestream = function(event) {
+            pc.addEventListener('removestream', function(event) {
                 logDebug("saw remove on remote media stream");
                 onRemoveStreamHelper(otherUser, event.stream);
-            };
+            });
 
             // Register PeerConn
             peerConns[otherUser] = newPeerConn;
@@ -4005,6 +4073,11 @@ var Easyrtc = function() {
         function initOutGoingChannel(otherUser) {
             logDebug("saw initOutgoingChannel call");
 
+            if (!peerConns[otherUser]) {
+                logDebug("failed to setup outgoing channel listener");
+                return;
+            }
+
             var dataChannel = pc.createDataChannel(dataChannelName, self.getDatachannelConstraints());
             peerConns[otherUser].dataChannelS = dataChannel;
             peerConns[otherUser].dataChannelR = dataChannel;
@@ -4034,9 +4107,19 @@ var Easyrtc = function() {
         function initIncomingChannel(otherUser) {
             logDebug("initializing incoming channel handler for " + otherUser);
 
+            if (!peerConns[otherUser]) {
+                logDebug("failed to setup incoming channel listener");
+                return;
+            }
+
             peerConns[otherUser].pc.ondatachannel = function(event) {
 
                 logDebug("saw incoming data channel");
+
+                if (!peerConns[otherUser]) {
+                    logDebug("failed to setup incoming channel listener");
+                    return;
+                }
 
                 var dataChannel = event.channel;
                 peerConns[otherUser].dataChannelR = dataChannel;
@@ -4455,7 +4538,6 @@ var Easyrtc = function() {
               peerConns[otherUser].pc
         ) {
             try {
-                peerConns[otherUser].cancelled = true;
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
                 for (var i = 0; i < remoteStreams.length; i++) {
                     if (isStreamActive(remoteStreams[i])) {
@@ -4465,6 +4547,7 @@ var Easyrtc = function() {
                 }
 
                 peerConns[otherUser].pc.close();
+                peerConns[otherUser].cancelled = true;
                 logDebug("peer closed");
             } catch (err) {
                 logDebug("peer " + otherUser + " close failed:" + err);
@@ -4885,7 +4968,7 @@ var Easyrtc = function() {
 
         var i, j, item;
 
-        pc_config = {
+        pc_ice_config = {
             iceServers: []
         };
 
@@ -4902,7 +4985,7 @@ var Easyrtc = function() {
                 "iceConfig received from server didn't have an array called iceServers, ignoring it"
             );
         } else {
-            pc_config = {
+            pc_ice_config = {
                 iceServers: iceConfig.iceServers
             };
         }
@@ -5013,7 +5096,7 @@ var Easyrtc = function() {
         self.emitEvent("roomOccupant", lastLoggedInList);
     }
 
-    var processCandidateBody = function(caller, msgData) {
+    var processCandidateBody = function (caller, msgData) {
 
         //
         // if we've discarded the peer connection, ignore the candidate.
@@ -5022,11 +5105,21 @@ var Easyrtc = function() {
             return;
         }
 
-        if( iceCandidateFilter ) {
+        if (peerConns[caller] && peerConns[caller].pc &&
+                peerConns[caller].pc.iceConnectionState === 'connected') {
+            return;
+        }
+
+        if (iceCandidateFilter) {
            msgData = iceCandidateFilter(msgData, true);
-           if( !msgData ) {
+           if (!msgData) {
               return;
            }
+        }
+
+        if (!msgData.candidate) {
+           self.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice empty candidate: " + JSON.stringify(msgData));
+           return;
         }
 
         var candidate = new RTCIceCandidate({
@@ -5043,8 +5136,9 @@ var Easyrtc = function() {
         }
 
         function iceAddFailure(domError) {
-               self.showError(self.errCodes.ICECANDIDATE_ERR, "bad ice candidate (" + domError.name + "): " +
-                JSON.stringify(msgData));
+               self.showError(self.errCodes.ICECANDIDATE_ERR,
+                   "bad ice candidate (" + domError.name + "): " + JSON.stringify(msgData)
+               );
         }
 
         pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
@@ -5249,7 +5343,6 @@ var Easyrtc = function() {
         }
     }
 
-
     /** @private */
     function onChannelCmd(msg, ackAcceptorFn) {
 
@@ -5428,18 +5521,25 @@ var Easyrtc = function() {
             callback = function() {
             };
         }
-        self.webSocket.json.emit("easyrtcCmd", dataToShip,
-                function(ackMsg) {
-                    if (ackMsg.msgType === "iceConfig") {
-                        processIceConfig(ackMsg.msgData.iceConfig);
-                        callback(true);
+        if (self.webSocket) {
+            self.webSocket.json.emit("easyrtcCmd", dataToShip,
+                    function(ackMsg) {
+                        if (ackMsg.msgType === "iceConfig") {
+                            processIceConfig(ackMsg.msgData.iceConfig);
+                            callback(true);
+                        }
+                        else {
+                            self.showError(ackMsg.msgData.errorCode, ackMsg.msgData.errorText);
+                            callback(false);
+                        }
                     }
-                    else {
-                        self.showError(ackMsg.msgData.errorCode, ackMsg.msgData.errorText);
-                        callback(false);
-                    }
-                }
-        );
+            );
+        }
+        else {
+            logDebug("websocket failed because no connection to server");
+
+            throw "Attempt to send message without a valid connection to the server.";
+        }
     };
 
     /**
@@ -5678,33 +5778,41 @@ var Easyrtc = function() {
             msgData.credential = credential;
         }
 
-        self.webSocket.json.emit(
-            "easyrtcAuth",
-            {
-                msgType: "authenticate",
-                msgData: msgData
-            },
-            function(msg) {
-                var room;
-                if (msg.msgType === "error") {
-                    errorCallback(msg.msgData.errorCode, msg.msgData.errorText);
-                    self.roomJoin = {};
-                }
-                else {
-                    processToken(msg);
-                    if (self._roomApiFields) {
-                        for (room in self._roomApiFields) {
-                            if (self._roomApiFields.hasOwnProperty(room)) {
-                                enqueueSendRoomApi(room);
+        if (self.webSocket) {
+            self.webSocket.json.emit(
+                "easyrtcAuth",
+                {
+                    msgType: "authenticate",
+                    msgData: msgData
+                },
+                function(msg) {
+                    var room;
+                    if (msg.msgType === "error") {
+                        errorCallback(msg.msgData.errorCode, msg.msgData.errorText);
+                        self.roomJoin = {};
+                    }
+                    else {
+                        processToken(msg);
+                        if (self._roomApiFields) {
+                            for (room in self._roomApiFields) {
+                                if (self._roomApiFields.hasOwnProperty(room)) {
+                                    enqueueSendRoomApi(room);
+                                }
                             }
                         }
-                    }
-                    if (successCallback) {
-                        successCallback(self.myEasyrtcid);
+                        if (successCallback) {
+                            successCallback(self.myEasyrtcid);
+                        }
                     }
                 }
-            }
-        );
+            );
+        }
+        else {
+            logDebug("websocket failed because no connection to server");
+
+            throw "Attempt to send message without a valid connection to the server.";
+        }
+
     }
 
     /** @private */
@@ -5715,7 +5823,6 @@ var Easyrtc = function() {
         }
         else if (!self.webSocket) {
             try {
-               connectionOptions['force new connection'] = true;
                self.webSocket = io.connect(serverPath, connectionOptions);
 
                 if (!self.webSocket) {
@@ -5750,28 +5857,26 @@ var Easyrtc = function() {
             logDebug("the web socket closed");
         });
 
-        function handleErrorEvent() {
-            if (self.myEasyrtcid) {
-                //
-                // socket.io version 1 got rid of the socket member, moving everything up one level.
-                //
-                if (isSocketConnected(self.webSocket)) {
-                    self.showError(self.errCodes.SIGNAL_ERR, self.getConstantString("miscSignalError"));
+        addSocketListener('error', function(event) {
+            function handleErrorEvent() {
+                if (self.myEasyrtcid) {
+                    //
+                    // socket.io version 1 got rid of the socket member, moving everything up one level.
+                    //
+                    if (isSocketConnected(self.webSocket)) {
+                        self.showError(self.errCodes.SIGNAL_ERR, self.getConstantString("miscSignalError"));
+                    }
+                    else {
+                        /* socket server went down. this will generate a 'disconnect' event as well, so skip this event */
+                        errorCallback(self.errCodes.CONNECT_ERR, self.getConstantString("noServer"));
+                    }
                 }
                 else {
-                    /* socket server went down. this will generate a 'disconnect' event as well, so skip this event */
                     errorCallback(self.errCodes.CONNECT_ERR, self.getConstantString("noServer"));
                 }
             }
-            else {
-                errorCallback(self.errCodes.CONNECT_ERR, self.getConstantString("noServer"));
-            }
-        }
-        addSocketListener('error', handleErrorEvent);
-        if (connectionOptions.reconnection !== false)
-          addSocketListener('reconnect_failed', handleErrorEvent);
-        else
-          addSocketListener('connect_error', handleErrorEvent);
+            handleErrorEvent();
+        });
 
         function connectHandler(event) {
             if (!self.webSocket) {
@@ -5805,6 +5910,10 @@ var Easyrtc = function() {
             updateConfigurationInfo = function() {}; // dummy update function
             oldConfig = {};
             disconnectBody();
+
+            if (self.disconnectListener) {
+                self.disconnectListener();
+            }
         });
     }
 
@@ -5865,7 +5974,7 @@ var Easyrtc = function() {
             self.showError(self.errCodes.DEVELOPER_ERR, "Attempt to connect when already connected to socket server");
             return;
         }
-        pc_config = {};
+        pc_ice_config = {};
         closedChannel = null;
         oldConfig = {}; // used internally by updateConfiguration
         queuedMessages = {};
