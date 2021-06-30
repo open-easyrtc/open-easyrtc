@@ -133,6 +133,7 @@ EasyRTC comes with a number of demo's which work immediately after installation.
 License
 -------
 
+Copyright (c) 2018, Open-EasyRTC
 Copyright (c) 2016, Priologic Software Inc.
 All rights reserved.
 
