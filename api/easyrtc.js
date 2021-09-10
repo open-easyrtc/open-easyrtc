@@ -9443,9 +9443,7 @@ var Easyrtc = function() {
             //"iceTransportPolicy": "all",
             //"iceCandidatePoolSize": 0,
             // @ts-ignore
-            "voiceActivityDetection": true,
-            // @ts-ignore
-            "offerExtmapAllowMixed": false,
+            "voiceActivityDetection": true
         };
 
         // Apply iceServers
@@ -9973,6 +9971,19 @@ var Easyrtc = function() {
                 sd = new RTCSessionDescription({
                     type: sd.type,
                     sdp: sdpRemoteFilter(sd.sdp)
+                });
+            }
+
+            // Remove extmap-allow-mixed sdp header
+            if (sd && sd.sdp && sd.sdp.indexOf('\na=extmap-allow-mixed') !== -1) {
+                sd = new RTCSessionDescription({
+                    type: sd.type,
+                    sdp: sd.sdp
+                        .split('\n')
+                        .filter((line) => {
+                            return line.trim() !== 'a=extmap-allow-mixed';
+                        })
+                        .join('\n')
                 });
             }
 
