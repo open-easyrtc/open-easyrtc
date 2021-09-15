@@ -5759,7 +5759,6 @@ var Easyrtc = function() {
 
         if( missedAliveResponses === 1 ) {
             self.showError(self.errCodes.SYSTEM_ERR, "Timed out trying to talk to the server.");
-            self.printpeerconns();
             self.hangupAll();
             self.disconnect();
             return;
@@ -6794,10 +6793,6 @@ var Easyrtc = function() {
     //        function wasAcceptedCB(boolean,string) - see the easyrtc.call documentation.
     //     }
     //
-
-    this.printpeerconns = function() {
-        console.log("peerconns = ", peerConns);
-    };
 
     /** @private */
     //
