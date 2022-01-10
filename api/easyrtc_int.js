@@ -4291,7 +4291,7 @@ var Easyrtc = function() {
                     type: sd.type,
                     sdp: sd.sdp
                         .split('\n')
-                        .filter((line) => {
+                        .filter(function(line) {
                             return line.trim() !== 'a=extmap-allow-mixed';
                         })
                         .join('\n')
