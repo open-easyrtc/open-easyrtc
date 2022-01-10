@@ -24,6 +24,18 @@ var webServer = https.createServer({
 // Start Socket.io so it attaches itself to Express server
 var socketServer = io.listen(webServer, {"log level":1});
 
+// Cross-domain workaround presented below:
+socketServer.origins(function(origin, callback) {
+    if (origin && ![
+        'https://game.example.com',
+        'https://easyrtc.example.com',
+        '*'
+    ].includes(origin)) {
+        return callback('origin not allowed', false);
+    }
+    callback(null, true);
+});
+
 // Start EasyRTC server
 var rtc = easyrtc.listen(httpApp, socketServer);
 
