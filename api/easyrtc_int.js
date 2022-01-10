@@ -3431,8 +3431,7 @@ var Easyrtc = function() {
      */
     function buildPeerConstraints() {
         var options = [];
-        options.push({'DtlsSrtpKeyAgreement': 'true'}); // for interoperability
-        return {optional: options};
+        return { optional: options };
     }
 
     /** @private */
@@ -3440,12 +3439,12 @@ var Easyrtc = function() {
         var i;
         for (i = 0; i < peerConns[peer].candidatesToSend.length; i++) {
             sendSignalling(
-                    peer,
-                    "candidate",
-                    peerConns[peer].candidatesToSend[i],
-                    onSignalSuccess,
-                    onSignalFailure
-                    );
+                peer,
+                "candidate",
+                peerConns[peer].candidatesToSend[i],
+                onSignalSuccess,
+                onSignalFailure
+            );
         }
     }
 
