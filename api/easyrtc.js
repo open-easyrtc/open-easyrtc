@@ -4695,7 +4695,7 @@ var Easyrtc = function() {
      */
     this.getPeerConnectionByUserId = function(userId) {
         if (peerConns && peerConns[userId]) {
-            return peerConns[userId].pc;
+            return peerConns[userId];
         }
         return null;
     };
