@@ -22,7 +22,7 @@ app.use(serveStatic('static', {'index': ['index.html']}));
 var webServer = http.createServer(app);
 
 // Start Socket.io so it attaches itself to Express server
-var socketServer = socketIo.listen(webServer, {"log level":1});
+var socketServer = socketIo(webServer, {"log level":1});
 
 // Cross-domain workaround presented below:
 socketServer.origins(function(origin, callback) {

@@ -29,7 +29,7 @@
   "dependencies": {
     "async": "0.2.x",
     "colors": "*",
-    "socket.io-client": "^2.4.0",
+    "socket.io-client": "^4.4.1",
     "underscore": "^1.13.2",
     "webrtc-adapter": "^8.1.1"
   },
