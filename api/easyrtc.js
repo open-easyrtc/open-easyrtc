@@ -3851,9 +3851,11 @@ var Easyrtc = function() {
         } else if(peerConnection.addStream) {
             var existingStreams = peerConnection.getLocalStreams();
             if (existingStreams.indexOf(stream) === -1) {
-                peerConnection.addStream(stream).catch(function () {
-                    // Ingore...
-                });
+                try {
+                    peerConnection.addStream(stream);
+                } catch (err) {
+                    // Ignore possible RTCPeerConnection.addStream error
+                }
             }
         }
     }
@@ -4598,7 +4600,7 @@ var Easyrtc = function() {
                 peer.close();
             }
             catch (err) {
-                // Ingore possible RTCPeerConnection.close error
+                // Ignore possible RTCPeerConnection.close error
                 // hasCreateDataChannel should reflect the feature state still.
             }
         }
@@ -5538,9 +5540,11 @@ var Easyrtc = function() {
                 peerConnection.removeTrack(sender);
             })
         } else {
-            peerConnection.removeStream(stream).catch(function () {
-                // Ignore
-            });
+            try {
+                peerConnection.removeStream(stream);
+            } catch (err) {
+                // Ignore possible RTCPeerConnection.removeStream error
+            }
         }
     }
 
