@@ -87,8 +87,8 @@ var localStreamCount = 0;
 function addSrcButton(buttonLabel, videoId) {
     var button = createLabelledButton(buttonLabel);
     button.onclick = function() {
-        var streamName = buttonLabel + "_" +  localStreamCount;
-        localStreamCount++;
+        var streamName = buttonLabel + localStreamCount;
+        localStreamCount++;        
         easyrtc.setVideoSource(videoId);
         easyrtc.initMediaSource(
                 function(stream) {
@@ -126,19 +126,14 @@ function connect() {
     screenShareButton.onclick = function() {
         numScreens++;
         var streamName = "screen" + numScreens;
-        easyrtc.initDesktopStream(
-                function(stream) {
-                    createLocalVideo(stream, streamName);
-                    if (otherEasyrtcid) {
-                        easyrtc.addStreamToCall(otherEasyrtcid, streamName);
-                    }
-                },
-                function(errCode, errText) {
-                    easyrtc.showError(errCode, errText);
-                },
-                streamName);
-    };
 
+        navigator.mediaDevices.getDisplayMedia({video: true}).then((stream) => {
+            createLocalVideo(stream, streamName);
+            easyrtc.register3rdPartyLocalMediaStream(stream, streamName);
+        }).catch((err) => {
+            easyrtc.showError(err.name, err.message);
+        });
+    };
 }
 
 
@@ -225,9 +220,10 @@ easyrtc.setStreamAcceptor(function(easyrtcid, stream, streamName) {
     var labelBlock = addMediaStreamToDiv("remoteVideos", stream, streamName, false);
     labelBlock.parentNode.id = "remoteBlock" + easyrtcid + streamName;
 
+    console.log("accepted incoming stream with name " + stream.streamName);
+    console.log("checking incoming " + easyrtc.getNameOfRemoteStream(easyrtcid, stream));
+
 });
-
-
 
 easyrtc.setOnStreamClosed(function(easyrtcid, stream, streamName) {
     var item = document.getElementById("remoteBlock" + easyrtcid + streamName);
