@@ -3828,8 +3828,8 @@ var Easyrtc = function() {
                 return sender.track;
             });
 
+            // Add audio then videos tracks
             var i;
-
             var tracks = stream.getAudioTracks();
             for (i = 0; i < tracks.length; i++) {
                 if (existingTracks.indexOf(tracks[i]) === -1) {
@@ -3844,6 +3844,7 @@ var Easyrtc = function() {
                 }
             }
 
+            // Purge empty senders
             emptySenders.forEach(function (emptySender) {
                 peerConnection.removeTrack(emptySender);
             });
