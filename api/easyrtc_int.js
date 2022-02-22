@@ -36,18 +36,18 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         //RequireJS (AMD) build system
-        define(['easyrtc_lang', 'webrtc-adapter', 'socket.io'], factory);
+        define(['easyrtc_lang', 'socket.io', 'webrtc-adapter'], factory);
     } else if (typeof module === 'object' && module.exports) {
         //CommonJS build system
-        module.exports = factory(require('easyrtc_lang'), require('webrtc-adapter'), require('socket.io'));
+        module.exports = factory(require('easyrtc_lang'), require('socket.io'), require('webrtc-adapter'));
     } else {
         //Vanilla JS, ensure dependencies are loaded correctly
         if (typeof window.io === 'undefined' || !window.io) {
             throw new Error("easyrtc requires socket.io");
         }
-        root.easyrtc = factory(window.easyrtc_lang, window.adapter, window.io);
+        root.easyrtc = factory(window.easyrtc_lang, window.io, window.adapter);
   }
-}(this, function (easyrtc_lang, adapter, io, undefined) {
+}(this, function (easyrtc_lang, io, adapter, undefined) {
 
 "use strict";
 /**
@@ -266,28 +266,56 @@ var Easyrtc = function() {
     // tracks.
     //
     function addStreamToPeerConnection(stream, peerConnection) {
-       if( peerConnection.addStream ) {
-           var existingStreams = peerConnection.getLocalStreams();
-           if (existingStreams.indexOf(stream) === -1) {
-              peerConnection.addStream(stream);
-           }
-       }
-       else {
-          var existingTracks = peerConnection.getSenders();
-          var tracks = stream.getAudioTracks();
-          var i;
-          for( i = 0; i < tracks.length; i++ ) {
-            if (existingTracks.indexOf(tracks[i]) === -1) {
-             peerConnection.addTrack( tracks[i]);
+
+        if (peerConnection.addTrack) {
+
+            var senders = peerConnection.getSenders();
+
+            // Will be used for replaceTrack or purged
+            var emptySenders = senders.filter(function (sender) {
+                return !sender.track;
+            });
+
+            // Will be used to get existingTracks
+            var activeSenders = senders.filter(function (sender) {
+                return !!sender.track;
+            });
+
+            var existingTracks = activeSenders.map(function (sender) {
+                return sender.track;
+            });
+
+            // Add audio then videos tracks
+            var i;
+            var tracks = stream.getAudioTracks();
+            for (i = 0; i < tracks.length; i++) {
+                if (existingTracks.indexOf(tracks[i]) === -1) {
+                    peerConnection.addTrack(tracks[i], stream);
+                }
             }
-          }
-          tracks = stream.getVideoTracks();
-          for( i = 0; i < tracks.length; i++ ) {
-            if (existingTracks.indexOf(tracks[i]) === -1) {
-             peerConnection.addTrack( tracks[i]);
+
+            tracks = stream.getVideoTracks();
+            for (i = 0; i < tracks.length; i++) {
+                if (existingTracks.indexOf(tracks[i]) === -1) {
+                    peerConnection.addTrack(tracks[i], stream);
+                }
             }
-          }
-       }
+
+            // Purge empty senders
+            emptySenders.forEach(function (emptySender) {
+                peerConnection.removeTrack(emptySender);
+            });
+
+        } else if(peerConnection.addStream) {
+            var existingStreams = peerConnection.getLocalStreams();
+            if (existingStreams.indexOf(stream) === -1) {
+                try {
+                    peerConnection.addStream(stream);
+                } catch (err) {
+                    // Ignore possible RTCPeerConnection.addStream error
+                }
+            }
+        }
     }
 
     /** This method is used to trigger renegotiation, which is how you
@@ -1030,7 +1058,7 @@ var Easyrtc = function() {
                 peer.close();
             }
             catch (err) {
-                // Ingore possible RTCPeerConnection.close error
+                // Ignore possible RTCPeerConnection.close error
                 // hasCreateDataChannel should reflect the feature state still.
             }
         }
@@ -1952,13 +1980,31 @@ var Easyrtc = function() {
     }
 
     this.getNameOfRemoteStream = function(easyrtcId, webrtcStream){
-        if(typeof webrtcStream === "string") {
+        if (typeof webrtcStream === "string") {
             return getNameOfRemoteStream(easyrtcId, webrtcStream);
         }
         else if( webrtcStream.id) {
             return getNameOfRemoteStream(easyrtcId, webrtcStream.id);
         }
     };
+
+    function removeStreamFromPeerConnection(stream, peerConnection) {
+        if (peerConnection.removeTrack) {
+            var tracks = stream.getTracks();
+            var trackSenders = peerConnection.getSenders().filter(function (sender) {
+                return sender.track && tracks.indexOf(sender.track) !== -1;
+            });
+            trackSenders.forEach(function (sender) {
+                peerConnection.removeTrack(sender);
+            })
+        } else {
+            try {
+                peerConnection.removeStream(stream);
+            } catch (err) {
+                // Ignore possible RTCPeerConnection.removeStream error
+            }
+        }
+    }
 
     /** @private */
     function closeLocalMediaStreamByName(streamName) {
@@ -1970,17 +2016,17 @@ var Easyrtc = function() {
             return;
         }
         var streamId = stream.id || "default";
-        var id;
+        var easyrtcid;
         var roomName;
         if (namedLocalMediaStreams[streamName]) {
 
-            for (id in peerConns) {
-                if (peerConns.hasOwnProperty(id)) {
-                    try {
-                        peerConns[id].pc.removeStream(stream);
-                    } catch (err) {
-                    }
-                    self.sendPeerMessage(id, "__closingMediaStream", {streamId: streamId, streamName: streamName});
+            for (easyrtcid in peerConns) {
+                if (peerConns.hasOwnProperty(easyrtcid)) {
+                    removeStreamFromPeerConnection(stream, peerConns[easyrtcid].pc);
+                    self.sendPeerMessage(easyrtcid, "__closingMediaStream", {
+                        streamId: streamId,
+                        streamName: streamName
+                    });
                 }
             }
 
@@ -3477,9 +3523,7 @@ var Easyrtc = function() {
             emitOnStreamClosed(easyrtcid, stream);
             updateConfigurationInfo();
             if (peerConns[easyrtcid].pc) {
-                 try {
-                    peerConns[easyrtcid].pc.removeStream(stream);
-                 } catch( err) {}
+                removeStreamFromPeerConnection(stream, peerConns[easyrtcid].pc);
             }
         }
     }
@@ -4193,6 +4237,83 @@ var Easyrtc = function() {
     }
 
     /** @private */
+    function testSdpMediaOrder(sdp) {
+      const lines = sdp.split(/[\r\n]+/);
+      let audio_idx;
+      let video_idx;
+      for (let i = 0; i < lines.length; i++) {
+        const m_match = lines[i].substring(0, 7)
+        if (m_match == "m=audio") {
+          audio_idx = i;
+          //console.log("[SDP order] test audio_idx: " + audio_idx);
+        }
+        else if (m_match == "m=video") {
+          video_idx = i;
+          //console.log("[SDP order] test video_idx: " + video_idx);
+        }
+      }
+      const mLinesBackwards = audio_idx && video_idx && video_idx < audio_idx;
+      //console.log("[SDP order] test m-lines backwards: " + String(mLinesBackwards));
+      return mLinesBackwards;
+    }
+
+    /** @private */
+    function fixSdpMediaOrder(sdp) {
+
+        if (!testSdpMediaOrder(sdp)) {
+            return sdp;
+        }
+
+        const lines = sdp.split(/[\r\n]+/);
+        let audio_idx;
+        let video_idx;
+        let mid_lines = []
+
+        for (let i = 0; i < lines.length; i++) {
+            const m_match = lines[i].substring(0, 7)
+            const mid_match = lines[i].substring(0, 6)
+
+            if (m_match == "m=audio") {
+              audio_idx = i;
+              //console.log("[SDP order] audio_idx: " + audio_idx);
+            } else if (m_match == "m=video") {
+              video_idx = i;
+              //console.log("[SDP order] video_idx: " + video_idx);
+            } else if (mid_match == "a=mid:") {
+              mid_lines.push(i);
+              //console.log("[SDP order] mid idx: " + i);
+            }
+        }
+
+        mid_lines = mid_lines.reverse();
+        for (let i = 0; i < mid_lines.length; i++) {
+            lines[mid_lines[i]] = "a=mid:" + i;
+        }
+
+        const audio_lines = lines.splice(audio_idx, video_idx - audio_idx);
+        const adjusted_lines = lines.concat(audio_lines).filter(function(l) { return l.length > 0; });
+        const new_sdp = adjusted_lines.join("\r\n") + "\r\n";
+        //console.log("[SDP order] SDP adjusted");
+        //console.log(new_sdp);
+
+      return new_sdp;
+    }
+
+    /** @private */
+    function fixSdpExtmap(sdp) {
+        if (sdp.indexOf('\na=extmap-allow-mixed') !== -1) {
+            sdp = sdp
+            .split('\n')
+            .filter((line) => {
+                return line.trim() !== 'a=extmap-allow-mixed';
+            })
+            .join('\n')
+        }
+
+        return sdp;
+    }
+
+    /** @private */
     function doAnswerBody(caller, msgData, streamNames) {
         if( !peerConns[caller] ) {
             buildPeerConnection(caller, false, function(message) {
@@ -4276,26 +4397,22 @@ var Easyrtc = function() {
 
         try {
 
+            var sdp = sd.sdp;
+
             if (sdpRemoteFilter) {
-                //sd.sdp = sdpRemoteFilter(sd.sdp);
-                sd = new RTCSessionDescription({
-                    type: sd.type,
-                    sdp: sdpRemoteFilter(sd.sdp)
-                });
+                sdp = sdpRemoteFilter(sdp);
             }
 
             // Remove extmap-allow-mixed sdp header
-            if (sd && sd.sdp && sd.sdp.indexOf('\na=extmap-allow-mixed') !== -1) {
-                sd = new RTCSessionDescription({
-                    type: sd.type,
-                    sdp: sd.sdp
-                        .split('\n')
-                        .filter(function(line) {
-                            return line.trim() !== 'a=extmap-allow-mixed';
-                        })
-                        .join('\n')
-                });
-            }
+            sdp = fixSdpExtmap(sdp);
+
+            // Fix ios bad track order
+            //sdp = fixSdpMediaOrder(sdp);
+
+            sd = new RTCSessionDescription({
+                type: sd.type,
+                sdp: sd.sdp
+            });
 
             logDebug("sdp ||  " + JSON.stringify(sd));
 
@@ -4728,9 +4845,8 @@ var Easyrtc = function() {
             logDebug("Can't remove stream before a call has started.");
         }
         else {
-            var pc = peerConns[easyrtcId].pc;
             peerConns[easyrtcId].enableNegotiateListener = true;
-            pc.removeStream(stream);
+            removeStreamFromPeerConnection(stream, peerConns[easyrtcId].pc);
         }
 
     };
