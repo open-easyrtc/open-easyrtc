@@ -1,6 +1,6 @@
 {
   "name": "open-easyrtc",
-  "version": "2.0.9",
+  "version": "2.0.13",
   "homepage": "https://github.com/open-easyrtc/open-easyrtc",
   "author": "Harold Thetiot <hthetiot@gmail.com>",
   "description": "Open-EasyRTC enables quick development of WebRTC",
@@ -27,18 +27,19 @@
   },
   "main": "index",
   "dependencies": {
-    "async": "0.2.x",
+    "async": "^3.2.3",
     "colors": "*",
     "socket.io-client": "^4.1.2",
-    "underscore": "^1.13.1",
-    "webrtc-adapter": "^7.3.0"
+    "underscore": "^1.13.2",
+    "webrtc-adapter": "^8.1.1"
   },
   "scripts": {
     "lint": "grunt lint",
     "cleanup": "rm -fr node_modules/ && npm install && rm -fr bower_components/ && bower install",
     "build": "grunt build",
     "test": "grunt test",
-    "test-headless": "grunt test-headless"
+    "test-headless": "grunt test-headless",
+    "serve": "grunt serve"
   },
   "analyze": false,
   "license": "BSD-2-Clause",
@@ -48,16 +49,16 @@
   "devDependencies": {
     "fs": "0.0.2",
     "grunt": "^1.0.4",
-    "grunt-contrib-clean": "^1.0.0",
-    "grunt-contrib-connect": "^1.0.2",
+    "grunt-contrib-clean": "^2.0.1",
+    "grunt-contrib-connect": "^3.0.0",
     "grunt-contrib-csslint": "^2.0.0",
-    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-jshint": "^3.2.0",
     "grunt-contrib-requirejs": "^1.0.0",
     "grunt-contrib-uglify": "^5.0.1",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-file-info": "^1.0.10",
     "grunt-jsdoc": "^2.4.0",
-    "grunt-karma": "^3.0.0",
+    "grunt-karma": "^4.0.2",
     "jasmine": "^3.5.0",
     "jasmine-core": "^2.4.1",
     "jsdoc-oblivion": "0.0.4",
