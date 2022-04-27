@@ -27,7 +27,7 @@
   },
   "main": "index",
   "dependencies": {
-    "async": "0.2.x",
+    "async": "^3.2.3",
     "colors": "*",
     "socket.io-client": "^2.4.0",
     "underscore": "^1.13.2",
@@ -38,7 +38,8 @@
     "cleanup": "rm -fr node_modules/ && npm install && rm -fr bower_components/ && bower install",
     "build": "grunt build",
     "test": "grunt test",
-    "test-headless": "grunt test-headless"
+    "test-headless": "grunt test-headless",
+    "serve": "grunt serve"
   },
   "analyze": false,
   "license": "BSD-2-Clause",
@@ -48,8 +49,8 @@
   "devDependencies": {
     "fs": "0.0.2",
     "grunt": "^1.0.4",
-    "grunt-contrib-clean": "^1.0.0",
-    "grunt-contrib-connect": "^1.0.2",
+    "grunt-contrib-clean": "^2.0.1",
+    "grunt-contrib-connect": "^3.0.0",
     "grunt-contrib-csslint": "^2.0.0",
     "grunt-contrib-jshint": "^3.2.0",
     "grunt-contrib-requirejs": "^1.0.0",
