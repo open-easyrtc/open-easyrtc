@@ -2,7 +2,7 @@ Open-EasyRTC
 =======
 
 [![npm version](https://img.shields.io/npm/v/open-easyrtc.svg?style=flat)](https://www.npmjs.com/package/open-easyrtc)
-[![Build Status](https://github.com/open-easyrtc/open-easyrtc/actions/workflows/main.yml/badge.svg)](https://github.com/open-easyrtc/open-easyrtc/actions/workflows/main.yml)
+[![Build Status](https://github.com/open-easyrtc/open-easyrtc/actions/workflows/main.yaml/badge.svg)](https://github.com/open-easyrtc/open-easyrtc/actions/workflows/main.yaml)
 
 
 [![NPM](https://nodei.co/npm/open-easyrtc.png)](https://npmjs.org/package/open-easyrtc)
