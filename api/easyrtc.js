@@ -3809,53 +3809,29 @@ var Easyrtc = function() {
     // tracks.
     //
     function addStreamToPeerConnection(stream, peerConnection) {
-
-        if (peerConnection.addTrack) {
-
-            var senders = peerConnection.getSenders();
-
-            // Will be used for replaceTrack or purged
-            var emptySenders = senders.filter(function (sender) {
-                return !sender.track;
-            });
-
-            // Will be used to get existingTracks
-            var activeSenders = senders.filter(function (sender) {
-                return !!sender.track;
-            });
-
-            var existingTracks = activeSenders.map(function (sender) {
+        if (peerConnection.addStream) {
+            var existingStreams = peerConnection.getLocalStreams();
+            if (existingStreams.indexOf(stream) === -1) {
+                peerConnection.addStream(stream);
+            }
+        } else {
+            var existingTracks = peerConnection.getSenders().map(function (sender) {
                 return sender.track;
             });
 
-            // Add audio then videos tracks
             var i;
+
             var tracks = stream.getAudioTracks();
-            for (i = 0; i < tracks.length; i++) {
+            for (i = 0; i < tracks.length; i++ ) {
                 if (existingTracks.indexOf(tracks[i]) === -1) {
                     peerConnection.addTrack(tracks[i], stream);
                 }
             }
 
             tracks = stream.getVideoTracks();
-            for (i = 0; i < tracks.length; i++) {
+            for (i = 0; i < tracks.length; i++ ) {
                 if (existingTracks.indexOf(tracks[i]) === -1) {
-                    peerConnection.addTrack(tracks[i], stream);
-                }
-            }
-
-            // Purge empty senders
-            emptySenders.forEach(function (emptySender) {
-                peerConnection.removeTrack(emptySender);
-            });
-
-        } else if(peerConnection.addStream) {
-            var existingStreams = peerConnection.getLocalStreams();
-            if (existingStreams.indexOf(stream) === -1) {
-                try {
-                    peerConnection.addStream(stream);
-                } catch (err) {
-                    // Ignore possible RTCPeerConnection.addStream error
+                   peerConnection.addTrack(tracks[i], stream);
                 }
             }
         }
