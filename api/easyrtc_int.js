@@ -2752,16 +2752,29 @@ var Easyrtc = function() {
     /**
      * Set the authentication credential if needed.
      * @param {Object} credentialParm - a JSONable object.
+     * @param {Function} successCallback - A function which expects a boolean.
+     * @param {Function} failureCallback - A function which expects the following arguments: errorCode, errorText, roomName.
      */
-    this.setCredential = function(credentialParm) {
+    this.setCredential = function(credentialParm, successCallback, errorCallback) {
         try {
             JSON.stringify(credentialParm);
             credential = credentialParm;
-            return true;
-        }
-        catch (oops) {
-            self.showError(self.errCodes.BAD_CREDENTIAL, "easyrtc.setCredential passed a non-JSON-able object");
-            throw "easyrtc.setCredential passed a non-JSON-able object";
+
+            if (self.webSocketConnected) {
+                sendAuthenticate(successCallback, errorCallback);
+            }
+
+            if (successCallback) {
+                successCallback(true);
+            } else {
+                return true;
+            }
+        } catch (oops) {
+            if (errorCallback) {
+                errorCallback(self.errCodes.BAD_CREDENTIAL, "easyrtc.setCredential passed a non-JSON-able object")
+            } else {
+                throw "easyrtc.setCredential passed a non-JSON-able object";
+            }
         }
     };
 
@@ -5885,8 +5898,10 @@ var Easyrtc = function() {
                 function(msg) {
                     var room;
                     if (msg.msgType === "error") {
-                        errorCallback(msg.msgData.errorCode, msg.msgData.errorText);
                         self.roomJoin = {};
+                        if (errorCallback) {
+                            errorCallback(msg.msgData.errorCode, msg.msgData.errorText);
+                        }
                     }
                     else {
                         processToken(msg);
@@ -5985,7 +6000,7 @@ var Easyrtc = function() {
             logDebug("saw socket-server onconnect event");
 
             if (self.webSocketConnected) {
-                sendAuthenticate( successCallback, errorCallback);
+                sendAuthenticate(successCallback, errorCallback);
             }
             else {
                 errorCallback(self.errCodes.SIGNAL_ERR, self.getConstantString("icf"));
