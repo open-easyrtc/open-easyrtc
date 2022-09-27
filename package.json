@@ -1,6 +1,6 @@
 {
   "name": "open-easyrtc",
-  "version": "2.0.15",
+  "version": "2.0.16",
   "homepage": "https://github.com/open-easyrtc/open-easyrtc",
   "author": "Harold Thetiot <hthetiot@gmail.com>",
   "description": "Open-EasyRTC enables quick development of WebRTC",
