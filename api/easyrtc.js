@@ -6295,6 +6295,8 @@ var Easyrtc = function() {
     /**
      * Set the authentication credential if needed.
      * @param {Object} credentialParm - a JSONable object.
+     * @param {Function} successCallback - A function which expects a boolean.
+     * @param {Function} failureCallback - A function which expects the following arguments: errorCode, errorText, roomName.
      */
     this.setCredential = function(credentialParm, successCallback, errorCallback) {
         try {
@@ -6303,9 +6305,7 @@ var Easyrtc = function() {
 
             if (self.webSocketConnected) {
                 sendAuthenticate(successCallback, errorCallback);
-            }
-
-            if (successCallback) {
+            } else if (successCallback) {
                 successCallback(true);
             } else {
                 return true;
