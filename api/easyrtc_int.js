@@ -2762,9 +2762,7 @@ var Easyrtc = function() {
 
             if (self.webSocketConnected) {
                 sendAuthenticate(successCallback, errorCallback);
-            }
-
-            if (successCallback) {
+            } else if (successCallback) {
                 successCallback(true);
             } else {
                 return true;
