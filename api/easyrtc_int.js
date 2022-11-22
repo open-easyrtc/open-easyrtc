@@ -61,31 +61,6 @@ var Easyrtc = function() {
 
     var self = this;
     var peerConns = {};
-    var stillAliveTimer = null;
-    var stillAlivePeriod = 0;
-    var missedAliveResponses = 0;
-
-    function stillAliveEmitter() {
-        if( !stillAlivePeriod ) {
-            return;
-        }
-        if( stillAliveTimer ) {
-           clearTimeout(stillAliveTimer);
-        }
-
-        if( missedAliveResponses === 1 ) {
-            self.showError(self.errCodes.SYSTEM_ERR, "Timed out trying to talk to the server.");
-            self.hangupAll();
-            self.disconnect();
-            return;
-        }
-        stillAliveTimer = setTimeout(stillAliveEmitter, 20*1000);
-        missedAliveResponses++;
-        sendSignalling(null, "stillAlive", {}, function(msgType, msgData){
-             missedAliveResponses = 0;
-         }, function() {
-           });
-    }
 
     function logDebug (message, obj) {
         if (self.debugPrinter) {
@@ -119,8 +94,12 @@ var Easyrtc = function() {
     var signalingStateChangeListener = null;
     /** @private */
     var connectionOptions =  {
-        'connect timeout': 10000,
-        'force new connection': true
+        // whether to reconnect automatically
+        "reconnection": false,
+        // connection timeout before a connect_error and connect_timeout events are emitted
+        'timeout': 25000,
+        // whether to reuse an existing connection
+        'forceNew': true
     };
 
     /** @private */
@@ -2669,7 +2648,7 @@ var Easyrtc = function() {
     this.setSocketUrl = function(socketUrl, options) {
         logDebug("WebRTC signaling server URL set to " + socketUrl);
         serverPath = socketUrl;
-        if( options ) {
+        if (options) {
             connectionOptions = options;
         }
     };
@@ -3027,11 +3006,6 @@ var Easyrtc = function() {
         acceptancePending = {};
         self.disconnecting = true;
         closedChannel = self.webSocket;
-
-        if (stillAliveTimer) {
-           clearTimeout(stillAliveTimer);
-           stillAliveTimer = null;
-        }
 
         if (self.webSocketConnected) {
             if (!preallocatedSocketIo) {
@@ -5693,6 +5667,7 @@ var Easyrtc = function() {
 
                 roomData = msgData.roomData;
                 self.roomJoin[roomName] = newRoomData;
+
                 if (successCB) {
                     successCB(roomName);
                 }
@@ -5822,13 +5797,6 @@ var Easyrtc = function() {
         if (msgData.iceConfig) {
             processIceConfig(msgData.iceConfig);
         }
-        if( msgData.stillAliveInterval ) {
-            stillAlivePeriod = msgData.stillAliveInterval;
-            if( stillAlivePeriod > 0 ) {
-               stillAliveEmitter();
-            }
-        }
-
         if (msgData.sessionData) {
             processSessionData(msgData.sessionData);
         }
@@ -5903,6 +5871,7 @@ var Easyrtc = function() {
                     }
                     else {
                         processToken(msg);
+
                         if (self._roomApiFields) {
                             for (room in self._roomApiFields) {
                                 if (self._roomApiFields.hasOwnProperty(room)) {
@@ -5942,17 +5911,15 @@ var Easyrtc = function() {
             } catch(socketErr) {
                 self.webSocket = 0;
                 errorCallback( self.errCodes.SYSTEM_ERROR, socketErr.toString());
-
-               return;
+                return;
             }
         }
         else {
             for (i in self.websocketListeners) {
-                if (!self.websocketListeners.hasOwnProperty(i)) {
-                    continue;
+                if (self.websocketListeners.hasOwnProperty(i)) {
+                    self.webSocket.removeEventListener(self.websocketListeners[i].event,
+                            self.websocketListeners[i].handler);
                 }
-                self.webSocket.removeEventListener(self.websocketListeners[i].event,
-                        self.websocketListeners[i].handler);
             }
         }
 
@@ -5963,8 +5930,20 @@ var Easyrtc = function() {
             self.websocketListeners.push({event: event, handler: handler});
         }
 
+        addSocketListener("connect_timeout", function(event) {
+            logDebug("websocket timeout");
+
+            self.showError(self.errCodes.SYSTEM_ERR, "Timed out trying to talk to the server.");
+            self.hangupAll();
+            self.disconnect();
+        });
+
+        addSocketListener("connect_error", function(event) {
+            logDebug("websocket error");
+        });
+
         addSocketListener("close", function(event) {
-            logDebug("the web socket closed");
+            logDebug("websocket closed");
         });
 
         addSocketListener('error', function(event) {
@@ -5993,7 +5972,6 @@ var Easyrtc = function() {
                 self.showError(self.errCodes.CONNECT_ERR, self.getConstantString("badsocket"));
             }
             self.webSocketConnected = true;
-            missedAliveResponses = 0;
 
             logDebug("saw socket-server onconnect event");
 
