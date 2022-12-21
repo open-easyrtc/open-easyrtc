@@ -37,7 +37,7 @@ socketServer.origins(function(origin, callback) {
 });
 */
 
-easyrtc.setOption("logLevel", "debug");
+easyrtc.setOption("logLevel", "info");
 
 // Overriding the default easyrtcAuth listener, only so we can directly access its callback
 easyrtc.events.on("easyrtcAuth", function(socket, easyrtcid, msg, socketCallback, callback) {
