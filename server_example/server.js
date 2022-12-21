@@ -47,9 +47,11 @@ easyrtc.events.on("easyrtcAuth", function(socket, easyrtcid, msg, socketCallback
             return;
         }
 
-        connectionObj.setField("credential", msg.msgData.credential, {"isShared":false});
-
-        console.log("["+easyrtcid+"] Credential saved!", connectionObj.getFieldValueSync("credential"));
+        // save credential in connectionObj
+        if (msg.msgData.credential) {
+            connectionObj.setField("credential", msg.msgData.credential, {"isShared":false});
+            //console.log("["+easyrtcid+"] Credential saved!", connectionObj.getFieldValueSync("credential"));
+        }
 
         callback(err, connectionObj);
     });
@@ -57,7 +59,7 @@ easyrtc.events.on("easyrtcAuth", function(socket, easyrtcid, msg, socketCallback
 
 // To test, lets print the credential to the console for every room join!
 easyrtc.events.on("roomJoin", function(connectionObj, roomName, roomParameter, callback) {
-    console.log("["+connectionObj.getEasyrtcid()+"] Credential retrieved!", connectionObj.getFieldValueSync("credential"));
+    //console.log("["+connectionObj.getEasyrtcid()+"] Credential retrieved!", connectionObj.getFieldValueSync("credential"));
     easyrtc.events.defaultListeners.roomJoin(connectionObj, roomName, roomParameter, callback);
 });
 
@@ -68,9 +70,9 @@ var rtc = easyrtc.listen(app, socketServer, null, function(err, rtcRef) {
         return;
     }
 
-    console.log("Initiated");
+    //console.log("Initiated");
     rtcRef.events.on("roomCreate", function(appObj, creatorConnectionObj, roomName, roomOptions, callback) {
-        console.log("roomCreate fired! Trying to create: " + roomName);
+        //console.log("roomCreate fired! Trying to create: " + roomName);
 
         appObj.events.defaultListeners.roomCreate(appObj, creatorConnectionObj, roomName, roomOptions, callback);
     });
@@ -78,5 +80,5 @@ var rtc = easyrtc.listen(app, socketServer, null, function(err, rtcRef) {
 
 // Listen on port 8080
 webServer.listen(8080, function () {
-    console.log('listening on http://localhost:8080');
+    //console.log('listening on http://localhost:8080');
 });
