@@ -522,17 +522,16 @@ function muteActiveBox() {
     updateMuteImage(true);
 }
 
-
-
-
-function callEverybodyElse(roomName, otherPeople) {
-
-    easyrtc.setRoomOccupantListener(null); // so we're only called once.
+const perfectNegotiation = false;
+function callEverybodyElse(roomName, roomUsers, newUser) {
 
     var list = [];
     var connectCount = 0;
-    for(var easyrtcid in otherPeople ) {
-        list.push(easyrtcid);
+    for(var easyrtcid in roomUsers ) {
+        const newRoomUser = roomUsers[easyrtcid];
+        if (newUser.roomJoinTime < newRoomUser.roomJoinTime || perfectNegotiation) {
+            list.push(easyrtcid);
+        }
     }
     //
     // Connect in reverse order. Latter arriving people are more likely to have
@@ -551,6 +550,7 @@ function callEverybodyElse(roomName, otherPeople) {
                 establishConnection(position-1);
             }
         }
+
         easyrtc.call(list[position], callSuccess, callFailure);
 
     }
