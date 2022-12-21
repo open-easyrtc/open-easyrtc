@@ -63,8 +63,12 @@ easyrtc.events.on("roomJoin", function(connectionObj, roomName, roomParameter, c
 
 // Start EasyRTC server
 var rtc = easyrtc.listen(app, socketServer, null, function(err, rtcRef) {
-    console.log("Initiated");
+    if (err) {
+        console.error(err);
+        return;
+    }
 
+    console.log("Initiated");
     rtcRef.events.on("roomCreate", function(appObj, creatorConnectionObj, roomName, roomOptions, callback) {
         console.log("roomCreate fired! Trying to create: " + roomName);
 
