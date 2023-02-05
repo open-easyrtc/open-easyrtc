@@ -7278,7 +7278,6 @@ var Easyrtc = function() {
     function buildPeerConnection(otherUser, isInitiator, failureCB, streamNames) {
         var pc;
         var message;
-        var newPeerConn;
 
         // Apply peer config
         var pcConfig = pc_config_to_use || {
@@ -7327,20 +7326,38 @@ var Easyrtc = function() {
                 dataEnabled = false;
             }
 
+            var newPeerConn = {
+                pc: pc,
+                candidatesToSend: [],
+                startedAV: false,
+                cancelled: false,
+                connectionAccepted: false,
+                isInitiator: isInitiator,
+                remoteStreamIdToName: {},
+                streamsAddedAcks: {},
+                liveRemoteStreams: {},
+                supportHalfTrickleIce:false
+            };
+
             pc.onnegotiationneeded = function(event) {
+                if (newPeerConn.cancelled) {
+                    return;
+                }
+
                 var eventTarget = event.currentTarget || event.target || pc,
                     signalingState = eventTarget.signalingState || 'unknown';
 
                 logDebug('onnegotiationneeded', signalingState);
-                if (
-                    peerConns[otherUser] &&
-                        (peerConns[otherUser].enableNegotiateListener)
-                ) {
+
+                if (newPeerConn.enableNegotiateListener) {
                     initiateSendOffer(otherUser);
                 }
             };
 
             pc.onsignalingstatechange = function () {
+                if (newPeerConn.cancelled) {
+                    return;
+                }
 
                 var eventTarget = event.currentTarget || event.target || pc,
                     signalingState = eventTarget.signalingState || 'unknown';
@@ -7353,6 +7370,9 @@ var Easyrtc = function() {
             };
 
             pc.oniceconnectionstatechange = function(event) {
+                if (newPeerConn.cancelled) {
+                    return;
+                }
 
                 var eventTarget = event.currentTarget || event.target || pc,
                     connState = eventTarget.iceConnectionState || 'unknown';
@@ -7365,7 +7385,7 @@ var Easyrtc = function() {
 
                 switch (connState) {
                     case "connected":
-                        if (self.onPeerOpen ) {
+                        if (self.onPeerOpen) {
                             self.onPeerOpen(otherUser);
                         }
                         if (peerConns[otherUser] && peerConns[otherUser].callSuccessCB) {
@@ -7407,22 +7427,15 @@ var Easyrtc = function() {
                 logDebug("onconnection called prematurely");
             };
 
-            newPeerConn = {
-                pc: pc,
-                candidatesToSend: [],
-                startedAV: false,
-                connectionAccepted: false,
-                isInitiator: isInitiator,
-                remoteStreamIdToName: {},
-                streamsAddedAcks: {},
-                liveRemoteStreams: {},
-                supportHalfTrickleIce:false
-            };
-
             pc.onicecandidate = function(event) {
-                if (peerConns[otherUser] && peerConns[otherUser].cancelled) {
+                if (newPeerConn.cancelled) {
                     return;
                 }
+
+                if (newPeerConn.cancelled) {
+                    return;
+                }
+
                 var candidateData;
                 if (
                     event.candidate &&
@@ -8119,7 +8132,8 @@ var Easyrtc = function() {
         if (stream.active === true || stream.ended === false)  {
             isActive = true;
         } else {
-            isActive = stream.getTracks().reduce(function (track) {
+            var tracks = stream.getTracks();
+            isActive = tracks.length && tracks.reduce(function (track) {
                 return track.enabled;
             });
         }
@@ -8152,7 +8166,9 @@ var Easyrtc = function() {
               peerConns[otherUser].pc
         ) {
             try {
+
                 var remoteStreams = peerConns[otherUser].pc.getRemoteStreams();
+
                 for (var i = 0; i < remoteStreams.length; i++) {
                     if (isStreamActive(remoteStreams[i])) {
                         emitOnStreamClosed(otherUser, remoteStreams[i]);
