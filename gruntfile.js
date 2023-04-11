@@ -149,12 +149,11 @@ module.exports = (function() {
 
                 server: {
                     src: [
-                        '<%= config.libPath %>/easyrtc_public_obj.js',
-                        '<%= config.libPath %>/easyrtc_default_event_listeners',
+                        '<%= config.libPath %>/**/*.js',
                         '<%= config.docsPath %>/easyrtc_server_install.md'
                     ],
                     options: {
-                        destination: '<%= config.docsPath %>/server_html_docs_lite'
+                        destination: '<%= config.docsPath %>/server_html_docs'
                     }
                 },
 

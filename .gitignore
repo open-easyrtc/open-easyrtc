@@ -182,3 +182,5 @@ desktopCapture
 /api/labs/desktopCapture
 test/reports/
 bower_components/
+docs/client_html_docs_lite
+docs/docs_in_html
