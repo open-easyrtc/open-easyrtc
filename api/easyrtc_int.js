@@ -60,7 +60,6 @@
 var Easyrtc = function() {
 
     var self = this;
-    var peerConns = {};
 
     function logDebug (message, obj) {
         if (self.debugPrinter) {
@@ -81,6 +80,28 @@ var Easyrtc = function() {
         return true;
     }
 
+    /** @private */
+    //
+    //
+    //  peerConns is a map from caller names to the below object structure
+    //     {  startedAV: boolean,  -- true if we have traded audio/video streams
+    //        dataChannelS: RTPDataChannel for outgoing messages if present
+    //        dataChannelR: RTPDataChannel for incoming messages if present
+    //        dataChannelReady: true if the data channel can be used for sending yet
+    //        connectTime: timestamp when the connection was started
+    //        sharingAudio: true if audio is being shared
+    //        sharingVideo: true if video is being shared
+    //        cancelled: temporarily true if a connection was cancelled by the peer asking to initiate it
+    //        candidatesToSend: SDP candidates temporarily queued
+    //        streamsAddedAcks: ack callbacks waiting for stream received messages
+    //        pc: RTCPeerConnection
+    //        mediaStream: mediaStream
+    //     function callSuccessCB(string) - see the easyrtc.call documentation.
+    //        function callFailureCB(errorCode, string) - see the easyrtc.call documentation.
+    //        function wasAcceptedCB(boolean,string) - see the easyrtc.call documentation.
+    //     }
+    //
+    var peerConns = {};
     /** @private */
     var autoInitUserMedia = true;
     /** @private */
@@ -1068,31 +1089,6 @@ var Easyrtc = function() {
     var receivePeer = {msgTypes: {}};
     /** @private */
     var receiveServerCB = null;
-    /** @private */
-    // dummy placeholder for when we aren't connected
-    var updateConfigurationInfo = function() { };
-    /** @private */
-    //
-    //
-    //  peerConns is a map from caller names to the below object structure
-    //     {  startedAV: boolean,  -- true if we have traded audio/video streams
-    //        dataChannelS: RTPDataChannel for outgoing messages if present
-    //        dataChannelR: RTPDataChannel for incoming messages if present
-    //        dataChannelReady: true if the data channel can be used for sending yet
-    //        connectTime: timestamp when the connection was started
-    //        sharingAudio: true if audio is being shared
-    //        sharingVideo: true if video is being shared
-    //        cancelled: temporarily true if a connection was cancelled by the peer asking to initiate it
-    //        candidatesToSend: SDP candidates temporarily queued
-    //        streamsAddedAcks: ack callbacks waiting for stream received messages
-    //        pc: RTCPeerConnection
-    //        mediaStream: mediaStream
-    //     function callSuccessCB(string) - see the easyrtc.call documentation.
-    //        function callFailureCB(errorCode, string) - see the easyrtc.call documentation.
-    //        function wasAcceptedCB(boolean,string) - see the easyrtc.call documentation.
-    //     }
-    //
-
     /** @private */
     //
     // a map keeping track of whom we've requested a call with so we don't try to
@@ -2382,8 +2378,6 @@ var Easyrtc = function() {
                             document.body.removeChild(videoObj);
                         }
 
-                        updateConfigurationInfo();
-
                         if (successCallback) {
                             successCallback(stream);
                         }
@@ -2397,7 +2391,7 @@ var Easyrtc = function() {
                 tryToGetSize();
             }
             else {
-                updateConfigurationInfo();
+
                 if (successCallback) {
                     successCallback(stream);
                 }
@@ -2430,7 +2424,6 @@ var Easyrtc = function() {
                 audio: false,
                 video: false
             };
-            updateConfigurationInfo();
         };
 
         if (!self.audioEnabled && !self.videoEnabled) {
@@ -3482,7 +3475,7 @@ var Easyrtc = function() {
     function onRemoveStreamHelper(easyrtcid, stream) {
         if (peerConns[easyrtcid]) {
             emitOnStreamClosed(easyrtcid, stream);
-            updateConfigurationInfo();
+
             if (peerConns[easyrtcid].pc) {
                 removeStreamFromPeerConnection(stream, peerConns[easyrtcid].pc);
             }
@@ -4096,8 +4089,6 @@ var Easyrtc = function() {
                 if (onDataChannelClose) {
                     onDataChannelClose(otherUser);
                 }
-
-                updateConfigurationInfo();
             };
         }
 
@@ -4133,8 +4124,6 @@ var Easyrtc = function() {
                     if (onDataChannelClose) {
                         onDataChannelClose(otherUser);
                     }
-
-                    updateConfigurationInfo();
                 };
                 dataChannel.onopen = function(event) {
                     logDebug("saw dataChannel.onopen event");
@@ -4160,7 +4149,6 @@ var Easyrtc = function() {
                     if (onDataChannelOpen) {
                         onDataChannelOpen(otherUser, true);
                     }
-                    updateConfigurationInfo();
                 } else {
                     logDebug("failed to setup outgoing channel listener");
                 }
@@ -4658,8 +4646,6 @@ var Easyrtc = function() {
                 delete peerConns[otherUser];
             }
 
-            updateConfigurationInfo();
-
             if (self.webSocket) {
                 sendSignalling(otherUser, "hangup", null, function() {
                     logDebug("hangup succeeds");
@@ -4681,7 +4667,6 @@ var Easyrtc = function() {
      */
     this.hangup = function(otherUser) {
         hangupBody(otherUser);
-        updateConfigurationInfo();
     };
 
     /**
@@ -4690,18 +4675,10 @@ var Easyrtc = function() {
      *    easyrtc.hangupAll();
      */
     this.hangupAll = function() {
-
-        var sawAConnection = false;
         for (var otherUser in peerConns) {
-            if (!peerConns.hasOwnProperty(otherUser)) {
-                continue;
+            if (peerConns.hasOwnProperty(otherUser)) {
+                this.hangup(otherUser);
             }
-            sawAConnection = true;
-            hangupBody(otherUser);
-        }
-
-        if (sawAConnection) {
-            updateConfigurationInfo();
         }
     };
 
@@ -5995,7 +5972,6 @@ var Easyrtc = function() {
         addSocketListener("disconnect", function(/* code, reason, wasClean */) {
 
             self.webSocketConnected = false;
-            updateConfigurationInfo = function() {}; // dummy update function
             oldConfig = {};
             disconnectBody();
 
