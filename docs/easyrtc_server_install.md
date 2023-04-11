@@ -80,8 +80,8 @@ For EasyRTC maintainers or those wishing to test the newer beta release, [a Git 
 1. Follow NodeJS install instructions for your OS
 
 2. Clone EasyRTC repository folder.
-    - Using Stable:  `git clone https://github.com/priologic/easyrtc.git`
-    - Using Beta: `git clone -b beta https://github.com/priologic/easyrtc.git`
+    - Using Stable:  `git clone https://github.com/open-easyrtc/open-easyrtc.git`
+    - Using Beta: `git clone -b beta https://github.com/open-easyrtc/open-easyrtc.git`
 
 4. In the console, enter the `easyrtc/` folder
     - `cd easyrtc`
@@ -245,7 +245,7 @@ Ubuntu EasyRTC Install Steps:
 4. Download files from the git repository into your EasyRTC application folder.
     - `sudo -i`
     - `cd /var/nodes/easyrtc`
-    - `git clone https://github.com/priologic/easyrtc.git`
+    - `git clone https://github.com/open-easyrtc/open-easyrtc.git`
 
 5. Change to the easyrtc folder and then install node modules locally
     - `cd /var/nodes/easyrtc`
@@ -265,7 +265,7 @@ Windows EasyRTC Install Steps:
     - Note: Node is defaulted to browse to `%HOMEDRIVE%%HOMEPATH%`
     - ex: `C:\Users\USERNAME\nodes\easyrtc`
 
-3. Download  from https://github.com/priologic/easyrtc/master.zip
+3. Download  from https://github.com/open-easyrtc/open-easyrtc/master.zip
 
 4. In the start menu, launch the Node.js command prompt
 
@@ -292,9 +292,9 @@ Mac EasyRTC Install Steps:
     - ex: `cd ${HOME}/nodes`
 
 3. Download the easyrtc distribution into the nodes directory using git
-    - ex: `git clone https://github.com/priologic/easyrtc.git`
+    - ex: `git clone https://github.com/open-easyrtc/open-easyrtc.git`
     
-    or by pointing your browser at https://github.com/priologic/easyrtc/archive/master.zip,
+    or by pointing your browser at https://github.com/open-easyrtc/open-easyrtc/archive/master.zip,
     moving the zip file into the nodes directory, and unzipping it.
 
 5. Navigate to the easyrtc folder. 
