@@ -170,16 +170,6 @@ module.exports = (function() {
                     }
                 },
 
-                client_ft_lite: {
-                    src: [
-                        '<%= config.apiPath %>/easyrtc_ft.js'
-                    ],
-                    options: {
-                        template: 'dev/scripts/client_jsdoc_templates2',
-                        destination: '<%= config.docsPath %>/client_ft_html_docs_lite'
-                    }
-                },
-
                 server_lite: {
                     src: [
                         '<%= config.libPath %>/easyrtc_public_obj.js',

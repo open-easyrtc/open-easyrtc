@@ -1,6 +1,6 @@
 {
   "name": "open-easyrtc",
-  "version": "2.0.18",
+  "version": "2.0.20",
   "homepage": "https://github.com/open-easyrtc/open-easyrtc",
   "author": "Harold Thetiot <hthetiot@gmail.com>",
   "description": "Open-EasyRTC enables quick development of WebRTC",
@@ -40,6 +40,8 @@
     "test": "grunt test",
     "doc": "grunt jsdoc:server jsdoc:client",
     "test-headless": "grunt test-headless",
+    "doc": "grunt jsdoc:client jsdoc:server",
+    "doc_lite": "grunt jsdoc:client_lite jsdoc:server_lite",
     "serve": "grunt serve"
   },
   "analyze": false,
