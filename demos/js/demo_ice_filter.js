@@ -21,7 +21,7 @@ function iceCandidateFilter( iceCandidate, fromPeer) {
            return null;
        }
    }
-   else if( sdp.indexOf("typ host") > 0) { // is turn candidate
+   else if( sdp.indexOf("typ host") > 0) { // is local candidate
        if( document.getElementById("allowLocal").checked ) {
            return iceCandidate;
        }
@@ -38,8 +38,7 @@ function connect() {
     easyrtc.setRoomOccupantListener(convertListToButtons);
     easyrtc.setIceCandidateFilter(iceCandidateFilter);
     easyrtc.easyApp("easyrtc.iceFilter", "selfVideo", ["callerVideo"], loginSuccess, loginFailure);
- }
-
+}
 
 function clearConnectList() {
     var otherClientDiv = document.getElementById('otherClients');
@@ -47,7 +46,6 @@ function clearConnectList() {
         otherClientDiv.removeChild(otherClientDiv.lastChild);
     }
 }
-
 
 function convertListToButtons (roomName, data, isPrimary) {
     clearConnectList();
@@ -66,7 +64,6 @@ function convertListToButtons (roomName, data, isPrimary) {
     }
 }
 
-
 function performCall(otherEasyrtcid) {
     easyrtc.hangupAll();
     easyrtc.setIceUsedInCalls( getModifiedIceList());
@@ -75,12 +72,7 @@ function performCall(otherEasyrtcid) {
     easyrtc.call(otherEasyrtcid, successCB, failureCB);
 }
 
-
-
-
-
 var iceMap = [];
-
 function getModifiedIceList(){
    var iceList = [];
    var i;
@@ -92,7 +84,6 @@ function getModifiedIceList(){
    }
    return {iceServers: iceList};
 }
-
 
 function loginSuccess(easyrtcid) {
     var i;
@@ -109,10 +100,9 @@ function loginSuccess(easyrtcid) {
 	    blockentries += '<div style="width:100%;overflow:hidden;text-align:left"><input type="checkbox" id="' + label + '" + checked="checked" style="float:left /> <label for="' + label + '">' + url + '</label></div>';
 
     }
+	
     document.getElementById("iceEntries").innerHTML = blockentries;
-
 }
-
 
 function loginFailure(errorCode, message) {
     easyrtc.showError(errorCode, message);
