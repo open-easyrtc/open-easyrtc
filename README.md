@@ -2,7 +2,8 @@ Open-EasyRTC
 =======
 
 [![npm version](https://img.shields.io/npm/v/open-easyrtc.svg?style=flat)](https://www.npmjs.com/package/open-easyrtc)
-[![Build Status](https://travis-ci.org/open-easyrtc/open-easyrtc.svg?branch=master)](https://travis-ci.org/open-easyrtc/open-easyrtc)
+[![Build Status](https://github.com/open-easyrtc/open-easyrtc/actions/workflows/main.yaml/badge.svg)](https://github.com/open-easyrtc/open-easyrtc/actions/workflows/main.yaml)
+
 
 [![NPM](https://nodei.co/npm/open-easyrtc.png)](https://npmjs.org/package/open-easyrtc)
 
@@ -15,14 +16,10 @@ This NodeJS `open-easyrtc` module version is a fork of `easyrtc` hosted on Githu
 
 This fork of `easyrtc` module named `open-easyrtc` starts at version `2.0.0` in case previous the repository decides to pick up work again on version `1.x.x`.
 
-The main reason of the fork is that `Priologic Software Inc.` as been trying to make the main contributor @hthetiot pay for pushing major issues and security fixes to be released on NPM registry and the maintainer that closed more than 200 issues and contributed more than 80 Pull-Request past 3 years, do not agreed with that kind crooked open-source of practices.
-
-This Fork will retain it's original BSD 2-Clause "Simplified" License until a License migration path solution is found.
-
 Try a Live Demo Here:
 --------
 
-[![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg)](https://glitch.com/edit/#!/open-easyrtc-demo?path=server.js%3A7%3A0)
+[![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg)](https://glitch.com/~open-easyrtc-server-demo)
 
 Features
 --------
@@ -133,8 +130,9 @@ EasyRTC comes with a number of demo's which work immediately after installation.
 License
 -------
 
-Copyright (c) 2016, Priologic Software Inc.
-All rights reserved.
+Copyright (c) 2018, Open-EasyRTC
+
+Copyright (c) 2016, Priologic Software Inc. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:

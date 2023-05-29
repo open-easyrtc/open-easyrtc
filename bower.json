@@ -1,0 +1,15 @@
+{
+  "name": "open-easyrtc",
+  "version": "2.0.15",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "demos",
+    "dev",
+    "docs",
+    "lib",
+    "server_example",
+    "test",
+    "typescript_support"
+  ]
+}
