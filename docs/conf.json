@@ -13,7 +13,7 @@
     "default": {
       "outputSourceFiles": true
     },
-    "systemName"      : "EasyRTC",
+    "systemName"      : "Open-EasyRTC",
     "footer"          : "",
     "copyright"       : "",
     "navType"         : "vertical",
