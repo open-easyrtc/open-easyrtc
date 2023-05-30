@@ -63,8 +63,10 @@ All documentation can be found within [the docs folder](./docs/).
      * `/docs/easyrtc_client_tutorial.md`
  * [Client API](https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc.html)__*__
      * `https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc.html`
- * [Client File Transfer API (lite)](https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_ft.html)__*__
+ * [Client File Transfer API](https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_ft.html)__*__
      * `https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_ft.html`
+ * [Client App API](https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_App.html)__*__
+     * `https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_App.html`
 
 **General Development**
  * [Frequently asked questions](./docs/easyrtc_faq.md)
