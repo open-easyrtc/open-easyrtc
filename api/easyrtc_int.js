@@ -1856,6 +1856,8 @@ var Easyrtc = function() {
      * Allow an externally created mediastream (ie, created by another
      * library) to be used within easyrtc. Tracking when it closes
      * must be done by the supplying party.
+     * @param {MediaStream} stream - the MediaStream to register.
+     * @param {String} streamName - the streamName of the new registered MediaStream.
      */
     this.register3rdPartyLocalMediaStream = function(stream, streamName) {
        return registerLocalMediaStreamByName(stream, streamName);
@@ -2028,7 +2030,7 @@ var Easyrtc = function() {
      * the microphone, sounds stops being transmitted to your peers. By default, the microphone
      * is enabled.
      * @param {Boolean} enable - true to enable the microphone, false to disable it.
-     * @param {String} streamName - an optional streamName
+     * @param {String} streamName - an optional streamName.
      */
     this.enableMicrophone = function(enable, streamName) {
         var stream = getLocalMediaStreamByName(streamName);
