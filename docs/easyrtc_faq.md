@@ -141,7 +141,7 @@ How do I report bugs or ask for features?
 
 We monitor both the Github issue tracker and the Google Groups discussion forum.
 
- - [https://github.com/priologic/easyrtc/issues](https://github.com/priologic/easyrtc/issues)
+ - [https://github.com/open-easyrtc/open-easyrtc/issues](https://github.com/open-easyrtc/open-easyrtc/issues)
  - [https://groups.google.com/forum/?forum/#!forum/easyrtc](https://groups.google.com/forum/?forum/#!forum/easyrtc)
 
 
