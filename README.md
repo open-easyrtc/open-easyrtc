@@ -57,15 +57,15 @@ _**Note:** Links marked with an asterisk (__*__) use the third-party service [ht
      * `/docs/easyrtc_server_configuration.md`
  * [Using Server Events](./docs/easyrtc_server_events.md)
      * `/docs/easyrtc_server_events.md`  
- * [Server API](http://htmlpreview.github.io/?https://github.com/open-easyrtc/open-easyrtc/blob/master/docs/docs_in_html/server-api/index.html)__*__
+ * [Server API](http://htmlpreview.github.io/?https://github.com/open-easyrtc/open-easyrtc/blob/master/docs/html/server/index.html)__*__
      * `/docs/docs_in_html/server-api/index.html`  
 
 **EasyRTC Client API**
  * [Client API tutorial](./docs/easyrtc_client_tutorial.md)
      * `/docs/easyrtc_client_tutorial.md`
- * [Client API (lite)](http://htmlpreview.github.io/?https://github.com/open-easyrtc/open-easyrtc/blob/master/docs/client_html_docs_lite/Easyrtc.html)__*__
+ * [Client API (lite)](http://htmlpreview.github.io/?https://github.com/open-easyrtc/open-easyrtc/blob/master/docs/html/client/Easyrtc.html)__*__
      * `/docs/client_html_docs_lite/Easyrtc.html`
- * [Client File Transfer API (lite)](http://htmlpreview.github.io/?https://github.com/open-easyrtc/open-easyrtc/blob/master/docs/client_html_docs_lite/Easyrtc_ft.html)__*__
+ * [Client File Transfer API (lite)](http://htmlpreview.github.io/?https://github.com/open-easyrtc/open-easyrtc/blob/master/docs/html/client/Easyrtc_ft.html)__*__
      * `/docs/client_html_docs_lite/easyrtc_ft.html`
 
 **General Development**

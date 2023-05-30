@@ -60,3 +60,13 @@ jobs:
 
       - name: Tests specs headless
         run: npm run test-headless
+
+      - name: Generate documentation
+        run: npm run doc
+
+      - name: Deploy documentation
+        if: github.head_ref == 'master'
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: docs/html # The folder the action should deploy.
