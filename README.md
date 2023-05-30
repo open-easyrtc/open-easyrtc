@@ -55,17 +55,17 @@ All documentation can be found within [the docs folder](./docs/).
      * `/docs/easyrtc_server_configuration.md`
  * [Using Server Events](./docs/easyrtc_server_events.md)
      * `/docs/easyrtc_server_events.md`  
- * [Server API](https://open-easyrtc.github.io/open-easyrtc/server/)__*__
+ * [Server API](https://open-easyrtc.github.io/open-easyrtc/server/)
      * `https://open-easyrtc.github.io/open-easyrtc/server/`  
 
 **EasyRTC Client**
  * [Client API tutorial](./docs/easyrtc_client_tutorial.md)
      * `/docs/easyrtc_client_tutorial.md`
- * [Client API](https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc.html)__*__
+ * [Client API](https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc.html)
      * `https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc.html`
- * [Client File Transfer API](https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_ft.html)__*__
+ * [Client File Transfer API](https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_ft.html)
      * `https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_ft.html`
- * [Client App API](https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_App.html)__*__
+ * [Client App API](https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_App.html)
      * `https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_App.html`
 
 **General Development**
