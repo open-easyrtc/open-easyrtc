@@ -47,8 +47,6 @@ Documentation
 -------------
 All documentation can be found within [the docs folder](./docs/).
 
-_**Note:** Links marked with an asterisk (__*__) use the third-party service [http://htmlpreview.github.io](http://htmlpreview.github.io) to render HTML._
-
 **EasyRTC Server**
 
  * [Install instructions for Ubuntu, Windows, and Mac](./docs/easyrtc_server_install.md)
@@ -57,16 +55,16 @@ _**Note:** Links marked with an asterisk (__*__) use the third-party service [ht
      * `/docs/easyrtc_server_configuration.md`
  * [Using Server Events](./docs/easyrtc_server_events.md)
      * `/docs/easyrtc_server_events.md`  
- * [Server API](http://htmlpreview.github.io/?https://github.com/open-easyrtc/open-easyrtc/blob/master/docs/html/server/index.html)__*__
-     * `/docs/docs_in_html/server-api/index.html`  
+ * [Server API](https://open-easyrtc.github.io/open-easyrtc/server/)__*__
+     * `https://open-easyrtc.github.io/open-easyrtc/server/`  
 
-**EasyRTC Client API**
+**EasyRTC Client**
  * [Client API tutorial](./docs/easyrtc_client_tutorial.md)
      * `/docs/easyrtc_client_tutorial.md`
- * [Client API (lite)](http://htmlpreview.github.io/?https://github.com/open-easyrtc/open-easyrtc/blob/master/docs/html/client/Easyrtc.html)__*__
-     * `/docs/client_html_docs_lite/Easyrtc.html`
- * [Client File Transfer API (lite)](http://htmlpreview.github.io/?https://github.com/open-easyrtc/open-easyrtc/blob/master/docs/html/client/Easyrtc_ft.html)__*__
-     * `/docs/client_html_docs_lite/easyrtc_ft.html`
+ * [Client API](https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc.html)__*__
+     * `https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc.html`
+ * [Client File Transfer API (lite)](https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_ft.html)__*__
+     * `https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_ft.html`
 
 **General Development**
  * [Frequently asked questions](./docs/easyrtc_faq.md)
