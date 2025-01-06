@@ -184,7 +184,10 @@ Below is the initial server program which will run an EasyRTC server along with 
     var socketServer = io.listen(webServer);
 
     // Start EasyRTC server
-    var easyrtcServer = easyrtc.listen(httpApp, socketServer);
+    let easyrtcServer;
+    easyrtc.listen(httpApp, socketServer, undefined, (err, pub) => {
+        easyrtcServer = pub;
+    });
 
 
 Configuring EasyRTC Server
@@ -196,7 +199,7 @@ Configuration options are set using the `setOption` function or from the `listen
 
 or
 
-    var easyrtcServer = easyrtc.listen(httpApp, socketServer, {'OPTION1_NAME': 'OPTION1_VALUE', 'OPTION2_NAME': 'OPTION2_VALUE'})
+    easyrtc.listen(httpApp, socketServer, {'OPTION1_NAME': 'OPTION1_VALUE', 'OPTION2_NAME': 'OPTION2_VALUE'})
 
 
 Note that some options can not be set after the `listen()` function has been run.

@@ -40,7 +40,6 @@
     "test": "grunt test",
     "test-headless": "grunt test-headless",
     "doc": "grunt jsdoc:client jsdoc:server",
-    "doc_lite": "grunt jsdoc:client_lite jsdoc:server_lite",
     "serve": "grunt serve"
   },
   "analyze": false,
