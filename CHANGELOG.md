@@ -1,6 +1,13 @@
 EasyRTC: Change Log
 ===================
 
+v.2.1.0
+-------
+Changes:
+ - Migrate Client from socket.io-client@^2.4.0 to socket.io-client@^4.8.1
+ - Migrate Server from socket.io@^2.4.0 to socket.io@^4.8.1
+ - Update all dependencies to latest versions.
+
 v.2.0.7
 -------
 Fixes:
