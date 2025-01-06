@@ -1,6 +1,6 @@
 {
   "name": "open-easyrtc",
-  "version": "2.0.20",
+  "version": "2.1.0",
   "homepage": "https://github.com/open-easyrtc/open-easyrtc",
   "author": "Harold Thetiot <hthetiot@gmail.com>",
   "description": "Open-EasyRTC enables quick development of WebRTC",
@@ -29,7 +29,7 @@
   "dependencies": {
     "async": "^3.2.3",
     "colors": "*",
-    "socket.io-client": "^2.4.0",
+    "socket.io-client": "^4.1.2",
     "underscore": "^1.13.2",
     "webrtc-adapter": "^8.1.1"
   },
