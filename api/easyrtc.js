@@ -3428,6 +3428,8 @@ var Easyrtc = function() {
     var signalingStateChangeListener = null;
     /** @private */
     var connectionOptions =  {
+        // whether or not cross-site requests should made using credentials such as cookies, authorization headers.
+        "withCredentials": false,
         // whether to reconnect automatically
         "reconnection": false,
         // connection timeout before a connect_error and connect_timeout events are emitted
