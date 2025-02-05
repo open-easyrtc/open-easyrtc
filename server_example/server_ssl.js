@@ -24,6 +24,8 @@ var webServer = https.createServer({
 // Start Socket.io so it attaches itself to Express server
 var socketServer = io.listen(webServer, {
     "log level": 1,
+    // Whether to enable compatibility with Socket.IO v2 clients.
+    "allowEIO3": true,
     // See Socket.io CORS documentation: 
     // - https://socket.io/docs/v3/handling-cors/
     "cors": {
