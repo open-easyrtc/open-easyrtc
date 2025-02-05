@@ -22,25 +22,19 @@ var webServer = https.createServer({
 }, httpApp);
 
 // Start Socket.io so it attaches itself to Express server
-var socketServer = io.listen(webServer, {"log level":1});
-
-// Cross-domain workaround presented below:
-/*
-socketServer.origins(function(origin, callback) {
-    if (origin && ![
-        'https://localhost:8080',
-        '*'
-    ].includes(origin)) {
-        return callback('origin not allowed', false);
+var socketServer = io.listen(webServer, {
+    "log level": 1,
+    // See Socket.io CORS documentation: 
+    // - https://socket.io/docs/v3/handling-cors/
+    "cors": {
+        "origin": '*'
     }
-    callback(null, true);
 });
-*/
 
 // Start EasyRTC server
 var rtc = easyrtc.listen(httpApp, socketServer);
 
 // Listen on port 8443
-webServer.listen(8443, function () {
-    console.log('listening on https://localhost:8443');
+webServer.listen(process.env.PORT || 8443, function () {
+    console.log(`listening on ${process.env.PORT || 8443}`);
 });
