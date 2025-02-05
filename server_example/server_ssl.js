@@ -11,6 +11,9 @@ var io      = require("socket.io"); // web socket external module
 
 var easyrtc = require("../"); // EasyRTC internal module
 
+// Set process name
+process.title = "node-easyrtc-ssl";
+
 // Setup and configure Express http server. Expect a subfolder called "static" to be the web root.
 var httpApp = express();
 httpApp.use(express.static(__dirname + "/static/"));
