@@ -1,6 +1,28 @@
 EasyRTC: Change Log
 ===================
 
+v.2.1.4
+-------
+New Features:
+ - Imeplement `roomMaxConnection` options to limit connection per room, default to 100.
+
+v.2.1.3
+-------
+Changes:
+ - emit connection only if socket is still connected, add logs listeners only if easyrtcAuth succeed.
+
+v.2.1.2
+-------
+Changes:
+ - by default do not connect to withCredentials to socket.io.
+ - update example server with allowEIO3 options to enable compatibility with Socket.IO v2 clients.
+
+v.2.1.1
+-------
+Changes:
+ - update CORS example in server_example.
+ - setup socket once instead of removeAll on Authenticate to avoid external events to be removed.
+
 v.2.1.0
 -------
 Changes:
