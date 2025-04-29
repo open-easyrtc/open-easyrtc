@@ -64,7 +64,7 @@ var rtc = easyrtc.listen(app, socketServer, null, function(err, rtcRef) {
     rtcRef.events.on("roomCreate", function(appObj, creatorConnectionObj, roomName, roomOptions, callback) {
         console.log("roomCreate fired! Trying to create: " + roomName);
 
-        appObj.events.defaultListeners.roomCreate(appObj, creatorConnectionObj, roomName, roomOptions, callback);
+        easyrtc.events.defaultListeners.roomCreate(appObj, creatorConnectionObj, roomName, roomOptions, callback);
     });
 });
 
