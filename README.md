@@ -47,8 +47,6 @@ Documentation
 -------------
 All documentation can be found within [the docs folder](./docs/).
 
-_**Note:** Links marked with an asterisk (__*__) use the third-party service [http://htmlpreview.github.io](http://htmlpreview.github.io) to render HTML._
-
 **EasyRTC Server**
 
  * [Install instructions for Ubuntu, Windows, and Mac](./docs/easyrtc_server_install.md)
@@ -57,16 +55,18 @@ _**Note:** Links marked with an asterisk (__*__) use the third-party service [ht
      * `/docs/easyrtc_server_configuration.md`
  * [Using Server Events](./docs/easyrtc_server_events.md)
      * `/docs/easyrtc_server_events.md`  
- * [Server API](http://htmlpreview.github.io/?https://github.com/open-easyrtc/open-easyrtc/blob/master/docs/docs_in_html/server-api/index.html)__*__
-     * `/docs/docs_in_html/server-api/index.html`  
+ * [Server API](https://open-easyrtc.github.io/open-easyrtc/server/)
+     * `https://open-easyrtc.github.io/open-easyrtc/server/`  
 
-**EasyRTC Client API**
+**EasyRTC Client**
  * [Client API tutorial](./docs/easyrtc_client_tutorial.md)
      * `/docs/easyrtc_client_tutorial.md`
- * [Client API (lite)](http://htmlpreview.github.io/?https://github.com/open-easyrtc/open-easyrtc/blob/master/docs/client_html_docs_lite/Easyrtc.html)__*__
-     * `/docs/client_html_docs_lite/Easyrtc.html`
- * [Client File Transfer API (lite)](http://htmlpreview.github.io/?https://github.com/open-easyrtc/open-easyrtc/blob/master/docs/client_html_docs_lite/Easyrtc_ft.html)__*__
-     * `/docs/client_html_docs_lite/easyrtc_ft.html`
+ * [Client API](https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc.html)
+     * `https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc.html`
+ * [Client File Transfer API](https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_ft.html)
+     * `https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_ft.html`
+ * [Client App API](https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_App.html)
+     * `https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_App.html`
 
 **General Development**
  * [Frequently asked questions](./docs/easyrtc_faq.md)
@@ -137,12 +137,13 @@ Copyright (c) 2016, Priologic Software Inc. All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright notice,
-      this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
+* Redistributions of source code must retain the below copyright notice,
+  this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the below copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
 
+```
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -154,3 +155,4 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
+```

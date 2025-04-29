@@ -115,6 +115,8 @@ var Easyrtc = function() {
     var signalingStateChangeListener = null;
     /** @private */
     var connectionOptions =  {
+        // whether or not cross-site requests should made using credentials such as cookies, authorization headers.
+        "withCredentials": false,
         // whether to reconnect automatically
         "reconnection": false,
         // connection timeout before a connect_error and connect_timeout events are emitted
@@ -1453,7 +1455,7 @@ var Easyrtc = function() {
         };
 
         if (self.webSocket) {
-            self.webSocket.json.emit("easyrtcCmd", dataToShip,
+            self.webSocket.emit("easyrtcCmd", dataToShip,
                     function(ackMsg) {
                         if (ackMsg.msgType === "error") {
                             self.showError(ackMsg.msgData.errorCode, ackMsg.msgData.errorText);
@@ -1856,6 +1858,8 @@ var Easyrtc = function() {
      * Allow an externally created mediastream (ie, created by another
      * library) to be used within easyrtc. Tracking when it closes
      * must be done by the supplying party.
+     * @param {MediaStream} stream - the MediaStream to register.
+     * @param {String} streamName - the streamName of the new registered MediaStream.
      */
     this.register3rdPartyLocalMediaStream = function(stream, streamName) {
        return registerLocalMediaStreamByName(stream, streamName);
@@ -2028,7 +2032,7 @@ var Easyrtc = function() {
      * the microphone, sounds stops being transmitted to your peers. By default, the microphone
      * is enabled.
      * @param {Boolean} enable - true to enable the microphone, false to disable it.
-     * @param {String} streamName - an optional streamName
+     * @param {String} streamName - an optional streamName.
      */
     this.enableMicrophone = function(enable, streamName) {
         var stream = getLocalMediaStreamByName(streamName);
@@ -3098,7 +3102,7 @@ var Easyrtc = function() {
 
             logDebug("sending socket message " + JSON.stringify(dataToShip));
 
-            self.webSocket.json.emit("easyrtcCmd", dataToShip,
+            self.webSocket.emit("easyrtcCmd", dataToShip,
                     function(ackMsg) {
                         if (ackMsg.msgType !== "error") {
                             if (!ackMsg.hasOwnProperty("msgData")) {
@@ -3249,7 +3253,7 @@ var Easyrtc = function() {
         }
 
         if (self.webSocket) {
-            self.webSocket.json.emit("easyrtcMsg", outgoingMessage, ackhandler);
+            self.webSocket.emit("easyrtcMsg", outgoingMessage, ackhandler);
         }
         else {
             logDebug("websocket failed because no connection to server");
@@ -5597,7 +5601,7 @@ var Easyrtc = function() {
             };
         }
         if (self.webSocket) {
-            self.webSocket.json.emit("easyrtcCmd", dataToShip,
+            self.webSocket.emit("easyrtcCmd", dataToShip,
                     function(ackMsg) {
                         if (ackMsg.msgType === "iceConfig") {
                             processIceConfig(ackMsg.msgData.iceConfig);
@@ -5848,7 +5852,7 @@ var Easyrtc = function() {
         }
 
         if (self.webSocket) {
-            self.webSocket.json.emit(
+            self.webSocket.emit(
                 "easyrtcAuth",
                 {
                     msgType: "authenticate",

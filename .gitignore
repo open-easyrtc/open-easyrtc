@@ -182,5 +182,4 @@ desktopCapture
 /api/labs/desktopCapture
 test/reports/
 bower_components/
-docs/client_html_docs*
-docs/server_html_docs*
+/docs/html*

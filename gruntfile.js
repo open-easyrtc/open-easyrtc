@@ -143,7 +143,7 @@ module.exports = (function() {
                         '<%= config.docsPath %>/easyrtc_client_tutorial.md'
                     ],
                     options: {
-                        destination: '<%= config.docsPath %>/client_html_docs'
+                        destination: '<%= config.docsPath %>/html/client'
                     }
                 },
 
@@ -153,30 +153,7 @@ module.exports = (function() {
                         '<%= config.docsPath %>/easyrtc_server_install.md'
                     ],
                     options: {
-                        destination: '<%= config.docsPath %>/server_html_docs'
-                    }
-                },
-
-                client_lite: {
-                    src: [
-                        '<%= config.apiPath %>/easyrtc_int.js',
-                        '<%= config.apiPath %>/easyrtc_ft.js',
-                        '<%= config.apiPath %>/easyrtc_app.js',
-                        '<%= config.apiPath %>/easyrtc_lang.js'
-                    ],
-                    options: {
-                        template: 'dev/scripts/client_jsdoc_templates',
-                        destination: '<%= config.docsPath %>/client_html_docs_lite'
-                    }
-                },
-
-                server_lite: {
-                    src: [
-                        '<%= config.libPath %>/easyrtc_public_obj.js',
-                        '<%= config.libPath %>/easyrtc_default_event_listeners'
-                    ],
-                    options: {
-                        destination: '<%= config.docsPath %>/server_html_docs_lite'
+                        destination: '<%= config.docsPath %>/html/server'
                     }
                 }
             },

@@ -1,6 +1,6 @@
 {
   "name": "open-easyrtc",
-  "version": "2.0.20",
+  "version": "2.1.4",
   "homepage": "https://github.com/open-easyrtc/open-easyrtc",
   "author": "Harold Thetiot <hthetiot@gmail.com>",
   "description": "Open-EasyRTC enables quick development of WebRTC",
@@ -27,11 +27,11 @@
   },
   "main": "index",
   "dependencies": {
-    "async": "^3.2.3",
-    "colors": "*",
-    "socket.io-client": "^2.4.0",
-    "underscore": "^1.13.2",
-    "webrtc-adapter": "^8.1.1"
+    "async": "^3.2.6",
+    "colors": "^1.4.0",
+    "socket.io-client": "^4.8.1",
+    "underscore": "^1.13.7",
+    "webrtc-adapter": "^9.0.1"
   },
   "scripts": {
     "lint": "grunt lint",
@@ -40,7 +40,6 @@
     "test": "grunt test",
     "test-headless": "grunt test-headless",
     "doc": "grunt jsdoc:client jsdoc:server",
-    "doc_lite": "grunt jsdoc:client_lite jsdoc:server_lite",
     "serve": "grunt serve"
   },
   "analyze": false,
