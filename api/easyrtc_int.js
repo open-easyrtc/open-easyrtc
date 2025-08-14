@@ -84,7 +84,8 @@ var Easyrtc = function() {
     //
     //
     //  peerConns is a map from caller names to the below object structure
-    //     {  startedAV: boolean,  -- true if we have traded audio/video streams
+    //     {  
+    //        startedAV: boolean,  -- true if we have traded audio/video streams
     //        dataChannelS: RTPDataChannel for outgoing messages if present
     //        dataChannelR: RTPDataChannel for incoming messages if present
     //        dataChannelReady: true if the data channel can be used for sending yet
@@ -304,7 +305,7 @@ var Easyrtc = function() {
      *  connection being updated.
      */
     this.renegotiate = function(otherUser, iceRestart) {
-        var peerConnObj =  peerConns[otherUser];
+        var peerConnObj = peerConns[otherUser];
         if(!peerConnObj) {
             logDebug("Attempt to renegotiate ice on nonexistant connection");
             return;
@@ -331,7 +332,7 @@ var Easyrtc = function() {
         };
 
         if (peerConnObj.sendingOffer) {
-            logDebug('initiateSendOffer.setLocalAndSendMessage0.ignored', peerConnObj.sendingOffer);
+            logDebug('renegotiate already in progress', peerConnObj.sendingOffer);
             return;
         }
 
@@ -339,14 +340,15 @@ var Easyrtc = function() {
             iceRestart = pc.iceConnectionState !== 'connected';
         }
 
-        logDebug('iceRestart:' + iceRestart);
+        logDebug('renegotiate iceRestart:' + iceRestart);
 
         peerConnObj.sendingOffer = true;
-        pc.createOffer({iceRestart: iceRestart }).then(setLocalAndSendMessage0)
-          .catch(function(reason) {
-                 peerConnObj.sendingOffer = false;
-                 callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(reason));
-           });
+        pc.createOffer({iceRestart: iceRestart })
+            .then(setLocalAndSendMessage0)
+            .catch(function(reason) {
+                peerConnObj.sendingOffer = false;
+                callFailureCB(self.errCodes.CALL_ERR, JSON.stringify(reason));
+            });
 
     };
 
@@ -1125,6 +1127,20 @@ var Easyrtc = function() {
     this.callCancelled = function(easyrtcid) {
     };
 
+    /** @private
+     * @param {string} easyrtcid
+     */
+    this.hasPendingOffer = function (easyrtcid) {
+        return !!offersPending[easyrtcid];
+    };
+
+    /** @private
+     * @param {string} easyrtcid
+     */
+    this.hasAcceptancePending = function (easyrtcid) {
+        return !!acceptancePending[easyrtcid];
+    };
+
     /**
      * This function gets the raw RTCPeerConnection for a given easyrtcid
      * @param {String} easyrtcid
@@ -1836,12 +1852,29 @@ var Easyrtc = function() {
     }
 
     /** @private */
+    function hasMediaTrackKind(mediaStream, kind) {
+        return mediaStream.getTracks().some((track) => track.kind === kind)
+    }
+
+    /** @private */
+    function hasLocalMediaTrackKind(mediaStreams, kind) {
+        return Object.values(mediaStreams).some((mediaStream) => 
+            hasMediaTrackKind(mediaStream, kind)
+        )
+    }
+
+    /** @private */
     function registerLocalMediaStreamByName(stream, streamName) {
         var roomName;
         if (!streamName) {
             streamName = "default";
         }
         stream.streamName = streamName;
+
+        // Update haveAudioVideo state
+        haveAudioVideo.video = hasLocalMediaTrackKind(namedLocalMediaStreams, 'video');
+        haveAudioVideo.audio = hasLocalMediaTrackKind(namedLocalMediaStreams, 'audio');
+
         namedLocalMediaStreams[streamName] = stream;
         if (streamName !== "default") {
             var mediaIds = buildMediaIds(),
@@ -3734,6 +3767,187 @@ var Easyrtc = function() {
         }
     }
 
+    //
+    // This function handles data channel message events.
+    //
+
+    /** @private */
+    function createDataChannelMessageHandler(otherUser) {
+
+        var pendingTransfer = {};
+        /** @private */
+        return function dataChannelMessageHandler(event) {
+            logDebug("saw dataChannel.onmessage event: ", event.data);
+
+            if (event.data === "dataChannelPrimed") {
+                self.sendDataWS(otherUser, "dataChannelPrimed", "");
+            }
+            else {
+                //
+                // Chrome and Firefox Interop is passing a event with a strange data="", perhaps
+                // as it's own form of priming message. Comparing the data against "" doesn't
+                // work, so I'm going with parsing and trapping the parse error.
+                //
+                var msg;
+
+                try {
+                    msg = JSON.parse(event.data);
+                } catch (err) {
+                    logDebug('Developer error, unable to parse event data');
+                }
+
+                if (msg) {
+                    if (msg.transfer && msg.transferId) {
+                        if (msg.transfer === 'start') {
+                            logDebug('start transfer #' + msg.transferId);
+
+                            var parts = parseInt(msg.parts);
+                            pendingTransfer = {
+                                chunks: [],
+                                parts: parts,
+                                transferId: msg.transferId
+                            };
+
+                        } else if (msg.transfer === 'chunk') {
+                            logDebug('got chunk for transfer #' + msg.transferId);
+
+                            // check data is valid
+                            if (!(typeof msg.data === 'string' && msg.data.length <= self.maxP2PMessageLength)) {
+                                logDebug('Developer error, invalid data');
+
+                                // check there's a pending transfer
+                            } else if (!pendingTransfer) {
+                                logDebug('Developer error, unexpected chunk');
+
+                            // check that transferId is valid
+                            } else if (msg.transferId !== pendingTransfer.transferId) {
+                                logDebug('Developer error, invalid transfer id');
+
+                            // check that the max length of transfer is not reached
+                            } else if (pendingTransfer.chunks.length + 1 > pendingTransfer.parts) {
+                                logDebug('Developer error, received too many chunks');
+
+                            } else {
+                                pendingTransfer.chunks.push(msg.data);
+                            }
+
+                        } else if (msg.transfer === 'end') {
+                            logDebug('end of transfer #' + msg.transferId);
+
+                            // check there's a pending transfer
+                            if (!pendingTransfer) {
+                                logDebug('Developer error, unexpected end of transfer');
+
+                            // check that transferId is valid
+                            } else if (msg.transferId !== pendingTransfer.transferId) {
+                                logDebug('Developer error, invalid transfer id');
+
+                            // check that all the chunks were received
+                            } else if (pendingTransfer.chunks.length !== pendingTransfer.parts) {
+                                logDebug('Developer error, received wrong number of chunks');
+
+                            } else {
+                                var chunkedMsg;
+                                try {
+                                    chunkedMsg = JSON.parse(pendingTransfer.chunks.join(''));
+                                } catch (err) {
+                                    logDebug('Developer error, unable to parse message');
+                                }
+
+                                if (chunkedMsg) {
+                                    self.receivePeerDistribute(otherUser, chunkedMsg, null);
+                                }
+                            }
+                            pendingTransfer = {  };
+
+                        } else {
+                            logDebug('Developer error, got an unknown transfer message' + msg.transfer);
+                        }
+                    } else {
+                        self.receivePeerDistribute(otherUser, msg, null);
+                    }
+                }
+            }
+        }
+    }
+
+    /** @private */
+    function initOutGoingChannel(otherUser) {
+        logDebug("saw initOutgoingChannel call");
+
+        if (!peerConns[otherUser]) {
+            logDebug("failed to setup outgoing channel listener");
+            return;
+        }
+
+        var dataChannel = peerConns[otherUser].pc.createDataChannel(dataChannelName, self.getDatachannelConstraints());
+        peerConns[otherUser].dataChannelS = dataChannel;
+        peerConns[otherUser].dataChannelR = dataChannel;
+        dataChannel.onmessage = createDataChannelMessageHandler(otherUser);
+        dataChannel.onopen = function(event) {
+            logDebug("saw dataChannel.onopen event");
+
+            if (peerConns[otherUser]) {
+                dataChannel.send("dataChannelPrimed");
+            }
+        };
+        dataChannel.onclose = function(event) {
+            logDebug("saw dataChannelS.onclose event");
+
+            if (peerConns[otherUser]) {
+                peerConns[otherUser].dataChannelReady = false;
+                delete peerConns[otherUser].dataChannelS;
+            }
+            if (onDataChannelClose) {
+                onDataChannelClose(otherUser);
+            }
+        };
+    }
+
+    /** @private */
+    function initIncomingChannel(otherUser) {
+        logDebug("initializing incoming channel handler for " + otherUser);
+
+        if (!peerConns[otherUser]) {
+            logDebug("failed to setup incoming channel listener");
+            return;
+        }
+
+        peerConns[otherUser].pc.ondatachannel = function(event) {
+
+            logDebug("saw incoming data channel");
+
+            if (!peerConns[otherUser]) {
+                logDebug("failed to setup incoming channel listener");
+                return;
+            }
+
+            var dataChannel = event.channel;
+            peerConns[otherUser].dataChannelR = dataChannel;
+            peerConns[otherUser].dataChannelS = dataChannel;
+            peerConns[otherUser].dataChannelReady = true;
+            dataChannel.onmessage = createDataChannelMessageHandler(otherUser);
+            dataChannel.onclose = function(event) {
+                logDebug("saw dataChannelR.onclose event");
+
+                if (peerConns[otherUser]) {
+                    peerConns[otherUser].dataChannelReady = false;
+                    delete peerConns[otherUser].dataChannelR;
+                }
+                if (onDataChannelClose) {
+                    onDataChannelClose(otherUser);
+                }
+            };
+            dataChannel.onopen = function(event) {
+                logDebug("saw dataChannel.onopen event");
+
+                if (peerConns[otherUser]) {
+                    dataChannel.send("dataChannelPrimed");
+                }
+            };
+        };
+    }
+
     /** @private */
     // TODO split buildPeerConnection it more thant 500 lines
     function buildPeerConnection(otherUser, isInitiator, failureCB, streamNames) {
@@ -3797,7 +4011,8 @@ var Easyrtc = function() {
                 remoteStreamIdToName: {},
                 streamsAddedAcks: {},
                 liveRemoteStreams: {},
-                supportHalfTrickleIce:false
+                supportHalfTrickleIce: false,
+                sharingData: dataEnabled
             };
 
             pc.onnegotiationneeded = function(event) {
@@ -3962,194 +4177,34 @@ var Easyrtc = function() {
             return null;
         }
 
-        var i, stream;
+        
+        var i, stream,
+            streamName = 'default',
+            streamReceiptHandler = function () {
+                logDebug("saw ack on remote media stream");
+            };
+
         if (streamNames) {
             for (i = 0; i < streamNames.length; i++) {
-                stream = getLocalMediaStreamByName(streamNames[i]);
+                streamName = streamNames[i];
+                stream = getLocalMediaStreamByName(streamName);
                 if (stream) {
                     addStreamToPeerConnection(stream, pc);
+                    if (streamReceiptHandler) {
+                        peerConns[otherUser].streamsAddedAcks[streamName] = streamReceiptHandler;
+                    }
                 }
                 else {
-                    logDebug("Developer error, attempt to access unknown local media stream " + streamNames[i]);
+                    logDebug("Developer error, attempt to access unknown local media stream " + streamName);
                 }
             }
         }
         else if (autoInitUserMedia && (self.videoEnabled || self.audioEnabled)) {
             stream = self.getLocalStream();
             addStreamToPeerConnection(stream, pc);
-        }
-
-        //
-        // This function handles data channel message events.
-        //
-        var pendingTransfer = {};
-        function dataChannelMessageHandler(event) {
-            logDebug("saw dataChannel.onmessage event: ", event.data);
-
-            if (event.data === "dataChannelPrimed") {
-                self.sendDataWS(otherUser, "dataChannelPrimed", "");
+            if (streamReceiptHandler) {
+                peerConns[otherUser].streamsAddedAcks[streamName] = streamReceiptHandler;
             }
-            else {
-                //
-                // Chrome and Firefox Interop is passing a event with a strange data="", perhaps
-                // as it's own form of priming message. Comparing the data against "" doesn't
-                // work, so I'm going with parsing and trapping the parse error.
-                //
-                var msg;
-
-                try {
-                    msg = JSON.parse(event.data);
-                } catch (err) {
-                    logDebug('Developer error, unable to parse event data');
-                }
-
-                if (msg) {
-                    if (msg.transfer && msg.transferId) {
-                        if (msg.transfer === 'start') {
-                            logDebug('start transfer #' + msg.transferId);
-
-                            var parts = parseInt(msg.parts);
-                            pendingTransfer = {
-                                chunks: [],
-                                parts: parts,
-                                transferId: msg.transferId
-                            };
-
-                        } else if (msg.transfer === 'chunk') {
-                            logDebug('got chunk for transfer #' + msg.transferId);
-
-                            // check data is valid
-                            if (!(typeof msg.data === 'string' && msg.data.length <= self.maxP2PMessageLength)) {
-                                logDebug('Developer error, invalid data');
-
-                                // check there's a pending transfer
-                            } else if (!pendingTransfer) {
-                                logDebug('Developer error, unexpected chunk');
-
-                            // check that transferId is valid
-                            } else if (msg.transferId !== pendingTransfer.transferId) {
-                                logDebug('Developer error, invalid transfer id');
-
-                            // check that the max length of transfer is not reached
-                            } else if (pendingTransfer.chunks.length + 1 > pendingTransfer.parts) {
-                                logDebug('Developer error, received too many chunks');
-
-                            } else {
-                                pendingTransfer.chunks.push(msg.data);
-                            }
-
-                        } else if (msg.transfer === 'end') {
-                            logDebug('end of transfer #' + msg.transferId);
-
-                            // check there's a pending transfer
-                            if (!pendingTransfer) {
-                                logDebug('Developer error, unexpected end of transfer');
-
-                            // check that transferId is valid
-                            } else if (msg.transferId !== pendingTransfer.transferId) {
-                                logDebug('Developer error, invalid transfer id');
-
-                            // check that all the chunks were received
-                            } else if (pendingTransfer.chunks.length !== pendingTransfer.parts) {
-                                logDebug('Developer error, received wrong number of chunks');
-
-                            } else {
-                                var chunkedMsg;
-                                try {
-                                    chunkedMsg = JSON.parse(pendingTransfer.chunks.join(''));
-                                } catch (err) {
-                                    logDebug('Developer error, unable to parse message');
-                                }
-
-                                if (chunkedMsg) {
-                                    self.receivePeerDistribute(otherUser, chunkedMsg, null);
-                                }
-                            }
-                            pendingTransfer = {  };
-
-                        } else {
-                            logDebug('Developer error, got an unknown transfer message' + msg.transfer);
-                        }
-                    } else {
-                        self.receivePeerDistribute(otherUser, msg, null);
-                    }
-                }
-            }
-        }
-
-        function initOutGoingChannel(otherUser) {
-            logDebug("saw initOutgoingChannel call");
-
-            if (!peerConns[otherUser]) {
-                logDebug("failed to setup outgoing channel listener");
-                return;
-            }
-
-            var dataChannel = pc.createDataChannel(dataChannelName, self.getDatachannelConstraints());
-            peerConns[otherUser].dataChannelS = dataChannel;
-            peerConns[otherUser].dataChannelR = dataChannel;
-            dataChannel.onmessage = dataChannelMessageHandler;
-            dataChannel.onopen = function(event) {
-                logDebug("saw dataChannel.onopen event");
-
-                if (peerConns[otherUser]) {
-                    dataChannel.send("dataChannelPrimed");
-                }
-            };
-            dataChannel.onclose = function(event) {
-                logDebug("saw dataChannelS.onclose event");
-
-                if (peerConns[otherUser]) {
-                    peerConns[otherUser].dataChannelReady = false;
-                    delete peerConns[otherUser].dataChannelS;
-                }
-                if (onDataChannelClose) {
-                    onDataChannelClose(otherUser);
-                }
-            };
-        }
-
-        function initIncomingChannel(otherUser) {
-            logDebug("initializing incoming channel handler for " + otherUser);
-
-            if (!peerConns[otherUser]) {
-                logDebug("failed to setup incoming channel listener");
-                return;
-            }
-
-            peerConns[otherUser].pc.ondatachannel = function(event) {
-
-                logDebug("saw incoming data channel");
-
-                if (!peerConns[otherUser]) {
-                    logDebug("failed to setup incoming channel listener");
-                    return;
-                }
-
-                var dataChannel = event.channel;
-                peerConns[otherUser].dataChannelR = dataChannel;
-                peerConns[otherUser].dataChannelS = dataChannel;
-                peerConns[otherUser].dataChannelReady = true;
-                dataChannel.onmessage = dataChannelMessageHandler;
-                dataChannel.onclose = function(event) {
-                    logDebug("saw dataChannelR.onclose event");
-
-                    if (peerConns[otherUser]) {
-                        peerConns[otherUser].dataChannelReady = false;
-                        delete peerConns[otherUser].dataChannelR;
-                    }
-                    if (onDataChannelClose) {
-                        onDataChannelClose(otherUser);
-                    }
-                };
-                dataChannel.onopen = function(event) {
-                    logDebug("saw dataChannel.onopen event");
-
-                    if (peerConns[otherUser]) {
-                        dataChannel.send("dataChannelPrimed");
-                    }
-                };
-            };
         }
 
         //
@@ -4302,11 +4357,11 @@ var Easyrtc = function() {
                 logDebug("sending answer");
 
                 function onSignalSuccess() {
-                    logDebug("sending success");
+                    logDebug("sending to signaling success");
                 }
 
                 function onSignalFailure(errorCode, errorText) {
-                    logDebug("sending error");
+                    logDebug("sending to signaling error");
                     delete peerConns[caller];
                     self.showError(errorCode, errorText);
                 }
@@ -4452,7 +4507,7 @@ var Easyrtc = function() {
         var callFailureCB = peerConnObj.callFailureCB || self.showError;
         var setLocalAndSendMessage0 = function(sessionDescription) {
             if (peerConnObj.cancelled) {
-                logDebug('initiateSendOffer.setLocalAndSendMessage0.ignored', peerConnObj.cancelled, peerConnObj.sendingOffer);
+                logDebug('initiateSendOffer ignored because call canceled', peerConnObj.cancelled, peerConnObj.sendingOffer);
                 return;
             }
             var sendOffer = function() {
@@ -4470,7 +4525,7 @@ var Easyrtc = function() {
         };
 
         if (peerConnObj.sendingOffer) {
-            logDebug('initiateSendOffer.setLocalAndSendMessage0.ignored', peerConnObj.sendingOffer);
+            logDebug('initiateSendOffer ignore because already sending offer', peerConnObj.sendingOffer);
             return;
         }
 
@@ -4843,17 +4898,17 @@ var Easyrtc = function() {
             if (peerConns[otherUser].pc) {
                 closePeer(otherUser);
             }
-            else {
-                if (self.callCancelled) {
-                    self.callCancelled(otherUser, true);
-                }
-            }
 
             if (peerConns[otherUser]) {
                 delete peerConns[otherUser];
             }
         }
         else {
+        
+            if (offersPending[otherUser]) {
+                delete offersPending[otherUser];
+            }
+
             if (self.callCancelled) {
                 self.callCancelled(otherUser, true);
             }
@@ -5335,9 +5390,10 @@ var Easyrtc = function() {
             }
         }
         var onSignalSuccess = function() {
-
+            logDebug("sending to signaling success");
         };
         var onSignalFailure = function(errorCode, errorText) {
+            logDebug("sending to signaling error");
             if (peerConns[caller]) {
                 delete peerConns[caller];
             }
