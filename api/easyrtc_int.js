@@ -4074,8 +4074,9 @@ var Easyrtc = function() {
 
     function onPeerStreamAck(otherUser, streamName) {           
         if (
-            peerConns[otherUser].streamsAddedAcks &&
-                peerConns[otherUser].streamsAddedAcks.hasOwnProperty(streamName)
+            peerConns[otherUser] &&
+                peerConns[otherUser].streamsAddedAcks &&
+                    peerConns[otherUser].streamsAddedAcks.hasOwnProperty(streamName)
         ) {
             try {
                 (peerConns[otherUser].streamsAddedAcks[streamName])(otherUser, streamName);
@@ -4210,10 +4211,10 @@ var Easyrtc = function() {
                         onPeerOpen(otherUser)
                         break;
                     case "failed":
-                        closePeer(otherUser)
                         if (failureCB) {
                             failureCB(self.errCodes.NOVIABLEICE, "No usable STUN/TURN path");
                         }
+                        closePeer(otherUser)
                         break;
                     case "disconnected":
                         onPeerFailing(otherUser)
