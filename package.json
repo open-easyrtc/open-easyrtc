@@ -1,6 +1,7 @@
 {
   "name": "open-easyrtc",
-  "version": "2.1.4",
+  "version": "2.1.5",
+  "license": "BSD-2-Clause",
   "homepage": "https://github.com/open-easyrtc/open-easyrtc",
   "author": "Harold Thetiot <hthetiot@gmail.com>",
   "description": "Open-EasyRTC enables quick development of WebRTC",
@@ -26,6 +27,10 @@
     "url": "https://github.com/open-easyrtc/open-easyrtc/issues"
   },
   "main": "index",
+  "analyze": false,
+  "engines": {
+    "node": ">=0.8"
+  },
   "dependencies": {
     "async": "^3.2.6",
     "colors": "^1.4.0",
@@ -41,11 +46,6 @@
     "test-headless": "grunt test-headless",
     "doc": "grunt jsdoc:client jsdoc:server",
     "serve": "grunt serve"
-  },
-  "analyze": false,
-  "license": "BSD-2-Clause",
-  "engines": {
-    "node": ">=0.8"
   },
   "devDependencies": {
     "fs": "0.0.2",
