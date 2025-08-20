@@ -1429,7 +1429,10 @@ var Easyrtc = function() {
     }
 
     /** @private */
-    this._roomApiFieldTimer = {};
+    var roomApiFieldTimer = {};
+
+    /** @private */
+    this.roomApiFields = {};
 
     /**
      * @private
@@ -1440,16 +1443,16 @@ var Easyrtc = function() {
         // Rather than issue the send request immediately, we set a timer so we can accumulate other
         // calls
         //
-        if (self._roomApiFieldTimer[roomName]) {
-            clearTimeout(self._roomApiFieldTimer[roomName]);
+        if (roomApiFieldTimer[roomName]) {
+            clearTimeout(roomApiFieldTimer[roomName]);
         }
 
-        self._roomApiFieldTimer[roomName] = setTimeout(function() {
-            var roomApiFields = self._roomApiFields[roomName];
+        roomApiFieldTimer[roomName] = setTimeout(function() {
+            var roomApiFields = self.roomApiFields[roomName];
             if (roomApiFields) {
                 sendRoomApiFields(roomName, roomApiFields);
             }
-            self._roomApiFieldTimer[roomName] = null;
+            roomApiFieldTimer[roomName] = null;
         }, 10);
     }
 
@@ -1468,19 +1471,14 @@ var Easyrtc = function() {
      *   });
      */
     this.setRoomApiField = function(roomName, fieldName, fieldValue) {
-        //
-        // if we're not connected yet, we'll just cache the fields until we are.
-        //
-        if (!self._roomApiFields) {
-            self._roomApiFields = {};
-        }
+
         if (!fieldName && !fieldValue) {
-            clearTimeout(self._roomApiFieldTimer[roomName]);
-            delete self._roomApiFields[roomName];
+            clearTimeout(roomApiFieldTimer[roomName]);
+            delete self.roomApiFields[roomName];
         } else {
 
-            if (!self._roomApiFields[roomName]) {
-                self._roomApiFields[roomName] = {};
+            if (!self.roomApiFields[roomName]) {
+                self.roomApiFields[roomName] = {};
             }
 
             if (fieldValue !== undefined && fieldValue !== null) {
@@ -1492,9 +1490,14 @@ var Easyrtc = function() {
                         return;
                     }
                 }
-                self._roomApiFields[roomName][fieldName] = {fieldName: fieldName, fieldValue: fieldValue};
+                
+                self.roomApiFields[roomName][fieldName] = {
+                    fieldName: fieldName, 
+                    fieldValue: fieldValue
+                };
+
             } else {
-                delete self._roomApiFields[roomName][fieldName];
+                delete self.roomApiFields[roomName][fieldName];
             }
 
             if (self.webSocketConnected) {
@@ -3127,10 +3130,12 @@ var Easyrtc = function() {
 
         self.roomData = {};
         self.roomJoin = {};
+        self.roomApiFields = {};
+
         self.loggingOut = false;
         self.myEasyrtcid = null;
-        self.disconnecting = false;
         userConfig = {};
+        self.disconnecting = false;
     }
 
     /**
@@ -4140,7 +4145,7 @@ var Easyrtc = function() {
                 pc: pc,
                 isInitiator: isInitiator,
                 // States
-                accepted: false,
+                accepted: !isInitiator,
                 cancelled: false,
                 failing: false,
                 pendingAwnser: false,
@@ -4202,10 +4207,10 @@ var Easyrtc = function() {
 
                 switch (connState) {
                     case "connected":
-                        onPeerOpen(caller)
+                        onPeerOpen(otherUser)
                         break;
                     case "failed":
-                        closePeer(caller)
+                        closePeer(otherUser)
                         if (failureCB) {
                             failureCB(self.errCodes.NOVIABLEICE, "No usable STUN/TURN path");
                         }
@@ -4453,13 +4458,12 @@ var Easyrtc = function() {
 
     /** @private */
     function doAnswerBody(caller, msgData, streamNames) {
-        if( !peerConns[caller] ) {
+        if (!peerConns[caller]) {
             buildPeerConnection(caller, false, function(message) {
                 self.showError(self.errCodes.SYSTEM_ERR, message);
                 onPeerFailing(caller)
               }, streamNames);
         }
-
 
         if (!peerConns[caller] || !peerConns[caller].pc) {
             logDebug("buildPeerConnection failed. Call not answered");
@@ -6049,9 +6053,9 @@ var Easyrtc = function() {
                     else {
                         processToken(msg);
 
-                        if (self._roomApiFields) {
-                            for (room in self._roomApiFields) {
-                                if (self._roomApiFields.hasOwnProperty(room)) {
+                        if (self.roomApiFields) {
+                            for (room in self.roomApiFields) {
+                                if (self.roomApiFields.hasOwnProperty(room)) {
                                     enqueueSendRoomApi(room);
                                 }
                             }
@@ -6238,11 +6242,16 @@ var Easyrtc = function() {
             self.showError(self.errCodes.DEVELOPER_ERR, "Attempt to connect when already connected to socket server");
             return;
         }
+
+        self.applicationName = applicationName;
+        
         pc_ice_config = {};
         closedChannel = null;
-        userConfig = {}; // used internally by updateConfiguration
         queuedMessages = {};
-        self.applicationName = applicationName;
+        
+        // used internally by updateConfiguration
+        userConfig = {}; 
+
         fields = {
             rooms: {},
             application: {},
