@@ -2,9 +2,12 @@
     "esversion": 6,
     "asi" : true,
     "loopfunc": true,
+    "undef": true,
+    "browser": true,
     "globals": {
         "console": true,
         "easyrtc": true,
-        "RTCPeerConnection": true
+        "RTCPeerConnection": true,
+        "MediaStream": true
     } 
 }
