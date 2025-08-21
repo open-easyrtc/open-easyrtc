@@ -1008,7 +1008,7 @@ var Easyrtc = function() {
     this.getDatachannelConstraints = function() {
         return {
             reliable: adapter && adapter.browserDetails &&
-                adapter.browserDetails.browser !== "chrome" &&
+                adapter.browserDetails.browser === "chrome" &&
                     adapter.browserDetails.version < 31
         };
     };
@@ -1400,8 +1400,7 @@ var Easyrtc = function() {
      * @param fields
      */
     function sendRoomApiFields(roomName, fields) {
-        var fieldAsString = JSON.stringify(fields);
-        JSON.parse(fieldAsString);
+
         var dataToShip = {
             msgType: "setRoomApiField",
             msgData: {
@@ -1596,7 +1595,7 @@ var Easyrtc = function() {
         if (window.URL && window.URL.createObjectURL) {
             return window.URL.createObjectURL(mediaStream);
         }
-        else if (window.webkitURL && window.webkitURL.createObjectURL) {
+        else if (window.webkit && window.webkit.createObjectURL) {
             return window.webkit.createObjectURL(mediaStream);
         }
         else {
@@ -4177,7 +4176,7 @@ var Easyrtc = function() {
                 logDebug('onnegotiationneeded', signalingState);
 
                 if (newPeerConn.enableNegotiateListener) {
-                    initiateSendOffer(otherUser);
+                    initiateSendOffer(otherUser, eventTarget, signalingState);
                 }
             };
 
@@ -4237,10 +4236,6 @@ var Easyrtc = function() {
             };
 
             pc.onicecandidate = function(event) {
-                if (newPeerConn.cancelled) {
-                    return;
-                }
-
                 if (newPeerConn.cancelled) {
                     return;
                 }
@@ -4563,7 +4558,7 @@ var Easyrtc = function() {
 
             sd = new RTCSessionDescription({
                 type: sd.type,
-                sdp: sd.sdp
+                sdp: sdp
             });
 
             logDebug("sdp ||  " + JSON.stringify(sd));
@@ -4627,7 +4622,8 @@ var Easyrtc = function() {
         initiateSendOffer(otherUser);
     }
 
-    function initiateSendOffer(otherUser) {
+    function initiateSendOffer(otherUser, eventTarget, signalingState) {
+
         var peerConnObj = peerConns[otherUser];
         if( !peerConnObj ) {
            logDebug("message attempt to send offer for nonexistent peer connection " + otherUser);
@@ -4779,7 +4775,7 @@ var Easyrtc = function() {
             isActive = true;
         } else {
             var tracks = stream.getTracks();
-            isActive = tracks.length && tracks.reduce(function (track) {
+            isActive = tracks.length && tracks.some(function (track) {
                 return track.enabled;
             });
         }
@@ -5582,7 +5578,7 @@ var Easyrtc = function() {
 
                     // Ack remote streams
                     for (var streamName in newPeerConn.streamsAddedAcks) {
-                        onPeerStreamAck(caller, msgData.streamName)
+                        onPeerStreamAck(caller, streamName)
                     }
                 }
 
@@ -5829,14 +5825,13 @@ var Easyrtc = function() {
         if (self.webSocket) {
 
             var msgData = {
-                roomJoin: {
-                    roomName: roomName
-                }
+                roomJoin: {}
             };
         
-            // Add roomParameters to newRoomMsgData, 
-            // but do not store roomParameters in roomJoin, 
-            // roomParameters is only for roomJoin event
+            var newRoomData = {
+                roomName: roomName
+            };
+            
             if (roomParameters) {
                 try {
                     JSON.stringify(roomParameters);
@@ -5851,17 +5846,21 @@ var Easyrtc = function() {
                     }
                 }
 
-                msgData.roomJoin.roomParameter = parameters;
+                newRoomData.roomParameter = parameters;
             }
+
+            msgData.roomJoin[roomName] = newRoomData;
 
             sendSignalling(
                 null, "roomJoin", msgData, 
                 function signallingSuccess(msgType, msgData) {
 
-                    // Init empty roomJoin, 
+                    // Create empty room data
                     self.roomJoin[roomName] = {
                         roomName: roomName
                     };
+
+                    var roomData = msgData.roomData;
 
                     if (successCB) {
                         successCB(roomName);
@@ -6113,7 +6112,7 @@ var Easyrtc = function() {
 
             } catch(socketErr) {
                 self.webSocket = 0;
-                errorCallback( self.errCodes.SYSTEM_ERROR, socketErr.toString());
+                errorCallback( self.errCodes.SYSTEM_ERR, socketErr.toString());
                 return;
             }
         }
