@@ -4528,7 +4528,7 @@ var Easyrtc = function() {
 
         var invokeCreateAnswer = function() {
             if (newPeerConn.cancelled) {
-                logDebug('invokeCreateAnswer.canceled', pc.signalingState);
+                logDebug('invokeCreateAnswer.cancelled', pc.signalingState);
                 return;
             }
             if (newPeerConn.pendingAwnser) {
@@ -4638,7 +4638,7 @@ var Easyrtc = function() {
         var callFailureCB = peerConnObj.callFailureCB || self.showError;
         var setLocalAndSendMessage0 = function(sessionDescription) {
             if (peerConnObj.cancelled) {
-                logDebug('initiateSendOffer ignored because call canceled', peerConnObj.cancelled, peerConnObj.sendingOffer);
+                logDebug('initiateSendOffer ignored because call cancelled', peerConnObj.cancelled, peerConnObj.sendingOffer);
                 return;
             }
             var sendOffer = function() {
