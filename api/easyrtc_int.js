@@ -5273,7 +5273,7 @@ var Easyrtc = function() {
                     self.roomJoin[roomName] = roomData[roomName];
                 }
                 var mediaIds = buildMediaIds();
-                if (!isEmptyObj(mediaId)) {
+                if (!isEmptyObj(mediaIds)) {
                     self.setRoomApiField(roomName, "mediaIds", mediaIds);
                 }
             }
