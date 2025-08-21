@@ -4908,8 +4908,8 @@ var Easyrtc = function() {
         if (window.URL && window.URL.createObjectURL) {
             return window.URL.createObjectURL(mediaStream);
         }
-        else if (window.webkit && window.webkit.createObjectURL) {
-            return window.webkit.createObjectURL(mediaStream);
+        else if (window.webkitURL && window.webkitURL.createObjectURL) {
+            return window.webkitURL.createObjectURL(mediaStream);
         }
         else {
             errMessage = "Your browsers does not support URL.createObjectURL.";
@@ -7493,7 +7493,7 @@ var Easyrtc = function() {
                 }
             };
 
-            pc.onsignalingstatechange = function () {
+            pc.onsignalingstatechange = function (event) {
                 if (newPeerConn.cancelled) {
                     return;
                 }
