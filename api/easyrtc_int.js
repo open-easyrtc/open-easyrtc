@@ -3133,8 +3133,10 @@ var Easyrtc = function() {
         self.roomApiFields = {};
 
         self.loggingOut = false;
+        
         self.myEasyrtcid = null;
         userConfig = {};
+        
         self.disconnecting = false;
     }
 
@@ -3708,14 +3710,16 @@ var Easyrtc = function() {
             //
             if (alteredData) {
                 logDebug("cfg=" + JSON.stringify(alteredData.added));
-
                 if (self.webSocket) {
-                    sendSignalling(null, "setUserCfg", {setUserCfg: alteredData.added}, null, null);
+                    sendSignalling(null, "setUserCfg", {
+                        setUserCfg: alteredData.added
+                    }, null, null);
                 }
             }
             userConfig = newConfig;
         };
-        if (userConfig === {}) {
+
+        if (isEmptyObj(userConfig)) {
             sendDeltas();
         }
         else {
@@ -5269,7 +5273,7 @@ var Easyrtc = function() {
                     self.roomJoin[roomName] = roomData[roomName];
                 }
                 var mediaIds = buildMediaIds();
-                if (mediaIds !== {}) {
+                if (!isEmptyObj(mediaId)) {
                     self.setRoomApiField(roomName, "mediaIds", mediaIds);
                 }
             }
@@ -6176,8 +6180,9 @@ var Easyrtc = function() {
         addSocketListener("easyrtcCmd", onChannelCmd);
         addSocketListener("disconnect", function(/* code, reason, wasClean */) {
 
+            // Mark already closed
             self.webSocketConnected = false;
-            userConfig = {};
+            
             disconnectBody();
 
             if (self.disconnectListener) {
