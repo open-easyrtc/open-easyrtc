@@ -4301,7 +4301,7 @@ var Easyrtc = function() {
     };
 
     /** @private
-     * @param {Array} pc_ice_config ice configuration array
+     * @param {Array} pcIceConfig ice configuration array
      * @param {Object} optionalStuff peer constraints.
      */
     this.createRTCPeerConnection = function(pc_config, optionalStuff) {
@@ -6202,19 +6202,19 @@ var Easyrtc = function() {
     /** @private */
     this.webSocket = null;
     /** @private */
-    var pc_ice_config = {};
+    var pcIceConfig = {};
     /** @private */
-    var pc_ice_config_to_use = null;
+    var pcIceConfigToUse = null;
     /** @private */
-    var pc_config_to_use = null;
+    var pcConfigToUse = null;
     /** @private */
-    var use_fresh_ice_each_peer = false;
+    var useFreshIceEachPeer = false;
 
     /**
      * Sets the peer connection configuration that will be used in subsequent calls.
      */
     this.setPeerConnectionConfig = function(value) {
-        pc_config_to_use = value;
+        pcConfigToUse = value;
     };
 
     /**
@@ -6222,7 +6222,7 @@ var Easyrtc = function() {
      * @param {Boolean} value the default is false.
      */
     this.setUseFreshIceEachPeerConnection = function(value) {
-        use_fresh_ice_each_peer = value;
+        useFreshIceEachPeer = value;
     };
 
     /**
@@ -6231,7 +6231,7 @@ var Easyrtc = function() {
      * @return {Object} which has the form {iceServers:[ice_server_entry, ice_server_entry, ...]}
      */
     this.getServerIce = function() {
-        return pc_ice_config;
+        return pcIceConfig;
     };
 
     /**
@@ -6257,7 +6257,7 @@ var Easyrtc = function() {
             self.showError(self.errCodes.DEVELOPER_ERR, "Bad ice configuration passed to easyrtc.setIceUsedInCalls");
         }
         else {
-            pc_ice_config_to_use = ice;
+            pcIceConfigToUse = ice;
         }
     };
 
@@ -7413,7 +7413,7 @@ var Easyrtc = function() {
         var message;
 
         // Apply peer config
-        var pcConfig = pc_config_to_use || {
+        var pcConfig = pcConfigToUse || {
             //"offerToReceiveVideo": true,
             //"offerToReceiveAudio": true,
             // @ts-ignore
@@ -7430,7 +7430,7 @@ var Easyrtc = function() {
         };
 
         // Apply iceServers
-        var iceConfig = (pc_ice_config_to_use ? pc_ice_config_to_use : pc_ice_config);
+        var iceConfig = (pcIceConfigToUse ? pcIceConfigToUse : pcIceConfig);
         if (iceConfig.iceServers) {
             pcConfig.iceServers = iceConfig.iceServers;
         }
@@ -7841,7 +7841,7 @@ var Easyrtc = function() {
 
         var invokeCreateAnswer = function() {
             if (newPeerConn.cancelled) {
-                logDebug('invokeCreateAnswer.canceled', pc.signalingState);
+                logDebug('invokeCreateAnswer.cancelled', pc.signalingState);
                 return;
             }
             if (newPeerConn.pendingAwnser) {
@@ -7907,7 +7907,7 @@ var Easyrtc = function() {
                 return;
             }
         }
-        if (use_fresh_ice_each_peer) {
+        if (useFreshIceEachPeer) {
             self.getFreshIceConfig(function(succeeded) {
                 if (succeeded) {
                     doAnswerBody(caller, msgData, streamNames);
@@ -7951,7 +7951,7 @@ var Easyrtc = function() {
         var callFailureCB = peerConnObj.callFailureCB || self.showError;
         var setLocalAndSendMessage0 = function(sessionDescription) {
             if (peerConnObj.cancelled) {
-                logDebug('initiateSendOffer ignored because call canceled', peerConnObj.cancelled, peerConnObj.sendingOffer);
+                logDebug('initiateSendOffer ignored because call cancelled', peerConnObj.cancelled, peerConnObj.sendingOffer);
                 return;
             }
             var sendOffer = function() {
@@ -8065,7 +8065,7 @@ var Easyrtc = function() {
             logDebug(message);
             callFailureCB(self.errCodes.ALREADY_CONNECTED, message);
 
-        } else if (use_fresh_ice_each_peer) {
+        } else if (useFreshIceEachPeer) {
             self.getFreshIceConfig(function(succeeded) {
                 if (succeeded) {
                     callBody(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB, streamNames);
@@ -8516,7 +8516,7 @@ var Easyrtc = function() {
 
         var i, j, item;
 
-        pc_ice_config = {
+        pcIceConfig = {
             iceServers: []
         };
 
@@ -8533,7 +8533,7 @@ var Easyrtc = function() {
                 "iceConfig received from server didn't have an array called iceServers, ignoring it"
             );
         } else {
-            pc_ice_config = {
+            pcIceConfig = {
                 iceServers: iceConfig.iceServers
             };
         }
@@ -8641,6 +8641,7 @@ var Easyrtc = function() {
             }
             processOccupantList(roomName, lastLoggedInList[roomName]);
         }
+
         self.emitEvent("roomOccupant", lastLoggedInList);
     }
 
@@ -8691,7 +8692,7 @@ var Easyrtc = function() {
         }
 
         pc.addIceCandidate(candidate, iceAddSuccess, iceAddFailure);
-    };
+    }
 
     /** @private */
     function flushCachedCandidates(caller) {
@@ -8702,7 +8703,7 @@ var Easyrtc = function() {
             }
             delete queuedMessages[caller];
         }
-    };
+    }
 
     /** @private */
     function isPolitePeer(caller) {
@@ -8796,7 +8797,7 @@ var Easyrtc = function() {
         else {
             self.acceptCheck(caller, acceptOfferhelper);
         }
-    };
+    }
 
     /** @private */
     function processReject(caller) {
@@ -9137,56 +9138,72 @@ var Easyrtc = function() {
             self.showError(self.errCodes.DEVELOPER_ERR, "Attempt to join room " + roomName + " which you are already in.");
             return;
         }
-
-        var newRoomData = {roomName: roomName};
-        if (roomParameters) {
-            try {
-                JSON.stringify(roomParameters);
-            } catch (error) {
-                self.showError(self.errCodes.DEVELOPER_ERR, "non-jsonable parameter to easyrtc.joinRoom");
-                throw "Developer error, see application error messages";
-            }
-            var parameters = {};
-            for (var key in roomParameters) {
-                if (roomParameters.hasOwnProperty(key)) {
-                    parameters[key] = roomParameters[key];
-                }
-            }
-            newRoomData.roomParameter = parameters;
-        }
-        var msgData = {
-            roomJoin: {}
-        };
-        var roomData;
-        var signallingSuccess, signallingFailure;
+        
         if (self.webSocket) {
 
-            msgData.roomJoin[roomName] = newRoomData;
-            signallingSuccess = function(msgType, msgData) {
-
-                roomData = msgData.roomData;
-                self.roomJoin[roomName] = newRoomData;
-
-                if (successCB) {
-                    successCB(roomName);
-                }
-
-                processRoomData(roomData);
-            };
-            signallingFailure = function(errorCode, errorText) {
-                if (failureCB) {
-                    failureCB(errorCode, errorText, roomName);
-                }
-                else {
-                    self.showError(errorCode, self.format(self.getConstantString("unableToEnterRoom"), roomName, errorText));
+            var msgData = {
+                roomJoin: {
+                    roomName: roomName
                 }
             };
-            sendSignalling(null, "roomJoin", msgData, signallingSuccess, signallingFailure);
+        
+            // Add roomParameters to newRoomMsgData, 
+            // but do not store roomParameters in roomJoin, 
+            // roomParameters is only for roomJoin event
+            if (roomParameters) {
+                try {
+                    JSON.stringify(roomParameters);
+                } catch (error) {
+                    self.showError(self.errCodes.DEVELOPER_ERR, "non-jsonable parameter to easyrtc.joinRoom");
+                    throw "Developer error, see application error messages";
+                }
+                var parameters = {};
+                for (var key in roomParameters) {
+                    if (roomParameters.hasOwnProperty(key)) {
+                        parameters[key] = roomParameters[key];
+                    }
+                }
+
+                msgData.roomJoin.roomParameter = parameters;
+            }
+
+            sendSignalling(
+                null, "roomJoin", msgData, 
+                function signallingSuccess(msgType, msgData) {
+
+                    // Init empty roomJoin, 
+                    self.roomJoin[roomName] = {
+                        roomName: roomName
+                    };
+
+                    if (successCB) {
+                        successCB(roomName);
+                    }
+
+                    processRoomData(roomData);
+                }, 
+                function signallingFailure(errorCode, errorText) {
+                    if (failureCB) {
+                        failureCB(errorCode, errorText, roomName);
+                    }
+                    else {
+                        self.showError(
+                            errorCode, 
+                            self.format(
+                                self.getConstantString("unableToEnterRoom"), 
+                                roomName, 
+                                errorText
+                            )
+                        );
+                    }
+                }
+            );
         }
         else {
-            self.roomJoin[roomName] = newRoomData;
-        }
+            logDebug("websocket failed because no connection to server");
 
+            throw "Attempt to join room without a valid connection to the server.";
+        }
     };
 
     /**
@@ -9511,7 +9528,11 @@ var Easyrtc = function() {
     //
     function checkIceGatheringState(otherPeer) {
         logDebug("entered checkIceGatheringState");
-        if( peerConns[otherPeer] && peerConns[otherPeer].pc && peerConns[otherPeer].pc.iceGatheringState ) {
+        if (
+            peerConns[otherPeer] && 
+                peerConns[otherPeer].pc && 
+                    peerConns[otherPeer].pc.iceGatheringState
+        ) {
            if( peerConns[otherPeer].pc.iceGatheringState === "complete" ) {
                self.sendPeerMessage(otherPeer, "iceGatheringDone", {});
                logDebug("sent iceGatherDone message to ", otherPeer);
@@ -9564,7 +9585,7 @@ var Easyrtc = function() {
 
         self.applicationName = applicationName;
         
-        pc_ice_config = {};
+        pcIceConfig = {};
         closedChannel = null;
         queuedMessages = {};
         
@@ -9580,14 +9601,14 @@ var Easyrtc = function() {
         logDebug("attempt to connect to WebRTC signalling server with application name=" + applicationName);
 
         if (errorCallback === null) {
-            errorCallback = function(errorCode, errorText) {
+            errorCallback = function (errorCode, errorText) {
                 self.showError(errorCode, errorText);
             };
         }
 
-        self.setPeerListener(function(easyrtcid, msgType, msgData, targeting){
+        self.setPeerListener(function (easyrtcid, msgType, msgData, targeting) {
              logDebug("received request to supportHalfIceTrickle");
-             if( peerConns[easyrtcid] ) {
+             if (peerConns[easyrtcid]) {
                 peerConns[easyrtcid].supportHalfTrickleIce = true;
                 flushCachedCandidates(easyrtcid);
                 checkIceGatheringState(easyrtcid);
