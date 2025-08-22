@@ -4203,7 +4203,7 @@ var Easyrtc = function() {
                 var eventTarget = event.currentTarget || event.target || pc,
                     connState = eventTarget.iceConnectionState || 'unknown';
 
-                logDebug('onsignalingstatechange', connState);
+                logDebug('oniceconnectionstatechange', connState);
 
                 if (iceConnectionStateChangeListener) {
                    iceConnectionStateChangeListener(otherUser, eventTarget, connState);
