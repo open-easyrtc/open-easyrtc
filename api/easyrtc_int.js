@@ -458,7 +458,7 @@ var Easyrtc = function() {
     this.apiVersion = "1.1.1-beta";
 
     /** Most basic message acknowledgment object */
-    this.ackMessage = {msgType: "ack"};
+    this.ackMessage = { msgType: "ack" };
 
     /** Regular expression pattern for user ids. This will need modification to support non US character sets */
     this.usernameRegExp = /^(.){1,64}$/;
@@ -471,6 +471,9 @@ var Easyrtc = function() {
 
     /** Flag to indicate that user is currently logging out */
     this.loggingOut = false;
+
+    /** @private */
+    this.webSocket = null;
 
     /** @private */
     this.disconnecting = false;
@@ -2886,9 +2889,6 @@ var Easyrtc = function() {
         return easyrtcid;
     };
 
-    /* used in easyrtc.connect */
-    /** @private */
-    this.webSocket = null;
     /** @private */
     var pcIceConfig = {};
     /** @private */
@@ -3166,7 +3166,7 @@ var Easyrtc = function() {
                 }
 
                 closedChannel = self.webSocket;
-                self.webSocket = 0;
+                self.webSocket = null;
             }
             self.loggingOut = false;
             self.disconnecting = false;
@@ -6114,7 +6114,7 @@ var Easyrtc = function() {
                 }
 
             } catch(socketErr) {
-                self.webSocket = 0;
+                self.webSocket = null;
                 errorCallback( self.errCodes.SYSTEM_ERR, socketErr.toString());
                 return;
             }
