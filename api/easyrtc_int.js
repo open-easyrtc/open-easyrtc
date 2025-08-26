@@ -4530,23 +4530,28 @@ var Easyrtc = function() {
                         .then(function sendAnswer() {
                             logDebug("sending answer");
 
+                            function onSignalSuccess() {
+                                logDebug("sending to signaling success");
+                            }
+
+                            function onSignalFailure(errorCode, errorText) {
+                                logDebug("sending to signaling error");
+                                closePeer(caller)
+                                self.showError(errorCode, errorText);
+                            }
+
                             newPeerConn.pendingAwnser = false;
                             sendSignalling(
                                 caller, "answer", 
                                 sessionDescription, 
-                                onSignalSuccess, onSignalFailure
+                                onSignalSuccess, 
+                                onSignalFailure
                             );
                             
                             newPeerConn.accepted = true;
                             sendQueuedCandidates(caller, 
-                                function onSignalSuccess() {
-                                    logDebug("sending to signaling success");
-                                }, 
-                                function onSignalFailure(errorCode, errorText) {
-                                    logDebug("sending to signaling error");
-                                    closePeer(caller)
-                                    self.showError(errorCode, errorText);
-                                }
+                                onSignalSuccess, 
+                                onSignalFailure
                             );
 
                             if (pc.connectDataConnection) {
