@@ -4589,21 +4589,22 @@ var Easyrtc = function() {
                         self.showError(self.errCodes.MEDIA_ERR, self.format(self.getConstantString("localMediaError")));
                     }
                 );
+                return;
             }
-        } else {
-            if (useFreshIceEachPeer) {
-                self.getFreshIceConfig(function(succeeded) {
-                    if (succeeded) {
-                        doAnswerBody(caller, msgData, streamNames);
-                    }
-                    else {
-                        self.showError(self.errCodes.CALL_ERR, "Failed to get fresh ice config");
-                    }
-                });
-            }
-            else {
-                doAnswerBody(caller, msgData, streamNames);
-            }
+        } 
+
+        if (useFreshIceEachPeer) {
+            self.getFreshIceConfig(function(succeeded) {
+                if (succeeded) {
+                    doAnswerBody(caller, msgData, streamNames);
+                }
+                else {
+                    self.showError(self.errCodes.CALL_ERR, "Failed to get fresh ice config");
+                }
+            });
+        }
+        else {
+            doAnswerBody(caller, msgData, streamNames);
         }
     }
 
