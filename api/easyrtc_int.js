@@ -80,7 +80,7 @@ var Easyrtc = function() {
         return true;
     }
 
-    /** @private 
+    /**  
     peerConns is a map from caller names to the below object structure
      {  
         pc: RTCPeerConnection - the WebRTC peer connection object
@@ -112,6 +112,7 @@ var Easyrtc = function() {
         callFailureCB: function(errorCode, string) - see the easyrtc.call documentation
         wasAcceptedCB: function(boolean, string) - see the easyrtc.call documentation
      }
+     @private
     */
     var peerConns = {};
     /** @private */
