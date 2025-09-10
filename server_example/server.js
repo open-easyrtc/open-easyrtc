@@ -22,20 +22,16 @@ app.use(serveStatic('static', {'index': ['index.html']}));
 var webServer = http.createServer(app);
 
 // Start Socket.io so it attaches itself to Express server
-var socketServer = socketIo.listen(webServer, {"log level":1});
-
-// Cross-domain workaround presented below:
-/*
-socketServer.origins(function(origin, callback) {
-    if (origin && ![
-        'http://localhost:8080',
-        '*'
-    ].includes(origin)) {
-        return callback('origin not allowed', false);
+var socketServer = socketIo(webServer, {
+    "log level": 1,
+    // Whether to enable compatibility with Socket.IO v2 clients.
+    "allowEIO3": true,
+    // See Socket.io CORS documentation: 
+    // - https://socket.io/docs/v3/handling-cors/
+    "cors": {
+        "origin": '*'
     }
-    callback(null, true);
 });
-*/
 
 easyrtc.setOption("logLevel", "debug");
 
@@ -73,6 +69,6 @@ var rtc = easyrtc.listen(app, socketServer, null, function(err, rtcRef) {
 });
 
 // Listen on port 8080
-webServer.listen(8080, function () {
-    console.log('listening on http://localhost:8080');
+webServer.listen(process.env.PORT || 8080, function () {
+    console.log(`listening on ${process.env.PORT || 8080}`);
 });
