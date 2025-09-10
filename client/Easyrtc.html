@@ -4816,6 +4816,149 @@ This should be done periodically by long running applications.
         
             
 <dt>
+    <h4 class="name" id="getLocalStreamAsUrl"><span class="type-signature"></span>getLocalStreamAsUrl<span class="signature">(streamName)</span><span class="type-signature"> &rarr; {URL}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Returns a URL for your local camera and microphone.
+ It can be called only after easyrtc.initMediaSource has succeeded.
+ It returns a url that can be used as a source by the Chrome video element or the &lt;canvas&gt; element.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+<div class="params-table-container">
+  <table class="params table table-striped">
+      <thead>
+    <tr>
+      
+      <th>Name</th>
+      
+  
+      <th>Type</th>
+  
+      
+  
+      
+  
+      <th class="last">Description</th>
+    </tr>
+    </thead>
+  
+    <tbody>
+    
+  
+          <tr>
+              
+                  <td class="name"><code>streamName</code></td>
+              
+  
+              <td class="type">
+              
+                  
+<span class="param-type">String</span>
+
+
+              
+              </td>
+  
+              
+  
+              
+  
+              <td class="description last">an option stream name.</td>
+          </tr>
+  
+    
+    </tbody>
+  </table>
+</div>
+
+    
+    
+    
+<dl class="details">
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+
+  
+
+  
+
+  
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+  <dt>
+    Type
+  </dt>
+  <dd>
+    
+<span class="param-type">URL</span>
+
+
+  </dd>
+</dl>
+
+
+        
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">document.getElementById(&quot;myVideo&quot;).src = easyrtc.getLocalStreamAsUrl();</pre>
+
+
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="getPeerConnectionByUserId"><span class="type-signature"></span>getPeerConnectionByUserId<span class="signature">(easyrtcid, for)</span><span class="type-signature"></span></h4>
     
     
@@ -6585,6 +6728,95 @@ for people who want to try filtering ice server configuration on the client.
     <h5>Returns:</h5>
     
             
+
+
+<dl>
+  <dt>
+    Type
+  </dt>
+  <dd>
+    
+<span class="param-type">Object</span>
+
+
+  </dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="getUserMediaConstraints"><span class="type-signature"></span>getUserMediaConstraints<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Builds the constraint object passed to getUserMedia.
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+
+  
+
+  
+
+  
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    mediaConstraints
+</div>
+
 
 
 <dl>
@@ -13349,6 +13581,266 @@ path.
         
             
 <dt>
+    <h4 class="name" id="setRoomEntryListener"><span class="type-signature"></span>setRoomEntryListener<span class="signature">(handler)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Set a callback that will be invoked when the application enters or leaves a room.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+<div class="params-table-container">
+  <table class="params table table-striped">
+      <thead>
+    <tr>
+      
+      <th>Name</th>
+      
+  
+      <th>Type</th>
+  
+      
+  
+      
+  
+      <th class="last">Description</th>
+    </tr>
+    </thead>
+  
+    <tbody>
+    
+  
+          <tr>
+              
+                  <td class="name"><code>handler</code></td>
+              
+  
+              <td class="type">
+              
+                  
+<span class="param-type">function</span>
+
+
+              
+              </td>
+  
+              
+  
+              
+  
+              <td class="description last">the first parameter is true for entering a room, false for leaving a room. The second parameter is the room name.</td>
+          </tr>
+  
+    
+    </tbody>
+  </table>
+</div>
+
+    
+    
+    
+<dl class="details">
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+
+  
+
+  
+
+  
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">easyrtc.setRoomEntryListener(function(entry, roomName){
+      if( entry ){
+          console.log(&quot;entering room &quot; + roomName);
+      }
+      else{
+          console.log(&quot;leaving room &quot; + roomName);
+      }
+  });</pre>
+
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="setRoomOccupantListener"><span class="type-signature"></span>setRoomOccupantListener<span class="signature">(listener)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Set the callback that will be invoked when the list of people logged in changes.
+The callback expects to receive a room name argument, and
+a map whose ideas are easyrtcids and whose values are in turn maps
+supplying user specific information. The inner maps have the following keys:
+username, applicationName, browserFamily, browserMajor, osFamily, osMajor, deviceFamily.
+The third argument is the listener is the innerMap for the connections own data (not needed by most applications).
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+<div class="params-table-container">
+  <table class="params table table-striped">
+      <thead>
+    <tr>
+      
+      <th>Name</th>
+      
+  
+      <th>Type</th>
+  
+      
+  
+      
+  
+      <th class="last">Description</th>
+    </tr>
+    </thead>
+  
+    <tbody>
+    
+  
+          <tr>
+              
+                  <td class="name"><code>listener</code></td>
+              
+  
+              <td class="type">
+              
+                  
+<span class="param-type">function</span>
+
+
+              
+              </td>
+  
+              
+  
+              
+  
+              <td class="description last"></td>
+          </tr>
+  
+    
+    </tbody>
+  </table>
+</div>
+
+    
+    
+    
+<dl class="details">
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+
+  
+
+  
+
+  
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">easyrtc.setRoomOccupantListener( function(roomName, list, selfInfo){
+     for( var i in list ){
+        (&quot;easyrtcid=&quot; + i + &quot; belongs to user &quot; + list[i].username);
+     }
+  });</pre>
+
+
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="setScreenCapture"><span class="type-signature"></span>setScreenCapture<span class="signature">(enableScreenCapture, mediaSourceId)</span><span class="type-signature"></span></h4>
     
     
@@ -15729,7 +16221,7 @@ close sockets that were supplied with easyrtc.useThisSocketConnection.
           
     <span class="jsdoc-message">
     Documentation generated by <a href="https://github.com/jsdoc3/jsdoc" target="_blank">JSDoc 3.6.11</a>
-    on 2025-02-19T14:18:14+00:00
+    on 2025-09-10T14:23:39+00:00
     </span>
         </footer>
       </div>
