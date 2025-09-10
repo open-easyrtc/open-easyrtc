@@ -61,13 +61,6 @@ var Easyrtc = function() {
 
     var self = this;
 
-     // Testing truthy / falsy values with assert/expect
-    function assert(condition, failureMsg) {
-        if (!condition) {
-            throw new Error(failureMsg)
-        }
-    }
-
     function logDebug (message, obj) {
         if (self.debugPrinter) {
             self.debugPrinter(message, obj);
@@ -4094,7 +4087,6 @@ var Easyrtc = function() {
     // TODO split buildPeerConnection it more thant 500 lines
     function buildPeerConnection(otherUser, isInitiator, failureCB, streamNames) {
         var pc;
-        var message;
 
         // Apply peer config
         var pcConfig = pcConfigToUse || {
@@ -4127,10 +4119,17 @@ var Easyrtc = function() {
 
         try {
 
+            // Prevent peerConn override
+            if (peerConns[otherUser]) {
+                var duplicateMsg = "Unable to create duplicate PeerConnection object for peer " + otherUser;
+                logDebug(duplicateMsg);
+                throw Error(duplicateMsg);
+            }
+
             pc = self.createRTCPeerConnection(pcConfig, buildPeerConstraints());
 
             if (!pc) {
-                message = "Unable to create PeerConnection object, check your ice configuration(" + JSON.stringify(pcConfig) + ")";
+                var message = "Unable to create PeerConnection object, check your ice configuration(" + JSON.stringify(pcConfig) + ")";
                 logDebug(message);
                 throw Error(message);
             }
@@ -4558,6 +4557,7 @@ var Easyrtc = function() {
                                 logDebug("calling connectDataConnection(5002,5001)");
                                 pc.connectDataConnection(5002, 5001);
                             }
+
                         }, function(message) {
                             newPeerConn.pendingAwnser = false;
                             self.showError(self.errCodes.INTERNAL_ERR, "setLocalDescription: " + message);
@@ -4581,38 +4581,40 @@ var Easyrtc = function() {
             var localStream = self.getLocalStream();
             if (!localStream && (self.videoEnabled || self.audioEnabled)) {
                 self.initMediaSource(
-                        function() {
-                            doAnswer(caller, msgData);
-                        },
-                        function(errorCode, error) {
-                            self.showError(self.errCodes.MEDIA_ERR, self.format(self.getConstantString("localMediaError")));
-                        });
-                return;
+                    function() {
+                        doAnswer(caller, msgData);
+                    },
+                    function(errorCode, error) {
+                        self.showError(self.errCodes.MEDIA_ERR, self.format(self.getConstantString("localMediaError")));
+                    }
+                );
             }
-        }
-        if (useFreshIceEachPeer) {
-            self.getFreshIceConfig(function(succeeded) {
-                if (succeeded) {
-                    doAnswerBody(caller, msgData, streamNames);
-                }
-                else {
-                    self.showError(self.errCodes.CALL_ERR, "Failed to get fresh ice config");
-                }
-            });
-        }
-        else {
-            doAnswerBody(caller, msgData, streamNames);
+        } else {
+            if (useFreshIceEachPeer) {
+                self.getFreshIceConfig(function(succeeded) {
+                    if (succeeded) {
+                        doAnswerBody(caller, msgData, streamNames);
+                    }
+                    else {
+                        self.showError(self.errCodes.CALL_ERR, "Failed to get fresh ice config");
+                    }
+                });
+            }
+            else {
+                doAnswerBody(caller, msgData, streamNames);
+            }
         }
     }
 
     /** @private */
     //
     function callBody(otherUser, callSuccessCB, callFailureCB, wasAcceptedCB, streamNames) {
+        
         acceptancePending[otherUser] = Date.now()
+
         var pc = buildPeerConnection(otherUser, true, callFailureCB, streamNames);
-        var message;
         if (!pc) {
-            message = "buildPeerConnection failed, call not completed";
+            var message = "buildPeerConnection failed, call not completed";
             logDebug(message);
             throw message;
         }
@@ -4626,7 +4628,7 @@ var Easyrtc = function() {
     function initiateSendOffer(otherUser, eventTarget, signalingState) {
 
         var peerConnObj = peerConns[otherUser];
-        if( !peerConnObj ) {
+        if (!peerConnObj) {
            logDebug("message attempt to send offer for nonexistent peer connection " + otherUser);
            return;
         }
@@ -4836,25 +4838,20 @@ var Easyrtc = function() {
         }
     }
 
-    /**
-     * Hang up on a particular user or all users.
-     *  @param {String} otherUser - the easyrtcid of the person to hang up on.
-     *  @example
-     *     easyrtc.hangup(someEasyrtcid);
-     */
-    this.hangup = function(otherUser) {
-    
+    /** @private */
+    function hangupBody(otherUser, sendRemoteSignal) {
+
         logDebug("Hanging up on " + otherUser);
 
         // Has connection (or acceptancePending also)
         if (peerConns[otherUser]) {
             closePeer(otherUser);
 
-            if (self.webSocket) {
+            if (sendRemoteSignal && self.webSocket) {
                 sendSignalling(otherUser, "hangup", null, function() {
-                    logDebug("hangup succeeds");
+                    logDebug("signaling hangup succeeds");
                 }, function(errorCode, errorText) {
-                    logDebug("hangup failed:" + errorText);
+                    logDebug("signaling hangup failed:" + errorText);
                     self.showError(errorCode, errorText);
                 });
             }
@@ -4867,18 +4864,25 @@ var Easyrtc = function() {
                 self.callCancelled(otherUser, true);
             }
 
-            if (self.webSocket) {
-                sendSignalling(otherUser, "reject", null, null, null);
+            if (sendRemoteSignal && self.webSocket) {
+                sendSignalling(otherUser, "reject", null, function() {
+                    logDebug("signaling reject succeeds");
+                }, function(errorCode, errorText) {
+                    logDebug("signaling reject failed:" + errorText);
+                    self.showError(errorCode, errorText);
+                });
             }
         }
+    }
 
-        /*
-        // TODO deploy assert on critical code paths
-        assert(!queuedMessages.hasOwnProperty(otherUser), "Should not have queuedMessages reference for peer: " + otherUser);
-        assert(!acceptancePending.hasOwnProperty(otherUser), "Should not have acceptancePending reference for peer: " + otherUser);
-        assert(!offersPending.hasOwnProperty(otherUser), "Should not have offersPending reference for peer: " + otherUser);
-        assert(!peerConns.hasOwnProperty(otherUser), "Should not have peerConn reference for peer: " + otherUser);
-        */
+    /**
+     * Hang up on a particular user or all users.
+     *  @param {String} otherUser - the easyrtcid of the person to hang up on.
+     *  @example
+     *     easyrtc.hangup(someEasyrtcid);
+     */
+    this.hangup = function(otherUser) {
+        hangupBody(otherUser, true)
     };
 
     /**
@@ -4889,7 +4893,7 @@ var Easyrtc = function() {
     this.hangupAll = function() {
         for (var otherUser in peerConns) {
             if (peerConns.hasOwnProperty(otherUser)) {
-                this.hangup(otherUser);
+               hangupBody(otherUser, true)
             }
         }
     };
@@ -4998,27 +5002,11 @@ var Easyrtc = function() {
             peerConns[easyrtcId].enableNegotiateListener = true;
             removeStreamFromPeerConnection(stream, peerConns[easyrtcId].pc);
         }
-
     };
 
     /** @private */
     function onRemoteHangup(otherUser) {
-
-        logDebug("Saw onRemote hangup event");
-        clearQueuedMessages(otherUser);
-
-        // Has connection or calling user
-        if (peerConns[otherUser]) {
-            closePeer(otherUser);
-        }
-        // Has incoming call pending 
-        else if (offersPending[otherUser]) {
-            delete offersPending[otherUser];
-
-            if (self.callCancelled) {
-                self.callCancelled(otherUser, true);
-            }
-        }
+        hangupBody(otherUser, false)
     }
 
     /** @private */
@@ -5385,6 +5373,11 @@ var Easyrtc = function() {
     }
 
     /** @private */
+    function isPolitePeer(caller) {
+        return caller < self.myEasyrtcid
+    }    
+
+    /** @private */
     function flushCachedCandidates(caller) {
         var i;
         if (queuedMessages[caller]) {
@@ -5396,8 +5389,17 @@ var Easyrtc = function() {
     }
 
     /** @private */
-    function isPolitePeer(caller) {
-        return caller < self.myEasyrtcid
+    function processCandidateQueue(caller, msgData) {
+        if (peerConns[caller] && peerConns[caller].pc) {
+            processCandidateBody(caller, msgData);
+        }
+        else {
+            if (typeof queuedMessages[caller] === "undefined") {
+                clearQueuedMessages(caller);
+            }
+
+            queuedMessages[caller].candidates.push(msgData);
+        }
     }
 
     /** @private */
@@ -5603,21 +5605,6 @@ var Easyrtc = function() {
     }
 
     /** @private */
-    function processCandidateQueue(caller, msgData) {
-        if (peerConns[caller] && peerConns[caller].pc) {
-            processCandidateBody(caller, msgData);
-        }
-        else {
-            if (!peerConns[caller]) {
-                queuedMessages[caller] = {
-                    candidates: []
-                };
-            }
-            queuedMessages[caller].candidates.push(msgData);
-        }
-    }
-
-    /** @private */
     function onChannelCmd(msg, ackAcceptorFn) {
 
         var caller = msg.senderEasyrtcid;
@@ -5625,12 +5612,6 @@ var Easyrtc = function() {
         var msgData = msg.msgData;
 
         logDebug('received message of type ' + msgType);
-
-
-        if (typeof queuedMessages[caller] === "undefined") {
-            clearQueuedMessages(caller);
-        }
-
 
         switch (msgType) {
             case "sessionData":
