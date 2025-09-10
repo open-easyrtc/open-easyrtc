@@ -4407,308 +4407,123 @@ var Easyrtc = function() {
      * @param {RTCPeerConnection} for that easyrtcid, or null if no connection exists
      * Submitted by Fabian Bernhard.
      */
-    this.getPeerConnectionByUserId = function(userId) {
-        if (peerConns && peerConns[userId]) {
-            return peerConns[userId].pc;
+    this.getPeerConnectionByUserId = function(easyrtcid) {
+        if (peerConns && peerConns[easyrtcid]) {
+            return peerConns[easyrtcid].pc;
         }
         return null;
     };
 
-
-    var chromeStatsFilter = [
-        {
-            "googTransmitBitrate": "transmitBitRate",
-            "googActualEncBitrate": "encodeRate",
-            "googAvailableSendBandwidth": "availableSendRate"
-        },
-        {
-            "googCodecName": "audioCodec",
-            "googTypingNoiseState": "typingNoise",
-            "packetsSent": "audioPacketsSent",
-            "bytesSent": "audioBytesSent"
-        },
-        {
-            "googCodecName": "videoCodec",
-            "googFrameRateSent": "outFrameRate",
-            "packetsSent": "videoPacketsSent",
-            "bytesSent": "videoBytesSent"
-        },
-        {
-            "packetsLost": "videoPacketsLost",
-            "packetsReceived": "videoPacketsReceived",
-            "bytesReceived": "videoBytesReceived",
-            "googFrameRateOutput": "frameRateOut"
-        },
-        {
-            "packetsLost": "audioPacketsLost",
-            "packetsReceived": "audioPacketsReceived",
-            "bytesReceived": "audioBytesReceived",
-            "audioOutputLevel": "audioOutputLevel"
-        },
-        {
-            "googRemoteAddress": "remoteAddress",
-            "googActiveConnection": "activeConnection"
-        },
-        {
-            "audioInputLevel": "audioInputLevel"
-        }
-    ];
-
-    var firefoxStatsFilter = {
-        "outboundrtp_audio.bytesSent": "audioBytesSent",
-        "outboundrtp_video.bytesSent": "videoBytesSent",
-        "inboundrtp_video.bytesReceived": "videoBytesReceived",
-        "inboundrtp_audio.bytesReceived": "audioBytesReceived",
-        "outboundrtp_audio.packetsSent": "audioPacketsSent",
-        "outboundrtp_video.packetsSent": "videoPacketsSent",
-        "inboundrtp_video.packetsReceived": "videoPacketsReceived",
-        "inboundrtp_audio.packetsReceived": "audioPacketsReceived",
-        "inboundrtp_video.packetsLost": "videoPacketsLost",
-        "inboundrtp_audio.packetsLost": "audioPacketsLost",
-        "firefoxRemoteAddress": "remoteAddress"
-    };
-
-    /**
-      * This is a basic statistics filter that keesp just the generally
-      * useful information.
-      */
-    this.standardStatsFilter = adapter && adapter.browserDetails &&
-                adapter.browserDetails.browser === "firefox" ? firefoxStatsFilter : chromeStatsFilter;
-
-    function getFirefoxPeerStatistics(peerId, callback, filter) {
-
-
-        if (!peerConns[peerId]) {
-            callback(peerId, {"connected": false});
-        }
-        else if (peerConns[peerId].pc.getStats) {
-            // TODO Safari
-            // [Error] Unhandled Promise Rejection: TypeError: Argument 1 ('selector') to RTCPeerConnection.getStats must be an instance of MediaStreamTrack
-            peerConns[peerId].pc.getStats(null).then(function(stats) {
-                var items = {};
-                var candidates = {};
-                var activeId = null;
-                var srcKey;
-                //
-                // the stats objects has a group of entries. Each entry is either an rtcp, rtp entry
-                // or a candidate entry.
-                //
-                if (stats) {
-                    stats.forEach(function(entry) {
-                        var majorKey;
-                        var subKey;
-                        if (entry.type.match(/boundrtp/)) {
-                            if (entry.id.match(/audio/)) {
-                                majorKey = entry.type + "_audio";
-                            }
-                            else if (entry.id.match(/video/)) {
-                                majorKey = entry.type + "_video";
-                            }
-                            else {
-                                return;
-                            }
-                            for (subKey in entry) {
-                                if (entry.hasOwnProperty(subKey)) {
-                                    items[majorKey + "." + subKey] = entry[subKey];
-                                }
-                            }
-                        }
-                        else {
-                            if( entry.hasOwnProperty("ipAddress") && entry.id) {
-                                candidates[entry.id] = entry.ipAddress + ":" +
-                                      entry.portNumber;
-                            }
-                            else if( entry.hasOwnProperty("selected") &&
-                                     entry.hasOwnProperty("remoteCandidateId") &&
-                                     entry.selected ) {
-                                activeId =  entry.remoteCandidateId;
-                            }
-                        }
-                    });
-                }
-
-                if (activeId) {
-                    items.firefoxRemoteAddress = candidates[activeId];
-                }
-                if (!filter) {
-                    callback(peerId, items);
-                }
-                else {
-                    var filteredItems = {};
-                    for (srcKey in filter) {
-                        if (filter.hasOwnProperty(srcKey) && items.hasOwnProperty(srcKey)) {
-                            filteredItems[ filter[srcKey]] = items[srcKey];
-                        }
-                    }
-                    callback(peerId, filteredItems);
-                }
-            },
-                    function(error) {
-                        logDebug("unable to get statistics");
-                    });
-        }
-        else {
-            callback(peerId, {"statistics": self.getConstantString("statsNotSupported")});
-        }
-    }
-
-    function getChromePeerStatistics(peerId, callback, filter) {
-
-        if (!peerConns[peerId]) {
-            callback(peerId, {"connected": false});
-        }
-        else if (peerConns[peerId].pc.getStats) {
-
-            peerConns[peerId].pc.getStats().then(function(stats) {
-
-                var localStats = {};
-                var part, parts = stats.result();
-                var i, j;
-                var itemKeys;
-                var itemKey;
-                var names;
-                var userKey;
-                var partNames = [];
-                var partList;
-                var bestBytes = 0;
-                var bestI;
-                var turnAddress = null;
-                var hasActive, curReceived;
-                var localAddress, remoteAddress;
-                if (!filter) {
-                    for (i = 0; i < parts.length; i++) {
-                        names = parts[i].names();
-                        for (j = 0; j < names.length; j++) {
-                            itemKey = names[j];
-                            localStats[parts[i].id + "." + itemKey] = parts[i].stat(itemKey);
-                        }
-                    }
-                }
-                else {
-                    for (i = 0; i < parts.length; i++) {
-                        partNames[i] = {};
-                        //
-                        // convert the names into a dictionary
-                        //
-                        names = parts[i].names();
-                        for (j = 0; j < names.length; j++) {
-                            partNames[i][names[j]] = true;
-                        }
-
-                        //
-                        // a chrome-firefox connection results in several activeConnections.
-                        // we only want one, so we look for the one with the most data being received on it.
-                        //
-                        if (partNames[i].googRemoteAddress && partNames[i].googActiveConnection) {
-                            hasActive = parts[i].stat("googActiveConnection");
-                            if (hasActive === true || hasActive === "true") {
-                                curReceived = parseInt(parts[i].stat("bytesReceived")) +
-                                        parseInt(parts[i].stat("bytesSent"));
-                                if (curReceived > bestBytes) {
-                                    bestI = i;
-                                    bestBytes = curReceived;
-                                }
-                            }
-                        }
-                    }
-
-                    for (i = 0; i < parts.length; i++) {
-                        //
-                        // discard info from any inactive connection.
-                        //
-                        if (partNames[i].googActiveConnection) {
-                            if (i !== bestI) {
-                                partNames[i] = {};
-                            }
-                            else {
-                                localAddress = parts[i].stat("googLocalAddress").split(":")[0];
-                                remoteAddress = parts[i].stat("googRemoteAddress").split(":")[0];
-                                if (self.isTurnServer(localAddress)) {
-                                    turnAddress = localAddress;
-                                }
-                                else if (self.isTurnServer(remoteAddress)) {
-                                    turnAddress = remoteAddress;
-                                }
-                            }
-                        }
-                    }
-
-                    for (i = 0; i < filter.length; i++) {
-                        itemKeys = filter[i];
-                        partList = [];
-                        part = null;
-                        for (j = 0; j < parts.length; j++) {
-                            var fullMatch = true;
-                            for (itemKey in itemKeys) {
-                                if (itemKeys.hasOwnProperty(itemKey) && !partNames[j][itemKey]) {
-                                    fullMatch = false;
-                                    break;
-                                }
-                            }
-                            if (fullMatch && parts[j]) {
-                                partList.push(parts[j]);
-                            }
-                        }
-                        if (partList.length === 1) {
-                            for (j = 0; j < partList.length; j++) {
-                                part = partList[j];
-                                if (part) {
-                                    for (itemKey in itemKeys) {
-                                        if (itemKeys.hasOwnProperty(itemKey)) {
-                                            userKey = itemKeys[itemKey];
-                                            localStats[userKey] = part.stat(itemKey);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        else if (partList.length > 1) {
-                            for (itemKey in itemKeys) {
-                                if (itemKeys.hasOwnProperty(itemKey)) {
-                                    localStats[itemKeys[itemKey]] = [];
-                                }
-                            }
-                            for (j = 0; j < partList.length; j++) {
-                                part = partList[j];
-                                    for (itemKey in itemKeys) {
-                                        if (itemKeys.hasOwnProperty(itemKey)) {
-                                            userKey = itemKeys[itemKey];
-                                            localStats[userKey].push(part.stat(itemKey));
-                                        }
-                                    }
-                            }
-                        }
-                    }
-                }
-
-                if (localStats.remoteAddress && turnAddress) {
-                    localStats.remoteAddress = turnAddress;
-                }
-                callback(peerId, localStats);
-            });
-        }
-        else {
-            callback(peerId, {"statistics": self.getConstantString("statsNotSupported")});
-        }
-    }
-
     /**
      * This function gets the statistics for a particular peer connection.
      * @param {String} easyrtcid
-     * @param {Function} callback gets the easyrtcid for the peer and a map of {userDefinedKey: value}. If there is no peer connection to easyrtcid, then the map will
-     *  have a value of {connected:false}.
-     * @param {Object} filter depends on whether Chrome or Firefox is used. See the default filters for guidance.
-     * It is still experimental.
+     * @param {Function} callback gets the easyrtcid for the peer and a stats object with basics stats and raw webrtc stats as report property.
+     * If there is no peer connection to easyrtcid, then the stats will have a value of {connected:false}.
      */
-    this.getPeerStatistics = function(easyrtcid, callback, filter) {
-        if (
-            adapter && adapter.browserDetails &&
-                adapter.browserDetails.browser === "firefox"
-        ) {
-            getFirefoxPeerStatistics(easyrtcid, callback, filter);
+    this.getPeerStatistics = function(easyrtcid, callback) {
+
+        if (!peerConns[easyrtcid]) {
+            callback(easyrtcid, {"connected": false});
+        }
+        else if (peerConns[easyrtcid].pc.getStats) {
+
+            var stats = {
+                "audioLevel": -1,
+                "framesSent": -1,
+                "framesDecoded": -1,
+                "framesDropped": -1,
+                "framesReceived": -1,
+                "download": -1,
+                "upload": -1,
+                "report": null
+            };
+
+            peerConns[easyrtcid].pc.getStats().then(function(res) {
+
+                // Handle falsy RTCStatsResponse
+                if (!res) {
+                    return;
+                }
+
+                // Handle RTCStatsResponse
+                if (typeof res.result === "function") {
+                    res = res.result();
+                }
+
+                var lastResult = peerConns[easyrtcid].stats;
+
+                // Reset cumulative stats
+                stats.download = 0;
+                stats.upload = 0;
+                stats.framesSent = 0;
+                stats.framesDropped = 0;
+                stats.framesDecoded = 0;
+                stats.framesReceived = 0;
+                stats.report = res;
+                res.forEach(function(report) {
+
+                    var bytes, bitrate;
+                    var type = report.type;
+                    var now = report.timestamp;
+
+                    // debug;
+                    //console.log(report.type, report.id, report.kind, report);
+
+                    if (report.bytesSent && (
+                            type === 'outboundrtp' || type === 'outbound-rtp'
+                        )
+                    ) {
+                        if (lastResult && lastResult.get(report.id)) {
+                            bytes = report.bytesSent;
+
+                            // calculate bitrate
+                            bitrate = 8 * (bytes - lastResult.get(report.id).bytesSent) /
+                                (now - lastResult.get(report.id).timestamp);
+                            if (bitrate > 0) {
+                                stats.upload += bitrate;
+                            }
+                        }
+
+                        if (report.kind === 'video') {
+                            stats.framesSent = +report.framesSent;
+                        }
+                    } else if (report.bytesReceived && (
+                            type === 'inboundrtp' || type === 'inbound-rtp' || type === 'ssrc'
+                        )
+                    ) {
+                        if (lastResult && lastResult.get(report.id)) {
+                            bytes = report.bytesReceived;
+
+                            // calculate bitrate
+                            bitrate = 8 * (bytes - lastResult.get(report.id).bytesReceived) /
+                                (now - lastResult.get(report.id).timestamp);
+                            if (bitrate > 0) {
+                                stats.download += bitrate;
+                            }
+                        }
+
+                        if (report.kind === 'video') {
+                            stats.framesDecoded = +report.framesDecoded;
+                            stats.framesDropped = +report.framesDropped;
+                            stats.framesReceived = +report.framesReceived;
+                        }
+                    }
+
+                    if (type === 'media-source' && !report.ended && !report.detached &&
+                        report.hasOwnProperty('audioLevel') && !report.frameHeight) {
+                        stats.audioLevel = +report.audioLevel;
+                        // TODO safari
+                        //stats.audioLevel = stats.audioLevel * 10;
+                    }
+                });
+
+                peerConns[easyrtcid].stats = res;
+
+                callback(easyrtcid, stats);
+            });
         }
         else {
-            getChromePeerStatistics(easyrtcid, callback, filter);
+            callback(easyrtcid, {"error": self.getConstantString("statsNotSupported")});
         }
     };
 
@@ -7467,6 +7282,7 @@ var Easyrtc = function() {
                 failing: false,
                 pendingAwnser: false,
                 // RTC
+                stats: null,
                 supportHalfTrickleIce: false,
                 candidatesToSend: [],
                 // Data
