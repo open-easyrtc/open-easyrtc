@@ -25,14 +25,15 @@ app.use(serveStatic('static', {'index': ['index.html']}));
 var httpServerConfig = config.httpServer;
 var webServer;
 
+// Start Express https 
 if (httpServerConfig.protocol == 'https') {
-    // Start Express https server on port 8443
     webServer = https.createServer({
         key:  httpServerConfig.key,
         cert: httpServerConfig.cert
     }, app);
+    
+// Start Express http
 } else {
-    // Start Express http server on port 8080
     webServer = http.createServer(app);
 }
 
