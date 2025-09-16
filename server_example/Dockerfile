@@ -1,5 +1,6 @@
 # Pull base image.
-FROM node:14-alpine
+ARG NODE_VERSION=22
+FROM node:${NODE_VERSION}
 MAINTAINER Harold Thetiot <hthetiot@gmail.com>
 
 # Upgrade npm
