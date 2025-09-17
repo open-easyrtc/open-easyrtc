@@ -16,10 +16,6 @@ This NodeJS `open-easyrtc` module version is a fork of `easyrtc` hosted on Githu
 
 This fork of `easyrtc` module named `open-easyrtc` starts at version `2.0.0` in case previous the repository decides to pick up work again on version `1.x.x`.
 
-Try a Live Demo Here:
---------
-
-[![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg)](https://glitch.com/~open-easyrtc-server-demo)
 
 Features
 --------

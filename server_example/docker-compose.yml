@@ -11,14 +11,13 @@ services:
     command: server_ssl
     volumes:
       - ./certs:/usr/src/app/certs:ro
+      - ./static:/static:ro
     networks:
       - frontend
     ports:
       - "8080:8080"
     tty: true
     stdin_open: true
-    volumes:
-      - ./static:/static:ro
 
 networks:
   frontend:

@@ -3441,16 +3441,36 @@ var Easyrtc = function() {
     /** @private */
     var iceConnectionStateChangeListener = null;
     var signalingStateChangeListener = null;
-    /** @private */
-    var connectionOptions =  {
+    
+    /**
+     * Socket.IO connection configuration options.
+     * @private
+     * @type {Object}
+     * @property {string[]} transports - List of transports to try in order. WebSocket first if available 
+     *   because some government agencies don't like WSS.
+     * @property {boolean} withCredentials - Whether cross-site requests should use credentials 
+     *   such as cookies and authorization headers.
+     * @property {boolean} reconnection - Whether to reconnect automatically on connection loss.
+     * @property {boolean} forceNew - Whether to reuse an existing connection or force a new one.
+     * @property {number} pingTimeout - Connection timeout in milliseconds before connect_error 
+     *   and connect_timeout events are emitted. How long to wait for pong before disconnect.
+     * @property {number} pingInterval - How often to send ping packets in milliseconds.
+     */
+    var connectionOptions = {
+        // a list of transports to try (in order).
+        // use WebSocket first, if available because some gov agency dont like wss
+        "transports": ["polling", "websocket"],         
         // whether or not cross-site requests should made using credentials such as cookies, authorization headers.
         "withCredentials": false,
         // whether to reconnect automatically
         "reconnection": false,
-        // connection timeout before a connect_error and connect_timeout events are emitted
-        'timeout': 25000,
         // whether to reuse an existing connection
-        'forceNew': true
+        'forceNew': true,
+        // connection timeout before a connect_error and connect_timeout events are emitted
+        // how long to wait for pong before disconnect
+        'pingTimeout': 10000, 
+        // how often to send ping
+        'pingInterval': 5000 
     };
 
     /**

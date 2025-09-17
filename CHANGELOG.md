@@ -1,6 +1,15 @@
 EasyRTC: Change Log
 ===================
 
+v.2.1.5
+-------
+Changes:
+ - Fix bad pendingOffer cleaning on Hangup or Cancelled call state
+ - Review Offer/Awnser/Cancelled/Accepted/Rejected states
+ - Prevent roomParameters to be shared as user fields
+ - Fix bad isEmpty checks on mediaIds and userConfig
+ - Fix easyrtc.getPeerStatistics
+
 v.2.1.4
 -------
 New Features:
