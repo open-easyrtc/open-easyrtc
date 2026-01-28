@@ -11,6 +11,7 @@ Changes:
  - Fix easyrtc.getPeerStatistics
  - Update and afd documentation  todefault socket.io client options
  - Improve server example Dockerfile and docker compose, add ENV socket.io options samples
+ - fix possible: TypeError: Cannot read properties of undefined (reading 'room')
 
 v.2.1.4
 -------
