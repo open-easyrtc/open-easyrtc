@@ -245,7 +245,7 @@ v1.0.14
 
 Fixes:
 
- - JS Client - Fix a bug in Proc rocessOccupantList that caused all rooms to appear to have the same occupant.
+ - JS Client - Fix a bug in ProcessOccupantList that caused all rooms to appear to have the same occupant.
  - JS Client - Removed the dataset attribute usage in easyapp. It was causing problems in the multiroom demo.
  - JS Client - Fixed a bug in processRoomData that was clobbering apifields when the presence changed.
  - JS Client - Various code quality fixes
