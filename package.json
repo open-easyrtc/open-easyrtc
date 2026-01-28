@@ -45,7 +45,9 @@
     "test": "grunt test",
     "test-headless": "grunt test-headless",
     "doc": "grunt jsdoc:client jsdoc:server",
-    "serve": "grunt serve"
+    "dev": "npm run serve",
+    "serve": "grunt serve",
+    "demo": "cd server_example && npm install && npm run start"
   },
   "devDependencies": {
     "fs": "0.0.2",

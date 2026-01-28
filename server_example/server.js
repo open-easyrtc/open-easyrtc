@@ -1,5 +1,6 @@
 // Load required modules
 var http    = require("http");              // http server core module
+var https   = require("https");             // https server core module
 var express = require("express");           // web framework external module
 var serveStatic = require('serve-static');  // serve static files
 var socketIo = require("socket.io");        // web socket external module
@@ -11,6 +12,8 @@ var socketIo = require("socket.io");        // web socket external module
 
 var easyrtc = require("../"); // EasyRTC internal module
 
+var config = require("./config"); 
+
 // Set process name
 process.title = "node-easyrtc";
 
@@ -19,19 +22,23 @@ var app = express();
 app.use(serveStatic('static', {'index': ['index.html']}));
 
 // Start Express http server on port 8080
-var webServer = http.createServer(app);
+var httpServerConfig = config.httpServer;
+var webServer;
+
+// Start Express https 
+if (httpServerConfig.protocol == 'https') {
+    webServer = https.createServer({
+        key:  httpServerConfig.key,
+        cert: httpServerConfig.cert
+    }, app);
+    
+// Start Express http
+} else {
+    webServer = http.createServer(app);
+}
 
 // Start Socket.io so it attaches itself to Express server
-var socketServer = socketIo(webServer, {
-    "log level": 1,
-    // Whether to enable compatibility with Socket.IO v2 clients.
-    "allowEIO3": true,
-    // See Socket.io CORS documentation: 
-    // - https://socket.io/docs/v3/handling-cors/
-    "cors": {
-        "origin": '*'
-    }
-});
+var socketServer = socketIo(webServer, config.socketServer);
 
 easyrtc.setOption("logLevel", "debug");
 
@@ -69,6 +76,6 @@ var rtc = easyrtc.listen(app, socketServer, null, function(err, rtcRef) {
 });
 
 // Listen on port 8080
-webServer.listen(process.env.PORT || 8080, function () {
-    console.log(`listening on ${process.env.PORT || 8080}`);
+webServer.listen(httpServerConfig.port, function () {
+    console.log(`listening on ${httpServerConfig.port}`);
 });
