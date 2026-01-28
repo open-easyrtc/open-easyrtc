@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        node-version: [25]
+        node-version: [24, 25]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:

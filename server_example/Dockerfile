@@ -1,5 +1,5 @@
 # Pull base image.
-ARG NODE_VERSION=25
+ARG NODE_VERSION=24
 FROM node:${NODE_VERSION}
 MAINTAINER Harold Thetiot <hthetiot@gmail.com>
 
