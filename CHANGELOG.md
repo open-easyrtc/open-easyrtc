@@ -1,6 +1,18 @@
 EasyRTC: Change Log
 ===================
 
+v.2.1.5
+-------
+Changes:
+ - Fix bad pendingOffer cleaning on Hangup or Cancelled call state
+ - Review Offer/Awnser/Cancelled/Accepted/Rejected states
+ - Prevent roomParameters to be shared as user fields
+ - Fix bad isEmpty checks on mediaIds and userConfig
+ - Fix easyrtc.getPeerStatistics
+ - Update and afd documentation  todefault socket.io client options
+ - Improve server example Dockerfile and docker compose, add ENV socket.io options samples
+ - fix possible: TypeError: Cannot read properties of undefined (reading 'room')
+
 v.2.1.4
 -------
 New Features:

@@ -6,8 +6,9 @@
   "private": true,
   "scripts": {
     "start": "npm run server",
-    "server": "node server.js",
-    "server_ssl": "node server_ssl.js",
+    "server": "HTTP_ONLY=true node server.js",
+    "server:ssl": "node server.js",
+    "ssl:certificate": "openssl req -nodes -new -x509 -keyout certs/localhost.key -out certs/localhost.cert -days 365 -subj '/C=US/ST=CA/L=San Francisco/O=OpenEasyRTC/OU=Development/CN=localhost/emailAddress=dev@localhost'",
     "docker:build": "docker build -t easyrtc-server -f Dockerfile .",
     "docker:start": "docker run -it -d -p 8080:8080 easyrtc-server",
     "docker-compose:build": "docker-compose -f docker-compose.yml build",
