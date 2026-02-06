@@ -3995,6 +3995,28 @@ var Easyrtc = function() {
      */
     this.roomJoin = {};
 
+    /** 
+     * @private
+     * Room data state from signaling server.
+     * @example 
+     * var roomData = {
+     *    [roomName]{
+     *    field: {},
+     *    roomStatus: "join"|"leave",
+     *    clientList: {},
+     *    clientListDelta: {
+     *        removeClient: [string]
+     *        updateClient: {
+     *            [string]: {
+     *                ["apiField" | "presence"]: any
+     *            }
+     *        } 
+     *    }
+     * }
+     * processRoomData(roomData)
+     */
+    this.roomData = {};
+
     /** Checks if the supplied string is a valid user name (standard identifier rules)
      * @param {String} name
      * @return {Boolean} true for a valid user name
@@ -4582,6 +4604,9 @@ var Easyrtc = function() {
 
     /** @private */
     var roomApiFieldTimer = {};
+    
+    /** @private */
+    var roomApiFieldDelayMs = 10;
 
     /** @private */
     this.roomApiFields = {};
@@ -4605,10 +4630,10 @@ var Easyrtc = function() {
                 sendRoomApiFields(roomName, roomApiFields);
             }
             roomApiFieldTimer[roomName] = null;
-        }, 10);
+        }, roomApiFieldDelayMs);
     }
 
-    /** Provide a set of application defined fields that will be part of this instances
+    /** Populate room participants field value to provide a set of application defined fields that will be part of this instances
      * configuration information. This data will get sent to other peers via the websocket
      * path.
      * @param {String} roomName - the room the field is attached to.
@@ -4657,6 +4682,59 @@ var Easyrtc = function() {
             }
         }
     };
+
+    /** Populate rooms participants field value Provide a set of application defined fields that will be part of this instances
+     * configuration information. This data will get sent to other peers via the websocket
+     * path.
+     * @param {String} fieldName - the name of the field.
+     * @param {Object} fieldValue - the value of the field.
+     * @param {String|String[]} roomNames - an optional list of roomNmaes to apply user fields.
+     * 
+     * @example
+     *   easyrtc.setUserApiField("favorite_alien", "Mr Spock", ["trekkieRoom",  "bobRoom"]);
+     *   easyrtc.setRoomOccupantListener( function(roomName, list){
+     *      for( var i in list ){
+     *         console.log("easyrtcid=" + i + " favorite alien is " + list[i].apiFields.favorite_alien);
+     *      }
+     *   });
+     */
+    this.setUserApiField = function(fieldName, fieldValue, roomNames) {
+
+        // Ensure roomNames is null or array
+        roomNames = Array.isArray(roomNames) ? roomNames : 
+            // If string make it array single value
+            typeof roomNames === 'string' ? [roomNames] : null
+
+        for (var roomName in self.roomJoin) {
+            if (
+                self.roomJoin.hasOwnProperty(roomName) &&
+                // Filter by roomNames if provided
+                roomNames === null || roomNames.indexOf(roomName) !== -1
+            ) {
+                self.setRoomApiField(roomName, fieldName, fieldValue);
+            }
+        }
+    };
+
+    /** Populate rooms participants field value Provide a set of application defined fields, see setUserApiField method.
+     * @param {String} fields - set of application defined fields.
+     * @param {String|String[]} roomNames - an optional list of roomNmaes to apply user fields.
+     * 
+     * @example
+     *   easyrtc.setUserApiFields({"favorite_alien", "Mr Spock"}, "trekkieRoom");
+     *   easyrtc.setRoomOccupantListener( function(roomName, list){
+     *      for( var i in list ){
+     *         console.log("easyrtcid=" + i + " favorite alien is " + list[i].apiFields.favorite_alien);
+     *      }
+     *   });
+     */
+    this.setUserApiFields = function(fields, roomNames) {
+        for (var fieldName in fields) {
+            if (fields.hasOwnProperty(fieldName)) {
+                self.setUserApiField(fieldName, fields[fieldName], roomNames)
+            }
+        }
+    }
 
     /**
      * Default error reporting function. The default implementation displays error messages
@@ -4913,12 +4991,15 @@ var Easyrtc = function() {
     }
 
     /** @private */
+    var defaultStreamName = "default"
+    
+    /** @private */
     //
     // fetches a stream by name. Treat a null/undefined streamName as "default".
     //
     function getLocalMediaStreamByName(streamName) {
         if (!streamName) {
-            streamName = "default";
+            streamName = defaultStreamName;
         }
         if (namedLocalMediaStreams.hasOwnProperty(streamName)) {
             return namedLocalMediaStreams[streamName];
@@ -4942,7 +5023,7 @@ var Easyrtc = function() {
         var streamName;
         for (streamName in namedLocalMediaStreams) {
             if (namedLocalMediaStreams.hasOwnProperty(streamName)) {
-                mediaMap[streamName] = namedLocalMediaStreams[streamName].id || "default";
+                mediaMap[streamName] = namedLocalMediaStreams[streamName].id || defaultStreamName;
             }
         }
         return mediaMap;
@@ -4963,8 +5044,9 @@ var Easyrtc = function() {
     /** @private */
     function registerLocalMediaStreamByName(stream, streamName) {
         var roomName;
+        var defaultStreamName
         if (!streamName) {
-            streamName = "default";
+            streamName = defaultStreamName;
         }
         stream.streamName = streamName;
 
@@ -4973,14 +5055,13 @@ var Easyrtc = function() {
         haveAudioVideo.audio = hasLocalMediaTrackKind(namedLocalMediaStreams, 'audio');
 
         namedLocalMediaStreams[streamName] = stream;
-        if (streamName !== "default") {
-            var mediaIds = buildMediaIds(),
-                roomData = self.roomData;
-            for (roomName in roomData) {
-                if (roomData.hasOwnProperty(roomName)) {
-                    self.setRoomApiField(roomName, "mediaIds", mediaIds);
-                }
-            }
+
+        // TODO why the defaultStreamName is not part of mediaIds
+        if (streamName !== defaultStreamName) {
+            var mediaIds = buildMediaIds();
+
+            // Update all room with mediaIds
+            self.setUserApiFields( "mediaIds", mediaIds);
         }
     }
 
@@ -5004,7 +5085,7 @@ var Easyrtc = function() {
         var mediaIds;
         var streamName;
         if (!webrtcStreamId) {
-            webrtcStreamId = "default";
+            webrtcStreamId = defaultStreamName;
         }
         if (peerConns[easyrtcId]) {
             streamName = peerConns[easyrtcId].remoteStreamIdToName[webrtcStreamId];
@@ -5013,9 +5094,11 @@ var Easyrtc = function() {
             }
         }
 
-        for (roomName in self.roomData) {
-            if (self.roomData.hasOwnProperty(roomName)) {
+        // For all joinned rooms
+        for (roomName in self.roomJoin) {
+            if (self.roomJoin.hasOwnProperty(roomName)) {
 
+                // TODO why default will be missing
                 mediaIds = self.getRoomApiField(roomName, easyrtcId, "mediaIds");
 
                 if (!mediaIds) {
@@ -5044,8 +5127,8 @@ var Easyrtc = function() {
                 ) {
 
                    // if there is a stream called default, return it in preference
-                   if (mediaIds["default"]) {
-                       return "default";
+                   if (mediaIds[defaultStreamName]) {
+                       return defaultStreamName;
                    }
 
                    //
@@ -5209,13 +5292,13 @@ var Easyrtc = function() {
     /** @private */
     function closeLocalMediaStreamByName(streamName) {
         if (!streamName) {
-            streamName = "default";
+            streamName = defaultStreamName;
         }
         var stream = self.getLocalStream(streamName);
         if (!stream) {
             return;
         }
-        var streamId = stream.id || "default";
+        var streamId = stream.id || defaultStreamName;
         var easyrtcid;
         var roomName;
         if (namedLocalMediaStreams[streamName]) {
@@ -5233,13 +5316,12 @@ var Easyrtc = function() {
             stopStream(namedLocalMediaStreams[streamName]);
             delete namedLocalMediaStreams[streamName];
 
-            if (streamName !== "default") {
+            // TODO why the defaultStreamName is not part of mediaIds
+            if (streamName !== defaultStreamName) {
                 var mediaIds = buildMediaIds();
-                for (roomName in self.roomData) {
-                    if (self.roomData.hasOwnProperty(roomName)) {
-                        self.setRoomApiField(roomName, "mediaIds", mediaIds);
-                    }
-                }
+
+                // Update all room with mediaIds
+                self.setUserApiFields( "mediaIds", mediaIds);
             }
         }
     }
@@ -5751,7 +5833,7 @@ var Easyrtc = function() {
      *        document.getElementById("errMessageDiv").innerHTML += errorObject.errorText;
      *    });
      */
-    self.setOnError = function(errListener) {
+    this.setOnError = function(errListener) {
         self.onError = errListener;
     };
 
@@ -5906,7 +5988,7 @@ var Easyrtc = function() {
      *
      */
     this.setUsername = function(username) {
-        if( self.myEasyrtcid ) {
+        if (self.myEasyrtcid) {
             self.showError(self.errCodes.DEVELOPER_ERR, "easyrtc.setUsername called after authentication");
             return false;
         }
@@ -6114,9 +6196,9 @@ var Easyrtc = function() {
             }
         }
 
-        // Get mediaIds from user roomData
-        for (var roomName in self.roomData) {
-            if (self.roomData.hasOwnProperty(roomName)) {
+        // Get mediaIds from user roomJoin
+        for (var roomName in self.roomJoin) {
+            if (self.roomJoin.hasOwnProperty(roomName)) {
                 var mediaIds = self.getRoomApiField(roomName, otherUser, "mediaIds");
                 keyToMatch = mediaIds ? mediaIds[streamName] : null;
                 if (keyToMatch) {
@@ -6269,6 +6351,7 @@ var Easyrtc = function() {
         }
 
         lastLoggedInList = {};
+
         self.emitEvent("roomOccupant", {});
 
         self.roomData = {};
@@ -6276,10 +6359,9 @@ var Easyrtc = function() {
         self.roomApiFields = {};
 
         self.loggingOut = false;
-        
         self.myEasyrtcid = null;
         userConfig = {};
-        
+
         self.disconnecting = false;
     }
 
