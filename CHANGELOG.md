@@ -1,6 +1,14 @@
 EasyRTC: Change Log
 ===================
 
+v.2.1.6
+-------
+Changes:
+- Add and use defaultStreamName variable 
+- Add setUserApiField and setUserApiFields alias to setRoomApiField to set all rooms fields or selected room only
+- Fix mediaIds changed notifying the wrong rooms aven after leaving
+
+
 v.2.1.5
 -------
 Changes:
