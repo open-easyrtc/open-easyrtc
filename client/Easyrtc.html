@@ -12580,6 +12580,130 @@ the ice server configuration on the client or if you are using TURN certificates
         
             
 <dt>
+    <h4 class="name" id="setOnError"><span class="type-signature"></span>setOnError<span class="signature">(errListener)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Sets the easyrtc.onError field to a user specified function.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+<div class="params-table-container">
+  <table class="params table table-striped">
+      <thead>
+    <tr>
+      
+      <th>Name</th>
+      
+  
+      <th>Type</th>
+  
+      
+  
+      
+  
+      <th class="last">Description</th>
+    </tr>
+    </thead>
+  
+    <tbody>
+    
+  
+          <tr>
+              
+                  <td class="name"><code>errListener</code></td>
+              
+  
+              <td class="type">
+              
+                  
+<span class="param-type">function</span>
+
+
+              
+              </td>
+  
+              
+  
+              
+  
+              <td class="description last">takes an object of the form {errorCode: String, errorText: String}</td>
+          </tr>
+  
+    
+    </tbody>
+  </table>
+</div>
+
+    
+    
+    
+<dl class="details">
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+
+  
+
+  
+
+  
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">easyrtc.setOnError( function(errorObject){
+       document.getElementById(&quot;errMessageDiv&quot;).innerHTML += errorObject.errorText;
+   });</pre>
+
+
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="setOnStreamClosed"><span class="type-signature"></span>setOnStreamClosed<span class="signature">(onStreamClosed)</span><span class="type-signature"></span></h4>
     
     
@@ -13338,7 +13462,7 @@ The most specific case takes priority over the more general.
     
     
     <div class="description">
-        Provide a set of application defined fields that will be part of this instances
+        Populate room participants field value to provide a set of application defined fields that will be part of this instances
 configuration information. This data will get sent to other peers via the websocket
 path.
     </div>
@@ -14686,6 +14810,337 @@ of where the call was initiated (caller or callee).
     
     
     
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="setUserApiField"><span class="type-signature"></span>setUserApiField<span class="signature">(fieldName, fieldValue, roomNames)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Populate rooms participants field value Provide a set of application defined fields that will be part of this instances
+configuration information. This data will get sent to other peers via the websocket
+path.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+<div class="params-table-container">
+  <table class="params table table-striped">
+      <thead>
+    <tr>
+      
+      <th>Name</th>
+      
+  
+      <th>Type</th>
+  
+      
+  
+      
+  
+      <th class="last">Description</th>
+    </tr>
+    </thead>
+  
+    <tbody>
+    
+  
+          <tr>
+              
+                  <td class="name"><code>fieldName</code></td>
+              
+  
+              <td class="type">
+              
+                  
+<span class="param-type">String</span>
+
+
+              
+              </td>
+  
+              
+  
+              
+  
+              <td class="description last">the name of the field.</td>
+          </tr>
+  
+    
+  
+          <tr>
+              
+                  <td class="name"><code>fieldValue</code></td>
+              
+  
+              <td class="type">
+              
+                  
+<span class="param-type">Object</span>
+
+
+              
+              </td>
+  
+              
+  
+              
+  
+              <td class="description last">the value of the field.</td>
+          </tr>
+  
+    
+  
+          <tr>
+              
+                  <td class="name"><code>roomNames</code></td>
+              
+  
+              <td class="type">
+              
+                  
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Array.&lt;String></span>
+
+
+              
+              </td>
+  
+              
+  
+              
+  
+              <td class="description last">an optional list of roomNmaes to apply user fields.</td>
+          </tr>
+  
+    
+    </tbody>
+  </table>
+</div>
+
+    
+    
+    
+<dl class="details">
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+
+  
+
+  
+
+  
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">easyrtc.setUserApiField(&quot;favorite_alien&quot;, &quot;Mr Spock&quot;, [&quot;trekkieRoom&quot;,  &quot;bobRoom&quot;]);
+  easyrtc.setRoomOccupantListener( function(roomName, list){
+     for( var i in list ){
+        console.log(&quot;easyrtcid=&quot; + i + &quot; favorite alien is &quot; + list[i].apiFields.favorite_alien);
+     }
+  });</pre>
+
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="setUserApiFields"><span class="type-signature"></span>setUserApiFields<span class="signature">(fields, roomNames)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Populate rooms participants field value Provide a set of application defined fields, see setUserApiField method.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+<div class="params-table-container">
+  <table class="params table table-striped">
+      <thead>
+    <tr>
+      
+      <th>Name</th>
+      
+  
+      <th>Type</th>
+  
+      
+  
+      
+  
+      <th class="last">Description</th>
+    </tr>
+    </thead>
+  
+    <tbody>
+    
+  
+          <tr>
+              
+                  <td class="name"><code>fields</code></td>
+              
+  
+              <td class="type">
+              
+                  
+<span class="param-type">String</span>
+
+
+              
+              </td>
+  
+              
+  
+              
+  
+              <td class="description last">set of application defined fields.</td>
+          </tr>
+  
+    
+  
+          <tr>
+              
+                  <td class="name"><code>roomNames</code></td>
+              
+  
+              <td class="type">
+              
+                  
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Array.&lt;String></span>
+
+
+              
+              </td>
+  
+              
+  
+              
+  
+              <td class="description last">an optional list of roomNmaes to apply user fields.</td>
+          </tr>
+  
+    
+    </tbody>
+  </table>
+</div>
+
+    
+    
+    
+<dl class="details">
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+
+  
+
+  
+
+  
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">easyrtc.setUserApiFields({&quot;favorite_alien&quot;, &quot;Mr Spock&quot;}, &quot;trekkieRoom&quot;);
+  easyrtc.setRoomOccupantListener( function(roomName, list){
+     for( var i in list ){
+        console.log(&quot;easyrtcid=&quot; + i + &quot; favorite alien is &quot; + list[i].apiFields.favorite_alien);
+     }
+  });</pre>
+
+
     
 </dd>
 
@@ -16145,7 +16600,7 @@ close sockets that were supplied with easyrtc.useThisSocketConnection.
           
     <span class="jsdoc-message">
     Documentation generated by <a href="https://github.com/jsdoc3/jsdoc" target="_blank">JSDoc 3.6.11</a>
-    on 2026-01-28T13:02:15+00:00
+    on 2026-02-10T11:13:43+00:00
     </span>
         </footer>
       </div>
