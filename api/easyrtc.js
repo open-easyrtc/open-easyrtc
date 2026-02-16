@@ -4700,6 +4700,14 @@ var Easyrtc = function() {
      */
     this.setUserApiField = function(fieldName, fieldValue, roomNames) {
 
+        if (!fieldName || typeof fieldName !== 'string') {
+            throw "Developer error: attempt to use setUserApiField with invalid fieldName array of string or string";
+        }
+
+        if (roomNames && (typeof roomNames !== 'string' || Array.isArray(roomNames) === false)) {
+            throw "Developer error: attempt to use setUserApiField with invalid roomNames array of string or string";
+        }
+
         // Ensure roomNames is null or array
         roomNames = Array.isArray(roomNames) ? roomNames : 
             // If string make it array single value
@@ -4729,6 +4737,11 @@ var Easyrtc = function() {
      *   });
      */
     this.setUserApiFields = function(fields, roomNames) {
+
+        if (typeof fields === 'string' || Array.isArray(fields)) {
+            throw "Developer error: attempt to use setUserApiFields with invalid fields object";
+        }
+
         for (var fieldName in fields) {
             if (fields.hasOwnProperty(fieldName)) {
                 self.setUserApiField(fieldName, fields[fieldName], roomNames)
@@ -5061,7 +5074,7 @@ var Easyrtc = function() {
             var mediaIds = buildMediaIds();
 
             // Update all room with mediaIds
-            self.setUserApiFields( "mediaIds", mediaIds);
+            self.setUserApiField( "mediaIds", mediaIds);
         }
     }
 
@@ -5321,7 +5334,7 @@ var Easyrtc = function() {
                 var mediaIds = buildMediaIds();
 
                 // Update all room with mediaIds
-                self.setUserApiFields( "mediaIds", mediaIds);
+                self.setUserApiField( "mediaIds", mediaIds);
             }
         }
     }
