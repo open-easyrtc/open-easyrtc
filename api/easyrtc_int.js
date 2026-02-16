@@ -1386,7 +1386,7 @@ var Easyrtc = function() {
     this.setUserApiField = function(fieldName, fieldValue, roomNames) {
 
         if (!fieldName || typeof fieldName !== 'string') {
-            throw "Developer error: attempt to use setUserApiField with invalid fieldName array of string or string";
+            throw "Developer error: attempt to use setUserApiField with invalid fieldName string";
         }
 
         if (roomNames && (typeof roomNames !== 'string' || Array.isArray(roomNames) === false)) {
