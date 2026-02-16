@@ -1,6 +1,10 @@
 EasyRTC: Change Log
 ===================
 
+v.2.1.7
+-------
+- Fix mediaIds setUserApiField usage
+
 v.2.1.6
 -------
 Changes:
