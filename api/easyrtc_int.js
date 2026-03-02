@@ -3718,6 +3718,14 @@ var Easyrtc = function() {
             peerStream.streamName = remoteName;
 
             var tracks = peerStream.getTracks();
+
+            peerStream.addEventListener('addtrack', function (e) {
+                var trackIndex = tracks.indexOf(e.track);
+                if (trackIndex === -1) {
+                    tracks.push(e.track)
+                }
+            });
+
             peerStream.addEventListener('removetrack', function (e) {
                 var trackIndex = tracks.indexOf(e.track);
                 if (trackIndex !== -1) {
