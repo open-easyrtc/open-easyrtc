@@ -1,6 +1,10 @@
 EasyRTC: Change Log
 ===================
 
+v.2.1.8
+-------
+- Fix bad emitOnStreamClosed event on track change on remote media stream.
+
 v.2.1.7
 -------
 - Fix mediaIds setUserApiField usage

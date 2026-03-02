@@ -4701,7 +4701,7 @@ var Easyrtc = function() {
     this.setUserApiField = function(fieldName, fieldValue, roomNames) {
 
         if (!fieldName || typeof fieldName !== 'string') {
-            throw "Developer error: attempt to use setUserApiField with invalid fieldName array of string or string";
+            throw "Developer error: attempt to use setUserApiField with invalid fieldName string";
         }
 
         if (roomNames && (typeof roomNames !== 'string' || Array.isArray(roomNames) === false)) {
@@ -7033,6 +7033,14 @@ var Easyrtc = function() {
             peerStream.streamName = remoteName;
 
             var tracks = peerStream.getTracks();
+
+            peerStream.addEventListener('addtrack', function (e) {
+                var trackIndex = tracks.indexOf(e.track);
+                if (trackIndex === -1) {
+                    tracks.push(e.track)
+                }
+            });
+
             peerStream.addEventListener('removetrack', function (e) {
                 var trackIndex = tracks.indexOf(e.track);
                 if (trackIndex !== -1) {
