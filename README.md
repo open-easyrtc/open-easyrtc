@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./docs/images/open-easyrtc_logo.svg" alt="Open-EasyRTC" width="200" height="60">
+</p>
+
 Open-EasyRTC
 =======
 
@@ -65,6 +69,8 @@ All documentation can be found within [the docs folder](./docs/).
      * `https://open-easyrtc.github.io/open-easyrtc/client/Easyrtc_App.html`
 
 **General Development**
+ * [Brand assets](./docs/brand.md)
+     * `/docs/brand.md`
  * [Frequently asked questions](./docs/easyrtc_faq.md)
      * `/docs/easyrtc_faq.md`
  * [Authentication](./docs/easyrtc_authentication.md/)
