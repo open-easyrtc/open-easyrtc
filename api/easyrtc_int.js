@@ -2602,7 +2602,9 @@ var Easyrtc = function() {
         }
         else {
             if (!receivePeer.msgTypes[msgType]) {
-                receivePeer.msgTypes[msgType] = {sources: {}};
+                receivePeer.msgTypes[msgType] = {
+                    sources: {}
+                };
             }
             if (!source) {
                 receivePeer.msgTypes[msgType].cb = listener;
@@ -5747,48 +5749,48 @@ var Easyrtc = function() {
      * @param {Function} failureCB called if the room can not be joined. The arguments of failureCB are errorCode, errorText, roomName.
      */
     this.joinRoom = function(roomName, roomParameters, successCB, failureCB) {
+
         if (self.roomJoin[roomName]) {
             self.showError(self.errCodes.DEVELOPER_ERR, "Attempt to join room " + roomName + " which you are already in.");
             return;
         }
+
         
+        if (roomParameters) {
+            try {
+                JSON.stringify(roomParameters);
+            } catch (error) {
+                self.showError(self.errCodes.DEVELOPER_ERR, "non-jsonable parameter to easyrtc.joinRoom");
+                throw "Developer error, see application error messages";
+            }
+            var parameters = {};
+            for (var key in roomParameters) {
+                if (roomParameters.hasOwnProperty(key)) {
+                    parameters[key] = roomParameters[key];
+                }
+            }
+        }
+
+        var newRoomData = {
+            roomName: roomName,
+            roomParameter: parameters
+        };
+
+        // Add to the queue for connect rooms with parameters
+        self.roomJoin[roomName] = newRoomData
+
+        // Check Signaling is ready
         if (self.webSocket) {
 
             var msgData = {
-                roomJoin: {}
-            };
-        
-            var newRoomData = {
-                roomName: roomName
-            };
-            
-            if (roomParameters) {
-                try {
-                    JSON.stringify(roomParameters);
-                } catch (error) {
-                    self.showError(self.errCodes.DEVELOPER_ERR, "non-jsonable parameter to easyrtc.joinRoom");
-                    throw "Developer error, see application error messages";
+                roomJoin: {
+                    [roomName]: newRoomData
                 }
-                var parameters = {};
-                for (var key in roomParameters) {
-                    if (roomParameters.hasOwnProperty(key)) {
-                        parameters[key] = roomParameters[key];
-                    }
-                }
-
-                newRoomData.roomParameter = parameters;
-            }
-
-            msgData.roomJoin[roomName] = newRoomData;
+            };
 
             sendSignalling(
                 null, "roomJoin", msgData, 
                 function signallingSuccess(msgType, msgData) {
-
-                    // Create empty room data
-                    self.roomJoin[roomName] = {
-                        roomName: roomName
-                    };
 
                     var roomData = msgData.roomData;
 
@@ -5815,11 +5817,6 @@ var Easyrtc = function() {
                 }
             );
         }
-        else {
-            logDebug("websocket failed because no connection to server");
-
-            throw "Attempt to join room without a valid connection to the server.";
-        }
     };
 
     /**
@@ -5836,6 +5833,8 @@ var Easyrtc = function() {
     this.leaveRoom = function(roomName, successCallback, failureCallback) {
         var roomItem;
         if (self.roomJoin[roomName]) {
+
+            // Not connected to websocket yet
             if (!self.webSocket) {
                 delete self.roomJoin[roomName];
             }
