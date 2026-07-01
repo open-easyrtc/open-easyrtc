@@ -5755,25 +5755,29 @@ var Easyrtc = function() {
             return;
         }
 
+        var newRoomData = {
+            roomName: roomName
+        };
+
+        // Serialize room parameters
         if (roomParameters) {
+
             try {
                 JSON.stringify(roomParameters);
             } catch (error) {
                 self.showError(self.errCodes.DEVELOPER_ERR, "non-jsonable parameter to easyrtc.joinRoom");
                 throw "Developer error, see application error messages";
             }
+
             var parameters = {};
             for (var key in roomParameters) {
                 if (roomParameters.hasOwnProperty(key)) {
                     parameters[key] = roomParameters[key];
                 }
             }
-        }
 
-        var newRoomData = {
-            roomName: roomName,
-            roomParameter: parameters
-        };
+            newRoomData.roomParameter = parameters
+        }
 
         // Add to the queue for connect rooms with parameters
         if (!self.webSocket) {
