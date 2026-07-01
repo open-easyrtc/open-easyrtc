@@ -9070,7 +9070,6 @@ var Easyrtc = function() {
             return;
         }
 
-        
         if (roomParameters) {
             try {
                 JSON.stringify(roomParameters);
@@ -9109,8 +9108,6 @@ var Easyrtc = function() {
                 function signallingSuccess(msgType, msgData) {
 
                     var roomData = msgData.roomData;
-                    
-                    self.roomJoin[roomName] = newRoomData;
 
                     if (successCB) {
                         successCB(roomName);
