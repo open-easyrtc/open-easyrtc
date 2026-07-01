@@ -9109,6 +9109,8 @@ var Easyrtc = function() {
 
                     var roomData = msgData.roomData;
 
+                    self.roomJoin[roomName] = newRoomData;
+
                     if (successCB) {
                         successCB(roomName);
                     }
