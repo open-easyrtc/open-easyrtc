@@ -9092,10 +9092,11 @@ var Easyrtc = function() {
         };
 
         // Add to the queue for connect rooms with parameters
-        self.roomJoin[roomName] = newRoomData
+        if (!self.webSocket) {
+            self.roomJoin[roomName] = newRoomData
 
         // Check Signaling is ready
-        if (self.webSocket) {
+        } else {
 
             var msgData = {
                 roomJoin: {
@@ -9108,6 +9109,8 @@ var Easyrtc = function() {
                 function signallingSuccess(msgType, msgData) {
 
                     var roomData = msgData.roomData;
+                    
+                    self.roomJoin[roomName] = newRoomData;
 
                     if (successCB) {
                         successCB(roomName);
