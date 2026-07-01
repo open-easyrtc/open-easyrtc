@@ -4,8 +4,8 @@ module.exports = {
 	httpServer: {
 		protocol: process.env.HTTP_ONLY ? 'http' : 'https',
 		port: process.env.PORT || (process.env.HTTP_ONLY ? '8080' : '8443'),
-	    key:  fs.readFileSync(__dirname + "/certs/localhost.key"),
-	    cert: fs.readFileSync(__dirname + "/certs/localhost.cert")
+	    key:  process.env.PRIVATE_KEY || fs.readFileSync(__dirname + "/certs/localhost.key"),
+	    cert: process.env.PUBLIC_CERT || fs.readFileSync(__dirname + "/certs/localhost.cert")
 	},
 	socketServer: {
 	    "log level": 1,
