@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60" role="img" aria-labelledby="open-easyrtc-title open-easyrtc-desc">
+  <title id="open-easyrtc-title">Open-EasyRTC logo</title>
+  <desc id="open-easyrtc-desc">A rounded orange Open-EasyRTC wordmark with a white open communication ring and connected WebRTC nodes.</desc>
+  <defs>
+    <linearGradient id="open-easyrtc-bg" x1="0" y1="0" x2="200" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff7a1a"/>
+      <stop offset="1" stop-color="#f04f23"/>
+    </linearGradient>
+    <filter id="open-easyrtc-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#612000" flood-opacity=".22"/>
+    </filter>
+  </defs>
+  <rect width="200" height="60" rx="10" fill="url(#open-easyrtc-bg)"/>
+  <g filter="url(#open-easyrtc-shadow)">
+    <circle cx="31" cy="30" r="17" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-dasharray="75 18"/>
+    <path d="M42.5 20.5h12a6 6 0 0 1 6 6v7a6 6 0 0 1-6 6h-5.8l-7 6.2v-6.2h-2.5" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="23" cy="30" r="3.4" fill="#ffffff"/>
+    <circle cx="31" cy="30" r="3.4" fill="#ffffff"/>
+    <circle cx="39" cy="30" r="3.4" fill="#ffffff"/>
+  </g>
+  <g font-family="Arial, Helvetica, sans-serif" letter-spacing="0">
+    <text x="73" y="27" fill="#ffffff" font-size="19" font-weight="700">Open</text>
+    <text x="73" y="46" fill="#241008" font-size="21" font-weight="700">EasyRTC</text>
+  </g>
+</svg>
