@@ -51,7 +51,7 @@
   },
   "devDependencies": {
     "fs": "0.0.2",
-    "grunt": "1.5",
+    "grunt": "1.6",
     "grunt-contrib-clean": "^2.0.1",
     "grunt-contrib-connect": "^3.0.0",
     "grunt-contrib-csslint": "^2.0.0",
