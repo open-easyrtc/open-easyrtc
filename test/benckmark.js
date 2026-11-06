@@ -38,7 +38,7 @@ class ConnectionBenchmark {
         msgType: 'authenticate',
         msgData: {
           apiVersion: "1.0.11",
-          applicationName: "sylaps.com",
+          applicationName: "example.com",
           username: `test ${id}`,
           setPresence: {
               show: 'chat',
